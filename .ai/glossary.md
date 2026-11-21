@@ -13,7 +13,10 @@
 | **Temperatura energética**   | Escala de fechamento do dia: 😶 Anestesiada, 🌑 Lua nova, 🌓 Crescendo, 🌕 Lua cheia, 🔥 Chama acesa.                          |
 | **Revisão semanal**          | Dias 7, 14 e 21: integração do que se moveu na semana.                                                                         |
 | **Vitórias / Chamas Acesas** | Registro livre de conquistas, para ancorar a nova identidade.                                                                  |
-| **Protocolo Presencial**     | Sessão 1:1 com a Andreia, oferecida no encerramento da jornada.                                                                |
+| **Protocolo Presencial**     | Sessão 1:1 com a Andreía, oferecida no encerramento da jornada.                                                                |
+| **Zerando o Dia**            | Encontro ao vivo recorrente: encerrar o dia com uma percepção diferente. Tom espontâneo e reflexivo.                           |
+| **Pausa Sagrada**            | Encontro ao vivo recorrente: uma pausa consciente no ritmo da semana. Tom contemplativo e sensorial.                           |
+| **Universo Atmavox**         | O posicionamento desde 2026-11: um espaço de consciência e possibilidades, não um catálogo de terapias.                        |
 
 ## As três semanas
 

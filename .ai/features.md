@@ -7,27 +7,47 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 
 ## F1 · Hub (página principal) 🔲
 
-**Objetivo:** substituir o atmavox.keepo.bio por uma página única, refinada, que leva a cada produto.
+**Objetivo:** substituir o atmavox.keepo.bio por uma página que apresenta o universo Atmavox
+(posicionamento novo: `purpose.md`) e leva a cada parte dele, pensada primeiro para o celular.
 
-**Seções, em ordem:**
+**Layout (decidido em 2026-11 com protótipos clicáveis):** o mesmo conteúdo em duas estruturas (ADR-010):
 
-1. Hero: "ATMAVOX · PROTOCOLO DE ATIVAÇÃO", título "Saindo do Estado Cinza", subtítulo, botão
-   "Ativar agora (leva 5 minutos)" que rola até o áudio.
-2. O Estado Cinza: texto curto e 3 sinais em cartões.
-3. Comece aqui (grátis): áudio "Retorne ao Seu Centro", com o YouTube incorporado.
-4. Jornadas: Ritual Matinal (lista de espera via WhatsApp), A Chama Interna 21 dias (→ `#/jornada`),
-   Sessão 1:1 (WhatsApp).
-5. Sobre a Andreia (foto e texto, com placeholder até ela enviar).
-6. Rodapé: redes sociais e assinatura.
+- **Celular (< 700 px): "app com abas".** Barra fixa embaixo com Início · Ouvir · Jornadas · Contato.
+  - Início: anéis + slogan + princípio editorial; cartão "Comece aqui" (áudio grátis); próximos encontros;
+    vídeo em destaque (quando houver).
+  - Ouvir: áudios e encontros gravados, com filtro (Tudo · Áudios · Encontros gravados).
+  - Jornadas: A Chama Interna (→ `#/jornada`), Ritual Matinal (lista de espera), Sessão individual.
+  - Contato: sobre a Andreía, botão do WhatsApp, redes, assinatura.
+- **Tablet e computador (≥ 700 px): "revista".** Página única com menu no topo: hero com pergunta
+  provocadora + anéis; Encontros (2 colunas); Conversas em vídeo (3 colunas, só se houver vídeos);
+  Jornadas (3 colunas); faixa com o princípio editorial; rodapé com redes e assinatura.
+- Rotas: `#/` (início), `#/ouvir`, `#/jornadas`, `#/contato`. No celular trocam a aba; no computador rolam
+  até a seção. Assim o mesmo link funciona nos dois.
+
+**Mídia (ADR-011):**
+
+- Áudio com **player próprio** (`<audio>` + MP3 no próprio site), com **mini player** fixo que continua
+  tocando ao trocar de aba ou rolar. Enquanto o MP3 de um áudio não existir, o cartão abre o vídeo do
+  YouTube.
+- Vídeos do YouTube como **fachada**: só a miniatura carrega; o player (`youtube-nocookie.com`) entra
+  quando a pessoa toca.
 
 **Regras:**
 
-- Todos os links e o número de WhatsApp ficam num só arquivo, `shared/brand/links.ts`, porque a jornada
-  também usa (áudio do dia 5, Protocolo Presencial). Textos do hub ficam em `features/hub/content.ts`.
+- Links e WhatsApp em `shared/brand/links.ts`; textos e listas do hub em `features/hub/content.ts`.
+- **Nada de marcador `[...]` publicado.** O que ainda não existe fica escondido ou ganha alternativa:
+  - horário dos encontros ausente → "Horários no Instagram";
+  - foto da Andreía ausente → anéis da marca no lugar;
+  - redes sem link confirmado (TikTok, Threads, Telegram) → não aparecem;
+  - sem vídeos → a seção de vídeos não aparece.
 - Corrigir os problemas do Keepo: TikTok quebrado e botões "Lista de Espera" sem destino.
 
-**Aceite:** abre bem em celular de 360 px; todos os links funcionam; Lighthouse ≥ 90 em performance e
-acessibilidade; funciona nos dois temas.
+**Aceite:** abre bem em celular de 360 px e no computador; todos os links funcionam; o áudio continua
+tocando ao trocar de aba; Lighthouse ≥ 90 em performance e acessibilidade; funciona nos dois temas.
+
+**Pendências com a Andreía:** horários dos encontros; MP3 do "Retorne ao Seu Centro"; foto e texto curto;
+@ do TikTok, Threads e Telegram; textos novos do hub (hero, descrições), que foram escritos a partir do PDF
+de posicionamento.
 
 ---
 

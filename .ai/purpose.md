@@ -2,12 +2,18 @@
 
 ## A marca
 
-**ATMAVOX — Protocolo de Ativação de Energia, Presença e Direção.** Criada pela terapeuta
-**Andreia Oliveira**. Trabalha autoconhecimento, presença e jornadas individuais, com práticas como
-respiração, escrita reflexiva, PNL, radiestesia, fitoenergética e aromaterapia.
+**ATMAVOX — Consciência, presença e expansão.** Criada pela terapeuta **Andreía Oliveirà** (grafia
+oficial, com acentos, por numerologia: use sempre assim em textos públicos). Trabalha autoconhecimento,
+presença e jornadas individuais, com práticas como respiração, escrita reflexiva, PNL, radiestesia, Reiki,
+Barras de Access, Desenho Humano, fitoenergética e aromaterapia.
 
-A ideia central: muitas pessoas vivem no **Estado Cinza** (pedem permissão para existir, procrastinam,
-perdem energia sem razão). A Atmavox as ajuda a **acender a Chama Interna** e agir com direção.
+**Posicionamento (desde 2026-11):** "Ativadora de consciência e possibilidades". A marca deixou de ser uma
+resposta à dor e passou a ser **uma janela para possibilidades**: provoca perguntas em vez de prometer
+transformação, sem tom de venda ou funil. O **Estado Cinza** continua como conceito (e dá nome à jornada
+de 21 dias), mas não é mais o centro da comunicação. Princípio editorial: _"Não estamos aqui para ensinar
+você a viver. Estamos aqui para explorar tudo aquilo que você ainda não descobriu sobre estar vivo."_
+
+**Palavra a evitar** nos textos da marca: "direção" (pedido da Andreía). Ver `brand.md`.
 
 ## Para quem é
 
@@ -16,12 +22,14 @@ mas estão travadas. Não são pessoas técnicas: tudo precisa ser óbvio, acolh
 
 ## O que este projeto entrega
 
-1. **Hub** (`/`): a página da bio do Instagram. Apresenta a marca e leva a cada produto:
-   - áudio gratuito **"Retorne ao Seu Centro"** (5 min, YouTube), que é a porta de entrada;
-   - **Ritual Matinal** (7 dias), lista de espera;
+1. **Hub** (`/`): a página da bio do Instagram. Apresenta o universo Atmavox e leva a cada parte dele:
+   - áudio gratuito **"Retorne ao Seu Centro"** (5 min), que é a porta de entrada;
+   - encontros ao vivo recorrentes: **Zerando o Dia** e **Pausa Sagrada**;
    - **A Chama Interna** (21 dias), que leva à jornada deste projeto;
-   - **Sessão de Ativação 1:1** (45 min), contato pelo WhatsApp;
-   - redes sociais (Instagram, Facebook, YouTube, TikTok, WhatsApp).
+   - **Ritual Matinal** (7 dias), lista de espera;
+   - **Sessão individual** (45 min), contato pelo WhatsApp;
+   - áudios e vídeos (conversas, encontros gravados) conforme forem publicados;
+   - redes sociais (Instagram, Facebook, YouTube, TikTok, Threads, Telegram, WhatsApp).
 2. **Jornada** (`/jornada`): workbook interativo de 21 dias, com rituais, reflexões escritas, afirmações,
    revisões semanais e registro de vitórias.
 
@@ -37,10 +45,10 @@ mas estão travadas. Não são pessoas técnicas: tudo precisa ser óbvio, acolh
 
 - Venda ou pagamento dentro do site.
 - Bloquear conteúdo para quem não comprou: a jornada é aberta.
-- Painel administrativo para a Andreia.
+- Painel administrativo para a Andreía.
 - App nativo.
 
 ## Pessoas
 
-- **Andreia Oliveira**: dona da marca e do conteúdo. Aprova textos e mudanças visuais.
+- **Andreía Oliveirà**: dona da marca e do conteúdo. Aprova textos e mudanças visuais.
 - **Desenvolvedor (filho dela)**: mantém o código com o Claude Code.

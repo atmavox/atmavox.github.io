@@ -64,6 +64,10 @@ versão com data.
 
 ### Alterado
 
+- Reposicionamento da marca na documentação: slogan "Consciência, presença e expansão", tom de voz por
+  perguntas e sem venda, assinatura "Com presença — Andreía Oliveirà", grafia oficial do nome e
+  especificação nova do hub (abas no celular, revista no computador; ADR-010 e ADR-011).
+
 - TypeScript estrito (`strict` e `noUncheckedIndexedAccess`) no app e na config do Vite.
 - Versão do Node na documentação: de 22 para 24 LTS.
 - ESLint de 10 para 9, por compatibilidade com o jsx-a11y (ADR-008).

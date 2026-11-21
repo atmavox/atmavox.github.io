@@ -43,12 +43,34 @@ Elementos recorrentes: **três anéis concêntricos** girando devagar com um pon
 - **Playfair Display**: títulos, números dos dias, afirmações (itálico).
 - **Jost**: texto corrido e interface. Rótulos em CAIXA ALTA com espaçamento largo (`tracking` 0.15–0.3em).
 
+## Nome, slogan e assinatura
+
+- **Nome:** **Andreía Oliveirà**, sempre com os dois acentos (numerologia). Vale para todo texto público:
+  site, metadados, mensagens prontas de WhatsApp. No código, o nome vem de `shared/brand/links.ts`.
+- **Slogan:** "Consciência, presença e expansão." (substituiu "Protocolo de Ativação de Energia, Presença
+  e Direção" em 2026-11).
+- **Assinatura:** "Com presença — Andreía Oliveirà" (com travessão). Fica em `BRAND_SIGNATURE` e aparece
+  no rodapé do hub e no fim do Encerramento da jornada.
+- **Posicionamento:** "Ativadora de consciência e possibilidades."
+
 ## Tom de voz
 
+Fonte: conversa de posicionamento da Andreía (PDF "Posicionamento do Atmavox", 2026-11, fora do repo).
+
 - Segunda pessoa, no feminino ("presa", "guiada", "honesta").
-- Direto, acolhedor e firme. Frases curtas. Nada de jargão técnico nem promessas exageradas.
-- Palavras da marca: presença, ativação, chama, cinza, direção, ancorar, mover, ritual.
-- Assinatura: "Com presença e direção — Andreia Oliveira · ATMAVOX".
+- **Perguntas em vez de respostas prontas.** Oferecer perspectiva, não empurrar transformação.
+- Observadora sem ser passiva; provocadora sem ser agressiva; profunda sem ser complicada; espiritual sem
+  frases prontas; leve sem perder inteligência.
+- **Sem tom de venda:** nada de funil, urgência ou promessa. Ofertas pagas são extensões naturais do
+  universo, nunca o centro.
+- Não prometer que ferramentas energéticas substituem acompanhamento psicológico ou médico.
+- Palavras da marca: consciência, presença, expansão, possibilidades, perceber, experimentar, ativação,
+  chama, ritual.
+- **Evitar "direção"** em textos novos da marca. Ocorrências dentro do conteúdo da jornada (Semana III, dia
+  17, revisões) são texto da Andreía e só mudam com aprovação dela (pendente).
+- Encontros recorrentes: **Zerando o Dia** (consciência e perspectiva: "O que hoje merece ser percebido de
+  outra maneira?") e **Pausa Sagrada** (presença e experiência: "O que você consegue perceber quando deixa
+  de tentar resolver tudo por alguns instantes?").
 
 ## Links
 
@@ -60,8 +82,12 @@ Elementos recorrentes: **três anéis concêntricos** girando devagar com um pon
 | Facebook                      | https://facebook.com/atmavox                      |
 | YouTube                       | https://youtube.com/@atmavox                      |
 | TikTok                        | **confirmar o @** (no Keepo o link está quebrado) |
+| Threads                       | **confirmar**                                     |
+| Telegram                      | **confirmar** (canal/grupo)                       |
 | WhatsApp                      | https://wa.me/5547991889442                       |
 | Página antiga (Keepo)         | https://atmavox.keepo.bio                         |
 
-Mensagens prontas de WhatsApp usam `?text=` codificado, uma por produto (ex.: "Olá, Andreia! Quero entrar
+Redes sem link confirmado **não aparecem** no site até serem confirmadas.
+
+Mensagens prontas de WhatsApp usam `?text=` codificado, uma por produto (ex.: "Olá, Andreía! Quero entrar
 na lista de espera do Ritual Matinal de 7 dias.").

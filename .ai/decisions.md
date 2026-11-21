@@ -91,6 +91,34 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ o hub não baixa o código da jornada (~13 kB gzip a menos); a `ui/` só conhece
   interfaces. ➖ um instante de carregamento ao abrir a jornada pela primeira vez.
 
+## ADR-010 · Hub com duas estruturas: abas no celular, revista no computador
+
+- **Status:** aceita · 2026-11-21
+- **Contexto:** o público chega pelo Instagram no celular, mas o site também será aberto no computador.
+  Foram comparados três layouts em protótipos clicáveis (lista, revista, app com abas) em quatro tamanhos.
+- **Decisão:** abaixo de 700 px, "app com abas" (Início · Ouvir · Jornadas · Contato, barra embaixo); a
+  partir de 700 px, "revista" (página única com menu no topo). Os blocos (cartões de áudio, encontro,
+  jornada, redes) são os mesmos componentes nas duas; só a composição muda. A escolha é feita por
+  `matchMedia` (um hook), não por CSS escondendo uma das duas, para não duplicar o DOM nem ids.
+- **Alternativas consideradas:** uma estrutura só com CSS responsivo (mais simples, mas abas no
+  computador ou página longa no celular pioravam a experiência de um dos lados).
+- **Consequências:** ➕ cada tela tem a navegação que lhe cabe; rotas `#/ouvir` etc. funcionam nas duas.
+  ➖ duas composições para manter (os blocos são compartilhados para limitar isso).
+
+## ADR-011 · Player de áudio próprio e vídeos com fachada
+
+- **Status:** aceita · 2026-11-21
+- **Contexto:** o site vai ter áudios (práticas, encontros gravados) e vídeos. Embutir o YouTube direto
+  pesa (~1 MB por player), rastreia e o áudio para quando a tela do celular bloqueia.
+- **Decisão:** áudios em MP3 servidos pelo próprio GitHub Pages (`public/audio/`), tocados por um
+  `<audio>` único controlado por um store em `shared/` (mini player persistente, Media Session para a
+  tela bloqueada). Vídeos do YouTube como fachada: miniatura + botão; o iframe de
+  `youtube-nocookie.com` só entra ao tocar.
+- **Alternativas consideradas:** só YouTube (simples, mas visual e comportamento ruins para áudio);
+  serviços de podcast/SoundCloud (contas externas, visual de terceiros).
+- **Consequências:** ➕ leve, bonito, funciona com a tela bloqueada, custo zero. ➖ arquivos de áudio no
+  repositório (manter cada um com poucos MB; o Pages tem limite de 1 GB por site).
+
 ---
 
 ## Modelo

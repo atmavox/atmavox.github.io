@@ -1,6 +1,7 @@
 # CLAUDE.md — Atmavox
 
-Site oficial da **ATMAVOX**, marca da terapeuta **Andreia Oliveira** (autoconhecimento, presença e jornadas
+Site oficial da **ATMAVOX**, marca da terapeuta **Andreía Oliveirà** (grafia oficial com acentos, por
+numerologia; use sempre assim em textos públicos) (autoconhecimento, presença e jornadas
 individuais). Um único projeto com duas partes:
 
 - **Hub** (`/`): página principal da marca, que leva a todos os produtos. Substitui o atmavox.keepo.bio.
