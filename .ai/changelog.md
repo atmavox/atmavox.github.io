@@ -46,6 +46,9 @@ versão com data.
   hora no `localStorage` e continua lá ao recarregar.
 - Rotas por hash e carregamento sob demanda da jornada (ADR-009).
 - Marcação mínima nos textos (`**negrito**`, `*itálico*`, `[link](https://…)`) com `RichText`.
+- Mídia (ADR-011, `shared/media`): player de áudio único para o site todo, com mini player fixo (pausar,
+  voltar 15 s, posição, fechar), controles na tela bloqueada (Media Session) e vídeos do YouTube com
+  fachada (o player só carrega ao tocar). Ícones com `lucide-react`.
 - Abas com evolução (F3): cada aba vai do cinza ao âmbar conforme o progresso, com barrinha, legenda
   (`14%`, `3/7`, `4/11`…) e ✦ quando completa; barra de progresso geral no cabeçalho.
 
