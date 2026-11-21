@@ -63,7 +63,7 @@ Os demais arquivos da `.ai/` devem ser lidos **sob demanda**, conforme a tarefa 
 ## Comandos
 
 ```bash
-npm install         # Node 22 LTS
+npm install         # Node 24 LTS (.nvmrc)
 npm run dev         # http://localhost:5173
 npm run check       # typecheck + lint + testes (obrigatório antes de finalizar)
 npm run build       # build de produção em dist/

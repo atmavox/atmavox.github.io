@@ -74,3 +74,10 @@ chore: atualizar dependências
 
 Tipos: `feat`, `fix`, `refactor`, `style`, `test`, `docs`, `chore`, `ci`. Escopos: `hub`, `jornada`,
 `shared`, `ai`, `deploy`.
+
+**Sem vírgulas na mensagem.** Para dizer mais de uma coisa, separe com `+`:
+
+```
+chore: configurar Prettier + jsx-a11y + Vitest + script check     ✅
+chore: configurar Prettier, jsx-a11y, Vitest e script check       ❌
+```

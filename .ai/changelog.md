@@ -16,3 +16,8 @@ versão com data.
   decisões, roadmap e changelog.
 - HTML original do workbook guardado em `.ai/reference/workbook-original.html`.
 - `README.md` do projeto na raiz; o índice da `.ai/` passou para `.ai/README.md`.
+- `.nvmrc` fixando o Node 24 LTS.
+
+### Alterado
+- TypeScript estrito (`strict` e `noUncheckedIndexedAccess`) no app e na config do Vite.
+- Versão do Node na documentação: de 22 para 24 LTS.

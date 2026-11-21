@@ -15,7 +15,7 @@
 | Formatação      | **Prettier** + eslint-config-prettier           | Formatação automática sem brigar com o lint                     |
 | CI/CD           | **GitHub Actions** → GitHub Pages               | Grátis; deploy a cada push na `main`                            |
 | Hospedagem      | **GitHub Pages**, organização `atmavox`         | Grátis; URL limpa `atmavox.github.io`                           |
-| Node            | 22 LTS (`.nvmrc`)                               | Versão estável suportada pelo Vite                              |
+| Node            | 24 LTS (`.nvmrc`)                               | LTS ativa (a 22 está só em manutenção); suportada pelo Vite     |
 
 ## Regras para dependências
 
