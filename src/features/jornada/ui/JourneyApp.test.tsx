@@ -56,6 +56,17 @@ describe('JourneyApp', () => {
     expect(screen.getByText('1/21 dias')).toBeInTheDocument()
   })
 
+  it('marcar um dia atualiza a evolução da aba na hora', () => {
+    renderJourney('/jornada/semana-1')
+    const nav = screen.getByRole('navigation', { name: 'Etapas da jornada' })
+    expect(within(nav).getByRole('link', { name: /Semana I progresso: 0\/7/ })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dia 3 concluído' }))
+
+    expect(within(nav).getByRole('link', { name: /Semana I progresso: 1\/7/ })).toBeInTheDocument()
+    expect(within(nav).getByRole('link', { name: /Abertura progresso: 5%/ })).toBeInTheDocument()
+  })
+
   it('registra vitórias como texto puro, sem interpretar HTML', () => {
     renderJourney('/jornada/vitorias')
 

@@ -88,7 +88,7 @@ testes de conteúdo garantem 21 dias, revisões em 7/14/21, ids únicos e nenhum
 
 ---
 
-## F3 · Abas com evolução 🔲
+## F3 · Abas com evolução ✅
 
 **Objetivo:** cada aba mostra o quanto aquela etapa avançou, reforçando o conceito "sair do cinza".
 
@@ -108,6 +108,11 @@ testes de conteúdo garantem 21 dias, revisões em 7/14/21, ids únicos e nenhum
 - A aba ativa sempre usa a cor de texto principal.
 
 **Aceite:** marcar um dia atualiza a aba na hora; as cores são legíveis nos dois temas.
+
+**Implementação:** medidas puras em `domain/measures.ts`; `application/tabProgress.ts` liga cada aba à
+sua medida; `ui/JourneyHeader.tsx` desenha. Uma pergunta conta como respondida quando tem texto. Como
+`--gray-state` e `--accent` passam de 4,5:1 nos dois temas, as cores intermediárias também ficam
+legíveis.
 
 ---
 

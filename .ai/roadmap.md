@@ -11,13 +11,14 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Workflow de deploy no GitHub Pages (`.github/workflows/deploy.yml`)
 - [ ] Ativar o Pages: _Settings → Pages → Source → GitHub Actions_ (feito manualmente no GitHub)
 
-## Fase 1 · Tema e jornada (sem login) 🔲
+## Fase 1 · Tema e jornada (sem login) ✅
 
-- [ ] Tokens e tema claro/escuro (F4)
-- [ ] Domínio da jornada: tipos, progresso, merge, validação, com testes
-- [ ] Conteúdo dos 21 dias migrado, com os erros do original corrigidos (F2)
-- [ ] Telas da jornada salvando no `localStorage`
-- [ ] Abas com evolução (F3)
+- [x] Tokens e tema claro/escuro (F4)
+- [x] Domínio da jornada: tipos, progresso, merge, validação, com testes
+- [x] Conteúdo dos 21 dias migrado, com os erros do original corrigidos (F2)
+- [x] Telas da jornada salvando no `localStorage`
+- [x] Abas com evolução (F3)
+- [ ] Revisão visual no celular e validação dos textos com a Andreia (pendências em `features.md`, F2)
 
 ## Fase 2 · Hub 🔲
 

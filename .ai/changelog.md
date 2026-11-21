@@ -46,6 +46,8 @@ versão com data.
   hora no `localStorage` e continua lá ao recarregar.
 - Rotas por hash e carregamento sob demanda da jornada (ADR-009).
 - Marcação mínima nos textos (`**negrito**`, `*itálico*`, `[link](https://…)`) com `RichText`.
+- Abas com evolução (F3): cada aba vai do cinza ao âmbar conforme o progresso, com barrinha, legenda
+  (`14%`, `3/7`, `4/11`…) e ✦ quando completa; barra de progresso geral no cabeçalho.
 
 ### Corrigido
 
