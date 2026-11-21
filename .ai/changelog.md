@@ -11,13 +11,21 @@ versão com data.
 ## [Não lançado]
 
 ### Adicionado
+
 - Repositório `atmavox/atmavox.github.io` criado na organização `atmavox`.
 - `CLAUDE.md` e pasta `.ai/` com propósito, convenções, stack, arquitetura, marca, glossário, features,
   decisões, roadmap e changelog.
 - HTML original do workbook guardado em `.ai/reference/workbook-original.html`.
 - `README.md` do projeto na raiz; o índice da `.ai/` passou para `.ai/README.md`.
 - `.nvmrc` fixando o Node 24 LTS.
+- Prettier (com `eslint-config-prettier`), jsx-a11y, Vitest + Testing Library + jsdom.
+- Scripts `typecheck`, `test`, `test:watch`, `format`, `format:check` e `check`.
+- `no-restricted-imports` protegendo as camadas (`domain/` e `content/` puros) e as fronteiras
+  `hub/` ↔ `jornada/` ↔ `shared/`.
+- `.gitattributes` forçando quebra de linha LF.
 
 ### Alterado
+
 - TypeScript estrito (`strict` e `noUncheckedIndexedAccess`) no app e na config do Vite.
 - Versão do Node na documentação: de 22 para 24 LTS.
+- ESLint de 10 para 9, por compatibilidade com o jsx-a11y (ADR-008).

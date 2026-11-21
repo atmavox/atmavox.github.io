@@ -65,7 +65,8 @@ Os demais arquivos da `.ai/` devem ser lidos **sob demanda**, conforme a tarefa 
 ```bash
 npm install         # Node 24 LTS (.nvmrc)
 npm run dev         # http://localhost:5173
-npm run check       # typecheck + lint + testes (obrigatório antes de finalizar)
+npm run check       # typecheck + lint + formatação + testes (obrigatório antes de finalizar)
+npm run test:watch  # testes em modo contínuo
 npm run build       # build de produção em dist/
 npm run preview     # serve o build
 npm run format      # prettier

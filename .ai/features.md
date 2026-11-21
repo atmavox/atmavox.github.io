@@ -10,6 +10,7 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 **Objetivo:** substituir o atmavox.keepo.bio por uma página única, refinada, que leva a cada produto.
 
 **Seções, em ordem:**
+
 1. Hero: "ATMAVOX · PROTOCOLO DE ATIVAÇÃO", título "Saindo do Estado Cinza", subtítulo, botão
    "Ativar agora (leva 5 minutos)" que rola até o áudio.
 2. O Estado Cinza: texto curto e 3 sinais em cartões.
@@ -20,6 +21,7 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 6. Rodapé: redes sociais e assinatura.
 
 **Regras:**
+
 - Todos os links e o número de WhatsApp ficam num só arquivo (`features/hub/content.ts`).
 - Corrigir os problemas do Keepo: TikTok quebrado e botões "Lista de Espera" sem destino.
 
@@ -36,6 +38,7 @@ acessibilidade; funciona nos dois temas.
 **Telas (abas):** Abertura · Semana I · Semana II · Semana III · Revisões · Vitórias · Encerramento.
 
 **Estrutura de um dia:** lista de seções tipadas:
+
 - `checkin` (emoções), `ritual`, `prompt` (pergunta + campo), `affirmation` (reescrevível), `closing`
   (temperatura energética + campo curto).
 - Dias 1–7 têm seções próprias; dias 8–21 seguem o formato padrão
@@ -50,6 +53,7 @@ acessibilidade; funciona nos dois temas.
 `parseProgress` que copie o valor antigo para o novo id.
 
 **Problemas do HTML original a corrigir na migração:**
+
 - Só o rastreador era salvo: reflexões, emoções, humor e vitórias **sumiam ao recarregar**.
 - Letras cirílicas: "Neutра" (dia 1) e "aprenди" (dia 3).
 - Semana II definida duas vezes (versões diferentes). Use a mais completa, do `<script>` dentro da Semana II.
@@ -67,13 +71,14 @@ testes de conteúdo garantem 21 dias, revisões em 7/14/21, ids únicos e nenhum
 **Objetivo:** cada aba mostra o quanto aquela etapa avançou, reforçando o conceito "sair do cinza".
 
 **Regras:**
-| Aba          | Medida                                        | Legenda  |
-| ------------ | --------------------------------------------- | -------- |
-| Abertura     | dias concluídos / 21                          | `14%`    |
-| Semana I–III | dias concluídos na semana / 7                 | `3/7`    |
-| Revisões     | perguntas respondidas / 11                    | `4/11`   |
-| Vitórias     | vitórias registradas (meta 7 para "acender")  | `2`      |
-| Encerramento | campos respondidos / 4                        | `1/4`    |
+
+| Aba          | Medida                                       | Legenda |
+| ------------ | -------------------------------------------- | ------- |
+| Abertura     | dias concluídos / 21                         | `14%`   |
+| Semana I–III | dias concluídos na semana / 7                | `3/7`   |
+| Revisões     | perguntas respondidas / 11                   | `4/11`  |
+| Vitórias     | vitórias registradas (meta 7 para "acender") | `2`     |
+| Encerramento | campos respondidos / 4                       | `1/4`   |
 
 - Cor do texto da aba: `color-mix(in oklab, var(--accent) {progresso}%, var(--gray-state))`.
 - Barrinha de progresso embaixo de cada aba; ✦ quando completa.
@@ -100,6 +105,7 @@ Botão sol/lua no cabeçalho, compartilhado entre hub e jornada.
 normalmente.
 
 **Regras:**
+
 - Firebase `atmavox-ativacao`: login com Google e com e-mail/senha; recuperar senha; mensagens de erro em
   português.
 - Sem as variáveis do Firebase, o botão "Entrar" não aparece e nada quebra.

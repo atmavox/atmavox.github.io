@@ -1,21 +1,21 @@
 # Stack
 
-| Área            | Escolha                                         | Por quê                                                         |
-| --------------- | ----------------------------------------------- | --------------------------------------------------------------- |
-| Linguagem       | **TypeScript** (estrito)                        | Erros aparecem antes de rodar; a IA erra menos com tipos claros |
-| UI              | **React 19**                                    | Ecossistema enorme, mesma base do Lovable (compatível no futuro) |
-| Build e dev     | **Vite**                                        | Rápido, simples, gera site estático para o GitHub Pages         |
-| Estilo          | **Tailwind CSS v4** + tokens em CSS variables   | Tema claro/escuro por `data-theme`; mesma base do Lovable       |
-| Ícones          | **lucide-react**                                | Leves, consistentes, tree-shaking                               |
-| Rotas           | Hash routing (`#/jornada`)                      | Funciona no GitHub Pages sem configurar servidor (sem erro 404) |
-| Login e dados   | **Firebase** Auth + Firestore, plano Spark (grátis) | Projeto `atmavox-ativacao`; login Google e e-mail/senha     |
-| Persistência local | `localStorage`                               | Jornada funciona sem login e sem internet                       |
-| Testes          | **Vitest** + Testing Library + jsdom            | Integrado ao Vite, rápido                                       |
-| Lint            | **ESLint** (typescript-eslint, react-hooks, react-refresh, jsx-a11y) | Padrão do template Vite; acessibilidade         |
-| Formatação      | **Prettier** + eslint-config-prettier           | Formatação automática sem brigar com o lint                     |
-| CI/CD           | **GitHub Actions** → GitHub Pages               | Grátis; deploy a cada push na `main`                            |
-| Hospedagem      | **GitHub Pages**, organização `atmavox`         | Grátis; URL limpa `atmavox.github.io`                           |
-| Node            | 24 LTS (`.nvmrc`)                               | LTS ativa (a 22 está só em manutenção); suportada pelo Vite     |
+| Área               | Escolha                                                                | Por quê                                                          |
+| ------------------ | ---------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Linguagem          | **TypeScript** (estrito)                                               | Erros aparecem antes de rodar; a IA erra menos com tipos claros  |
+| UI                 | **React 19**                                                           | Ecossistema enorme, mesma base do Lovable (compatível no futuro) |
+| Build e dev        | **Vite**                                                               | Rápido, simples, gera site estático para o GitHub Pages          |
+| Estilo             | **Tailwind CSS v4** + tokens em CSS variables                          | Tema claro/escuro por `data-theme`; mesma base do Lovable        |
+| Ícones             | **lucide-react**                                                       | Leves, consistentes, tree-shaking                                |
+| Rotas              | Hash routing (`#/jornada`)                                             | Funciona no GitHub Pages sem configurar servidor (sem erro 404)  |
+| Login e dados      | **Firebase** Auth + Firestore, plano Spark (grátis)                    | Projeto `atmavox-ativacao`; login Google e e-mail/senha          |
+| Persistência local | `localStorage`                                                         | Jornada funciona sem login e sem internet                        |
+| Testes             | **Vitest** + Testing Library + jsdom                                   | Integrado ao Vite, rápido                                        |
+| Lint               | **ESLint 9** (typescript-eslint, react-hooks, react-refresh, jsx-a11y) | Padrão do template Vite; acessibilidade (9, não 10: ADR-008)     |
+| Formatação         | **Prettier** + eslint-config-prettier                                  | Formatação automática sem brigar com o lint                      |
+| CI/CD              | **GitHub Actions** → GitHub Pages                                      | Grátis; deploy a cada push na `main`                             |
+| Hospedagem         | **GitHub Pages**, organização `atmavox`                                | Grátis; URL limpa `atmavox.github.io`                            |
+| Node               | 24 LTS (`.nvmrc`)                                                      | LTS ativa (a 22 está só em manutenção); suportada pelo Vite      |
 
 ## Regras para dependências
 

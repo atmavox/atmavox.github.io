@@ -11,19 +11,19 @@ Elementos recorrentes: **três anéis concêntricos** girando devagar com um pon
 
 ## Paleta (tokens)
 
-| Token          | Escuro     | Claro      | Uso                                     |
-| -------------- | ---------- | ---------- | --------------------------------------- |
-| `--bg`         | `#1b1714`  | `#f6f0e7`  | fundo                                   |
-| `--surface`    | `#25201c`  | `#fffcf7`  | cartões                                 |
-| `--surface-2`  | `#2e2823`  | `#f1e8db`  | hover, áreas secundárias                |
-| `--field`      | `#1f1b18`  | `#fbf7f1`  | campos de texto                         |
-| `--text`       | `#f5efe6`  | `#2a231d`  | texto principal                         |
-| `--text-muted` | `#cbbfb1`  | `#5c5046`  | texto secundário                        |
-| `--text-faint` | `#8e8377`  | `#8a7c6f`  | dicas, legendas                         |
-| `--accent`     | `#d9922b`  | `#a1600f`  | âmbar: ações, destaque, progresso       |
-| `--gold`       | `#d9b261`  | `#8a6319`  | dourado: afirmações, logo               |
-| `--wine`       | `#6b2536`  | `#7a2a3d`  | vinho: profundidade (rituais, CTA)      |
-| `--gray-state` | `#6f6860`  | `#a59c92`  | o "cinza" de onde as abas partem        |
+| Token          | Escuro    | Claro     | Uso                                |
+| -------------- | --------- | --------- | ---------------------------------- |
+| `--bg`         | `#1b1714` | `#f6f0e7` | fundo                              |
+| `--surface`    | `#25201c` | `#fffcf7` | cartões                            |
+| `--surface-2`  | `#2e2823` | `#f1e8db` | hover, áreas secundárias           |
+| `--field`      | `#1f1b18` | `#fbf7f1` | campos de texto                    |
+| `--text`       | `#f5efe6` | `#2a231d` | texto principal                    |
+| `--text-muted` | `#cbbfb1` | `#5c5046` | texto secundário                   |
+| `--text-faint` | `#8e8377` | `#8a7c6f` | dicas, legendas                    |
+| `--accent`     | `#d9922b` | `#a1600f` | âmbar: ações, destaque, progresso  |
+| `--gold`       | `#d9b261` | `#8a6319` | dourado: afirmações, logo          |
+| `--wine`       | `#6b2536` | `#7a2a3d` | vinho: profundidade (rituais, CTA) |
+| `--gray-state` | `#6f6860` | `#a59c92` | o "cinza" de onde as abas partem   |
 
 - O **escuro** é mais claro que o original (`#0A0A0A` → `#1b1714`, um marrom quente), por pedido da Andreia.
 - No **claro**, o âmbar escurece para manter contraste AA em textos pequenos.
@@ -44,16 +44,16 @@ Elementos recorrentes: **três anéis concêntricos** girando devagar com um pon
 
 ## Links
 
-| Canal                         | Link                                     |
-| ----------------------------- | ---------------------------------------- |
-| Site                          | https://atmavox.github.io                |
-| Áudio "Retorne ao Seu Centro" | https://youtu.be/jKuKSAQUTCA             |
-| Instagram                     | https://instagram.com/atmavox            |
-| Facebook                      | https://facebook.com/atmavox             |
-| YouTube                       | https://youtube.com/@atmavox             |
+| Canal                         | Link                                              |
+| ----------------------------- | ------------------------------------------------- |
+| Site                          | https://atmavox.github.io                         |
+| Áudio "Retorne ao Seu Centro" | https://youtu.be/jKuKSAQUTCA                      |
+| Instagram                     | https://instagram.com/atmavox                     |
+| Facebook                      | https://facebook.com/atmavox                      |
+| YouTube                       | https://youtube.com/@atmavox                      |
 | TikTok                        | **confirmar o @** (no Keepo o link está quebrado) |
-| WhatsApp                      | https://wa.me/5547991889442              |
-| Página antiga (Keepo)         | https://atmavox.keepo.bio                |
+| WhatsApp                      | https://wa.me/5547991889442                       |
+| Página antiga (Keepo)         | https://atmavox.keepo.bio                         |
 
 Mensagens prontas de WhatsApp usam `?text=` codificado, uma por produto (ex.: "Olá, Andreia! Quero entrar
 na lista de espera do Ritual Matinal de 7 dias.").

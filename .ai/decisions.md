@@ -68,6 +68,19 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Alternativa considerada:** Biome (mais rápido, uma ferramenta só), descartado por ter menos plugins
   (acessibilidade) e por não ser o padrão do Vite nem do Lovable.
 
+## ADR-008 · ESLint 9 em vez do 10, por causa do jsx-a11y
+
+- **Status:** aceita · 2026-11-21
+- **Contexto:** o template do Vite veio com ESLint 10, mas o `eslint-plugin-jsx-a11y` (6.10.2, a versão mais
+  recente) só aceita até o ESLint 9. As regras de acessibilidade são exigência do projeto (público leigo,
+  contraste AA, foco visível).
+- **Decisão:** usar ESLint 9.39 com o jsx-a11y oficialmente compatível.
+- **Alternativas consideradas:** forçar o plugin no ESLint 10 com `overrides` (sem suporte, pode quebrar sem
+  aviso); ficar sem jsx-a11y e checar acessibilidade só no Lighthouse (perde o aviso na hora de codar).
+- **Consequências:** ➕ lint de acessibilidade funcionando e suportado. ➖ o npm avisa que o ESLint 9 não é mais
+  suportado; como é ferramenta só de desenvolvimento (não vai para o site), o risco é baixo. Quando o
+  jsx-a11y aceitar o ESLint 10, atualizar e marcar esta decisão como substituída.
+
 ---
 
 ## Modelo

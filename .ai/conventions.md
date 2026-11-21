@@ -38,15 +38,15 @@
 
 ## Nomes
 
-| O quê              | Padrão                    | Exemplo                      |
-| ------------------ | ------------------------- | ---------------------------- |
-| Componentes        | `PascalCase.tsx`          | `DayCard.tsx`                |
-| Hooks              | `useCamelCase.ts`         | `useHashRoute.ts`            |
-| Módulos de lógica  | `camelCase.ts`            | `progress.ts`                |
-| Testes             | ao lado, `.test.ts(x)`    | `progress.test.ts`           |
-| Ids de campo       | `d{dia}:{chave}`          | `d3:raiz`, `r7:q1`           |
-| Código             | inglês                    | `toggleDay`, `JourneyStore`  |
-| Textos de interface | português do Brasil      | "Concluir dia"               |
+| O quê               | Padrão                 | Exemplo                     |
+| ------------------- | ---------------------- | --------------------------- |
+| Componentes         | `PascalCase.tsx`       | `DayCard.tsx`               |
+| Hooks               | `useCamelCase.ts`      | `useHashRoute.ts`           |
+| Módulos de lógica   | `camelCase.ts`         | `progress.ts`               |
+| Testes              | ao lado, `.test.ts(x)` | `progress.test.ts`          |
+| Ids de campo        | `d{dia}:{chave}`       | `d3:raiz`, `r7:q1`          |
+| Código              | inglês                 | `toggleDay`, `JourneyStore` |
+| Textos de interface | português do Brasil    | "Concluir dia"              |
 
 ## Testes (Vitest)
 

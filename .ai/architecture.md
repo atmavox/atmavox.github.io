@@ -43,14 +43,14 @@ ui  →  application  →  domain  ←  content
 
 ## Rotas (hash)
 
-| Rota                   | Tela                                |
-| ---------------------- | ----------------------------------- |
-| `#/`                   | Hub                                 |
-| `#/jornada`            | Abertura da jornada                 |
-| `#/jornada/semana-1`…`3` | Semanas                           |
-| `#/jornada/revisoes`   | Revisões semanais                   |
-| `#/jornada/vitorias`   | Registro de vitórias                |
-| `#/jornada/encerramento` | Encerramento                      |
+| Rota                     | Tela                 |
+| ------------------------ | -------------------- |
+| `#/`                     | Hub                  |
+| `#/jornada`              | Abertura da jornada  |
+| `#/jornada/semana-1`…`3` | Semanas              |
+| `#/jornada/revisoes`     | Revisões semanais    |
+| `#/jornada/vitorias`     | Registro de vitórias |
+| `#/jornada/encerramento` | Encerramento         |
 
 O hash evita o 404 do GitHub Pages ao recarregar uma página interna e permite compartilhar o link de uma aba.
 
