@@ -36,6 +36,10 @@ versão com data.
 - Tema claro e escuro (F4): segue o sistema na primeira visita, guarda a escolha, sem "piscar"; botão
   sol/lua no hub.
 
+- Domínio da jornada (`features/jornada/domain`): formato da jornada, progresso (dias, textos, emoções,
+  humor, vitórias), leitura segura de dados salvos, merge aparelho + nuvem e validação de vitórias, com
+  testes.
+
 ### Removido
 
 - Arquivos de exemplo do template do Vite (contador, logos, `App.css`, `index.css`, `icons.svg`).
