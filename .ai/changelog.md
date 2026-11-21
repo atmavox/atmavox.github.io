@@ -30,6 +30,8 @@ versão com data.
 - Estrutura `src/app`, `src/features/hub` e `src/shared` (`brand/links.ts`, `lib/whatsapp.ts`,
   `ui/BrandRings.tsx`), com testes.
 - `index.html` em português (`lang="pt-BR"`), com título, descrição, Open Graph e favicon da marca.
+- Workflow do GitHub Actions: checa e gera o build em todo push e PR; publica no Pages a cada push na
+  `main`.
 
 ### Removido
 

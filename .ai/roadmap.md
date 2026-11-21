@@ -2,13 +2,14 @@
 
 Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 
-## Fase 0 · Base 🔲
+## Fase 0 · Base ✅
 
-- [ ] Projeto Vite + React + TS criado no repositório `atmavox/atmavox.github.io`
-- [ ] `CLAUDE.md` e `.ai/` no repositório
-- [ ] Tailwind v4, ESLint (+ jsx-a11y), Prettier, Vitest, script `check`
-- [ ] Estrutura de pastas `app/`, `features/hub`, `features/jornada`, `shared/`
-- [ ] Workflow de deploy no GitHub Pages (site de "em breve" já no ar)
+- [x] Projeto Vite + React + TS criado no repositório `atmavox/atmavox.github.io`
+- [x] `CLAUDE.md` e `.ai/` no repositório
+- [x] Tailwind v4, ESLint (+ jsx-a11y), Prettier, Vitest, script `check`
+- [x] Estrutura de pastas `app/`, `features/hub`, `shared/` (`features/jornada` nasce na Fase 1)
+- [x] Workflow de deploy no GitHub Pages (`.github/workflows/deploy.yml`)
+- [ ] Ativar o Pages: _Settings → Pages → Source → GitHub Actions_ (feito manualmente no GitHub)
 
 ## Fase 1 · Tema e jornada (sem login) 🔲
 

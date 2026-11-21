@@ -120,7 +120,7 @@ outro navegador com a mesma conta → mesmo progresso.
 
 ---
 
-## F6 · Deploy 🔲
+## F6 · Deploy 🔨
 
 **Regras:** GitHub Actions publica no Pages a cada push na `main`, depois de `npm run check`. Pull requests
 rodam só a checagem.
