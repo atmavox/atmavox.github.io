@@ -74,18 +74,18 @@ Fonte: conversa de posicionamento da Andreía (PDF "Posicionamento do Atmavox", 
 
 ## Links
 
-| Canal                         | Link                                              |
-| ----------------------------- | ------------------------------------------------- |
-| Site                          | https://atmavox.github.io                         |
-| Áudio "Retorne ao Seu Centro" | https://youtu.be/jKuKSAQUTCA                      |
-| Instagram                     | https://instagram.com/atmavox                     |
-| Facebook                      | https://facebook.com/atmavox                      |
-| YouTube                       | https://youtube.com/@atmavox                      |
-| TikTok                        | **confirmar o @** (no Keepo o link está quebrado) |
-| Threads                       | **confirmar**                                     |
-| Telegram                      | **confirmar** (canal/grupo)                       |
-| WhatsApp                      | https://wa.me/5547991889442                       |
-| Página antiga (Keepo)         | https://atmavox.keepo.bio                         |
+| Canal                         | Link                            |
+| ----------------------------- | ------------------------------- |
+| Site                          | https://atmavox.github.io       |
+| Áudio "Retorne ao Seu Centro" | https://youtu.be/jKuKSAQUTCA    |
+| Instagram                     | https://instagram.com/atmavox   |
+| Facebook                      | https://facebook.com/atmavox    |
+| YouTube                       | https://youtube.com/@atmavox    |
+| TikTok                        | https://www.tiktok.com/@atmavox |
+| Threads                       | **confirmar**                   |
+| Telegram                      | **confirmar** (canal/grupo)     |
+| WhatsApp                      | https://wa.me/5547991889442     |
+| Página antiga (Keepo)         | https://atmavox.keepo.bio       |
 
 Redes sem link confirmado **não aparecem** no site até serem confirmadas.
 

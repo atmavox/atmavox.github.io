@@ -50,6 +50,7 @@ versão com data.
   Contato) e revista a partir de 700 px, com áudio grátis, encontros Zerando o Dia e Pausa Sagrada,
   jornadas, sobre a Andreía, redes e assinatura. O que ainda falta (horários, foto, MP3, algumas redes)
   fica escondido ou com alternativa, sem marcadores `[...]` no site.
+- TikTok (@atmavox) nas redes do hub; corrige o link quebrado que existia no Keepo.
 - Mídia (ADR-011, `shared/media`): player de áudio único para o site todo, com mini player fixo (pausar,
   voltar 15 s, posição, fechar), controles na tela bloqueada (Media Session) e vídeos do YouTube com
   fachada (o player só carrega ao tocar). Ícones com `lucide-react`.

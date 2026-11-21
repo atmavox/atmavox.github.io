@@ -142,10 +142,11 @@ export const about = {
   text: undefined as string | undefined,
 }
 
-/** Só redes com link confirmado (TikTok, Threads e Telegram aguardam a Andreía). */
+/** Só redes com link confirmado (Threads e Telegram aguardam a Andreía). */
 export const socials: readonly SocialLink[] = [
   { id: 'instagram', name: 'Instagram', handle: '@atmavox', href: brandLinks.instagram },
   { id: 'youtube', name: 'YouTube', handle: '@atmavox', href: brandLinks.youtube },
+  { id: 'tiktok', name: 'TikTok', handle: '@atmavox', href: brandLinks.tiktok },
   { id: 'facebook', name: 'Facebook', handle: 'atmavox', href: brandLinks.facebook },
   { id: 'whatsapp', name: 'WhatsApp', handle: 'Conversar', href: brandLinks.whatsapp },
 ]

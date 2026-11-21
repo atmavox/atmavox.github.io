@@ -27,7 +27,7 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Player de áudio próprio + mini player + vídeos com fachada (ADR-011)
 - [x] Hub: abas no celular, revista no computador (F1, ADR-010)
 - [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar
-- [ ] Receber da Andreía: horários dos encontros, MP3, foto, texto curto, @ de TikTok/Threads/Telegram
+- [ ] Receber da Andreía: horários dos encontros, MP3, foto, texto curto, links de Threads/Telegram (TikTok: @atmavox ✅)
 - [ ] Trocar o link da bio do Instagram para atmavox.github.io
 
 ## Fase 3 · Login opcional 🔲

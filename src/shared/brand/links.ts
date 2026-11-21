@@ -15,6 +15,7 @@ export const brandLinks = {
   instagram: 'https://instagram.com/atmavox',
   facebook: 'https://facebook.com/atmavox',
   youtube: 'https://youtube.com/@atmavox',
+  tiktok: 'https://www.tiktok.com/@atmavox',
   whatsapp: buildWhatsAppLink(WHATSAPP_PHONE),
 } as const
 

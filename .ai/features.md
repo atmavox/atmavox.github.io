@@ -38,7 +38,7 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 - **Nada de marcador `[...]` publicado.** O que ainda não existe fica escondido ou ganha alternativa:
   - horário dos encontros ausente → "Horários no Instagram";
   - foto da Andreía ausente → anéis da marca no lugar;
-  - redes sem link confirmado (TikTok, Threads, Telegram) → não aparecem;
+  - redes sem link confirmado (Threads, Telegram) → não aparecem;
   - sem vídeos → a seção de vídeos não aparece.
 - Corrigir os problemas do Keepo: TikTok quebrado e botões "Lista de Espera" sem destino.
 
@@ -46,7 +46,7 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 tocando ao trocar de aba; Lighthouse ≥ 90 em performance e acessibilidade; funciona nos dois temas.
 
 **Pendências com a Andreía:** horários dos encontros; MP3 do "Retorne ao Seu Centro"; foto e texto curto;
-@ do TikTok, Threads e Telegram; textos novos do hub (hero, descrições), que foram escritos a partir do PDF
+links do Threads e do Telegram; textos novos do hub (hero, descrições), que foram escritos a partir do PDF
 de posicionamento.
 
 ---
