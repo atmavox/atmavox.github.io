@@ -67,6 +67,8 @@ versão com data.
 - Reposicionamento da marca na documentação: slogan "Consciência, presença e expansão", tom de voz por
   perguntas e sem venda, assinatura "Com presença — Andreía Oliveirà", grafia oficial do nome e
   especificação nova do hub (abas no celular, revista no computador; ADR-010 e ADR-011).
+- No site: slogan novo no título, na descrição e no hub; assinatura "Com presença — Andreía Oliveirà" no
+  hub e no Encerramento da jornada; mensagem pronta do WhatsApp com "Olá, Andreía!".
 
 - TypeScript estrito (`strict` e `noUncheckedIndexedAccess`) no app e na config do Vite.
 - Versão do Node na documentação: de 22 para 24 LTS.

@@ -1,6 +1,13 @@
 import { buildWhatsAppLink } from '../lib/whatsapp'
 
-// Fonte única dos links da marca, usada pelo hub e pela jornada (.ai/brand.md).
+// Fonte única da identidade e dos links da marca, usada pelo hub e pela jornada (.ai/brand.md).
+
+/** Grafia oficial, com os dois acentos (numerologia). Use sempre esta constante em textos públicos. */
+export const BRAND_PERSON = 'Andreía Oliveirà'
+export const BRAND_FIRST_NAME = 'Andreía'
+export const BRAND_SLOGAN = 'Consciência, presença e expansão.'
+export const BRAND_SIGNATURE = `Com presença — ${BRAND_PERSON}`
+
 export const WHATSAPP_PHONE = '5547991889442'
 
 export const brandLinks = {
@@ -11,4 +18,7 @@ export const brandLinks = {
   whatsapp: buildWhatsAppLink(WHATSAPP_PHONE),
 } as const
 
-export const BRAND_SIGNATURE = 'Com presença e direção — Andreia Oliveira · ATMAVOX'
+/** Mensagem pronta de WhatsApp, já com a saudação no nome oficial. */
+export function whatsAppMessage(text: string): string {
+  return buildWhatsAppLink(WHATSAPP_PHONE, `Olá, ${BRAND_FIRST_NAME}! ${text}`)
+}

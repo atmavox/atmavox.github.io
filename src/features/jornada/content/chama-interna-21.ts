@@ -1,4 +1,4 @@
-// Conteúdo da Andreia Oliveira, migrado de .ai/reference/workbook-original.html.
+// Conteúdo da Andreía Oliveirà, migrado de .ai/reference/workbook-original.html.
 // Não reescreva os textos: corrija só erros evidentes de digitação (regra 3 do CLAUDE.md).
 // Marcação aceita: *itálico*, **negrito**, [texto](https://link ou #/rota).
 import { brandLinks } from '../../../shared/brand/links'

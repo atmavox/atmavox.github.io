@@ -7,8 +7,8 @@ describe('buildWhatsAppLink', () => {
   })
 
   it('codifica a mensagem pronta no parâmetro text', () => {
-    expect(buildWhatsAppLink('5547991889442', 'Olá, Andreia! Quero saber mais.')).toBe(
-      'https://wa.me/5547991889442?text=Ol%C3%A1%2C%20Andreia!%20Quero%20saber%20mais.',
+    expect(buildWhatsAppLink('5547991889442', 'Olá! Quero saber mais.')).toBe(
+      'https://wa.me/5547991889442?text=Ol%C3%A1!%20Quero%20saber%20mais.',
     )
   })
 })

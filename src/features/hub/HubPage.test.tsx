@@ -6,7 +6,9 @@ import { HubPage } from './HubPage'
 describe('HubPage', () => {
   it('mostra o título da marca', () => {
     render(<HubPage />)
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Saindo do Estado Cinza')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Consciência, presença e expansão.',
+    )
   })
 
   it('leva ao áudio grátis, ao Instagram e ao WhatsApp em nova aba', () => {

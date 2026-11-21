@@ -1,7 +1,6 @@
 // Textos fixos das telas da jornada (capa, revisões, vitórias, encerramento).
 // Textos terapêuticos vêm de .ai/reference/workbook-original.html e não devem ser reescritos.
-import { BRAND_SIGNATURE, WHATSAPP_PHONE } from '../../../shared/brand/links'
-import { buildWhatsAppLink } from '../../../shared/lib/whatsapp'
+import { BRAND_SIGNATURE, whatsAppMessage } from '../../../shared/brand/links'
 
 export const coverCopy = {
   tagline: 'Atmavox · Protocolo de Ativação',
@@ -67,10 +66,9 @@ export const closingCopy = {
     'Imagine o que acontece quando você é guiada por dentro, em uma sessão individual de diagnóstico, ativação e ancoragem.\n\n' +
     'O Protocolo Presencial vai mais fundo do que qualquer jornada solo.',
   ctaButton: 'Quero Sair do Estado Cinza →',
-  // O original apontava para o Keepo; agora vai direto ao WhatsApp da Andreia.
-  ctaHref: buildWhatsAppLink(
-    WHATSAPP_PHONE,
-    'Olá, Andreia! Concluí a jornada A Chama Interna (21 dias) e quero conhecer o Protocolo de Ativação Presencial.',
+  // O original apontava para o Keepo; agora vai direto ao WhatsApp da Andreía.
+  ctaHref: whatsAppMessage(
+    'Concluí a jornada A Chama Interna (21 dias) e quero conhecer o Protocolo de Ativação Presencial.',
   ),
   signature: BRAND_SIGNATURE,
 } as const
