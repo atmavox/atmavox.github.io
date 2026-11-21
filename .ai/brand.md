@@ -19,11 +19,11 @@ Elementos recorrentes: **três anéis concêntricos** girando devagar com um pon
 | `--field`      | `#1f1b18` | `#fbf7f1` | campos de texto                    |
 | `--text`       | `#f5efe6` | `#2a231d` | texto principal                    |
 | `--text-muted` | `#cbbfb1` | `#5c5046` | texto secundário                   |
-| `--text-faint` | `#8e8377` | `#8a7c6f` | dicas, legendas                    |
-| `--accent`     | `#d9922b` | `#a1600f` | âmbar: ações, destaque, progresso  |
-| `--gold`       | `#d9b261` | `#8a6319` | dourado: afirmações, logo          |
+| `--text-faint` | `#9a9186` | `#71665b` | dicas, legendas                    |
+| `--accent`     | `#d9922b` | `#96590e` | âmbar: ações, destaque, progresso  |
+| `--gold`       | `#d9b261` | `#876119` | dourado: afirmações, logo          |
 | `--wine`       | `#6b2536` | `#7a2a3d` | vinho: profundidade (rituais, CTA) |
-| `--gray-state` | `#6f6860` | `#a59c92` | o "cinza" de onde as abas partem   |
+| `--gray-state` | `#96918b` | `#6d6760` | o "cinza" de onde as abas partem   |
 | `--line`       | texto 14% | texto 14% | bordas e divisórias                |
 
 - Classes do Tailwind (em `src/shared/theme/theme.css`): `bg`, `surface`, `surface-2`, `field`, `ink`
@@ -31,6 +31,10 @@ Elementos recorrentes: **três anéis concêntricos** girando devagar com um pon
   `text-ink-muted`, `border-line`. Fontes: `font-sans` (Jost) e `font-display` (Playfair Display).
 - O **escuro** é mais claro que o original (`#0A0A0A` → `#1b1714`, um marrom quente), por pedido da Andreia.
 - No **claro**, o âmbar escurece para manter contraste AA em textos pequenos.
+- Contraste medido em 2026-11-21: todo texto tem **≥ 4,5:1** sobre `bg`, `surface` e `surface-2` nos dois
+  temas. Para chegar lá, `text-faint`, `gray-state` (escuro e claro), `accent` e `gold` (claro) foram
+  ajustados o mínimo possível em relação à paleta proposta (antes: `#8e8377`/`#8a7c6f`, `#6f6860`/`#a59c92`,
+  `#a1600f`, `#8a6319`). **Pendente:** aprovação visual da Andreia.
 - Paleta original do HTML, para referência: preto `#0A0A0A`, âmbar `#C9831A`, branco quente `#F5EFE6`,
   cinza névoa `#2C2C2C`, dourado `#D4A853`, vinho `#5C1F2E`, nude `#C4A882`.
 

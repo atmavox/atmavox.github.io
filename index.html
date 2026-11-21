@@ -10,6 +10,20 @@
     />
     <meta name="theme-color" content="#1b1714" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Aplica o tema antes da primeira pintura, para a página não "piscar". Espelha theme.ts. -->
+    <script>
+      ;(function () {
+        var theme = 'dark'
+        try {
+          var stored = localStorage.getItem('atmavox:theme')
+          if (stored === 'light' || stored === 'dark') theme = stored
+          else if (matchMedia('(prefers-color-scheme: light)').matches) theme = 'light'
+        } catch (e) {}
+        document.documentElement.dataset.theme = theme
+        if (theme === 'light')
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f6f0e7')
+      })()
+    </script>
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="pt_BR" />

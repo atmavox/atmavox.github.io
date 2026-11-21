@@ -1,4 +1,5 @@
 import { BRAND_SIGNATURE } from '../../shared/brand/links'
+import { ThemeToggle } from '../../shared/theme/ThemeToggle'
 import { BrandRings } from '../../shared/ui/BrandRings'
 import { comingSoon } from './content'
 
@@ -6,7 +7,10 @@ const externalLinkProps = { target: '_blank', rel: 'noopener noreferrer' } as co
 
 export function HubPage() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center gap-10 px-6 py-16 text-center">
+    <main className="relative mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center gap-10 px-6 py-16 text-center">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <BrandRings className="w-40 sm:w-48" />
 
       <header className="flex flex-col gap-4">

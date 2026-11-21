@@ -33,6 +33,9 @@ versão com data.
 - Workflow do GitHub Actions: checa e gera o build em todo push e PR; publica no Pages a cada push na
   `main`.
 
+- Tema claro e escuro (F4): segue o sistema na primeira visita, guarda a escolha, sem "piscar"; botão
+  sol/lua no hub.
+
 ### Removido
 
 - Arquivos de exemplo do template do Vite (contador, logos, `App.css`, `index.css`, `icons.svg`).
@@ -42,3 +45,4 @@ versão com data.
 - TypeScript estrito (`strict` e `noUncheckedIndexedAccess`) no app e na config do Vite.
 - Versão do Node na documentação: de 22 para 24 LTS.
 - ESLint de 10 para 9, por compatibilidade com o jsx-a11y (ADR-008).
+- Tokens `text-faint`, `gray-state`, `accent` e `gold` ajustados para contraste AA (ver `brand.md`).

@@ -23,7 +23,7 @@ src/
       ui/                 páginas (Abertura, Semana, Revisões, Vitórias, Encerramento) e componentes
   shared/
     brand/                links da marca (redes, áudio, WhatsApp) e assinatura
-    theme/                tokens CSS, ThemeProvider, botão de tema
+    theme/                tokens CSS, useTheme, botão de tema
     ui/                   componentes genéricos (Button, Card, ProgressBar)
     lib/                  utilitários sem regra de negócio
 ```

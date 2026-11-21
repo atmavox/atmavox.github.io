@@ -90,13 +90,17 @@ testes de conteúdo garantem 21 dias, revisões em 7/14/21, ids únicos e nenhum
 
 ---
 
-## F4 · Temas claro e escuro 🔲
+## F4 · Temas claro e escuro ✅
 
 **Regras:** escuro por padrão (mais suave que o original); claro como alternativa; respeita a preferência do
 sistema na primeira visita; a escolha fica salva (`localStorage: atmavox:theme`); sem "piscar" ao carregar.
 Botão sol/lua no cabeçalho, compartilhado entre hub e jornada.
 
 **Aceite:** contraste AA nos dois temas; nenhuma cor solta no código.
+
+**Implementação:** script inline no `index.html` (antes da pintura) + `shared/theme/theme.ts` (regra
+pura, testada) + `useTheme` (o `data-theme` do `<html>` é a fonte da verdade, sem Provider) +
+`ThemeToggle`. Exceção às cores soltas: o favicon e o `theme-color` do `index.html`, que não leem CSS.
 
 ---
 

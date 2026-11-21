@@ -12,11 +12,11 @@
   --field: #1f1b18;
   --text: #f5efe6;
   --text-muted: #cbbfb1;
-  --text-faint: #8e8377;
+  --text-faint: #9a9186;
   --accent: #d9922b;
   --gold: #d9b261;
   --wine: #6b2536;
-  --gray-state: #6f6860;
+  --gray-state: #96918b;
   --line: color-mix(in oklab, var(--text) 14%, transparent);
 }
 
@@ -28,11 +28,11 @@
   --field: #fbf7f1;
   --text: #2a231d;
   --text-muted: #5c5046;
-  --text-faint: #8a7c6f;
-  --accent: #a1600f;
-  --gold: #8a6319;
+  --text-faint: #71665b;
+  --accent: #96590e;
+  --gold: #876119;
   --wine: #7a2a3d;
-  --gray-state: #a59c92;
+  --gray-state: #6d6760;
 }
 
 /* `inline` faz as classes apontarem para as variáveis, então trocar o tema não exige recompilar. */
