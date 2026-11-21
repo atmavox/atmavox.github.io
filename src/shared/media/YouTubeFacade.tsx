@@ -5,14 +5,21 @@ interface YouTubeFacadeProps {
   videoId: string
   title: string
   className?: string
+  /** A pessoa já tocou em "play" em outro botão: entra direto no player. */
+  startActive?: boolean
 }
 
 /**
  * Mostra só a miniatura; o player do YouTube (versão sem cookies) só carrega quando a pessoa toca.
  * Economiza ~1 MB por vídeo e não rastreia quem apenas visita a página (ADR-011).
  */
-export function YouTubeFacade({ videoId, title, className = '' }: YouTubeFacadeProps) {
-  const [isActive, setIsActive] = useState(false)
+export function YouTubeFacade({
+  videoId,
+  title,
+  className = '',
+  startActive = false,
+}: YouTubeFacadeProps) {
+  const [isActive, setIsActive] = useState(startActive)
   const frameClass = `relative aspect-video w-full overflow-hidden rounded-2xl bg-surface-2 ${className}`
 
   if (isActive) {

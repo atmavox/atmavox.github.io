@@ -1,49 +1,18 @@
-import { BRAND_SIGNATURE } from '../../shared/brand/links'
-import { ThemeToggle } from '../../shared/theme/ThemeToggle'
-import { BrandRings } from '../../shared/ui/BrandRings'
-import { comingSoon } from './content'
+import { useEffect } from 'react'
+import { BRAND_SLOGAN } from '../../shared/brand/links'
+import { useMediaQuery } from '../../shared/lib/useMediaQuery'
+import { HubMagazine } from './layouts/HubMagazine'
+import { HubTabs } from './layouts/HubTabs'
+import { hubSectionFromPath, tabOfSection, WIDE_LAYOUT_QUERY } from './navigation'
 
-const externalLinkProps = { target: '_blank', rel: 'noopener noreferrer' } as const
+/** Escolhe a composição do hub pela largura da tela (ADR-010). */
+export function HubPage({ path }: { path: string }) {
+  const isWide = useMediaQuery(WIDE_LAYOUT_QUERY)
+  const section = hubSectionFromPath(path)
 
-export function HubPage() {
-  return (
-    <main className="relative mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center gap-10 px-6 py-16 text-center">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
-      <BrandRings className="w-40 sm:w-48" />
+  useEffect(() => {
+    document.title = `ATMAVOX · ${BRAND_SLOGAN.replace(/\.$/, '')}`
+  }, [])
 
-      <header className="flex flex-col gap-4">
-        <p className="text-xs tracking-[0.3em] text-gold uppercase">{comingSoon.eyebrow}</p>
-        <h1 className="font-display text-4xl leading-tight text-ink sm:text-5xl">
-          {comingSoon.title}
-        </h1>
-        <p className="text-lg text-ink-muted">{comingSoon.subtitle}</p>
-      </header>
-
-      <nav aria-label="Links da Atmavox" className="flex w-full flex-col gap-3">
-        <a
-          href={comingSoon.primaryAction.href}
-          {...externalLinkProps}
-          className="rounded-full bg-accent px-6 py-4 font-medium tracking-wide text-bg transition-opacity hover:opacity-90"
-        >
-          {comingSoon.primaryAction.label}
-        </a>
-        <div className="flex gap-3">
-          {comingSoon.secondaryActions.map((action) => (
-            <a
-              key={action.label}
-              href={action.href}
-              {...externalLinkProps}
-              className="flex-1 rounded-full border border-line px-6 py-3 text-ink transition-colors hover:bg-surface-2"
-            >
-              {action.label}
-            </a>
-          ))}
-        </div>
-      </nav>
-
-      <footer className="font-display text-sm text-ink-faint italic">{BRAND_SIGNATURE}</footer>
-    </main>
-  )
+  return isWide ? <HubMagazine section={section} /> : <HubTabs activeTab={tabOfSection(section)} />
 }

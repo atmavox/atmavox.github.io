@@ -46,6 +46,10 @@ versão com data.
   hora no `localStorage` e continua lá ao recarregar.
 - Rotas por hash e carregamento sob demanda da jornada (ADR-009).
 - Marcação mínima nos textos (`**negrito**`, `*itálico*`, `[link](https://…)`) com `RichText`.
+- Hub novo (F1, ADR-010) no lugar da página "em breve": abas no celular (Início · Ouvir · Jornadas ·
+  Contato) e revista a partir de 700 px, com áudio grátis, encontros Zerando o Dia e Pausa Sagrada,
+  jornadas, sobre a Andreía, redes e assinatura. O que ainda falta (horários, foto, MP3, algumas redes)
+  fica escondido ou com alternativa, sem marcadores `[...]` no site.
 - Mídia (ADR-011, `shared/media`): player de áudio único para o site todo, com mini player fixo (pausar,
   voltar 15 s, posição, fechar), controles na tela bloqueada (Media Session) e vídeos do YouTube com
   fachada (o player só carrega ao tocar). Ícones com `lucide-react`.

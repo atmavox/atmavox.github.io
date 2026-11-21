@@ -11,8 +11,11 @@ src/
     App.tsx               roteamento por hash: hub ou jornada (carregada sob demanda)
   features/
     hub/
-      content.ts          textos do hub
-      HubPage.tsx
+      content.ts          textos e listas do hub (áudios, encontros, jornadas, vídeos, redes, sobre)
+      navigation.ts       seções/rotas (#/ouvir…) e o ponto de troca de layout (700 px)
+      HubPage.tsx         escolhe a composição pela largura (ADR-010)
+      layouts/            HubTabs (celular, abas embaixo) e HubMagazine (tablet/computador)
+      components/         blocos comuns: AudioItem, EncounterCard, JourneyCard, SocialLinks…
     jornada/
       JourneyEntry.tsx    porta de entrada (lazy): cria os serviços e monta a UI
       domain/             regras puras: journey.ts (formato), progress.ts, victories.ts (+ testes)
@@ -24,7 +27,8 @@ src/
     brand/                links da marca (redes, áudio, WhatsApp) e assinatura
     theme/                tokens CSS, useTheme, botão de tema
     ui/                   componentes genéricos (BrandRings, RichText)
-    lib/                  utilitários sem regra de negócio (whatsapp, inlineMarkup, useHashRoute)
+    lib/                  utilitários sem regra de negócio (whatsapp, inlineMarkup, useHashRoute, useMediaQuery)
+    media/                player de áudio único + MiniPlayer + YouTubeFacade (ADR-011)
 ```
 
 ## Regra de dependência (jornada)
@@ -44,14 +48,15 @@ ui  →  application  →  domain  ←  content
 
 ## Rotas (hash)
 
-| Rota                     | Tela                 |
-| ------------------------ | -------------------- |
-| `#/`                     | Hub                  |
-| `#/jornada`              | Abertura da jornada  |
-| `#/jornada/semana-1`…`3` | Semanas              |
-| `#/jornada/revisoes`     | Revisões semanais    |
-| `#/jornada/vitorias`     | Registro de vitórias |
-| `#/jornada/encerramento` | Encerramento         |
+| Rota                                                | Tela                                      |
+| --------------------------------------------------- | ----------------------------------------- |
+| `#/`                                                | Hub (início)                              |
+| `#/ouvir`, `#/encontros`, `#/jornadas`, `#/contato` | Hub: aba no celular, âncora no computador |
+| `#/jornada`                                         | Abertura da jornada                       |
+| `#/jornada/semana-1`…`3`                            | Semanas                                   |
+| `#/jornada/revisoes`                                | Revisões semanais                         |
+| `#/jornada/vitorias`                                | Registro de vitórias                      |
+| `#/jornada/encerramento`                            | Encerramento                              |
 
 O hash evita o 404 do GitHub Pages ao recarregar uma página interna e permite compartilhar o link de uma aba.
 

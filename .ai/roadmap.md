@@ -25,7 +25,8 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Reposicionamento registrado (slogan, tom, assinatura, grafia "Andreía Oliveirà")
 - [x] Slogan, assinatura e grafia do nome aplicados no site e na jornada
 - [x] Player de áudio próprio + mini player + vídeos com fachada (ADR-011)
-- [ ] Hub: abas no celular, revista no computador (F1, ADR-010)
+- [x] Hub: abas no celular, revista no computador (F1, ADR-010)
+- [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar
 - [ ] Receber da Andreía: horários dos encontros, MP3, foto, texto curto, @ de TikTok/Threads/Telegram
 - [ ] Trocar o link da bio do Instagram para atmavox.github.io
 

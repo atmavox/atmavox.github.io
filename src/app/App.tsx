@@ -19,7 +19,7 @@ export function App() {
           <JourneyEntry path={path} />
         </Suspense>
       ) : (
-        <HubPage />
+        <HubPage path={path} />
       )}
       {/* Fora das rotas: o áudio continua tocando ao ir do hub para a jornada e voltar. */}
       <MiniPlayer />

@@ -5,7 +5,7 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 
 ---
 
-## F1 · Hub (página principal) 🔲
+## F1 · Hub (página principal) ✅ (aguardando conteúdo da Andreía)
 
 **Objetivo:** substituir o atmavox.keepo.bio por uma página que apresenta o universo Atmavox
 (posicionamento novo: `purpose.md`) e leva a cada parte dele, pensada primeiro para o celular.
