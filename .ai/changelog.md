@@ -39,6 +39,15 @@ versão com data.
 - Domínio da jornada (`features/jornada/domain`): formato da jornada, progresso (dias, textos, emoções,
   humor, vitórias), leitura segura de dados salvos, merge aparelho + nuvem e validação de vitórias, com
   testes.
+- Conteúdo dos 21 dias, revisões, vitórias e encerramento como dados tipados (`features/jornada/content`),
+  conferido texto a texto contra o original.
+
+### Corrigido
+
+- Letras cirílicas no original: "Neutра" (dia 1) e "aprenди" (dia 3).
+- Semana II definida duas vezes no original: ficou a versão mais completa.
+- O áudio do dia 5 e a "aba Encerramento" do dia 21 viraram links clicáveis.
+- O botão do Protocolo Presencial apontava para o Keepo; agora abre o WhatsApp com mensagem pronta.
 
 ### Removido
 
