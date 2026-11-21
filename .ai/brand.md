@@ -24,7 +24,11 @@ Elementos recorrentes: **três anéis concêntricos** girando devagar com um pon
 | `--gold`       | `#d9b261` | `#8a6319` | dourado: afirmações, logo          |
 | `--wine`       | `#6b2536` | `#7a2a3d` | vinho: profundidade (rituais, CTA) |
 | `--gray-state` | `#6f6860` | `#a59c92` | o "cinza" de onde as abas partem   |
+| `--line`       | texto 14% | texto 14% | bordas e divisórias                |
 
+- Classes do Tailwind (em `src/shared/theme/theme.css`): `bg`, `surface`, `surface-2`, `field`, `ink`
+  (`--text`), `ink-muted`, `ink-faint`, `accent`, `gold`, `wine`, `gray-state`, `line`. Ex.: `bg-surface`,
+  `text-ink-muted`, `border-line`. Fontes: `font-sans` (Jost) e `font-display` (Playfair Display).
 - O **escuro** é mais claro que o original (`#0A0A0A` → `#1b1714`, um marrom quente), por pedido da Andreia.
 - No **claro**, o âmbar escurece para manter contraste AA em textos pequenos.
 - Paleta original do HTML, para referência: preto `#0A0A0A`, âmbar `#C9831A`, branco quente `#F5EFE6`,

@@ -1,0 +1,80 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/jost';
+@import '@fontsource-variable/playfair-display';
+@import '@fontsource-variable/playfair-display/wght-italic.css';
+
+/* Paleta da marca (.ai/brand.md). O escuro é o padrão; o claro entra por data-theme="light". */
+:root {
+  color-scheme: dark;
+  --bg: #1b1714;
+  --surface: #25201c;
+  --surface-2: #2e2823;
+  --field: #1f1b18;
+  --text: #f5efe6;
+  --text-muted: #cbbfb1;
+  --text-faint: #8e8377;
+  --accent: #d9922b;
+  --gold: #d9b261;
+  --wine: #6b2536;
+  --gray-state: #6f6860;
+  --line: color-mix(in oklab, var(--text) 14%, transparent);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f6f0e7;
+  --surface: #fffcf7;
+  --surface-2: #f1e8db;
+  --field: #fbf7f1;
+  --text: #2a231d;
+  --text-muted: #5c5046;
+  --text-faint: #8a7c6f;
+  --accent: #a1600f;
+  --gold: #8a6319;
+  --wine: #7a2a3d;
+  --gray-state: #a59c92;
+}
+
+/* `inline` faz as classes apontarem para as variáveis, então trocar o tema não exige recompilar. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-field: var(--field);
+  --color-ink: var(--text);
+  --color-ink-muted: var(--text-muted);
+  --color-ink-faint: var(--text-faint);
+  --color-accent: var(--accent);
+  --color-gold: var(--gold);
+  --color-wine: var(--wine);
+  --color-gray-state: var(--gray-state);
+  --color-line: var(--line);
+
+  --font-sans: 'Jost Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Playfair Display Variable', ui-serif, Georgia, serif;
+}
+
+@layer base {
+  html {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -23,6 +23,9 @@ versão com data.
 - `no-restricted-imports` protegendo as camadas (`domain/` e `content/` puros) e as fronteiras
   `hub/` ↔ `jornada/` ↔ `shared/`.
 - `.gitattributes` forçando quebra de linha LF.
+- Tailwind CSS v4 com os tokens da marca (escuro e claro) em `src/shared/theme/theme.css`.
+- Fontes Jost e Playfair Display hospedadas no próprio site (Fontsource).
+- Foco visível em âmbar e suporte a `prefers-reduced-motion`.
 
 ### Alterado
 
