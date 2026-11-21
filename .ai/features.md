@@ -31,7 +31,7 @@ acessibilidade; funciona nos dois temas.
 
 ---
 
-## F2 · Jornada de 21 dias 🔲
+## F2 · Jornada de 21 dias ✅ (falta validar com a Andreia)
 
 **Objetivo:** migrar o workbook de `.ai/reference/workbook-original.html` para React, sem perder conteúdo e
 **salvando tudo** o que a pessoa escreve.
@@ -64,6 +64,27 @@ acessibilidade; funciona nos dois temas.
 
 **Aceite:** os 21 dias aparecem com o texto original; tudo o que se escreve continua lá após recarregar;
 testes de conteúdo garantem 21 dias, revisões em 7/14/21, ids únicos e nenhum caractere cirílico.
+
+**Como ficou (decisões de implementação):**
+
+- Salvo no `localStorage` em `atmavox:jornada:chama-interna-21`, a cada mudança.
+- Toda afirmação ganhou um campo opcional "Sua versão da afirmação" (`d{dia}:afirmacao`), já que a
+  spec diz "reescrevível". O dia 1 mantém a dica original como texto de apoio.
+- Cada dia pode ser concluído pelo ✦ do cabeçalho ou pelo botão "Concluir dia" no fim do conteúdo; o
+  rastreador da Abertura também marca e desmarca.
+- O exemplo de vitória do original aparece só enquanto a lista está vazia, marcado como "Exemplo".
+- Remover uma vitória pede confirmação na própria linha ("Remover? Sim / Não").
+- O "✦" do título das revisões virou um enfeite visual (não faz parte do texto).
+- O botão do Protocolo Presencial abre o WhatsApp com mensagem pronta (o original apontava para o Keepo).
+
+**Pendências para a Andreia validar:**
+
+- Instrução 4 da Abertura ("Campos entre [colchetes] são editáveis") e os textos entre colchetes
+  (`[registre sua temperatura energética]`, `[escreva aqui sua intenção…]`) foram mantidos como no
+  original, mas na versão interativa todo campo já é editável. Ela pode querer ajustar.
+- A etiqueta "editável" foi mantida onde o original tinha.
+- A "[Assinatura editável]" do encerramento era uma nota de modelo e não foi publicada.
+- Texto da mensagem pronta do WhatsApp no encerramento.
 
 ---
 

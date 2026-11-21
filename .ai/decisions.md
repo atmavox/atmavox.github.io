@@ -81,6 +81,16 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   suportado; como é ferramenta só de desenvolvimento (não vai para o site), o risco é baixo. Quando o
   jsx-a11y aceitar o ESLint 10, atualizar e marcar esta decisão como substituída.
 
+## ADR-009 · Jornada carregada sob demanda por uma porta de entrada
+
+- **Status:** aceita · 2026-11-21
+- **Contexto:** quem chega pela bio cai no hub; a maioria não abre a jornada. E a `ui/` não deve
+  importar `infrastructure/` (regra de dependência).
+- **Decisão:** `features/jornada/JourneyEntry.tsx` cria os serviços (`createServices`) e monta a
+  `JourneyApp` dentro do `JourneyContext`. O `app/App.tsx` carrega esse arquivo com `React.lazy`.
+- **Consequências:** ➕ o hub não baixa o código da jornada (~13 kB gzip a menos); a `ui/` só conhece
+  interfaces. ➖ um instante de carregamento ao abrir a jornada pela primeira vez.
+
 ---
 
 ## Modelo

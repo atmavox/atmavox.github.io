@@ -4,3 +4,6 @@ import { afterEach } from 'vitest'
 
 // Sem `globals: true` no Vitest, a Testing Library não desmonta sozinha entre os testes.
 afterEach(cleanup)
+
+// O jsdom não implementa rolagem; as telas rolam ao topo quando a aba muda.
+window.scrollTo = () => {}

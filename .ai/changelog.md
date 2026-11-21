@@ -41,6 +41,11 @@ versão com data.
   testes.
 - Conteúdo dos 21 dias, revisões, vitórias e encerramento como dados tipados (`features/jornada/content`),
   conferido texto a texto contra o original.
+- Jornada interativa em `#/jornada` (F2): Abertura com rastreador, Semanas I–III com os dias
+  expansíveis, Revisões, Vitórias e Encerramento. Tudo o que se escreve, marca ou escolhe é salvo na
+  hora no `localStorage` e continua lá ao recarregar.
+- Rotas por hash e carregamento sob demanda da jornada (ADR-009).
+- Marcação mínima nos textos (`**negrito**`, `*itálico*`, `[link](https://…)`) com `RichText`.
 
 ### Corrigido
 
@@ -48,6 +53,8 @@ versão com data.
 - Semana II definida duas vezes no original: ficou a versão mais completa.
 - O áudio do dia 5 e a "aba Encerramento" do dia 21 viraram links clicáveis.
 - O botão do Protocolo Presencial apontava para o Keepo; agora abre o WhatsApp com mensagem pronta.
+- Reflexões, emoções, humor e vitórias sumiam ao recarregar no original; agora tudo é salvo.
+- Vitórias eram montadas com `innerHTML` (injeção de HTML); agora são texto puro (com teste).
 
 ### Removido
 

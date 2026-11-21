@@ -8,24 +8,23 @@ uma Clean Architecture enxuta; o hub é mais simples (é quase só conteúdo e l
 ```
 src/
   app/                    composição
-    App.tsx               providers (tema, jornada) + roteamento
-    routes.ts             tabela de rotas
+    App.tsx               roteamento por hash: hub ou jornada (carregada sob demanda)
   features/
     hub/
-      content.ts          produtos, links, textos do hub
-      components/         Hero, ProductCard, FreeAudio, SocialLinks…
+      content.ts          textos do hub
       HubPage.tsx
     jornada/
-      domain/             tipos e regras puras: journey.ts, progress.ts (+ testes)
-      content/            chama-interna-21.ts (os 21 dias), copy.ts (capa, encerramento)
-      application/        ports.ts (interfaces), JourneyStore.ts, navigation.ts
-      infrastructure/     LocalProgressRepository, firebase/, createServices.ts
-      ui/                 páginas (Abertura, Semana, Revisões, Vitórias, Encerramento) e componentes
+      JourneyEntry.tsx    porta de entrada (lazy): cria os serviços e monta a UI
+      domain/             regras puras: journey.ts (formato), progress.ts, victories.ts (+ testes)
+      content/            chama-interna-21.ts (os 21 dias), copy.ts (capa, revisões, vitórias, encerramento)
+      application/        ports.ts, services.ts, JourneyStore.ts, navigation.ts (abas e rotas)
+      infrastructure/     LocalProgressRepository, InMemoryProgressRepository (testes), createServices.ts
+      ui/                 JourneyApp, JourneyHeader, pages/ (uma por aba), components/ (dia, seções…)
   shared/
     brand/                links da marca (redes, áudio, WhatsApp) e assinatura
     theme/                tokens CSS, useTheme, botão de tema
-    ui/                   componentes genéricos (Button, Card, ProgressBar)
-    lib/                  utilitários sem regra de negócio
+    ui/                   componentes genéricos (BrandRings, RichText)
+    lib/                  utilitários sem regra de negócio (whatsapp, inlineMarkup, useHashRoute)
 ```
 
 ## Regra de dependência (jornada)
@@ -40,6 +39,7 @@ ui  →  application  →  domain  ←  content
 - `application/` conhece `domain/` e define **portas** (interfaces): `ProgressRepository`, `AuthService`.
 - `infrastructure/` implementa as portas (localStorage, Firestore, Firebase Auth).
 - `createServices.ts` é a **composition root**: o único lugar que escolhe as implementações.
+  `JourneyEntry.tsx` (raiz da feature) é quem o chama e entrega os serviços à `ui/` via contexto.
 - `hub/` e `jornada/` não importam um do outro. O que for comum vai para `shared/`.
 
 ## Rotas (hash)
