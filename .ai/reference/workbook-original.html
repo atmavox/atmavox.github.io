@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATMAVOX — Saindo do Estado Cinza: 21 Dias de Ativação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --preto: #0A0A0A;
+    --ambar: #C9831A;
+    --branco-quente: #F5EFE6;
+    --cinza-nevoa: #2C2C2C;
+    --dourado: #D4A853;
+    --vinho: #5C1F2E;
+    --nude: #C4A882;
+    --ambar-light: rgba(201,131,26,0.15);
+    --ambar-glow: rgba(201,131,26,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--preto);
+    color: var(--branco-quente);
+    font-family: 'Jost', sans-serif;
+    font-weight: 400;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(10,10,10,0.95);
+    border-bottom: 1px solid rgba(201,131,26,0.2);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--dourado);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .nav-tab {
+    padding: 0 1rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(245,239,230,0.4);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .nav-tab:hover { color: rgba(245,239,230,0.7); }
+  .nav-tab.active {
+    color: var(--dourado);
+    border-bottom-color: var(--ambar);
+  }
+
+  /* PAGES */
+  .page { display: none; padding-top: 56px; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ===== PÁGINA DE ABERTURA ===== */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,131,26,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .ring-container {
+    position: relative;
+    width: 140px; height: 140px;
+    margin: 0 auto 2.5rem;
+  }
+
+  .ring-outer {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,131,26,0.3);
+    position: absolute;
+    top: 0; left: 0;
+    animation: rotate-slow 20s linear infinite;
+  }
+
+  .ring-mid {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 1px solid rgba(212,168,83,0.5);
+    position: absolute;
+    top: 20px; left: 20px;
+    animation: rotate-slow 14s linear infinite reverse;
+  }
+
+  .ring-inner {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,131,26,0.2), transparent);
+    border: 1px solid var(--ambar);
+    position: absolute;
+    top: 40px; left: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ring-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--ambar);
+    box-shadow: 0 0 12px rgba(201,131,26,0.6);
+  }
+
+  @keyframes rotate-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .cover-tagline {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ambar);
+    margin-bottom: 1rem;
+  }
+
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--branco-quente);
+    margin-bottom: 0.5rem;
+    max-width: 700px;
+  }
+
+  .cover-subtitle {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: var(--dourado);
+    margin-bottom: 2rem;
+  }
+
+  .cover-divider {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--ambar), transparent);
+    margin: 0 auto 2rem;
+  }
+
+  .cover-manifesto {
+    max-width: 560px;
+    font-size: 0.95rem;
+    color: rgba(245,239,230,0.7);
+    line-height: 1.85;
+    margin-bottom: 2.5rem;
+  }
+
+  .cover-manifesto strong {
+    color: var(--branco-quente);
+    font-weight: 500;
+  }
+
+  .instrucoes-card {
+    background: var(--cinza-nevoa);
+    border: 1px solid rgba(201,131,26,0.2);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    max-width: 560px;
+    text-align: left;
+    margin-bottom: 2.5rem;
+  }
+
+  .instrucoes-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ambar);
+    margin-bottom: 0.8rem;
+  }
+
+  .instrucoes-card ol {
+    list-style: none;
+    counter-reset: instrucao;
+  }
+
+  .instrucoes-card ol li {
+    counter-increment: instrucao;
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.88rem;
+    color: rgba(245,239,230,0.75);
+    margin-bottom: 0.5rem;
+  }
+
+  .instrucoes-card ol li::before {
+    content: counter(instrucao);
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--ambar-light);
+    border: 1px solid rgba(201,131,26,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    color: var(--ambar);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* TRACKER */
+  .tracker-section {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .tracker-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ambar);
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+
+  .tracker-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 0.75rem;
+  }
+
+  .tracker-day {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    border: 1px solid rgba(201,131,26,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: rgba(245,239,230,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(44,44,44,0.5);
+    font-weight: 500;
+  }
+
+  .tracker-day:hover {
+    border-color: var(--ambar);
+    color: var(--ambar);
+  }
+
+  .tracker-day.done {
+    background: var(--ambar-light);
+    border-color: var(--ambar);
+    color: var(--dourado);
+  }
+
+  .tracker-day.done::after {
+    content: '✦';
+    font-size: 0.65rem;
+  }
+
+  .tracker-day.done span { display: none; }
+
+  .tracker-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.82rem;
+    color: rgba(245,239,230,0.5);
+  }
+
+  .tracker-bar {
+    flex: 1;
+    height: 3px;
+    background: rgba(201,131,26,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .tracker-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--ambar), var(--dourado));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* ===== DIA ===== */
+  .dias-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .semana-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2.5rem 0 1.5rem;
+  }
+
+  .semana-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ambar);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .semana-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(201,131,26,0.2);
+  }
+
+  .dia-card {
+    background: var(--cinza-nevoa);
+    border: 1px solid rgba(201,131,26,0.15);
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .dia-card:hover {
+    border-color: rgba(201,131,26,0.35);
+  }
+
+  .dia-card.active-day {
+    border-color: rgba(201,131,26,0.5);
+  }
+
+  .dia-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+  }
+
+  .dia-num-grupo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .dia-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: rgba(201,131,26,0.3);
+    line-height: 1;
+    min-width: 42px;
+  }
+
+  .dia-card.active-day .dia-num,
+  .dia-card.done-day .dia-num { color: var(--ambar); }
+
+  .dia-info { flex: 1; }
+
+  .dia-tema {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--branco-quente);
+    line-height: 1.3;
+  }
+
+  .dia-subtema {
+    font-size: 0.78rem;
+    color: rgba(245,239,230,0.45);
+    letter-spacing: 0.05em;
+  }
+
+  .dia-status {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,131,26,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    color: rgba(201,131,26,0.4);
+  }
+
+  .dia-status:hover { border-color: var(--ambar); color: var(--ambar); }
+  .dia-status.done { background: var(--ambar-light); border-color: var(--ambar); color: var(--ambar); }
+
+  .dia-toggle {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(245,239,230,0.25);
+    font-size: 0.8rem;
+    transition: transform 0.25s;
+  }
+  .dia-toggle.open { transform: rotate(180deg); }
+
+  .dia-content {
+    display: none;
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid rgba(201,131,26,0.1);
+  }
+
+  .dia-content.open { display: block; }
+
+  .secao {
+    margin-top: 1.1rem;
+  }
+
+  .secao-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ambar);
+    font-weight: 600;
+    margin-bottom: 0.55rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .secao-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(201,131,26,0.15);
+  }
+
+  .checkin-emocional {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+
+  .emocao-btn {
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid rgba(201,131,26,0.25);
+    background: transparent;
+    color: rgba(245,239,230,0.5);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .emocao-btn:hover { border-color: var(--ambar); color: var(--ambar); }
+  .emocao-btn.selecionada { background: var(--ambar-light); border-color: var(--ambar); color: var(--ambar); }
+
+  .campo-texto {
+    width: 100%;
+    background: rgba(10,10,10,0.5);
+    border: 1px solid rgba(201,131,26,0.2);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--branco-quente);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .campo-texto:focus { border-color: var(--ambar); }
+  .campo-texto::placeholder { color: rgba(245,239,230,0.2); }
+
+  .afirmacao-box {
+    background: rgba(10,10,10,0.4);
+    border-left: 2px solid var(--ambar);
+    border-radius: 0 8px 8px 0;
+    padding: 0.75rem 1rem;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    color: var(--dourado);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .campo-editavel {
+    font-size: 0.78rem;
+    color: rgba(245,239,230,0.3);
+    margin-top: 0.35rem;
+    font-style: italic;
+  }
+
+  .ativacao-ritual {
+    background: linear-gradient(135deg, rgba(92,31,46,0.2), rgba(201,131,26,0.08));
+    border: 1px solid rgba(201,131,26,0.2);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+  }
+
+  .ativacao-ritual p {
+    font-size: 0.88rem;
+    color: rgba(245,239,230,0.7);
+    line-height: 1.7;
+  }
+
+  .humor-track {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+  }
+
+  .humor-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,131,26,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .humor-dot:hover, .humor-dot.ativo {
+    border-color: var(--ambar);
+    background: var(--ambar-light);
+    transform: scale(1.1);
+  }
+
+  .humor-label {
+    font-size: 0.72rem;
+    color: rgba(245,239,230,0.35);
+    margin-left: 0.5rem;
+  }
+
+  /* ===== REVISÃO ===== */
+  .revisao-container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .revisao-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .revisao-num {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ambar);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .revisao-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--branco-quente);
+    margin-bottom: 0.5rem;
+  }
+
+  .revisao-subtitulo {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--dourado);
+    font-size: 0.95rem;
+  }
+
+  .revisao-perguntas {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .pergunta-card {
+    background: var(--cinza-nevoa);
+    border: 1px solid rgba(201,131,26,0.15);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+  }
+
+  .pergunta-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ambar);
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+  }
+
+  .pergunta-texto {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.92rem;
+    color: rgba(245,239,230,0.75);
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  /* ===== REGISTRO DE VITÓRIAS ===== */
+  .vitoria-form {
+    background: var(--cinza-nevoa);
+    border: 1px solid rgba(201,131,26,0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .vitoria-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .campo-grupo label {
+    display: block;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ambar);
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+  }
+
+  .campo-input {
+    width: 100%;
+    background: rgba(10,10,10,0.5);
+    border: 1px solid rgba(201,131,26,0.2);
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    color: var(--branco-quente);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .campo-input:focus { border-color: var(--ambar); }
+  .campo-input::placeholder { color: rgba(245,239,230,0.2); }
+
+  .btn-adicionar {
+    background: var(--ambar-light);
+    border: 1px solid var(--ambar);
+    border-radius: 8px;
+    padding: 0.65rem 1.25rem;
+    color: var(--ambar);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-adicionar:hover { background: rgba(201,131,26,0.25); }
+
+  .vitoria-lista { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .vitoria-item {
+    background: rgba(10,10,10,0.4);
+    border: 1px solid rgba(201,131,26,0.15);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr auto;
+    gap: 1rem;
+    align-items: start;
+    font-size: 0.85rem;
+  }
+
+  .vitoria-data { color: var(--ambar); font-size: 0.75rem; }
+  .vitoria-texto { color: rgba(245,239,230,0.8); }
+  .vitoria-resultado { color: rgba(245,239,230,0.6); font-style: italic; }
+
+  .btn-remover {
+    background: none;
+    border: none;
+    color: rgba(245,239,230,0.2);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: color 0.15s;
+    padding: 0;
+  }
+
+  .btn-remover:hover { color: rgba(201,131,26,0.6); }
+
+  /* ===== ENCERRAMENTO ===== */
+  .encerramento-container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+    text-align: center;
+  }
+
+  .chama-grande {
+    width: 80px; height: 80px;
+    margin: 0 auto 2rem;
+    position: relative;
+  }
+
+  .chama-svg { width: 100%; height: 100%; }
+
+  .enc-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    color: var(--branco-quente);
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .enc-subtitulo {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--dourado);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .enc-texto {
+    font-size: 0.92rem;
+    color: rgba(245,239,230,0.65);
+    line-height: 1.85;
+    max-width: 520px;
+    margin: 0 auto 2.5rem;
+  }
+
+  .enc-perguntas {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .enc-cta {
+    background: linear-gradient(135deg, rgba(92,31,46,0.3), rgba(201,131,26,0.15));
+    border: 1px solid rgba(201,131,26,0.35);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .enc-cta-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--dourado);
+    margin-bottom: 0.75rem;
+  }
+
+  .enc-cta-texto {
+    font-size: 0.88rem;
+    color: rgba(245,239,230,0.6);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+
+  .btn-protocolo {
+    display: inline-block;
+    background: var(--ambar);
+    color: var(--preto);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-protocolo:hover { background: var(--dourado); transform: translateY(-1px); }
+
+  /* UTIL */
+  .campo-editavel-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(212,168,83,0.5);
+    border: 1px solid rgba(212,168,83,0.2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+
+  @media (max-width: 600px) {
+    .vitoria-item { grid-template-columns: 1fr; }
+    .vitoria-grid { grid-template-columns: 1fr; }
+    nav { padding: 0 1rem; }
+    .cover { padding: 4rem 1.25rem 2rem; }
+    .instrucoes-card { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">ATMAVOX</span>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('abertura')">Abertura</button>
+    <button class="nav-tab" onclick="showPage('semana1')">Semana I</button>
+    <button class="nav-tab" onclick="showPage('semana2')">Semana II</button>
+    <button class="nav-tab" onclick="showPage('semana3')">Semana III</button>
+    <button class="nav-tab" onclick="showPage('revisao')">Revisões</button>
+    <button class="nav-tab" onclick="showPage('vitorias')">Vitórias</button>
+    <button class="nav-tab" onclick="showPage('encerramento')">Encerramento</button>
+  </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- PÁGINA DE ABERTURA -->
+<!-- ============================================================ -->
+<div id="abertura" class="page active">
+  <div class="cover">
+    <div class="ring-container">
+      <div class="ring-outer"></div>
+      <div class="ring-mid"></div>
+      <div class="ring-inner"><div class="ring-dot"></div></div>
+    </div>
+
+    <p class="cover-tagline">Atmavox · Protocolo de Ativação</p>
+    <h1 class="cover-title">Saindo do Estado Cinza</h1>
+    <p class="cover-subtitle">21 Dias de Ativação da Chama Interna</p>
+    <div class="cover-divider"></div>
+
+    <p class="cover-manifesto">
+      Você chegou até aqui porque sabe que nasceu para mais.<br>
+      <strong>Mas ainda vive pedindo permissão para existir.</strong><br><br>
+      Isso tem nome: <strong>Estado Cinza.</strong><br>
+      E os próximos 21 dias existem para destruí-lo — dentro de você —<br>
+      e acender o que nunca deveria ter apagado.
+    </p>
+
+    <div class="instrucoes-card">
+      <h3>Como usar este workbook</h3>
+      <ol>
+        <li><span>Reserve entre 10 e 20 minutos por dia — de preferência pela manhã, antes que o mundo fale mais alto que você.</span></li>
+        <li><span>Cada dia tem um ritual, uma afirmação e espaço de reflexão. Não pule etapas — a sequência é intencional.</span></li>
+        <li><span>Marque cada dia concluído no rastreador abaixo. Progresso visível ativa o sistema nervoso.</span></li>
+        <li><span>Campos entre <strong>[colchetes]</strong> são editáveis — personalize com sua linguagem, datas e contexto.</span></li>
+        <li><span>Nas revisões semanais (dias 7, 14 e 21), reserve 30 minutos para integrar o que está se movendo.</span></li>
+      </ol>
+    </div>
+
+    <div class="tracker-section">
+      <p class="tracker-label">Rastreador de Progresso — 21 Dias</p>
+      <div class="tracker-grid" id="trackerGrid"></div>
+      <div class="tracker-progress">
+        <span id="trackerCount">0/21 dias</span>
+        <div class="tracker-bar"><div class="tracker-fill" id="trackerFill" style="width:0%"></div></div>
+        <span id="trackerPct">0%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEMANA I — Presença e Reconhecimento -->
+<!-- ============================================================ -->
+<div id="semana1" class="page">
+  <div class="dias-container">
+    <div class="semana-header">
+      <span class="semana-label">Semana I · Dias 1–7</span>
+      <div class="semana-line"></div>
+      <span class="semana-label" style="color:rgba(245,239,230,0.3)">Nomeando o Cinza</span>
+    </div>
+
+    <!-- DIA 1 -->
+    <div class="dia-card" id="card-d1">
+      <div class="dia-header" onclick="toggleDia('d1')">
+        <div class="dia-num-grupo">
+          <span class="dia-num">01</span>
+          <div class="dia-info">
+            <div class="dia-tema">O Estado que você não consegue nomear</div>
+            <div class="dia-subtema">Reconhecimento · Diagnóstico inicial</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <div class="dia-status" id="status-d1" onclick="toggleStatus('d1', event)" title="Marcar como concluído">✦</div>
+          <div class="dia-toggle" id="toggle-d1">▾</div>
+        </div>
+      </div>
+      <div class="dia-content" id="content-d1">
+        <div class="secao">
+          <div class="secao-label">Check-in energético</div>
+          <div class="checkin-emocional">
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Pesada</button>
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Ansiosa</button>
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Dispersa</button>
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Neutра</button>
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Esperançosa</button>
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Presente</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Ritual de abertura</div>
+          <div class="ativacao-ritual">
+            <p>Inspire pelo nariz contando 4 tempos. Segure por 4. Expire pela boca em 6. Repita 3 vezes. Ao final, coloque a mão esquerda no peito e diga em voz alta: <em>"Estou aqui. Estou me ouvindo."</em></p>
+          </div>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Reflexão do dia</div>
+          <p style="font-size:0.85rem;color:rgba(245,239,230,0.55);margin-bottom:0.6rem">Como o Estado Cinza aparece na minha vida hoje? <span class="campo-editavel-tag">editável</span></p>
+          <textarea class="campo-texto" placeholder="Escreva sem censura. Este espaço é só seu..."></textarea>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Afirmação da Chama</div>
+          <div class="afirmacao-box">"Eu reconheço o cinza — e já é um ato de presença."</div>
+          <p class="campo-editavel">[Reescreva com suas palavras se precisar — o que importa é que ressoe no corpo]</p>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Fechamento do dia</div>
+          <div style="margin-bottom:0.6rem">
+            <p style="font-size:0.82rem;color:rgba(245,239,230,0.5);margin-bottom:0.5rem">Como me sinto agora?</p>
+            <div class="humor-track">
+              <div class="humor-dot" onclick="setHumor(this, 'd1')">😶</div>
+              <div class="humor-dot" onclick="setHumor(this, 'd1')">🌑</div>
+              <div class="humor-dot" onclick="setHumor(this, 'd1')">🌓</div>
+              <div class="humor-dot" onclick="setHumor(this, 'd1')">🌕</div>
+              <div class="humor-dot" onclick="setHumor(this, 'd1')">🔥</div>
+              <span class="humor-label">[registre sua temperatura energética]</span>
+            </div>
+          </div>
+          <textarea class="campo-texto" style="min-height:60px" placeholder="Uma palavra ou frase sobre o que se moveu hoje..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIA 2 -->
+    <div class="dia-card" id="card-d2">
+      <div class="dia-header" onclick="toggleDia('d2')">
+        <div class="dia-num-grupo">
+          <span class="dia-num">02</span>
+          <div class="dia-info">
+            <div class="dia-tema">Os sintomas que você ignora</div>
+            <div class="dia-subtema">Consciência corporal · Escuta interna</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <div class="dia-status" id="status-d2" onclick="toggleStatus('d2', event)" title="Marcar como concluído">✦</div>
+          <div class="dia-toggle" id="toggle-d2">▾</div>
+        </div>
+      </div>
+      <div class="dia-content" id="content-d2">
+        <div class="secao">
+          <div class="secao-label">Check-in energético</div>
+          <div class="checkin-emocional">
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Pesada</button>
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Ansiosa</button>
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Dispersa</button>
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Neutra</button>
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Esperançosa</button>
+            <button class="emocao-btn" onclick="toggleEmocao(this)">Presente</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Ritual de abertura</div>
+          <div class="ativacao-ritual">
+            <p>Feche os olhos. Varra mentalmente seu corpo da cabeça aos pés. Onde sente tensão? Onde sente vazio? Não julgue — apenas observe. Este é seu diagnóstico energético diário.</p>
+          </div>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Os 5 sinais do Estado Cinza em mim</div>
+          <p style="font-size:0.82rem;color:rgba(245,239,230,0.45);margin-bottom:0.6rem">Liste os que aparecem na sua vida — sem filtro. <span class="campo-editavel-tag">editável</span></p>
+          <textarea class="campo-texto" placeholder="Ex: Procrastino decisões que já sei que preciso tomar. Busco aprovação antes de agir. Minha energia desaparece sem razão..."></textarea>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Afirmação da Chama</div>
+          <div class="afirmacao-box">"Ver o padrão é o primeiro ato de quem está saindo do cinza."</div>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Fechamento do dia</div>
+          <div style="margin-bottom:0.6rem">
+            <div class="humor-track">
+              <div class="humor-dot" onclick="setHumor(this, 'd2')">😶</div>
+              <div class="humor-dot" onclick="setHumor(this, 'd2')">🌑</div>
+              <div class="humor-dot" onclick="setHumor(this, 'd2')">🌓</div>
+              <div class="humor-dot" onclick="setHumor(this, 'd2')">🌕</div>
+              <div class="humor-dot" onclick="setHumor(this, 'd2')">🔥</div>
+            </div>
+          </div>
+          <textarea class="campo-texto" style="min-height:60px" placeholder="O que se moveu hoje?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIA 3 -->
+    <div class="dia-card" id="card-d3">
+      <div class="dia-header" onclick="toggleDia('d3')">
+        <div class="dia-num-grupo">
+          <span class="dia-num">03</span>
+          <div class="dia-info">
+            <div class="dia-tema">A raiz da validação</div>
+            <div class="dia-subtema">Origem do padrão · Desbloqueio de crença</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <div class="dia-status" id="status-d3" onclick="toggleStatus('d3', event)" title="Marcar como concluído">✦</div>
+          <div class="dia-toggle" id="toggle-d3">▾</div>
+        </div>
+      </div>
+      <div class="dia-content" id="content-d3">
+        <div class="secao">
+          <div class="secao-label">Ritual de abertura</div>
+          <div class="ativacao-ritual">
+            <p>Pegue um copo de água. Antes de beber, segure nas mãos e intencione: <em>"Que essa água dissolva o que não me pertence mais."</em> Beba devagar, sentindo.</p>
+          </div>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Investigação da raiz</div>
+          <p style="font-size:0.85rem;color:rgba(245,239,230,0.55);margin-bottom:0.6rem">Quando aprenди que precisava de aprovação para existir? <span class="campo-editavel-tag">editável</span></p>
+          <textarea class="campo-texto" placeholder="Não há resposta certa. Escreva o que vier — memórias, sensações, situações..."></textarea>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Crença para dissolver hoje</div>
+          <textarea class="campo-texto" style="min-height:50px" placeholder='[escreva a crença: "Eu preciso de permissão para..."]'></textarea>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Afirmação da Chama</div>
+          <div class="afirmacao-box">"Minha expansão não precisa de aprovação — só de ativação."</div>
+        </div>
+
+        <div class="secao">
+          <div class="secao-label">Fechamento do dia</div>
+          <div class="humor-track" style="margin-bottom:0.5rem">
+            <div class="humor-dot" onclick="setHumor(this, 'd3')">😶</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd3')">🌑</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd3')">🌓</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd3')">🌕</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd3')">🔥</div>
+          </div>
+          <textarea class="campo-texto" style="min-height:60px" placeholder="O que se moveu hoje?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIAS 4-7 CONDENSADOS -->
+    <div class="dia-card" id="card-d4">
+      <div class="dia-header" onclick="toggleDia('d4')">
+        <div class="dia-num-grupo">
+          <span class="dia-num">04</span>
+          <div class="dia-info">
+            <div class="dia-tema">Procrastinação energética</div>
+            <div class="dia-subtema">Ação do corpo · Desbloqueio de movimento</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <div class="dia-status" id="status-d4" onclick="toggleStatus('d4', event)">✦</div>
+          <div class="dia-toggle" id="toggle-d4">▾</div>
+        </div>
+      </div>
+      <div class="dia-content" id="content-d4">
+        <div class="secao">
+          <div class="secao-label">Ritual</div>
+          <div class="ativacao-ritual"><p>Levante-se. Chacoalhe os braços e as mãos por 30 segundos — deixe o corpo soltar o que está travado. O movimento físico precede o movimento energético.</p></div>
+        </div>
+        <div class="secao">
+          <div class="secao-label">O que estou procrastinando?</div>
+          <textarea class="campo-texto" placeholder="Liste até 3 coisas que sabe que precisa fazer mas está adiando..."></textarea>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Por que estou adiando? (sem julgamento)</div>
+          <textarea class="campo-texto" placeholder="O que é o medo por trás da procrastinação?"></textarea>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Afirmação da Chama</div>
+          <div class="afirmacao-box">"Agir é o ato espiritual mais poderoso que posso praticar hoje."</div>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Fechamento</div>
+          <div class="humor-track" style="margin-bottom:0.5rem">
+            <div class="humor-dot" onclick="setHumor(this, 'd4')">😶</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd4')">🌑</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd4')">🌓</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd4')">🌕</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd4')">🔥</div>
+          </div>
+          <textarea class="campo-texto" style="min-height:60px" placeholder="O que se moveu hoje?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-card" id="card-d5">
+      <div class="dia-header" onclick="toggleDia('d5')">
+        <div class="dia-num-grupo">
+          <span class="dia-num">05</span>
+          <div class="dia-info">
+            <div class="dia-tema">A voz que te encolhe</div>
+            <div class="dia-subtema">Crítica interna · Re-programação</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <div class="dia-status" id="status-d5" onclick="toggleStatus('d5', event)">✦</div>
+          <div class="dia-toggle" id="toggle-d5">▾</div>
+        </div>
+      </div>
+      <div class="dia-content" id="content-d5">
+        <div class="secao">
+          <div class="secao-label">Ritual</div>
+          <div class="ativacao-ritual"><p>Ouça por 5 minutos o áudio gratuito <em>Retorne ao Seu Centro</em> antes de começar. Se não tiver acesso, respire em coerência cardíaca: inspire 5s, expire 5s, por 3 minutos.</p></div>
+        </div>
+        <div class="secao">
+          <div class="secao-label">O que a voz interna diz que não posso?</div>
+          <textarea class="campo-texto" placeholder="Escreva as frases que sua crítica interna usa com mais frequência..."></textarea>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Reescrita — o que a Chama Interna responde a isso?</div>
+          <textarea class="campo-texto" placeholder="Para cada frase acima, escreva a versão ativada..."></textarea>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Afirmação da Chama</div>
+          <div class="afirmacao-box">"Não sou a voz do cinza. Sou a chama que a dissolve."</div>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Fechamento</div>
+          <div class="humor-track" style="margin-bottom:0.5rem">
+            <div class="humor-dot" onclick="setHumor(this, 'd5')">😶</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd5')">🌑</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd5')">🌓</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd5')">🌕</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd5')">🔥</div>
+          </div>
+          <textarea class="campo-texto" style="min-height:60px" placeholder="O que se moveu hoje?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-card" id="card-d6">
+      <div class="dia-header" onclick="toggleDia('d6')">
+        <div class="dia-num-grupo">
+          <span class="dia-num">06</span>
+          <div class="dia-info">
+            <div class="dia-tema">Minha energia vital hoje</div>
+            <div class="dia-subtema">Mapeamento energético · Radiestesia interna</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <div class="dia-status" id="status-d6" onclick="toggleStatus('d6', event)">✦</div>
+          <div class="dia-toggle" id="toggle-d6">▾</div>
+        </div>
+      </div>
+      <div class="dia-content" id="content-d6">
+        <div class="secao">
+          <div class="secao-label">Ritual</div>
+          <div class="ativacao-ritual"><p>Esfregue as mãos uma na outra por 20 segundos até sentir calor. Separe as palmas devagar e sinta o campo energético entre elas. Essa é sua Chama Interna — ela nunca apagou.</p></div>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Mapeamento: onde está minha energia hoje?</div>
+          <textarea class="campo-texto" placeholder="Sinto energia para: | Sinto bloqueio em: | Meu corpo pede: ..."></textarea>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Uma micro-ação que posso fazer HOJE para honrar minha energia</div>
+          <textarea class="campo-texto" style="min-height:50px" placeholder="Pequena, executável, sem pressão..."></textarea>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Afirmação da Chama</div>
+          <div class="afirmacao-box">"Minha energia vital é a bússola mais confiável que tenho."</div>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Fechamento</div>
+          <div class="humor-track" style="margin-bottom:0.5rem">
+            <div class="humor-dot" onclick="setHumor(this, 'd6')">😶</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd6')">🌑</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd6')">🌓</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd6')">🌕</div>
+            <div class="humor-dot" onclick="setHumor(this, 'd6')">🔥</div>
+          </div>
+          <textarea class="campo-texto" style="min-height:60px" placeholder="O que se moveu hoje?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-card" style="border-color:rgba(201,131,26,0.35)" id="card-d7">
+      <div class="dia-header" onclick="toggleDia('d7')">
+        <div class="dia-num-grupo">
+          <span class="dia-num" style="color:var(--ambar)">07</span>
+          <div class="dia-info">
+            <div class="dia-tema">Revisão da Semana I ✦</div>
+            <div class="dia-subtema">Integração · Consolidação · Presença</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <div class="dia-status" id="status-d7" onclick="toggleStatus('d7', event)">✦</div>
+          <div class="dia-toggle" id="toggle-d7">▾</div>
+        </div>
+      </div>
+      <div class="dia-content" id="content-d7">
+        <div class="secao">
+          <div class="secao-label">Ritual de integração semanal</div>
+          <div class="ativacao-ritual"><p>Reserve 30 minutos. Acenda uma vela ou difusor se possível. Releia suas anotações dos 6 dias anteriores antes de responder. Leia com presença — não com julgamento.</p></div>
+        </div>
+        <div class="secao">
+          <div class="secao-label">O que aprendi sobre meu Estado Cinza esta semana?</div>
+          <textarea class="campo-texto" placeholder="Padrões que reconheci, crenças que vi, comportamentos que nomeei..."></textarea>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Qual foi meu maior desafio? O que ele me ensinou?</div>
+          <textarea class="campo-texto" placeholder="Sem filtro. O desafio é o mestre."></textarea>
+        </div>
+        <div class="secao">
+          <div class="secao-label">O que quero aprofundar na Semana II?</div>
+          <textarea class="campo-texto" placeholder="Minha intenção para os próximos 7 dias..."></textarea>
+        </div>
+        <div class="secao">
+          <div class="secao-label">Afirmação de integração</div>
+          <div class="afirmacao-box">"Nomeei o cinza. Na semana que vem, começo a desfazê-lo."</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEMANA II -->
+<!-- ============================================================ -->
+<div id="semana2" class="page">
+  <div class="dias-container">
+    <div class="semana-header">
+      <span class="semana-label">Semana II · Dias 8–14</span>
+      <div class="semana-line"></div>
+      <span class="semana-label" style="color:rgba(245,239,230,0.3)">Desbloqueio Emocional</span>
+    </div>
+
+    <!-- Dias 8-14 condensados em estrutura rápida -->
+    <script>
+      const semana2 = [
+        { num:'08', tema:'O desbloqueio emocional começa', sub:'Presença corporal · Acesso ao campo', afirmacao:'Minhas emoções são informação — não prisão.', ritual:'Coloque uma das mãos no plexo solar. Respire para dentro da mão. Pergunte ao corpo: o que você precisa soltar hoje? Aguarde a resposta sem pressa.' },
+        { num:'09', tema:'O que está represado em mim', sub:'Desbloqueio emocional profundo', afirmacao:'Sentir é o primeiro movimento de quem está saindo do cinza.', ritual:'Escreva sem parar por 5 minutos — escrita automática, sem pensar. Não leia enquanto escreve.' },
+        { num:'10', tema:'Âncoras do passado', sub:'Dissolução de padrões antigos', afirmacao:'O passado informa — mas não define minha chama.', ritual:'Identifique uma situação passada que ainda carrega carga. Visualize-a envolta em luz âmbar. Agradeça a lição e a libere.' },
+        { num:'11', tema:'Relações que me drenam', sub:'Clareza energética · Fronteiras', afirmacao:'Minhas fronteiras são atos de amor — por mim e pelos outros.', ritual:'Liste 3 relações ou situações que consomem sua energia. Não julgue — apenas observe onde você perde força.' },
+        { num:'12', tema:'O corpo como portal', sub:'Fitoenergética · Aromaterapia interna', afirmacao:'Meu corpo sabe o caminho que minha mente ainda debate.', ritual:'Coloque uma gota de óleo essencial que te traga presença (lavanda, mirra, cedro) no pulso. Inspire profundamente. Deixe o aroma te ancorar.' },
+        { num:'13', tema:'A crença central do cinza', sub:'PNL · Ressignificação profunda', afirmacao:'Ressignifico para avançar — não para apagar.', ritual:'Pergunte: qual é a crença mais profunda que sustenta meu Estado Cinza? Não a superficial — a raiz. Escreva sem editar.' },
+        { num:'14', tema:'Revisão da Semana II ✦', sub:'Integração · Consolidação · Movimento', afirmacao:'Desbloqueei. Agora preparo o terreno para ativar.', ritual:'Reserve 30 minutos. Releia a semana. Identifique o maior movimento interno que aconteceu. Honre-o por escrito.' },
+      ];
+    </script>
+
+    <div id="semana2-cards"></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SEMANA III -->
+<!-- ============================================================ -->
+<div id="semana3" class="page">
+  <div class="dias-container">
+    <div class="semana-header">
+      <span class="semana-label">Semana III · Dias 15–21</span>
+      <div class="semana-line"></div>
+      <span class="semana-label" style="color:rgba(245,239,230,0.3)">Nova Identidade e Direção</span>
+    </div>
+    <div id="semana3-cards"></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- REVISÕES SEMANAIS -->
+<!-- ============================================================ -->
+<div id="revisao" class="page">
+  <div class="revisao-container">
+    <div class="revisao-header">
+      <p class="revisao-num">Revisão Periódica</p>
+      <h2 class="revisao-titulo">Integração das Semanas</h2>
+      <p class="revisao-subtitulo">Onde você estava. Onde está. Para onde vai.</p>
+    </div>
+
+    <div id="revisao-tabs" style="display:flex;gap:0.5rem;margin-bottom:2rem;flex-wrap:wrap">
+      <button class="emocao-btn selecionada" onclick="showRevisao('r7', this)">Semana I — Dia 7</button>
+      <button class="emocao-btn" onclick="showRevisao('r14', this)">Semana II — Dia 14</button>
+      <button class="emocao-btn" onclick="showRevisao('r21', this)">Semana III — Dia 21</button>
+    </div>
+
+    <div id="revisao-r7">
+      <div class="revisao-perguntas">
+        <div class="pergunta-card">
+          <div class="pergunta-label">Pergunta 01</div>
+          <div class="pergunta-texto">O que aprendi sobre meu Estado Cinza esta semana? Quais padrões consegui nomear? <span class="campo-editavel-tag">editável</span></div>
+          <textarea class="campo-texto" placeholder="Escreva com profundidade. Esta é sua ficha de diagnóstico."></textarea>
+        </div>
+        <div class="pergunta-card">
+          <div class="pergunta-label">Pergunta 02</div>
+          <div class="pergunta-texto">Qual foi meu maior desafio? O que ele revelou sobre onde ainda estou presa?</div>
+          <textarea class="campo-texto" placeholder="O desafio é o espelho mais honesto que existe."></textarea>
+        </div>
+        <div class="pergunta-card">
+          <div class="pergunta-label">Pergunta 03</div>
+          <div class="pergunta-texto">Que micro-movimento de ativação aconteceu? Por menor que tenha sido — onde a Chama piscou?</div>
+          <textarea class="campo-texto" placeholder="Reconheça e celebre cada centímetro de avanço."></textarea>
+        </div>
+        <div class="pergunta-card">
+          <div class="pergunta-label">Intenção para a Semana II</div>
+          <div class="pergunta-texto">Com o que aprendi, qual é minha intenção para os próximos 7 dias? <span class="campo-editavel-tag">editável</span></div>
+          <textarea class="campo-texto" placeholder="Uma frase clara. Uma direção. Sem pressão — com presença."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div id="revisao-r14" style="display:none">
+      <div class="revisao-perguntas">
+        <div class="pergunta-card">
+          <div class="pergunta-label">Pergunta 01</div>
+          <div class="pergunta-texto">O que desbloqueei emocionalmente nesta semana? O que estava represado e começou a se mover? <span class="campo-editavel-tag">editável</span></div>
+          <textarea class="campo-texto" placeholder="Seja honesta sobre o que se moveu — mesmo que tenha sido desconfortável."></textarea>
+        </div>
+        <div class="pergunta-card">
+          <div class="pergunta-label">Pergunta 02</div>
+          <div class="pergunta-texto">Quais relações ou padrões de consumo de energia ficaram mais claros? O que precisa mudar?</div>
+          <textarea class="campo-texto" placeholder="Clareza antes de ação. Escreva sem censurar."></textarea>
+        </div>
+        <div class="pergunta-card">
+          <div class="pergunta-label">Pergunta 03</div>
+          <div class="pergunta-texto">O que mudou em mim desde o Dia 1? Mesmo que seja sutil — o que já é diferente?</div>
+          <textarea class="campo-texto" placeholder="Compare com onde você estava na Semana I."></textarea>
+        </div>
+        <div class="pergunta-card">
+          <div class="pergunta-label">Intenção para a Semana III</div>
+          <div class="pergunta-texto">Entrando na semana da Nova Identidade: quem você está se tornando? <span class="campo-editavel-tag">editável</span></div>
+          <textarea class="campo-texto" placeholder="Descreva em presente — como se já fosse."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div id="revisao-r21" style="display:none">
+      <div class="revisao-perguntas">
+        <div class="pergunta-card">
+          <div class="pergunta-label">Pergunta Final 01</div>
+          <div class="pergunta-texto">Quem era a pessoa que começou este workbook no Dia 1? O que ela acreditava sobre si mesma? <span class="campo-editavel-tag">editável</span></div>
+          <textarea class="campo-texto" placeholder="Escreva em terceira pessoa se precisar de distância."></textarea>
+        </div>
+        <div class="pergunta-card">
+          <div class="pergunta-label">Pergunta Final 02</div>
+          <div class="pergunta-texto">Quem é você agora, no Dia 21? O que se ativou? O que não volta mais?</div>
+          <textarea class="campo-texto" placeholder="Esta é sua nova identidade. Escreva sem modéstia."></textarea>
+        </div>
+        <div class="pergunta-card">
+          <div class="pergunta-label">Pergunta Final 03</div>
+          <div class="pergunta-texto">Qual é o próximo passo real da sua ativação? O que você agora sabe que precisa fazer?</div>
+          <textarea class="campo-texto" placeholder="Uma ação. Um compromisso. Uma direção clara."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VITÓRIAS -->
+<!-- ============================================================ -->
+<div id="vitorias" class="page">
+  <div class="revisao-container">
+    <div class="revisao-header">
+      <p class="revisao-num">Registro de Conquistas</p>
+      <h2 class="revisao-titulo">Chamas Acesas</h2>
+      <p class="revisao-subtitulo">Cada vitória que você documenta, ancora a nova identidade</p>
+    </div>
+
+    <div class="vitoria-form">
+      <p style="font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ambar);margin-bottom:1rem;font-weight:600">Registrar nova conquista</p>
+      <div class="vitoria-grid">
+        <div class="campo-grupo">
+          <label>Data <span class="campo-editavel-tag">editável</span></label>
+          <input type="date" class="campo-input" id="vitoria-data">
+        </div>
+        <div class="campo-grupo">
+          <label>Dia do Protocolo</label>
+          <input type="number" class="campo-input" id="vitoria-dia" placeholder="Ex: 3" min="1" max="21">
+        </div>
+      </div>
+      <div class="campo-grupo" style="margin-bottom:0.75rem">
+        <label>O que aconteceu / foi tentado <span class="campo-editavel-tag">editável</span></label>
+        <input type="text" class="campo-input" id="vitoria-acao" placeholder="Descreva a conquista ou avanço...">
+      </div>
+      <div class="campo-grupo" style="margin-bottom:1rem">
+        <label>Como foi alcançado / resolvido</label>
+        <input type="text" class="campo-input" id="vitoria-resultado" placeholder="O que mudou, o que senti, o que se abriu...">
+      </div>
+      <button class="btn-adicionar" onclick="adicionarVitoria()">✦ Registrar Conquista</button>
+    </div>
+
+    <div class="vitoria-lista" id="vitoriaLista">
+      <!-- exemplo pré-preenchido -->
+      <div class="vitoria-item">
+        <div>
+          <div class="vitoria-data">Dia 1</div>
+          <div style="font-size:0.72rem;color:rgba(245,239,230,0.3)">[data]</div>
+        </div>
+        <div class="vitoria-texto">Completei o primeiro dia sem pular nenhuma etapa</div>
+        <div class="vitoria-resultado">Senti uma leveza inesperada ao nomear o Estado Cinza pela primeira vez</div>
+        <button class="btn-remover" onclick="this.parentElement.remove()">✕</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ENCERRAMENTO -->
+<!-- ============================================================ -->
+<div id="encerramento" class="page">
+  <div class="encerramento-container">
+    <div style="padding-top:2rem">
+      <div class="chama-grande">
+        <svg class="chama-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="40" r="38" stroke="rgba(201,131,26,0.25)" stroke-width="0.75"/>
+          <circle cx="40" cy="40" r="28" stroke="rgba(212,168,83,0.4)" stroke-width="0.75"/>
+          <ellipse cx="40" cy="52" rx="12" ry="16" fill="rgba(201,131,26,0.15)"/>
+          <path d="M40 24 C36 32 28 36 32 46 C34 52 38 56 40 60 C42 56 46 52 48 46 C52 36 44 32 40 24Z" fill="rgba(201,131,26,0.5)"/>
+          <path d="M40 32 C38 37 34 40 36 46 C37 49 39 52 40 54 C41 52 43 49 44 46 C46 40 42 37 40 32Z" fill="rgba(212,168,83,0.8)"/>
+          <circle cx="40" cy="38" r="3" fill="rgba(245,239,230,0.6)"/>
+        </svg>
+      </div>
+
+      <p class="cover-tagline" style="margin-bottom:1rem">Dia 21 · Encerramento</p>
+      <h1 class="enc-titulo">A Chama está acesa.</h1>
+      <p class="enc-subtitulo">O Estado Cinza não te define mais.</p>
+
+      <div class="cover-divider" style="margin:1.5rem auto"></div>
+
+      <p class="enc-texto">
+        Você completou 21 dias de presença intencional.<br>
+        Nomeou o que te prendia. Desbloqueou o que estava represado.<br>
+        Ancorou quem você está se tornando.<br><br>
+        Isso não é fim — é fundação.<br>
+        A Chama Interna que você ativou aqui não apaga mais facilmente.
+      </p>
+
+      <div class="enc-perguntas">
+        <div class="pergunta-card">
+          <div class="pergunta-label">Reflexão de encerramento 01</div>
+          <div class="pergunta-texto">Como eu era no Dia 1 e como sou agora? Qual a diferença mais concreta? <span class="campo-editavel-tag">editável</span></div>
+          <textarea class="campo-texto" placeholder="Escreva com presença e gratidão."></textarea>
+        </div>
+        <div class="pergunta-card">
+          <div class="pergunta-label">Reflexão de encerramento 02</div>
+          <div class="pergunta-texto">O que o Estado Cinza me custou até chegar aqui? O que não vou mais pagar esse preço?</div>
+          <textarea class="campo-texto" placeholder="Este é o seu compromisso com a nova identidade."></textarea>
+        </div>
+        <div class="pergunta-card">
+          <div class="pergunta-label">Reflexão de encerramento 03</div>
+          <div class="pergunta-texto">Qual é meu próximo passo real? Não o ideal — o real. O que farei nos próximos 7 dias para manter a Chama ativa? <span class="campo-editavel-tag">editável</span></div>
+          <textarea class="campo-texto" placeholder="Uma ação. Um compromisso. Uma direção."></textarea>
+        </div>
+      </div>
+
+      <div class="secao" style="text-align:left;margin-bottom:2rem">
+        <div class="secao-label">Intenção para os próximos 21 dias</div>
+        <textarea class="campo-texto" placeholder="[escreva aqui sua intenção para o próximo ciclo]"></textarea>
+      </div>
+
+      <div class="enc-cta">
+        <h3 class="enc-cta-titulo">O Protocolo de Ativação Presencial Atmavox</h3>
+        <p class="enc-cta-texto">
+          Você percorreu 21 dias sozinha — e isso é poderoso.<br>
+          Imagine o que acontece quando você é guiada por dentro, em uma sessão individual de diagnóstico, ativação e ancoragem.<br><br>
+          O Protocolo Presencial vai mais fundo do que qualquer jornada solo.
+        </p>
+        <a href="https://atmavox.keepo.bio" class="btn-protocolo" target="_blank">Quero Sair do Estado Cinza →</a>
+      </div>
+
+      <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:0.88rem;color:rgba(245,239,230,0.35);margin-top:1.5rem">
+        Com presença e direção — Andreia Oliveira · ATMAVOX<br>
+        <span style="font-size:0.72rem;letter-spacing:0.1em">[Assinatura editável]</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- NAVEGAÇÃO ----------
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    const tabs = document.querySelectorAll('.nav-tab');
+    const map = ['abertura','semana1','semana2','semana3','revisao','vitorias','encerramento'];
+    const idx = map.indexOf(id);
+    if (idx >= 0) tabs[idx].classList.add('active');
+  }
+
+  // ---------- TRACKER ----------
+  const tracker = JSON.parse(localStorage.getItem('atm-tracker') || '{}');
+
+  function buildTracker() {
+    const grid = document.getElementById('trackerGrid');
+    grid.innerHTML = '';
+    let done = 0;
+    for (let i = 1; i <= 21; i++) {
+      const d = document.createElement('div');
+      d.className = 'tracker-day' + (tracker[i] ? ' done' : '');
+      if (!tracker[i]) d.innerHTML = `<span>${i}</span>`;
+      d.onclick = () => { tracker[i] = !tracker[i]; localStorage.setItem('atm-tracker', JSON.stringify(tracker)); buildTracker(); };
+      grid.appendChild(d);
+      if (tracker[i]) done++;
+    }
+    const pct = Math.round((done/21)*100);
+    document.getElementById('trackerCount').textContent = `${done}/21 dias`;
+    document.getElementById('trackerPct').textContent = `${pct}%`;
+    document.getElementById('trackerFill').style.width = pct + '%';
+  }
+  buildTracker();
+
+  // ---------- TOGGLE DIA ----------
+  function toggleDia(id) {
+    const content = document.getElementById('content-' + id);
+    const tog = document.getElementById('toggle-' + id);
+    const isOpen = content.classList.contains('open');
+    content.classList.toggle('open', !isOpen);
+    tog.classList.toggle('open', !isOpen);
+  }
+
+  // ---------- STATUS DIA ----------
+  function toggleStatus(id, e) {
+    e.stopPropagation();
+    const el = document.getElementById('status-' + id);
+    const card = document.getElementById('card-' + id);
+    el.classList.toggle('done');
+    card.classList.toggle('done-day', el.classList.contains('done'));
+    const num = parseInt(id.replace('d',''));
+    tracker[num] = el.classList.contains('done');
+    localStorage.setItem('atm-tracker', JSON.stringify(tracker));
+    buildTracker();
+  }
+
+  // ---------- EMOÇÃO ----------
+  function toggleEmocao(btn) {
+    btn.classList.toggle('selecionada');
+  }
+
+  // ---------- HUMOR ----------
+  function setHumor(dot, day) {
+    const siblings = dot.parentElement.querySelectorAll('.humor-dot');
+    siblings.forEach(s => s.classList.remove('ativo'));
+    dot.classList.add('ativo');
+  }
+
+  // ---------- REVISÃO ----------
+  function showRevisao(id, btn) {
+    ['r7','r14','r21'].forEach(r => {
+      const el = document.getElementById('revisao-' + r);
+      if (el) el.style.display = r === id ? 'block' : 'none';
+    });
+    document.querySelectorAll('#revisao-tabs .emocao-btn').forEach(b => b.classList.remove('selecionada'));
+    btn.classList.add('selecionada');
+  }
+
+  // ---------- VITÓRIAS ----------
+  function adicionarVitoria() {
+    const data = document.getElementById('vitoria-data').value;
+    const dia = document.getElementById('vitoria-dia').value;
+    const acao = document.getElementById('vitoria-acao').value;
+    const resultado = document.getElementById('vitoria-resultado').value;
+    if (!acao) return;
+
+    const lista = document.getElementById('vitoriaLista');
+    const item = document.createElement('div');
+    item.className = 'vitoria-item';
+    item.innerHTML = `
+      <div>
+        <div class="vitoria-data">${dia ? 'Dia ' + dia : '—'}</div>
+        <div style="font-size:0.72rem;color:rgba(245,239,230,0.3)">${data || '—'}</div>
+      </div>
+      <div class="vitoria-texto">${acao}</div>
+      <div class="vitoria-resultado">${resultado || '—'}</div>
+      <button class="btn-remover" onclick="this.parentElement.remove()">✕</button>
+    `;
+    lista.prepend(item);
+    document.getElementById('vitoria-acao').value = '';
+    document.getElementById('vitoria-resultado').value = '';
+    document.getElementById('vitoria-dia').value = '';
+  }
+
+  // ---------- GERAR SEMANAS 2 E 3 ----------
+  const semana2data = [
+    { num:'08', tema:'O desbloqueio emocional começa', sub:'Presença corporal · Acesso ao campo', afirmacao:'Minhas emoções são informação — não prisão.', ritual:'Coloque uma das mãos no plexo solar. Respire para dentro da mão. Pergunte ao corpo: o que você precisa soltar hoje?' },
+    { num:'09', tema:'O que está represado em mim', sub:'Desbloqueio emocional profundo', afirmacao:'Sentir é o primeiro movimento de quem está saindo do cinza.', ritual:'Escreva sem parar por 5 minutos — escrita automática, sem pensar. Não leia enquanto escreve.' },
+    { num:'10', tema:'Âncoras do passado', sub:'Dissolução de padrões antigos', afirmacao:'O passado informa — mas não define minha chama.', ritual:'Identifique uma situação passada com carga. Visualize-a envolta em luz âmbar. Agradeça a lição e a libere.' },
+    { num:'11', tema:'Relações que me drenam', sub:'Clareza energética · Fronteiras', afirmacao:'Minhas fronteiras são atos de amor — por mim e pelos outros.', ritual:'Liste 3 relações ou situações que consomem sua energia. Observe onde você perde força.' },
+    { num:'12', tema:'O corpo como portal', sub:'Fitoenergética · Aromaterapia interna', afirmacao:'Meu corpo sabe o caminho que minha mente ainda debate.', ritual:'Use um óleo essencial que te traga presença. Inspire profundamente. Deixe o aroma te ancorar.' },
+    { num:'13', tema:'A crença central do cinza', sub:'PNL · Ressignificação profunda', afirmacao:'Ressignifico para avançar — não para apagar.', ritual:'Pergunte: qual é a crença mais profunda que sustenta meu Estado Cinza? Escreva sem editar.' },
+    { num:'14', tema:'Revisão da Semana II ✦', sub:'Integração · Consolidação · Movimento', afirmacao:'Desbloqueei. Agora preparo o terreno para ativar.', ritual:'Reserve 30 minutos. Releia a semana. Identifique o maior movimento interno.' },
+  ];
+
+  const semana3data = [
+    { num:'15', tema:'Quem sou quando não estou no cinza?', sub:'Nova identidade · Visão ativada', afirmacao:'Sou a versão que age — não a que espera estar pronta.', ritual:'Feche os olhos. Visualize sua versão ativada. Como ela se move? Como ela fala? O que ela decide sem pedir permissão?' },
+    { num:'16', tema:'Âncoras da nova identidade', sub:'PNL · Ancoragem energética', afirmacao:'Minha nova identidade não é futura — está sendo agora.', ritual:'Escolha um gesto físico como âncora (mão no peito, punho fechado). Faça o gesto enquanto se lembra de um momento de força total.' },
+    { num:'17', tema:'Minha direção real', sub:'Clareza de propósito · Direção prática', afirmacao:'Direção não precisa ser perfeita — precisa ser real.', ritual:'Escreva sua direção em uma frase. Uma. Sem pós-condições. Sem "quando eu estiver pronta".' },
+    { num:'18', tema:'Ação sem permissão', sub:'Movimento autônomo · Execução', afirmacao:'A ação é o portal. Não o pensamento — a ação.', ritual:'Faça hoje uma micro-ação que sua versão cinza adiaria. Pode ser pequena — mas precisa ser real.' },
+    { num:'19', tema:'Presença como prática', sub:'Consolidação · Radiestesia da presença', afirmacao:'Presença não é destino — é prática diária.', ritual:'Identifique três momentos do seu dia onde pode praticar presença total: antes de comer, antes de dormir, ao acordar.' },
+    { num:'20', tema:'Minha Chama Interna acesa', sub:'Integração final · Identidade consolidada', afirmacao:'Sou a ativadora de mim mesma — sempre fui.', ritual:'Escreva uma carta para a versão sua do Dia 1. O que você sabe agora que ela precisava ouvir?' },
+    { num:'21', tema:'Encerramento e próxima fase ✦', sub:'Transição · Compromisso · Celebração', afirmacao:'A jornada de 21 dias foi o começo — não o destino.', ritual:'Acesse a aba Encerramento. Responda as 3 perguntas finais com presença total. Você merece esse momento.' },
+  ];
+
+  function gerarDias(dados, container, offset) {
+    const wrap = document.getElementById(container);
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    dados.forEach((d, i) => {
+      const idx = offset + i + 1;
+      const id = 'd' + idx;
+      const isRevisao = d.tema.includes('✦');
+      wrap.innerHTML += `
+        <div class="dia-card ${isRevisao ? 'style="border-color:rgba(201,131,26,0.35)"' : ''}" id="card-${id}">
+          <div class="dia-header" onclick="toggleDia('${id}')">
+            <div class="dia-num-grupo">
+              <span class="dia-num ${isRevisao ? 'style="color:var(--ambar)"' : ''}">${d.num}</span>
+              <div class="dia-info">
+                <div class="dia-tema">${d.tema}</div>
+                <div class="dia-subtema">${d.sub}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem">
+              <div class="dia-status" id="status-${id}" onclick="toggleStatus('${id}', event)">✦</div>
+              <div class="dia-toggle" id="toggle-${id}">▾</div>
+            </div>
+          </div>
+          <div class="dia-content" id="content-${id}">
+            <div class="secao">
+              <div class="secao-label">Ritual</div>
+              <div class="ativacao-ritual"><p>${d.ritual}</p></div>
+            </div>
+            <div class="secao">
+              <div class="secao-label">Reflexão do dia <span class="campo-editavel-tag">editável</span></div>
+              <textarea class="campo-texto" placeholder="Escreva com presença — sem censura..."></textarea>
+            </div>
+            <div class="secao">
+              <div class="secao-label">Afirmação da Chama</div>
+              <div class="afirmacao-box">"${d.afirmacao}"</div>
+            </div>
+            <div class="secao">
+              <div class="secao-label">Fechamento</div>
+              <div class="humor-track" style="margin-bottom:0.5rem">
+                <div class="humor-dot" onclick="setHumor(this,'${id}')">😶</div>
+                <div class="humor-dot" onclick="setHumor(this,'${id}')">🌑</div>
+                <div class="humor-dot" onclick="setHumor(this,'${id}')">🌓</div>
+                <div class="humor-dot" onclick="setHumor(this,'${id}')">🌕</div>
+                <div class="humor-dot" onclick="setHumor(this,'${id}')">🔥</div>
+              </div>
+              <textarea class="campo-texto" style="min-height:60px" placeholder="O que se moveu hoje?"></textarea>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  gerarDias(semana2data, 'semana2-cards', 7);
+  gerarDias(semana3data, 'semana3-cards', 14);
+
+  // Sync tracker status on load
+  Object.keys(tracker).forEach(num => {
+    if (tracker[num]) {
+      const statusEl = document.getElementById('status-d' + num);
+      const cardEl = document.getElementById('card-d' + num);
+      if (statusEl) statusEl.classList.add('done');
+      if (cardEl) cardEl.classList.add('done-day');
+    }
+  });
+</script>
+</body>
+</html>
