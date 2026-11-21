@@ -22,7 +22,8 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 
 **Regras:**
 
-- Todos os links e o número de WhatsApp ficam num só arquivo (`features/hub/content.ts`).
+- Todos os links e o número de WhatsApp ficam num só arquivo, `shared/brand/links.ts`, porque a jornada
+  também usa (áudio do dia 5, Protocolo Presencial). Textos do hub ficam em `features/hub/content.ts`.
 - Corrigir os problemas do Keepo: TikTok quebrado e botões "Lista de Espera" sem destino.
 
 **Aceite:** abre bem em celular de 360 px; todos os links funcionam; Lighthouse ≥ 90 em performance e

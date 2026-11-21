@@ -26,6 +26,14 @@ versão com data.
 - Tailwind CSS v4 com os tokens da marca (escuro e claro) em `src/shared/theme/theme.css`.
 - Fontes Jost e Playfair Display hospedadas no próprio site (Fontsource).
 - Foco visível em âmbar e suporte a `prefers-reduced-motion`.
+- Página "em breve" no hub: anéis da marca, título, áudio grátis, Instagram e WhatsApp.
+- Estrutura `src/app`, `src/features/hub` e `src/shared` (`brand/links.ts`, `lib/whatsapp.ts`,
+  `ui/BrandRings.tsx`), com testes.
+- `index.html` em português (`lang="pt-BR"`), com título, descrição, Open Graph e favicon da marca.
+
+### Removido
+
+- Arquivos de exemplo do template do Vite (contador, logos, `App.css`, `index.css`, `icons.svg`).
 
 ### Alterado
 
