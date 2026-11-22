@@ -77,9 +77,13 @@ bastante liberdade**. Protótipos: `Downloads/atmavox-modo-admin.html` (5 formas
       vídeo (YouTube), imagem; reordenar, duplicar, criar dias, semanas e jornadas novas (ex.: Ritual Matinal)
 - [ ] "Ver como participante": celular/PC, claro/escuro, "estou no dia N", rascunho ou publicada, sem gravar
       progresso de ninguém
-- [ ] Uploads de áudio e imagem: o Firebase Storage gratuito não está disponível para projetos novos sem
-      plano pago; vídeo já resolvido como link; áudio e imagem: alternativas sem custo a decidir (link do
-      Drive, ou o arquivo entra no repositório pelo desenvolvedor)
+- [x] Onde guardar mídia, sem custo (ADR-014):
+  - **imagens no próprio Firestore**: a tela de admin reduz no navegador para WebP (~100–200 kB, limite
+    de 1 MB por documento) e grava numa coleção de mídia; sem serviço novo nem cartão
+  - **vídeo**: só link (YouTube com miniatura; outros sites viram cartão "Assistir ↗")
+  - **áudio**: link (Drive, SoundCloud, YouTube) ou arquivo incluído pelo desenvolvedor (com o tratamento
+    de ruído documentado em `features.md`)
+- [ ] Implementar o envio de imagem (redução para WebP, coleção `media`, regras só para admin)
 
 ## Regra nova da jornada: avançar só depois de completar ✅
 

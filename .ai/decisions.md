@@ -148,6 +148,23 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ a jornada é vivida na ordem pensada pela Andreía; regra testada sem tela.
   ➖ não dá para "pular" para ver o conteúdo adiante (só a admin, no modo dela).
 
+## ADR-014 · Imagens do modo admin no Firestore; vídeo e áudio por link
+
+- **Status:** aceita · 2026-11-21
+- **Contexto:** o modo Andreía (Fase 4) precisa de imagens nos blocos. O Firebase Storage não tem plano
+  gratuito para projetos novos; o padrão usado em outro projeto do desenvolvedor (omni-sheet-vault: MinIO
+  numa VM Oracle Always Free, com backend que assina links) e a alternativa Cloudflare R2 exigem cartão e
+  um backend para guardar a chave secreta, que este site estático não tem.
+- **Decisão:** imagens reduzidas no navegador para WebP (~100–200 kB) e gravadas como documentos numa
+  coleção do Firestore (limite de 1 MB por documento), com regras que só deixam a admin gravar. Vídeos
+  são só links. Áudios são links ou arquivos incluídos pelo desenvolvedor no repositório.
+- **Alternativas consideradas:** Cloudflare R2 + Worker (cartão para ativar); MinIO na VM Oracle (cartão
+  na verificação, VM para manter, acoplamento com outro projeto); imagens no repositório via API do GitHub
+  (exigiria um token no navegador).
+- **Consequências:** ➕ custo zero, nenhum serviço ou conta nova, nada muda para quem não é admin.
+  ➖ serve para poucas imagens por jornada; leituras contam na cota diária do Firestore (folgada para o
+  público esperado); se um dia houver muitas imagens, reavaliar.
+
 ---
 
 ## Modelo
