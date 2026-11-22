@@ -52,6 +52,10 @@ versão com data.
 - Firebase sob demanda (ADR-012): login com Google e e-mail/senha, recuperação de senha, mensagens de erro
   em português, Firestore "lite" em `users/{uid}/journeys/{journeyId}`, regras de segurança em
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
+- Login na jornada (F5): botão "Entrar" no cabeçalho (só aparece com o Firebase configurado), janela com
+  Google ou e-mail/senha, criar conta e recuperar senha; depois de entrar, a inicial da pessoa com um
+  ponto de status ("Salvando…", "Salvo na nuvem", "Sem conexão — salvo no aparelho") e "Sair da conta"
+  com confirmação. A janela deixa o resto da página inerte e fecha com Esc.
 - Hub novo (F1, ADR-010) no lugar da página "em breve": abas no celular (Início · Ouvir · Jornadas ·
   Contato) e revista a partir de 700 px, com áudio grátis, encontros Zerando o Dia e Pausa Sagrada,
   jornadas, sobre a Andreía, redes e assinatura. O que ainda falta (horários, foto, MP3, algumas redes)

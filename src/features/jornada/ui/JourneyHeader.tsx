@@ -2,6 +2,7 @@ import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { JOURNEY_TABS, type JourneyTabId } from '../application/navigation'
 import { tabProgress } from '../application/tabProgress'
 import { overallProgress } from '../domain/measures'
+import { AccountButton } from './account/AccountButton'
 import { useJourney } from './useJourney'
 
 /** A cor da aba vai do cinza ao âmbar conforme a etapa avança: "sair do cinza". */
@@ -65,6 +66,7 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
             })}
           </ul>
         </nav>
+        <AccountButton />
         <ThemeToggle />
       </div>
       <div
