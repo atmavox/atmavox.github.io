@@ -51,78 +51,38 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [ ] Andreía trocar o e-mail de suporte do login do Google para o dela (logada na conta dela)
 - [ ] Conferir o aceite da F5 no site publicado (passo a passo no fim do guia)
 
-## Fase 4 · Modo Andreía (admin) 🔨 · em construção
+## Fase 4 · Modo Andreía (admin) ✅ · falta a Andreía entrar como admin
 
-Plano (2026-11-21), um commit por passo:
+Spec em `features.md` (F7), decisões em ADR-013/014/015, guia para ela em `guia-modo-andreia.md`.
+Telas fiéis ao protótipo aprovado (`Downloads/atmavox-modo-admin-v2.html`).
 
-1. [x] Domínio: id fixo por bloco (`withSectionIds`), blocos novos (texto, citação, divisor, imagem,
-       vídeo, áudio; os só de leitura não pedem "Feito"), sequência dos dias pela ordem na jornada (o
-       número do dia é a identidade das respostas) e `parseJourney` para conteúdo vindo da nuvem
-2. [x] Conteúdo publicado na nuvem (`published/{journeyId}`, campo `content` com o JSON), lido por
-       `fetch` na API REST sem carregar o Firebase; cópia no aparelho; versão do código se a nuvem
-       falhar ou o conteúdo vier quebrado
-   - [ ] **Desenvolvedor:** colar o `firestore.rules` novo no console (Firestore → Regras → Publicar).
-         Até lá a leitura dá "permissão negada" e o site segue com a versão do código (sem erro visível)
-3. [x] Papel de admin (`admins/{uid}`, regras com `isAdmin()`), aviso "Modo Andreía" no menu da conta,
-       jornada sem cadeados para a admin (o link para a tela de edição entra no passo 4)
-   - [x] Regras novas publicadas e `admins/{uid}` do desenvolvedor criado (2026-11-21), para testar
-   - [ ] `admins/{uid}` da Andreía: quando ela puder entrar (o Google pediu verificação pelo celular).
-         Alternativa: criar a conta dela por e-mail e senha no console (`firebase-setup.md`, seção 7)
-4. [x] Tela de admin em `#/jornada/editar` (ADR-015): visão geral por semana com o estado de cada dia
-       (Rascunho / Salvo · falta publicar / No ar), tema da semana, novo dia, subir/descer dias; editor
-       do dia no lugar (título, subtítulo, blocos com subir/descer/duplicar/remover, "+ bloco" com
-       ícones), "Salvar dia" e "Descartar", "Publicar jornada" só sem rascunhos, histórico com "Voltar
-       para esta versão"; edições não salvas ficam no aparelho
-   - [x] Telas refeitas fiéis ao protótipo v2 (barra azul, quadro de cartões, dia editável no lugar,
-         ladrilhos de blocos, histórico em gaveta) — conferidas lado a lado com o protótipo
-   - [x] Conferido no site publicado com a conta admin (2026-11-21); ajuste: etiqueta de estado
-         alinhada com os botões na barra do dia
-   - [ ] Depois: editar revisões e encerramento; remover dia; "ver como participante" (item abaixo)
-5. [x] Tela da participante mostra os blocos novos: texto e citação (com a marcação `*itálico*`,
-       `**negrito**`, `[link](…)`), divisor, vídeo e áudio por link (YouTube = miniatura que vira
-       player; arquivo .mp3/.m4a = player do site com mini player; Drive, SoundCloud e outros = cartão
-       "Assistir ↗"/"Ouvir ↗" que abre o site do link). Vídeo e áudio pedem "Feito"; texto, citação e
-       divisor não
-6. [x] Envio de imagem (ADR-014): a Andreía escolhe a foto, o navegador reduz (maior lado 1200 px,
-       WebP; JPEG no Safari; meta ~200 kB) e grava em `media/{id}`; descrição obrigatória para leitor
-       de tela; legenda opcional; "Trocar imagem". Participantes leem por REST, sem o SDK. Conferido
-       no navegador: foto de 1200×900 virou WebP de 31 kB
-7. [ ] Documentação, regras e guia para cadastrar a Andreía como admin
+Feito (2026-11-21/22), um commit por passo:
 
-Detalhes e decisões:
+1. [x] Domínio: id fixo por bloco, blocos novos, sequência dos dias pela ordem na jornada (o número do
+       dia é a identidade das respostas), `parseJourney` para conteúdo vindo da nuvem
+2. [x] Conteúdo publicado em `published/{id}`, lido por REST sem o SDK; cópia no aparelho; versão do
+       código se a nuvem falhar
+3. [x] Papel de admin por `admins/{uid}` (sem custo; custom claims exigiriam plano pago); faixa azul e
+       jornada sem cadeados para a admin; regras publicadas no console
+4. [x] Editor em `#/jornada/editar`: quadro de cartões (arrastar para ordenar, novo dia, tema da semana),
+       dia editável no lugar, "+" entre blocos com ícones próprios, "Salvar dia"/"Descartar", "Publicar"
+       com confirmação e só sem rascunhos, histórico com "Voltar para esta"; conferido no site
+5. [x] Participantes veem texto, citação, divisor, vídeo e áudio por link (YouTube = miniatura; arquivo
+       de áudio = player do site; outros sites = cartão que abre o link)
+6. [x] Imagem: reduzida no navegador (WebP até 1200 px) e gravada em `media/{id}`; descrição obrigatória
+7. [x] Documentação: F7, arquitetura (coleções e regras), guia da Andreía, `firebase-setup.md` seção 7
 
-Um login especial que libera para a Andreía **ver a jornada como participante** e **editar as jornadas com
-bastante liberdade**. Protótipos: `Downloads/atmavox-modo-admin.html` (5 formas) e
-`Downloads/atmavox-modo-admin-v2.html` (a escolhida).
+Pendências:
 
-- [x] Forma de editar escolhida (2026-11-21): **quadro dos dias por semana (D)** como visão geral +
-      **editar no lugar (A)** dentro de cada dia
-- [x] Regras decididas:
-  - cada dia tem **"Salvar dia"** (sai de rascunho) e "Descartar alterações"; editar de novo volta a rascunho
-  - **"Publicar jornada" fica só na visão de todos os dias** e só libera quando **nenhum dia está em
-    rascunho** ("Faltam N dias…")
-  - menu "+ bloco" com **ícones próprios** (nada de emoji)
-  - **vídeo é só um link** (YouTube com miniatura; outros sites viram cartão "Assistir ↗"): nada de upload
-- [ ] Ver como participante (E) a partir da visão geral
-- [ ] Papel de admin sem custo: documento `admins/{uid}` no Firestore, criado à mão no console, e regras
-      que só deixam admin gravar o conteúdo (custom claims exigiriam Cloud Functions, plano pago)
-- [ ] Conteúdo sai do código para o Firestore (`journeys/{id}` com dias e seções), com o conteúdo atual como
-      versão inicial; o site continua funcionando se a nuvem falhar (cópia no build)
-- [ ] Rascunho × publicado, histórico de versões e "voltar para esta versão"
-- [ ] Ids de campo nunca mudam: blocos novos ganham id novo; apagar um bloco esconde, mas preserva as
-      respostas já escritas (regra 4 do CLAUDE.md)
-- [ ] Blocos livres: ritual, pergunta, afirmação, fechamento, check-in, texto, citação, divisor, áudio,
-      vídeo (YouTube), imagem; reordenar, duplicar, criar dias, semanas e jornadas novas (ex.: Ritual Matinal)
-- [ ] "Ver como participante": celular/PC, claro/escuro, "estou no dia N", rascunho ou publicada, sem gravar
-      progresso de ninguém
-- [x] Onde guardar mídia, sem custo (ADR-014):
-  - **imagens no próprio Firestore**: a tela de admin reduz no navegador para WebP (~100–200 kB, limite
-    de 1 MB por documento) e grava numa coleção de mídia; sem serviço novo nem cartão
-  - **vídeo**: só link (YouTube com miniatura; outros sites viram cartão "Assistir ↗")
-  - **áudio**: link (Drive, SoundCloud, YouTube) ou arquivo incluído pelo desenvolvedor (com o tratamento
-    de ruído documentado em `features.md`)
-- [x] Implementar o envio de imagem (redução para WebP, coleção `media`, regras só para admin)
-- [ ] Depois: apagar da coleção `media` as imagens que nenhum bloco usa mais (hoje ficam guardadas)
+- [ ] **Andreía como admin:** criar `admins/{uid}` dela quando puder entrar (o Google pediu verificação
+      pelo celular); alternativa: conta por e-mail e senha criada no console (`firebase-setup.md`, seção 7)
+- [ ] Passar o `guia-modo-andreia.md` para ela e acompanhar a primeira edição
+- [ ] "Ver como participante" completo: escolher celular/PC, claro/escuro, "estou no dia N", ver o
+      rascunho antes de publicar (hoje o botão abre a jornada publicada, sem cadeados)
+- [ ] Editar Revisões e Encerramento no Modo Andreía
+- [ ] Apagar dia (hoje só dá para criar e reordenar)
+- [ ] Jornadas novas pelo editor (ex.: Ritual Matinal — 7 dias)
+- [ ] Apagar da coleção `media` as imagens que nenhum bloco usa mais (hoje ficam guardadas, sem custo)
 
 ## Regra nova da jornada: avançar só depois de completar ✅
 

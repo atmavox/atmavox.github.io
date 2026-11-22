@@ -210,3 +210,45 @@ outro navegador com a mesma conta → mesmo progresso.
 rodam só a checagem.
 
 **Aceite:** https://atmavox.github.io abre o hub, e `#/jornada` abre a jornada.
+
+---
+
+## F7 · Modo Andreía (editar a jornada) ✅ (falta a Andreía entrar como admin)
+
+**Objetivo:** a Andreía edita a jornada sozinha, com bastante liberdade, sem desenvolvedor e sem custo.
+Telas fiéis ao protótipo aprovado (`Downloads/atmavox-modo-admin-v2.html`). Guia para ela:
+`guia-modo-andreia.md`.
+
+**Quem acessa:** contas com o documento `admins/{uid}` no Firestore (criado à mão; ver
+`firebase-setup.md`, seção 7). A admin vê a jornada sem cadeados, uma faixa azul "Modo Andreía ·
+Editar a jornada →" e o mesmo atalho no menu da conta. Qualquer outra pessoa que abrir
+`#/jornada/editar` vê "Só para a admin", e as regras da nuvem recusam gravações.
+
+**Regras:**
+
+- **Três versões** (ADR-015): edições não salvas (no aparelho dela), rascunho salvo (`drafts/{id}`) e
+  publicada (`published/{id}`, o que as participantes veem). Estado de cada dia: Rascunho (laranja),
+  Salvo · falta publicar, Salvo (verde).
+- **"Salvar dia"** grava o dia no rascunho; só libera sem problemas (título, textos, links `https://`,
+  imagem escolhida e descrita). **"Descartar alterações"** volta ao salvo.
+- **"Publicar jornada"** fica só no quadro de todos os dias, pede confirmação e só libera sem nenhum dia
+  em rascunho, sem campos faltando e com algo diferente do que está no ar. Cada publicação vira uma
+  versão no **Histórico** (gaveta lateral), com "Voltar para esta" (vira rascunho salvo; publica-se de
+  novo para ir ao ar).
+- **Estrutura** (novo dia, ordem dos dias, tema da semana) vai direto para o rascunho salvo.
+- **Ids nunca mudam:** o número do dia é a identidade das respostas (`d{n}:…`); reordenar só muda a
+  posição. Blocos novos e cópias ganham ids novos. Apagar um bloco não apaga respostas já escritas.
+- **Blocos:** check-in, ritual, pergunta, afirmação, fechamento (etapas, pedem "Feito"), áudio e vídeo
+  por link (pedem "Feito"), imagem, citação, texto e divisor (só leitura).
+- **Vídeo e áudio por link:** YouTube = miniatura que vira player; arquivo `.mp3`/`.m4a` = player do
+  site; outros sites = cartão "Assistir ↗"/"Ouvir ↗" que abre o link em outra aba.
+- **Imagem** (ADR-014): reduzida no navegador (WebP até 1200 px, ~200 kB), gravada em `media/{id}`;
+  descrição obrigatória, legenda opcional.
+- Tudo que vem da nuvem passa por `parseJourney`: bloco desconhecido, id repetido ou link que não seja
+  `http(s)` faz o site usar a versão do código.
+
+**Ainda não faz (roadmap):** editar Revisões e Encerramento, apagar dia, "ver como participante" com
+escolha de dia/aparelho, limpar imagens que nenhum bloco usa.
+
+**Aceite (conferido em 2026-11-21 com a conta do desenvolvedor):** editar o dia 1, salvar, publicar e ver
+a mudança numa janela anônima; voltar uma versão pelo Histórico.

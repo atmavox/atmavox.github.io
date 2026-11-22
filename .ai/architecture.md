@@ -18,17 +18,23 @@ src/
       components/         blocos comuns: AudioItem, EncounterCard, JourneyCard, SocialLinks…
     jornada/
       JourneyEntry.tsx    porta de entrada (lazy): cria os serviços e monta a UI
-      domain/             regras puras: journey.ts (formato), progress.ts, victories.ts (+ testes)
+      domain/             regras puras: journey.ts (formato e blocos), progress.ts, access.ts (avanço em
+                          sequência), journeyEditing.ts (editor), parseJourney.ts (conteúdo da nuvem)
       content/            chama-interna-21.ts (os 21 dias), copy.ts (capa, revisões, vitórias, encerramento)
-      application/        ports.ts, services.ts, JourneyStore.ts, navigation.ts (abas e rotas)
-      infrastructure/     LocalProgressRepository, InMemoryProgressRepository (testes), createServices.ts
-      ui/                 JourneyApp, JourneyHeader, pages/ (uma por aba), components/ (dia, seções…)
+      application/        ports.ts, services.ts, JourneyStore.ts (progresso), JourneyContent.ts (conteúdo
+                          publicado), JourneyEditor.ts (Modo Andreía), MediaCache.ts (imagens),
+                          account.ts (login e admin), navigation.ts, tabAccess.ts
+      infrastructure/     localStorage, Firestore REST (conteúdo e imagens, sem SDK), firebase/ (SDK sob
+                          demanda: login, progresso, admin, editor), compressImage.ts, versões em
+                          memória para testes, createServices.ts
+      ui/                 JourneyApp, JourneyHeader, pages/ (uma por aba), components/ (dia, blocos…),
+                          account/ (login), admin/ (Modo Andreía, carregado sob demanda)
   shared/
     brand/                links da marca (redes, áudio, WhatsApp) e assinatura
     theme/                tokens CSS, useTheme, botão de tema
     ui/                   componentes genéricos (BrandRings, RichText)
     lib/                  utilitários sem regra de negócio (whatsapp, inlineMarkup, useHashRoute, useMediaQuery)
-    media/                player de áudio único + MiniPlayer + YouTubeFacade (ADR-011)
+    media/                player de áudio único + MiniPlayer + YouTubeFacade (ADR-011) + mediaLinks
 ```
 
 ## Regra de dependência (jornada)
@@ -57,6 +63,7 @@ ui  →  application  →  domain  ←  content
 | `#/jornada/revisoes`                                | Revisões semanais                         |
 | `#/jornada/vitorias`                                | Registro de vitórias                      |
 | `#/jornada/encerramento`                            | Encerramento                              |
+| `#/jornada/editar`                                  | Modo Andreía (só admin)                   |
 
 O hash evita o 404 do GitHub Pages ao recarregar uma página interna e permite compartilhar o link de uma aba.
 
@@ -91,7 +98,21 @@ users/{uid}/journeys/{journeyId}      # journeyId = "chama-interna-21"
   updatedAt: number
 ```
 
-Regras do Firestore: cada pessoa só lê e escreve `users/{seu uid}/**`. O restante é negado.
+Conteúdo editável (ADR-015) e papel de admin:
+
+```n admins/{uid}                         # existe = é admin (criado à mão no console)
+ published/{journeyId}                # content: JSON da jornada no ar; publishedAt
+ drafts/{journeyId}                   # content: rascunho salvo; updatedAt
+ drafts/{journeyId}/versions/{auto}   # uma cópia por publicação (histórico)
+ media/{auto}                         # dataUrl: imagem WebP/JPEG reduzida; width, height (ADR-014)
+```
+
+Regras do Firestore (`firestore.rules`): cada pessoa só lê e escreve `users/{seu uid}/**`; `published`
+e `media` têm leitura pública e gravação só da admin; `drafts` é só da admin; cada pessoa só lê o
+próprio `admins/{uid}`. O restante é negado.
+
+As participantes leem `published` e `media` por `fetch` na API REST: o SDK do Firebase só carrega para
+quem entra na conta.
 
 ## Tema
 

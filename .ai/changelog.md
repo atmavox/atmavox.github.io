@@ -54,6 +54,9 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Documentação do Modo Andreía (Fase 4, passo 7): F7 em `features.md`, coleções e regras do Firestore
+  em `architecture.md`, `guia-modo-andreia.md` (passo a passo simples para ela) e roadmap da Fase 4
+  com as pendências.
 - Bloco de imagem (Fase 4, passo 6, ADR-014): no Modo Andreía, "Escolher imagem" reduz a foto no
   navegador (WebP até 1200 px, ~200 kB) e grava no Firestore; a descrição para leitor de tela é
   obrigatória e a legenda, opcional. Na jornada, a imagem aparece com a descrição e a legenda, lida por
