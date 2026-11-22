@@ -33,6 +33,7 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Logo não fica mais por trás do cartão "Comece aqui" no computador
 - [x] README no estilo do Tabi
 - [x] Retrato da Andreía (foto do Keepo) no início do hub e na seção "Sobre"
+- [x] Tema claro como padrão na primeira visita
 - [ ] Limpar o ruído do áudio de boas-vindas: 3 versões geradas (leve, média, forte) em Downloads;
       falta escolher uma para substituir no site
 - [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar

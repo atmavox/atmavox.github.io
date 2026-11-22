@@ -3,24 +3,8 @@
 @import '@fontsource-variable/playfair-display';
 @import '@fontsource-variable/playfair-display/wght-italic.css';
 
-/* Paleta da marca (.ai/brand.md): escuro "Sépia" (padrão) e claro "Areia" (data-theme="light"). */
+/* Paleta da marca (.ai/brand.md): claro "Areia" (padrão) e escuro "Sépia" (data-theme="dark"). */
 :root {
-  color-scheme: dark;
-  --bg: #211a14;
-  --surface: #2c231b;
-  --surface-2: #362c22;
-  --field: #261e17;
-  --text: #f3e9dc;
-  --text-muted: #cdbca6;
-  --text-faint: #a39580;
-  --accent: #dc9530;
-  --gold: #d8b25f;
-  --wine: #6b2536;
-  --gray-state: #9d958e;
-  --line: color-mix(in oklab, var(--text) 14%, transparent);
-}
-
-:root[data-theme='light'] {
   color-scheme: light;
   --bg: #ebe2d4;
   --surface: #f2eadf;
@@ -33,6 +17,22 @@
   --gold: #735214;
   --wine: #74283a;
   --gray-state: #625d57;
+  --line: color-mix(in oklab, var(--text) 14%, transparent);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #211a14;
+  --surface: #2c231b;
+  --surface-2: #362c22;
+  --field: #261e17;
+  --text: #f3e9dc;
+  --text-muted: #cdbca6;
+  --text-faint: #a39580;
+  --accent: #dc9530;
+  --gold: #d8b25f;
+  --wine: #6b2536;
+  --gray-state: #9d958e;
 }
 
 /* `inline` faz as classes apontarem para as variáveis, então trocar o tema não exige recompilar. */

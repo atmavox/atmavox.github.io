@@ -8,20 +8,20 @@
       name="description"
       content="ATMAVOX, de Andreía Oliveirà. Consciência, presença e expansão: áudios, encontros e jornadas para perceber possibilidades que você ainda não percebeu."
     />
-    <meta name="theme-color" content="#211a14" />
+    <meta name="theme-color" content="#ebe2d4" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Aplica o tema antes da primeira pintura, para a página não "piscar". Espelha theme.ts. -->
+    <!-- Aplica o tema antes da primeira pintura, para a página não "piscar". Espelha theme.ts:
+         a escolha salva vence; sem escolha, claro. -->
     <script>
       ;(function () {
-        var theme = 'dark'
+        var theme = 'light'
         try {
           var stored = localStorage.getItem('atmavox:theme')
           if (stored === 'light' || stored === 'dark') theme = stored
-          else if (matchMedia('(prefers-color-scheme: light)').matches) theme = 'light'
         } catch (e) {}
         document.documentElement.dataset.theme = theme
-        if (theme === 'light')
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ebe2d4')
+        if (theme === 'dark')
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#211a14')
       })()
     </script>
 

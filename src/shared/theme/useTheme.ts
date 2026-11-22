@@ -1,12 +1,12 @@
 import { useCallback, useSyncExternalStore } from 'react'
-import { oppositeTheme, parseTheme, THEME_STORAGE_KEY, type Theme } from './theme'
+import { DEFAULT_THEME, oppositeTheme, parseTheme, THEME_STORAGE_KEY, type Theme } from './theme'
 
 // O tema inicial é aplicado por um script inline no index.html, antes da primeira pintura.
 // Aqui o atributo data-theme do <html> é a fonte da verdade.
 const listeners = new Set<() => void>()
 
 function readTheme(): Theme {
-  return parseTheme(document.documentElement.dataset.theme) ?? 'dark'
+  return parseTheme(document.documentElement.dataset.theme) ?? DEFAULT_THEME
 }
 
 function applyTheme(theme: Theme) {
@@ -27,7 +27,7 @@ function subscribe(listener: () => void) {
 }
 
 export function useTheme() {
-  const theme = useSyncExternalStore(subscribe, readTheme, () => 'dark' as const)
+  const theme = useSyncExternalStore(subscribe, readTheme, () => DEFAULT_THEME)
   const toggleTheme = useCallback(() => applyTheme(oppositeTheme(readTheme())), [])
   return { theme, toggleTheme }
 }

@@ -23,7 +23,7 @@ Dois anéis concêntricos com traço grosso (externo dourado, interno âmbar) e 
 
 ## Paleta (tokens)
 
-Escuro **"Sépia"** (padrão) e claro **"Areia"**, escolhidos em 2026-11-21 entre 5 opções de cada, num
+Claro **"Areia"** (padrão desde 2026-11-21, pedido do cliente) e escuro **"Sépia"**, escolhidos em 2026-11-21 entre 5 opções de cada, num
 protótipo com contraste medido (o claro anterior, quase branco, ofuscava).
 
 | Token          | Escuro    | Claro     | Uso                                |

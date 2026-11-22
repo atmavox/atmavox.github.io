@@ -145,8 +145,9 @@ legíveis.
 
 ## F4 · Temas claro e escuro ✅
 
-**Regras:** escuro por padrão (mais suave que o original); claro como alternativa; respeita a preferência do
-sistema na primeira visita; a escolha fica salva (`localStorage: atmavox:theme`); sem "piscar" ao carregar.
+**Regras:** **claro ("Areia") por padrão** na primeira visita, independentemente do sistema (pedido do
+cliente em 2026-11-21; antes era escuro e seguia o sistema); escuro ("Sépia") como alternativa; a escolha
+fica salva (`localStorage: atmavox:theme`) e vence o padrão; sem "piscar" ao carregar.
 Botão sol/lua no cabeçalho, compartilhado entre hub e jornada.
 
 **Aceite:** contraste AA nos dois temas; nenhuma cor solta no código.
