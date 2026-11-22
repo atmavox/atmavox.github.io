@@ -150,7 +150,7 @@ pura, testada) + `useTheme` (o `data-theme` do `<html>` é a fonte da verdade, s
 
 ---
 
-## F5 · Login opcional e sincronização 🔲
+## F5 · Login opcional e sincronização 🔨 (código pronto; falta configurar o console: `firebase-setup.md`)
 
 **Objetivo:** quem quiser entra e passa a ter o progresso salvo em qualquer aparelho. Quem não quiser usa
 normalmente.

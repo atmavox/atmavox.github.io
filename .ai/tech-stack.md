@@ -36,3 +36,4 @@ VITE_FIREBASE_APP_ID=
 ```
 
 Sem essas variáveis o site funciona normalmente: a jornada salva só no navegador e o botão "Entrar" some.
+Modelo em `.env.example`; passo a passo do console e do GitHub em `firebase-setup.md`.

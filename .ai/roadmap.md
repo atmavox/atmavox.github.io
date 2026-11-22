@@ -9,7 +9,7 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Tailwind v4, ESLint (+ jsx-a11y), Prettier, Vitest, script `check`
 - [x] Estrutura de pastas `app/`, `features/hub`, `shared/` (`features/jornada` nasce na Fase 1)
 - [x] Workflow de deploy no GitHub Pages (`.github/workflows/deploy.yml`)
-- [ ] Ativar o Pages: _Settings → Pages → Source → GitHub Actions_ (feito manualmente no GitHub)
+- [x] Ativar o Pages: _Settings → Pages → Source → GitHub Actions_ (feito manualmente no GitHub)
 
 ## Fase 1 · Tema e jornada (sem login) ✅
 
@@ -20,7 +20,7 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Abas com evolução (F3)
 - [ ] Revisão visual no celular e validação dos textos com a Andreia (pendências em `features.md`, F2)
 
-## Fase 2 · Hub 🔲
+## Fase 2 · Hub 🔨 (código pronto; falta conteúdo e revisão visual)
 
 - [x] Reposicionamento registrado (slogan, tom, assinatura, grafia "Andreía Oliveirà")
 - [x] Slogan, assinatura e grafia do nome aplicados no site e na jornada
@@ -30,11 +30,13 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [ ] Receber da Andreía: horários dos encontros, MP3, foto, texto curto, links de Threads/Telegram (TikTok: @atmavox ✅)
 - [ ] Trocar o link da bio do Instagram para atmavox.github.io
 
-## Fase 3 · Login opcional 🔲
+## Fase 3 · Login opcional 🔨 (código pronto; falta o console)
 
-- [ ] Configurar o Firebase `atmavox-ativacao` (app web, Google, e-mail/senha, Firestore, regras,
-      domínio `atmavox.github.io` autorizado)
-- [ ] Login e sincronização (F5)
+- [x] Sincronização aparelho + nuvem (merge, envio com pausa, limpeza ao sair)
+- [x] Firebase sob demanda (Auth + Firestore lite), regras em `firestore.rules`, variáveis no deploy
+- [x] Tela de login, status de sincronização e "Sair da conta" (F5)
+- [ ] Configurar o Firebase `atmavox-ativacao` e as variáveis do GitHub (`.ai/firebase-setup.md`)
+- [ ] Conferir o aceite da F5 no site publicado (passo a passo no fim do guia)
 
 ## Depois
 

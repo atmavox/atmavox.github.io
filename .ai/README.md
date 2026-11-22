@@ -16,6 +16,7 @@ Também serve para pessoas: quem chegar ao projeto entende o que é, por que exi
 | `glossary.md`                      | Termos da marca e termos técnicos do projeto                     | quando um termo não estiver claro     |
 | `features.md`                      | Especificação de cada feature e critérios de aceite              | ao implementar ou mudar uma feature   |
 | `decisions.md`                     | Registro das decisões de arquitetura (ADRs)                      | antes de reverter uma escolha         |
+| `firebase-setup.md`                | Passo a passo do console do Firebase e das variáveis do deploy   | ao configurar ou mexer no login       |
 | `roadmap.md`                       | O que vem a seguir, em ordem                                     | ao escolher a próxima tarefa          |
 | `changelog.md`                     | Histórico de mudanças                                            | ao finalizar uma tarefa               |
 | `reference/workbook-original.html` | HTML original do workbook, fonte do conteúdo                     | ao migrar ou conferir textos          |
