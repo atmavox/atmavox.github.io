@@ -132,6 +132,22 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ ~62 kB gzip só para quem loga; nada muda para quem não loga. ➖ sem atualização em
   tempo real entre dois aparelhos abertos ao mesmo tempo (vale o merge ao entrar e o último envio).
 
+## ADR-013 · Jornada em sequência: só avança quem completa a etapa anterior
+
+- **Status:** aceita · 2026-11-21
+- **Contexto:** pedido do cliente: a participante só passa para a próxima etapa quando a anterior está
+  completa, valendo para etapas do dia, dias, semanas e abas. Antes, tudo ficava aberto e qualquer dia
+  podia ser marcado no rastreador.
+- **Decisão:** regras puras em `domain/access.ts` (etapas, dias, revisões) e `application/tabAccess.ts`
+  (ordem das abas). O progresso ganha `completedSteps` (etapas com "Feito"; união no merge). Concluir um
+  dia e marcar "Feito" são **definitivos** (não há desmarcar), para a sequência não se desfazer. Progresso
+  feito antes da regra é **respeitado** (dia/aba com qualquer resposta ou marcação continua aberto). A
+  admin tem `bypass`, pronto para a Fase 4.
+- **Alternativas consideradas:** bloqueio por data (um dia por dia de calendário), descartado pelo cliente
+  (o próximo dia abre na hora).
+- **Consequências:** ➕ a jornada é vivida na ordem pensada pela Andreía; regra testada sem tela.
+  ➖ não dá para "pular" para ver o conteúdo adiante (só a admin, no modo dela).
+
 ---
 
 ## Modelo

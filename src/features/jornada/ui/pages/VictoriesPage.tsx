@@ -1,5 +1,6 @@
 import { useId, useState, type FormEvent } from 'react'
 import { victoriesCopy } from '../../content/copy'
+import { VICTORIES_STEP } from '../../domain/access'
 import { TOTAL_DAYS } from '../../domain/journey'
 import type { Victory } from '../../domain/progress'
 import {
@@ -191,6 +192,31 @@ export function VictoriesPage() {
           </ul>
         </div>
       )}
+
+      {/* "Feito" libera o Encerramento; a pessoa pode continuar registrando conquistas depois. */}
+      <div className="mt-8 flex flex-col items-start gap-2 border-t border-line pt-6">
+        {progress.completedSteps.includes(VICTORIES_STEP) ? (
+          <a
+            href="#/jornada/encerramento"
+            className="inline-flex min-h-11 items-center rounded-full bg-accent px-6 font-semibold text-bg hover:opacity-90"
+          >
+            Ir para o Encerramento →
+          </a>
+        ) : (
+          <>
+            <p className="text-sm text-ink-muted">
+              Registrou o que queria? Marque como feito para abrir o Encerramento.
+            </p>
+            <button
+              type="button"
+              onClick={() => store.markStepDone(VICTORIES_STEP)}
+              className="rounded-full border border-accent px-5 py-2 text-sm font-medium text-accent hover:bg-accent/10"
+            >
+              Feito ✦
+            </button>
+          </>
+        )}
+      </div>
     </div>
   )
 }

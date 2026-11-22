@@ -1,7 +1,12 @@
 import { BrandRings } from '../../../../shared/ui/BrandRings'
 import { RichText } from '../../../../shared/ui/RichText'
+import { JOURNEY_TABS } from '../../application/navigation'
+import { furthestUnlockedTab } from '../../application/tabAccess'
 import { coverCopy } from '../../content/copy'
+import { hasStarted, nextDayToDo, START_STEP } from '../../domain/access'
+import { DAYS_PER_WEEK } from '../../domain/journey'
 import { DayTracker } from '../components/DayTracker'
+import { useJourney } from '../useJourney'
 
 export function CoverPage() {
   return (
@@ -44,7 +49,48 @@ export function CoverPage() {
         </ol>
       </section>
 
+      <StartOrContinue />
+
       <DayTracker label={coverCopy.trackerLabel} />
     </div>
+  )
+}
+
+/** "Começar a jornada" completa a Abertura e libera a Semana I; depois vira "Continuar no dia N". */
+function StartOrContinue() {
+  const { journey, progress, store } = useJourney()
+  const buttonClass =
+    'inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-8 font-semibold tracking-wide text-bg transition-opacity hover:opacity-90'
+
+  if (!hasStarted(progress)) {
+    return (
+      <button
+        type="button"
+        className={buttonClass}
+        onClick={() => {
+          store.markStepDone(START_STEP)
+          window.location.hash = '#/jornada/semana-1'
+        }}
+      >
+        Começar a jornada ✦
+      </button>
+    )
+  }
+
+  const nextDay = nextDayToDo(journey, progress)
+  const target = nextDay
+    ? {
+        href: `#/jornada/semana-${Math.ceil(nextDay / DAYS_PER_WEEK)}`,
+        label: `Continuar no dia ${nextDay}`,
+      }
+    : (() => {
+        const tab = JOURNEY_TABS.find((t) => t.id === furthestUnlockedTab(journey, progress))
+        return { href: tab?.href ?? '#/jornada', label: `Continuar em ${tab?.label ?? 'Abertura'}` }
+      })()
+
+  return (
+    <a href={target.href} className={buttonClass}>
+      {target.label} →
+    </a>
   )
 }

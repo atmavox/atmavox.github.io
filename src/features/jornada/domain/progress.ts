@@ -16,6 +16,8 @@ export interface Victory {
 export interface JourneyProgress {
   version: typeof PROGRESS_VERSION
   completedDays: number[]
+  /** Etapas marcadas como "Feito" (ids em `access.ts`): liberam a etapa seguinte. */
+  completedSteps: string[]
   entries: Record<string, string>
   emotions: Record<string, Emotion[]>
   moods: Record<string, Mood>
@@ -27,6 +29,7 @@ export function emptyProgress(): JourneyProgress {
   return {
     version: PROGRESS_VERSION,
     completedDays: [],
+    completedSteps: [],
     entries: {},
     emotions: {},
     moods: {},
@@ -41,12 +44,21 @@ export function isValidDay(day: unknown): day is number {
 
 // ---------- comandos (puros: recebem o estado e devolvem um novo) ----------
 
-export function toggleDay(progress: JourneyProgress, day: number, now: number): JourneyProgress {
-  if (!isValidDay(day)) return progress
-  const completedDays = progress.completedDays.includes(day)
-    ? progress.completedDays.filter((d) => d !== day)
-    : [...progress.completedDays, day].sort((a, b) => a - b)
+/** Concluir é definitivo: a jornada só avança (a regra de quando pode concluir fica em `access.ts`). */
+export function completeDay(progress: JourneyProgress, day: number, now: number): JourneyProgress {
+  if (!isValidDay(day) || progress.completedDays.includes(day)) return progress
+  const completedDays = [...progress.completedDays, day].sort((a, b) => a - b)
   return { ...progress, completedDays, updatedAt: now }
+}
+
+/** Marca uma etapa como "Feito". Também definitivo, como concluir um dia. */
+export function markStepDone(
+  progress: JourneyProgress,
+  stepId: string,
+  now: number,
+): JourneyProgress {
+  if (progress.completedSteps.includes(stepId)) return progress
+  return { ...progress, completedSteps: [...progress.completedSteps, stepId], updatedAt: now }
 }
 
 /** Texto vazio remove a resposta, para que "vazio" signifique sempre "sem resposta". */
@@ -143,6 +155,11 @@ export function parseProgress(raw: unknown): JourneyProgress {
     ? [...new Set(raw.completedDays.filter(isValidDay))].sort((a, b) => a - b)
     : []
 
+  // Progresso salvo antes da regra de etapas não tem este campo: começa vazio (ver "legado" em access.ts).
+  const completedSteps = Array.isArray(raw.completedSteps)
+    ? [...new Set(raw.completedSteps.filter((s): s is string => typeof s === 'string'))]
+    : []
+
   const entries: Record<string, string> = {}
   if (isRecord(raw.entries)) {
     for (const [key, value] of Object.entries(raw.entries)) {
@@ -173,6 +190,7 @@ export function parseProgress(raw: unknown): JourneyProgress {
   return {
     version: PROGRESS_VERSION,
     completedDays,
+    completedSteps,
     entries,
     emotions,
     moods,
@@ -206,7 +224,7 @@ function mergeRecords<T>(
 }
 
 /**
- * Dias e vitórias: união (nunca perde). Textos, emoções e humor: vence o lado que tem conteúdo; se os
+ * Dias, etapas e vitórias: união (nunca perde). Textos, emoções e humor: vence o lado que tem conteúdo; se os
  * dois têm, vence o progresso salvo mais recentemente. Valores vazios não existem nos registros
  * (ver setEntry), então um texto vazio nunca apaga um texto existente.
  */
@@ -223,6 +241,7 @@ export function mergeProgress(local: JourneyProgress, remote: JourneyProgress): 
     completedDays: [...new Set([...local.completedDays, ...remote.completedDays])].sort(
       (a, b) => a - b,
     ),
+    completedSteps: [...new Set([...local.completedSteps, ...remote.completedSteps])],
     entries: mergeRecords(local.entries, remote.entries, localIsNewer),
     emotions: mergeRecords(local.emotions, remote.emotions, localIsNewer),
     moods: mergeRecords(local.moods, remote.moods, localIsNewer),

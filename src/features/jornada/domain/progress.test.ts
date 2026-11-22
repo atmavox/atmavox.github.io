@@ -6,8 +6,9 @@ import {
   parseProgress,
   removeVictory,
   setEntry,
+  completeDay,
+  markStepDone,
   setMood,
-  toggleDay,
   toggleEmotion,
   type JourneyProgress,
   type Victory,
@@ -28,22 +29,27 @@ const progressWith = (overrides: Partial<JourneyProgress>): JourneyProgress => (
 })
 
 describe('comandos de progresso', () => {
-  it('marca e desmarca um dia, mantendo a lista ordenada', () => {
-    let p = toggleDay(emptyProgress(), 5, 1)
-    p = toggleDay(p, 2, 2)
+  it('conclui dias mantendo a lista ordenada; concluir de novo não muda nada', () => {
+    let p = completeDay(emptyProgress(), 5, 1)
+    p = completeDay(p, 2, 2)
     expect(p.completedDays).toEqual([2, 5])
-    expect(toggleDay(p, 5, 3).completedDays).toEqual([2])
+    expect(completeDay(p, 5, 3)).toBe(p)
   })
 
   it('ignora dias fora de 1 a 21', () => {
     const p = emptyProgress()
-    expect(toggleDay(p, 0, 1)).toBe(p)
-    expect(toggleDay(p, 22, 1)).toBe(p)
+    expect(completeDay(p, 0, 1)).toBe(p)
+    expect(completeDay(p, 22, 1)).toBe(p)
+  })
+
+  it('marca etapas como feitas, sem repetir', () => {
+    const p = markStepDone(markStepDone(emptyProgress(), 'd1:ritual', 1), 'd1:ritual', 2)
+    expect(p.completedSteps).toEqual(['d1:ritual'])
   })
 
   it('não altera o estado original (imutável)', () => {
     const p = emptyProgress()
-    toggleDay(p, 1, 1)
+    completeDay(p, 1, 1)
     setEntry(p, 'd1:reflexao', 'oi', 1)
     expect(p).toEqual(emptyProgress())
   })

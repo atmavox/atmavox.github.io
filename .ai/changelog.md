@@ -54,6 +54,9 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Jornada em sequência (ADR-013): etapas do dia com "Feito ✦", dias que abrem só depois do anterior,
+  abas na ordem Abertura → Semanas → Revisões → Vitórias → Encerramento, com cadeados e aviso para
+  links de abas ainda fechadas; botão "Começar a jornada" / "Continuar no dia N" na Abertura.
 - Cabeçalho da jornada em duas linhas: no computador as 7 abas dividem a largura toda (antes "Vitórias"
   ficava cortada e "Encerramento" sumia), com barras e legendas maiores e o % geral da jornada; no celular
   a aba atual se centraliza sozinha. Conteúdo um pouco mais largo no computador.
@@ -102,6 +105,8 @@ versão com data.
 - Vitórias eram montadas com `innerHTML` (injeção de HTML); agora são texto puro (com teste).
 
 ### Removido
+
+- Desmarcar dias concluídos e marcar dias pelo rastreador da Abertura (a jornada agora só avança).
 
 - Arquivos de exemplo do template do Vite (contador, logos, `App.css`, `index.css`, `icons.svg`).
 

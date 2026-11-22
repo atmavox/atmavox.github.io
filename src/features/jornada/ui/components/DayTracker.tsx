@@ -1,8 +1,11 @@
+import { Lock } from 'lucide-react'
+import { isDayUnlocked } from '../../domain/access'
 import { TOTAL_DAYS } from '../../domain/journey'
 import { useJourney } from '../useJourney'
 
+/** Rastreador dos 21 dias: só mostra o caminho (os dias se concluem dentro de cada semana). */
 export function DayTracker({ label }: { label: string }) {
-  const { progress, store } = useJourney()
+  const { progress } = useJourney()
   const doneCount = progress.completedDays.length
   const percent = Math.round((doneCount / TOTAL_DAYS) * 100)
   const days = Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1)
@@ -15,27 +18,30 @@ export function DayTracker({ label }: { label: string }) {
       >
         {label}
       </h2>
-      <div className="mb-3 grid grid-cols-7 gap-1.5">
+      <ol className="mb-3 grid grid-cols-7 gap-1.5">
         {days.map((day) => {
           const isDone = progress.completedDays.includes(day)
+          const isOpen = isDayUnlocked(progress, day)
+          const state = isDone ? 'concluído' : isOpen ? 'aberto' : 'fechado'
           return (
-            <button
+            <li
               key={day}
-              type="button"
-              aria-pressed={isDone}
-              aria-label={`Dia ${day}`}
-              onClick={() => store.toggleDay(day)}
-              className={`grid aspect-square place-items-center rounded-md border text-xs font-medium transition-colors ${
+              aria-label={`Dia ${day}, ${state}`}
+              className={`grid aspect-square place-items-center rounded-md border text-xs font-medium ${
                 isDone
                   ? 'border-accent bg-accent/15 text-gold'
-                  : 'border-line bg-surface text-ink-faint hover:border-accent hover:text-accent'
+                  : isOpen
+                    ? 'border-accent/60 bg-surface text-accent'
+                    : 'border-line bg-surface text-ink-faint'
               }`}
             >
-              <span aria-hidden="true">{isDone ? '✦' : day}</span>
-            </button>
+              <span aria-hidden="true">
+                {isDone ? '✦' : isOpen ? day : <Lock size={12} className="opacity-60" />}
+              </span>
+            </li>
           )
         })}
-      </div>
+      </ol>
       <div className="flex items-center gap-3 text-sm text-ink-muted">
         <span>
           {doneCount}/{TOTAL_DAYS} dias

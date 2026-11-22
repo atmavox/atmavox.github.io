@@ -1,10 +1,11 @@
 import type { Emotion, Mood } from '../domain/journey'
 import {
   addVictory,
+  completeDay,
+  markStepDone,
   removeVictory,
   setEntry,
   setMood,
-  toggleDay,
   toggleEmotion,
   type JourneyProgress,
 } from '../domain/progress'
@@ -19,7 +20,9 @@ import type { ProgressRepository } from './ports'
 export interface JourneyStore {
   getSnapshot(): JourneyProgress
   subscribe(listener: () => void): () => void
-  toggleDay(day: number): void
+  /** Concluir é definitivo. Quem chama confere antes se pode (`canCompleteDay`). */
+  completeDay(day: number): void
+  markStepDone(stepId: string): void
   setEntry(fieldId: string, text: string): void
   toggleEmotion(day: number, emotion: Emotion): void
   setMood(day: number, mood: Mood | null): void
@@ -58,7 +61,8 @@ export function createJourneyStore({
       listeners.add(listener)
       return () => listeners.delete(listener)
     },
-    toggleDay: (day) => commit(toggleDay(progress, day, now())),
+    completeDay: (day) => commit(completeDay(progress, day, now())),
+    markStepDone: (stepId) => commit(markStepDone(progress, stepId, now())),
     setEntry: (fieldId, text) => commit(setEntry(progress, fieldId, text, now())),
     toggleEmotion: (day, emotion) => commit(toggleEmotion(progress, day, emotion, now())),
     setMood: (day, mood) => commit(setMood(progress, day, mood, now())),

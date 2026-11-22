@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { emptyProgress, setEntry, toggleDay } from '../domain/progress'
+import { emptyProgress, setEntry, completeDay } from '../domain/progress'
 import { createInMemoryBackend } from '../infrastructure/InMemoryCloudBackend'
 import { InMemoryProgressRepository } from '../infrastructure/InMemoryProgressRepository'
 import { createAccount } from './account'
@@ -51,10 +51,10 @@ describe('conta e sincronização', () => {
 
   it('ao entrar, mescla aparelho e nuvem e grava nos dois', async () => {
     const local = new InMemoryProgressRepository(
-      setEntry(toggleDay(emptyProgress(), 1, 1), 'd1:reflexao', 'do aparelho', 1),
+      setEntry(completeDay(emptyProgress(), 1, 1), 'd1:reflexao', 'do aparelho', 1),
     )
     const { backend, account, store } = setup({ local })
-    backend.cloud.docs.set('uid-ana@exemplo.com', toggleDay(emptyProgress(), 5, 2))
+    backend.cloud.docs.set('uid-ana@exemplo.com', completeDay(emptyProgress(), 5, 2))
 
     await account.signInWithEmail('ana@exemplo.com', 'certa')
     await vi.advanceTimersByTimeAsync(0)

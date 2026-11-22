@@ -106,8 +106,16 @@ testes de conteúdo garantem 21 dias, revisões em 7/14/21, ids únicos e nenhum
 - Salvo no `localStorage` em `atmavox:jornada:chama-interna-21`, a cada mudança.
 - Toda afirmação ganhou um campo opcional "Sua versão da afirmação" (`d{dia}:afirmacao`), já que a
   spec diz "reescrevível". O dia 1 mantém a dica original como texto de apoio.
-- Cada dia pode ser concluído pelo ✦ do cabeçalho ou pelo botão "Concluir dia" no fim do conteúdo; o
-  rastreador da Abertura também marca e desmarca.
+- **Avanço em sequência (ADR-013):** a pessoa só avança quando completa a etapa anterior.
+  - **Etapas do dia:** abrem uma de cada vez; cada uma tem "Feito ✦". Perguntas de escrever pedem uma
+    resposta; o fechamento pede a temperatura energética ou um texto. As seguintes aparecem com cadeado.
+  - **Dias:** "Concluir dia ✦" só libera com todas as etapas feitas e abre o dia seguinte na hora.
+    Concluir é definitivo. O ✦ do cabeçalho do card e o rastreador da Abertura só **mostram** o estado.
+  - **Abas, nesta ordem:** Abertura ("Começar a jornada ✦") → Semana I → II → III (cada uma com os 7
+    dias concluídos) → Revisões (as 11 perguntas com "Feito", uma de cada vez) → Vitórias ("Feito ✦") →
+    Encerramento. Aba fechada aparece com cadeado; abrir o link dela mostra um aviso e "Continuar em…".
+  - **Progresso antigo respeitado:** dia ou aba que já tinha respostas ou marcações continua aberto.
+  - **Admin:** as regras aceitam `bypass` (Fase 4, modo Andreía).
 - O exemplo de vitória do original aparece só enquanto a lista está vazia, marcado como "Exemplo".
 - Remover uma vitória pede confirmação na própria linha ("Remover? Sim / Não").
 - O "✦" do título das revisões virou um enfeite visual (não faz parte do texto).

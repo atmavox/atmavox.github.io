@@ -1,7 +1,9 @@
+import { Lock } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { JOURNEY_TABS, type JourneyTabId } from '../application/navigation'
+import { isTabUnlocked } from '../application/tabAccess'
 import { tabProgress } from '../application/tabProgress'
 import { overallProgress } from '../domain/measures'
 import { AccountButton } from './account/AccountButton'
@@ -58,6 +60,24 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
           {JOURNEY_TABS.map((tab) => {
             const isActive = tab.id === activeTab
             const stage = tabProgress(tab.id, journey, progress)
+            if (!isTabUnlocked(tab.id, journey, progress)) {
+              return (
+                <li key={tab.id} className="relative shrink-0 snap-center md:min-w-0">
+                  <span
+                    aria-disabled="true"
+                    title="Complete a etapa anterior para abrir"
+                    className="flex flex-col gap-1.5 border-b-2 border-transparent px-3 pt-3 pb-2.5 text-xs font-medium tracking-wider whitespace-nowrap text-ink-faint uppercase opacity-70 md:px-2 md:text-[0.8rem]"
+                  >
+                    <span className="flex items-center justify-center gap-1.5 md:truncate">
+                      <Lock aria-hidden size={12} />
+                      {tab.label}
+                      <span className="sr-only">, fechada</span>
+                    </span>
+                    <span aria-hidden="true" className="h-1 rounded-full bg-line md:h-1.5" />
+                  </span>
+                </li>
+              )
+            }
             return (
               // `relative`: os textos só para leitor de tela (sr-only, absolutos) ficam presos à aba e
               // não alargam a página no celular.

@@ -81,11 +81,12 @@ bastante liberdade**. Protótipos: `Downloads/atmavox-modo-admin.html` (5 formas
       plano pago; vídeo já resolvido como link; áudio e imagem: alternativas sem custo a decidir (link do
       Drive, ou o arquivo entra no repositório pelo desenvolvedor)
 
-## Regra nova da jornada: avançar só depois de completar 🔲 · detalhes a confirmar
+## Regra nova da jornada: avançar só depois de completar ✅
 
-A participante só avança para a próxima etapa quando a anterior estiver completa. Vale para as etapas de
-cada dia, os dias, as semanas e as abas. Detalhes em definição (o que conta como "completo", o que fica
-liberado sempre, se o admin ignora o bloqueio).
+- [x] Etapas do dia com "Feito ✦" (perguntas pedem resposta), dias em sequência (abrem na hora),
+      abas em cadeia (Abertura → Semanas → Revisões → Vitórias → Encerramento) — ADR-013
+- [x] Progresso antigo respeitado; `bypass` pronto para a admin (Fase 4)
+- [ ] Ver no celular de verdade com a Andreía se o ritmo "uma etapa por vez" ficou bom
 
 ## Depois
 

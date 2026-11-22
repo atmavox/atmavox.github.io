@@ -22,16 +22,18 @@ describe('JourneyStore', () => {
     store.subscribe(listener)
 
     store.setEntry('d1:reflexao', 'Sinto o cinza')
-    store.toggleDay(1)
+    store.markStepDone('d1:ritual')
+    store.completeDay(1)
 
     expect(repository.saved.entries['d1:reflexao']).toBe('Sinto o cinza')
+    expect(repository.saved.completedSteps).toEqual(['d1:ritual'])
     expect(repository.saved.completedDays).toEqual([1])
-    expect(listener).toHaveBeenCalledTimes(2)
+    expect(listener).toHaveBeenCalledTimes(3)
   })
 
   it('não grava quando nada mudou', () => {
     const { repository, store } = setup()
-    store.toggleDay(99)
+    store.completeDay(99)
     expect(repository.saveCount).toBe(0)
   })
 
