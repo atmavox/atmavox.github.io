@@ -75,7 +75,8 @@ Plano (2026-11-21), um commit por passo:
        para esta versão"; edições não salvas ficam no aparelho
    - [x] Telas refeitas fiéis ao protótipo v2 (barra azul, quadro de cartões, dia editável no lugar,
          ladrilhos de blocos, histórico em gaveta) — conferidas lado a lado com o protótipo
-   - [ ] Conferir no site publicado com a conta admin (salvar, publicar, ver como participante)
+   - [x] Conferido no site publicado com a conta admin (2026-11-21); ajuste: etiqueta de estado
+         alinhada com os botões na barra do dia
    - [ ] Depois: editar revisões e encerramento; remover dia; "ver como participante" (item abaixo)
 5. [ ] Tela da participante mostra os blocos novos
 6. [ ] Envio de imagem (WebP no Firestore)
