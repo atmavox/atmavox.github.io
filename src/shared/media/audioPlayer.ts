@@ -5,7 +5,7 @@ export interface AudioTrack {
   src: string
 }
 
-export type PlayerStatus = 'loading' | 'playing' | 'paused' | 'ended' | 'error'
+export type PlayerStatus = 'loading' | 'playing' | 'paused' | 'error'
 
 export interface PlayerState {
   track: AudioTrack | null
@@ -57,12 +57,19 @@ export function createAudioPlayer(audio: AudioElementLike): AudioPlayer {
   audio.addEventListener('timeupdate', () => set({ position: audio.currentTime }))
   audio.addEventListener('playing', () => set({ status: 'playing' }))
   audio.addEventListener('pause', () => {
-    if (state.status !== 'ended') set({ status: 'paused' })
+    if (state.track) set({ status: 'paused' })
   })
-  audio.addEventListener('ended', () => set({ status: 'ended', position: duration() }))
+  // Terminou: o player fecha sozinho (pedido do cliente); tocar de novo recomeça do início.
+  audio.addEventListener('ended', () => close())
   audio.addEventListener('error', () => {
     if (state.track) set({ status: 'error' })
   })
+
+  function close() {
+    audio.pause()
+    audio.src = ''
+    set(IDLE)
+  }
 
   function start() {
     audio.play().catch(() => set({ status: 'paused' }))
@@ -83,10 +90,7 @@ export function createAudioPlayer(audio: AudioElementLike): AudioPlayer {
     toggle(track) {
       if (state.track?.id === track.id) {
         if (state.status === 'playing') audio.pause()
-        else {
-          if (state.status === 'ended') audio.currentTime = 0
-          start()
-        }
+        else start()
         return
       }
       // Zera o estado ANTES de carregar: a duração pode chegar (loadedmetadata) durante o load().
@@ -101,10 +105,6 @@ export function createAudioPlayer(audio: AudioElementLike): AudioPlayer {
     },
     seek,
     skip: (delta) => seek(audio.currentTime + delta),
-    close() {
-      audio.pause()
-      audio.src = ''
-      set(IDLE)
-    },
+    close,
   }
 }

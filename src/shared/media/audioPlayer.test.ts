@@ -55,14 +55,15 @@ describe('audioPlayer', () => {
     expect(player.getSnapshot().position).toBe(0)
   })
 
-  it('ao terminar, tocar de novo recomeça do início', () => {
+  it('ao terminar, o player fecha sozinho; tocar de novo recomeça do início', () => {
     const { audio, player } = setup()
     player.toggle(centro)
-    audio.currentTime = 300
+    audio.tick(300)
     audio.dispatchEvent(new Event('ended'))
-    expect(player.getSnapshot().status).toBe('ended')
+    expect(player.getSnapshot()).toMatchObject({ track: null, position: 0 })
+
     player.toggle(centro)
-    expect(audio.currentTime).toBe(0)
+    expect(player.getSnapshot()).toMatchObject({ track: centro, status: 'playing', position: 0 })
   })
 
   it('fechar para o som e esconde o player', () => {

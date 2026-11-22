@@ -29,7 +29,8 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Paleta nova: escuro "Sépia" + claro "Areia" (o claro anterior ofuscava)
 - [x] Áudio de boas-vindas (48 s) no player do site; vídeos saíram da tela inicial
 - [x] Logo "Anéis nítidos": transparente, traço grosso, favicon que se adapta ao tema
-- [x] Mini player fino no topo, abaixo do cabeçalho
+- [x] Mini player fino no topo, abaixo do cabeçalho; fecha sozinho quando o áudio termina
+- [x] Logo não fica mais por trás do cartão "Comece aqui" no computador
 - [x] README no estilo do Tabi
 - [ ] Limpar o ruído do áudio de boas-vindas (deixar só a voz) — precisa do ffmpeg instalado
 - [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar
