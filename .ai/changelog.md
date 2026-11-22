@@ -10,6 +10,8 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.1.0] · 2026-11-22
+
 ### Adicionado
 
 - App na tela inicial (PWA, F8): `manifest.webmanifest` com abertura sem a barra do navegador e cores
