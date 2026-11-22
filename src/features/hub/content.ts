@@ -138,10 +138,14 @@ export const journeys: readonly JourneyLink[] = [
 /** Vídeos em destaque. Vazio: a seção não aparece. */
 export const videos: readonly HubVideo[] = []
 
-/** Retrato da Andreía (o mesmo do Keepo), em duas larguras: o navegador baixa a que precisa. */
+/**
+ * Retrato da Andreía (o do Keepo, com a definição recuperada por IA: Real-ESRGAN misturado ao original),
+ * em três larguras: o navegador baixa a que precisa (1800 para celulares e telas de alta densidade).
+ */
 export const portrait = {
   src: '/images/andreia-1200.webp',
-  srcSet: '/images/andreia-600.webp 600w, /images/andreia-1200.webp 1200w',
+  srcSet:
+    '/images/andreia-600.webp 600w, /images/andreia-1200.webp 1200w, /images/andreia-1800.webp 1800w',
   width: 1200,
   height: 900,
   alt: `${BRAND_PERSON} sorrindo, com anéis de luz dourada ao redor`,

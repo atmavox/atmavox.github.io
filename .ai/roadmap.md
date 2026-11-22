@@ -34,8 +34,7 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Logo não fica mais por trás do cartão "Comece aqui" no computador
 - [x] README no estilo do Tabi
 - [x] Retrato da Andreía (foto do Keepo) no início do hub e na seção "Sobre"
-- [x] Retrato reprocessado para ficar mais nítido (a fonte do Keepo é pequena)
-- [ ] Receber da Andreía a foto original em alta (arquivo da sessão de fotos) para trocar o retrato
+- [x] Retrato em alta definição: ampliado por IA (Real-ESRGAN + mistura com o original), 600/1200/1800 px
 - [x] Tema claro como padrão na primeira visita
 - [x] Limpar o ruído do áudio de boas-vindas (versão 6 "só voz": silêncios totais, voz nítida; receita
       em `features.md`, F1 → Mídia)
