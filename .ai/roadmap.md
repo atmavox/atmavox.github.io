@@ -51,6 +51,29 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [ ] Andreía trocar o e-mail de suporte do login do Google para o dela (logada na conta dela)
 - [ ] Conferir o aceite da F5 no site publicado (passo a passo no fim do guia)
 
+## Fase 4 · Modo Andreía (admin) 🔲 · ideia, aguardando escolha da forma de editar
+
+Um login especial que libera para a Andreía **ver a jornada como participante** e **editar as jornadas com
+bastante liberdade**. Protótipo com 5 formas de edição: `Downloads/atmavox-modo-admin.html`
+(A · editar no lugar, B · painel estruturado, C · blocos livres "/", D · quadro dos 21 dias,
+E · ver como participante).
+
+- [ ] Escolher a forma de editar (pode ser uma combinação, ex.: D para planejar + A ou C para escrever + E)
+- [ ] Papel de admin sem custo: documento `admins/{uid}` no Firestore, criado à mão no console, e regras
+      que só deixam admin gravar o conteúdo (custom claims exigiriam Cloud Functions, plano pago)
+- [ ] Conteúdo sai do código para o Firestore (`journeys/{id}` com dias e seções), com o conteúdo atual como
+      versão inicial; o site continua funcionando se a nuvem falhar (cópia no build)
+- [ ] Rascunho × publicado, histórico de versões e "voltar para esta versão"
+- [ ] Ids de campo nunca mudam: blocos novos ganham id novo; apagar um bloco esconde, mas preserva as
+      respostas já escritas (regra 4 do CLAUDE.md)
+- [ ] Blocos livres: ritual, pergunta, afirmação, fechamento, check-in, texto, citação, divisor, áudio,
+      vídeo (YouTube), imagem; reordenar, duplicar, criar dias, semanas e jornadas novas (ex.: Ritual Matinal)
+- [ ] "Ver como participante": celular/PC, claro/escuro, "estou no dia N", rascunho ou publicada, sem gravar
+      progresso de ninguém
+- [ ] Uploads de áudio e imagem: o Firebase Storage gratuito não está disponível para projetos novos sem
+      plano pago; alternativas sem custo a decidir (links do YouTube/Drive, ou o arquivo entra no repositório
+      pelo desenvolvedor)
+
 ## Depois
 
 - [ ] Validar textos e experiência com a Andreia e com 2 ou 3 pessoas reais
