@@ -138,6 +138,9 @@ versão com data.
 
 ### Corrigido
 
+- O áudio da página inicial (e o mini player) ia junto para a jornada. Agora, ao passar do hub para a
+  jornada ou o contrário, o som para e o mini player fecha; trocar de aba na mesma área não interrompe
+  (ADR-016, com teste).
 - Dias criados no Modo Andreía (22 em diante) não podiam ser concluídos: o progresso só aceitava os
   dias 1 a 21. Agora aceita qualquer dia da jornada (com teste).
 

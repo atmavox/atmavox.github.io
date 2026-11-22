@@ -183,6 +183,17 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ publicação atômica, leitura leve, histórico com "voltar para esta versão".
   ➖ limite de 1 MB por documento (a jornada tem ~60 kB); editar revisões e encerramento fica para depois.
 
+## ADR-016 · Cada área do site tem o seu áudio
+
+- **Status:** aceita · 2026-11-22 · ajusta o ADR-011 (que deixava o som seguir por todas as páginas)
+- **Contexto:** o áudio de boas-vindas da página inicial continuava tocando, com o mini player, ao entrar
+  na jornada. O cliente considerou isso um defeito: a jornada tem os próprios áudios e ritmo.
+- **Decisão:** o player continua único, mas ao passar do hub para a jornada (ou o contrário) o que estava
+  tocando para e o mini player fecha (`useStopAudioOnAreaChange` no `App.tsx`). Dentro da mesma área,
+  trocar de aba não interrompe o som.
+- **Consequências:** ➕ cada área começa em silêncio; continua um `<audio>` só. ➖ quem quiser ouvir o
+  áudio da página inicial enquanto faz a jornada não consegue (não é um uso esperado).
+
 ---
 
 ## Modelo

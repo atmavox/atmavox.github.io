@@ -2,17 +2,21 @@ import { lazy, Suspense } from 'react'
 import { isJourneyPath } from '../features/jornada/application/navigation'
 import { HubPage } from '../features/hub/HubPage'
 import { useHashRoute } from '../shared/lib/useHashRoute'
+import { useStopAudioOnAreaChange } from '../shared/media/useStopAudioOnAreaChange'
 
 // A jornada só é baixada por quem entra nela: o hub (link da bio) fica leve.
 const JourneyEntry = lazy(() =>
   import('../features/jornada/JourneyEntry').then((module) => ({ default: module.JourneyEntry })),
 )
 
-// O MiniPlayer fica dentro de cada cabeçalho fixo (hub e jornada); o áudio é um só e não para ao navegar.
+// O MiniPlayer fica dentro de cada cabeçalho fixo (hub e jornada). O áudio continua ao trocar de aba
+// dentro da mesma área, mas para ao passar do hub para a jornada (ou o contrário).
 export function App() {
   const path = useHashRoute()
+  const isJourney = isJourneyPath(path)
+  useStopAudioOnAreaChange(isJourney ? 'jornada' : 'hub')
 
-  if (isJourneyPath(path)) {
+  if (isJourney) {
     return (
       <Suspense fallback={<div className="min-h-dvh bg-bg" aria-busy="true" />}>
         <JourneyEntry path={path} />
