@@ -40,7 +40,7 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
       em `features.md`, F1 → Mídia)
 - [x] Controle de volume no mini player (barra fina + silenciar; lembra a escolha; some no iPhone/iPad)
 - [x] Áudio da página inicial não vai mais junto para a jornada (ADR-016)
-- [ ] Barra de progresso do mini player anda aos saltos (parece travada): deixar o movimento fluido
+- [x] Barra de progresso do mini player fluida (lê a posição a cada quadro enquanto toca)
 - [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar
 - [ ] Receber da Andreía: horários dos encontros, título do áudio de boas-vindas, texto curto, links
       de Threads/Telegram (TikTok @atmavox ✅, áudio de boas-vindas ✅, foto ✅)
@@ -84,6 +84,7 @@ Pendências:
       rascunho antes de publicar (hoje o botão abre a jornada publicada, sem cadeados)
 - [ ] Editar Revisões e Encerramento no Modo Andreía
 - [x] Apagar dia (2026-11-22): com confirmação; número aposentado; semana nunca fica vazia
+- [x] Lixeira em cada cartão do quadro de todos os dias, para apagar sem abrir o dia
 - [ ] Jornadas novas pelo editor (ex.: Ritual Matinal — 7 dias)
 - [ ] Apagar da coleção `media` as imagens que nenhum bloco usa mais (hoje ficam guardadas, sem custo)
 

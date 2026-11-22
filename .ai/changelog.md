@@ -54,6 +54,7 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Lixeira em cada cartão do quadro de todos os dias (Modo Andreía), com a mesma confirmação do editor.
 - "Apagar dia" no Modo Andreía: botão no editor do dia, com confirmação. O dia sai do rascunho salvo
   (e do ar ao publicar); o número dele fica aposentado para nenhum dia novo herdar respostas antigas;
   nenhuma semana fica vazia. A barra de progresso geral passa a contar os dias que a jornada tem hoje.
@@ -138,6 +139,8 @@ versão com data.
 
 ### Corrigido
 
+- A barra de progresso do mini player andava aos saltos (o navegador só informa a posição ~4x por
+  segundo) e parecia travada; agora acompanha o áudio a cada quadro da tela, sem saltos.
 - O áudio da página inicial (e o mini player) ia junto para a jornada. Agora, ao passar do hub para a
   jornada ou o contrário, o som para e o mini player fecha; trocar de aba na mesma área não interrompe
   (ADR-016, com teste).

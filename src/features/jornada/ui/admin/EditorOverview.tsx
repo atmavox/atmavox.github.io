@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from 'react'
+import { useCallback, useState, type KeyboardEvent } from 'react'
 import {
   dayStatus,
   draftDayCount,
@@ -6,7 +6,9 @@ import {
   type EditorState,
   type JourneyEditor,
 } from '../../application/JourneyEditor'
-import { allDays, type JourneyWeek } from '../../domain/journey'
+import { allDays, type JourneyDay, type JourneyWeek } from '../../domain/journey'
+import { canRemoveDay } from '../../domain/journeyEditing'
+import { ConfirmDialog } from './ConfirmDialog'
 import { EditorIcon } from './EditorIcon'
 import { InlineText } from './InlineText'
 import { StatusTag } from './StatusTag'
@@ -50,6 +52,8 @@ function WeekHeading({ week, editor }: { week: JourneyWeek; editor: JourneyEdito
 export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }: OverviewProps) {
   const [dragging, setDragging] = useState<number | null>(null)
   const [over, setOver] = useState<number | null>(null)
+  const [removing, setRemoving] = useState<JourneyDay | null>(null)
+  const cancelRemove = useCallback(() => setRemoving(null), [setRemoving])
   const days = allDays(state.working)
   const positions = new Map(days.map((day, index) => [day.number, index + 1]))
   const total = days.length
@@ -153,14 +157,30 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
                 >
                   <span className="flex items-center justify-between font-display text-[28px] leading-none text-accent">
                     {String(position).padStart(2, '0')}
-                    <button
-                      type="button"
-                      aria-label={`Mover dia ${position} (use as setas)`}
-                      onKeyDown={(event) => onGripKey(event, day.number)}
-                      className="cursor-grab rounded text-ink-faint"
-                    >
-                      <EditorIcon name="grip" size={16} />
-                    </button>
+                    <span className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        aria-label={`Apagar dia ${position}: ${day.title}`}
+                        title={
+                          canRemoveDay(state.working, day.number)
+                            ? 'Apagar dia'
+                            : 'Cada semana precisa de pelo menos um dia'
+                        }
+                        disabled={!canRemoveDay(state.working, day.number) || state.isBusy}
+                        onClick={() => setRemoving(day)}
+                        className="grid size-7 place-items-center rounded-full text-ink-faint hover:bg-wine/10 hover:text-wine disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-ink-faint"
+                      >
+                        <EditorIcon name="trash" size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Mover dia ${position} (use as setas)`}
+                        onKeyDown={(event) => onGripKey(event, day.number)}
+                        className="cursor-grab rounded text-ink-faint"
+                      >
+                        <EditorIcon name="grip" size={16} />
+                      </button>
+                    </span>
                   </span>
                   <span className="flex-1 text-sm leading-snug text-ink">{day.title}</span>
                   <StatusTag status={status} className="self-start" />
@@ -192,6 +212,23 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
           </ol>
         </section>
       ))}
+
+      {removing && (
+        <ConfirmDialog
+          title={`Apagar o Dia ${positions.get(removing.number) ?? ''}?`}
+          confirmLabel="Apagar dia"
+          danger
+          onCancel={cancelRemove}
+          onConfirm={() => {
+            setRemoving(null)
+            void editor.removeDay(removing.number)
+          }}
+        >
+          “{removing.title}” sai da jornada quando você publicar. O que as participantes já
+          escreveram nele fica guardado. Se mudar de ideia antes de publicar, use o Histórico para
+          voltar à versão anterior.
+        </ConfirmDialog>
+      )}
     </div>
   )
 }

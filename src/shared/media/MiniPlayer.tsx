@@ -1,4 +1,5 @@
 import { Pause, Play, Volume1, Volume2, VolumeX, X } from 'lucide-react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { formatTime } from './time'
 import { useAudioPlayer } from './useAudioPlayer'
 
@@ -6,6 +7,41 @@ const STATUS_TEXT = {
   loading: 'Carregando…',
   error: 'Não foi possível tocar este áudio.',
 } as const
+
+interface ProgressFillProps {
+  percent: number
+  isPlaying: boolean
+  duration: number
+  readTime: () => number
+}
+
+/**
+ * Preenchimento da barra de posição. O navegador só avisa a posição ~4x por segundo, o que fazia a
+ * barra andar aos saltos; enquanto toca, ela lê a posição exata a cada quadro da tela e ajusta a
+ * largura direto no elemento (sem redesenhar o React 60x por segundo).
+ */
+function ProgressFill({ percent, isPlaying, duration, readTime }: ProgressFillProps) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Parado (ou carregando): a largura vem do estado, aplicada antes de pintar a tela.
+  useLayoutEffect(() => {
+    if (!isPlaying && ref.current) ref.current.style.width = `${percent}%`
+  }, [isPlaying, percent])
+
+  // Tocando: só a animação mexe na largura (o React não passa `style`, para não brigar com ela).
+  useEffect(() => {
+    if (!isPlaying || duration <= 0) return
+    let frame = requestAnimationFrame(function step() {
+      if (ref.current) {
+        ref.current.style.width = `${Math.min(100, (readTime() / duration) * 100)}%`
+      }
+      frame = requestAnimationFrame(step)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [isPlaying, duration, readTime])
+
+  return <div ref={ref} className="h-full w-0 bg-accent" />
+}
 
 interface VolumeControlProps {
   volume: number
@@ -104,7 +140,12 @@ export function MiniPlayer() {
       </div>
       {/* Barra de 3 px; um <input range> invisível por cima permite arrastar e usar o teclado. */}
       <div className="relative h-[3px] bg-line has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent">
-        <div className="h-full bg-accent transition-[width]" style={{ width: `${percent}%` }} />
+        <ProgressFill
+          percent={percent}
+          isPlaying={isPlaying}
+          duration={state.duration}
+          readTime={player.currentTime}
+        />
         <input
           type="range"
           min={0}

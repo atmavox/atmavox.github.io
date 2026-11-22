@@ -121,6 +121,17 @@ describe('Modo Andreía', () => {
     expect(backend.editor.drafts.get(chamaInterna21.id)).toContain('"retiredDays":[21]')
   })
 
+  it('a lixeira do cartão apaga o dia direto do quadro, com confirmação', async () => {
+    await renderEditor()
+    fireEvent.click(await screen.findByRole('button', { name: /Apagar dia 20:/ }))
+    const dialog = screen.getByRole('dialog', { name: 'Apagar o Dia 20?' })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Apagar dia' }))
+
+    await screen.findByText(/Dia apagado/)
+    expect(screen.queryByRole('button', { name: /Editar dia 21:/ })).toBeNull()
+    expect(screen.getByText('20 de 20 dias salvos')).toBeVisible()
+  })
+
   it('o "+" entre blocos abre os ladrilhos e aponta o que falta para salvar', async () => {
     await renderEditor()
     await openDay1()

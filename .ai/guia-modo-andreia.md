@@ -21,6 +21,8 @@ continuam vendo tudo em sequência, como sempre.
 - Para **mudar a ordem**, arraste o cartão para o lugar de outro (dentro da mesma semana).
 - Para **mudar o tema da semana**, clique no nome dela, escreva e clique fora.
 - **Novo dia** fica no fim da última semana.
+- Para **apagar um dia**, toque na **lixeira** do cartão (ou em "Apagar dia" dentro do dia) e confirme.
+  Ele some da jornada quando você publicar. Cada semana precisa ficar com pelo menos um dia.
 - **Ver como participante** abre a jornada como as pessoas veem.
 
 ## Editar um dia

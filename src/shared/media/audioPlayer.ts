@@ -40,6 +40,8 @@ export interface AudioPlayer {
   skip(deltaSeconds: number): void
   close(): void
   setVolume(volume: number): void
+  /** Posição exata agora (o estado só atualiza ~4x por segundo); para animar a barra sem saltos. */
+  currentTime(): number
   /** Silencia; tocando de novo, volta ao volume de antes. */
   toggleMute(): void
 }
@@ -142,6 +144,7 @@ export function createAudioPlayer(
     skip: (delta) => seek(audio.currentTime + delta),
     close,
     setVolume,
+    currentTime: () => audio.currentTime,
     toggleMute: () => setVolume(state.volume > 0 ? 0 : volumeBeforeMute),
   }
 }
