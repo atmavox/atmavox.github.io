@@ -1,5 +1,6 @@
 import {
   AuthFailure,
+  type AdminDirectory,
   type AuthService,
   type AuthUser,
   type CloudBackend,
@@ -61,9 +62,19 @@ export class InMemoryAuth implements AuthService {
   }
 }
 
+/** Admins de mentira para testes: os uids do conjunto são admin. */
+export class InMemoryAdmins implements AdminDirectory {
+  readonly uids = new Set<string>()
+
+  async isAdmin(uid: string) {
+    return this.uids.has(uid)
+  }
+}
+
 export function createInMemoryBackend(): CloudBackend & {
   auth: InMemoryAuth
   cloud: InMemoryCloud
+  admins: InMemoryAdmins
 } {
-  return { auth: new InMemoryAuth(), cloud: new InMemoryCloud() }
+  return { auth: new InMemoryAuth(), cloud: new InMemoryCloud(), admins: new InMemoryAdmins() }
 }

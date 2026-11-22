@@ -72,11 +72,11 @@ function StepDoneButton({ day, section }: { day: number; section: DaySection }) 
 }
 
 export function DayCard({ day }: { day: JourneyDay }) {
-  const { journey, progress, store } = useJourney()
+  const { journey, progress, store, access } = useJourney()
   const [isOpen, setIsOpen] = useState(false)
   const contentId = useId()
   const isDone = progress.completedDays.includes(day.number)
-  const isUnlocked = isDayUnlocked(journey, progress, day.number)
+  const isUnlocked = isDayUnlocked(journey, progress, day.number, access)
   const isHighlighted = isDone || day.isReview
   const dayLabel = String(day.number).padStart(2, '0')
   const canComplete = canCompleteDay(progress, day)
@@ -158,7 +158,7 @@ export function DayCard({ day }: { day: JourneyDay }) {
         className="flex flex-col gap-6 border-t border-line px-4 pt-4 pb-5"
       >
         {day.sections.map((section, index) => {
-          if (!isStepUnlocked(progress, day, index)) {
+          if (!isStepUnlocked(progress, day, index, access)) {
             return <LockedStep key={section.id} section={section} />
           }
           return (

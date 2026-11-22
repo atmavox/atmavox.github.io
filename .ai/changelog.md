@@ -54,6 +54,9 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Papel de admin (Fase 4, passo 3): ao entrar, o site confere se existe `admins/{uid}`; a admin vê a
+  jornada inteira sem cadeados e o menu da conta mostra "Modo Andreía". Regras do Firestore: só a admin
+  grava a versão publicada, os rascunhos e as imagens; cada pessoa só lê o próprio `admins/{uid}`.
 - Conteúdo da jornada pode vir da nuvem (Fase 4, passo 2): o site abre com a cópia do aparelho ou a
   versão do código e troca pela versão publicada em `published/{journeyId}` quando ela chega, lida por
   `fetch` na API REST do Firestore (quem não loga continua sem baixar o SDK). Conteúdo inválido, de

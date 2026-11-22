@@ -113,6 +113,24 @@ describe('conta e sincronização', () => {
     expect(account.getSnapshot()).toMatchObject({ user: null, sync: 'idle' })
   })
 
+  it('reconhece a admin pelo documento admins/{uid} e esquece ao sair', async () => {
+    const { backend, account } = setup()
+    backend.admins.uids.add('google-uid')
+    await account.signInWithGoogle()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(account.getSnapshot().isAdmin).toBe(true)
+
+    await account.signOut()
+    expect(account.getSnapshot().isAdmin).toBe(false)
+  })
+
+  it('quem não está em admins entra como participante', async () => {
+    const { account } = setup()
+    await account.signInWithEmail('ana@exemplo.com', 'certa')
+    await vi.advanceTimersByTimeAsync(0)
+    expect(account.getSnapshot().isAdmin).toBe(false)
+  })
+
   it('repassa o erro de login com a mensagem em português', async () => {
     const { account } = setup()
     await expect(account.signInWithEmail('ana@exemplo.com', 'errada')).rejects.toThrow(

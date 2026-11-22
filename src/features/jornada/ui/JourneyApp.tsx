@@ -17,10 +17,10 @@ import { useJourney } from './useJourney'
 
 /** Quem abre o link de uma aba ainda fechada vê o que falta e um atalho para onde está. */
 function LockedTab({ tab }: { tab: JourneyTabId }) {
-  const { journey, progress } = useJourney()
+  const { journey, progress, access } = useJourney()
   const index = JOURNEY_TABS.findIndex((t) => t.id === tab)
   const previous = JOURNEY_TABS[index - 1]
-  const furthest = JOURNEY_TABS.find((t) => t.id === furthestUnlockedTab(journey, progress))
+  const furthest = JOURNEY_TABS.find((t) => t.id === furthestUnlockedTab(journey, progress, access))
   return (
     <div className="flex flex-col items-center gap-4 py-20 text-center">
       <span className="grid size-14 place-items-center rounded-full border border-line text-ink-faint">
@@ -45,8 +45,8 @@ function LockedTab({ tab }: { tab: JourneyTabId }) {
 }
 
 function TabContent({ tab }: { tab: JourneyTabId }) {
-  const { journey, progress } = useJourney()
-  if (!isTabUnlocked(tab, journey, progress)) return <LockedTab tab={tab} />
+  const { journey, progress, access } = useJourney()
+  if (!isTabUnlocked(tab, journey, progress, access)) return <LockedTab tab={tab} />
   const weekNumber = weekNumberOfTab(tab)
   const week = weekNumber ? journey.weeks.find((w) => w.number === weekNumber) : undefined
 

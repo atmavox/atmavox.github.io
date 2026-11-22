@@ -88,6 +88,14 @@ Ser admin = existir o documento `admins/{uid}`. Só se cria pelo console (o site
 
 Para tirar o acesso, apague o documento. Dá para ter mais de uma admin (um documento por UID).
 
+**Se o Google pedir verificação pelo celular e ela não puder agora:** em **Authentication → Usuários →
+Adicionar usuário**, crie a conta dela com o e-mail e uma senha provisória. O UID aparece na hora; ela
+entra pela opção de e-mail e senha e troca a senha em "Esqueci a senha". (Fica separada de uma conta
+Google com o mesmo e-mail.)
+
+**Como conferir:** entre no site com a conta admin e abra o menu da inicial: aparece "Modo Andreía", e
+todas as abas e dias da jornada ficam abertos, sem cadeados. Se não aparecer, saia e entre de novo.
+
 ## Limites do plano gratuito
 
 Spark: 50 mil leituras e 20 mil gravações por dia no Firestore. O site lê uma vez ao entrar e grava no

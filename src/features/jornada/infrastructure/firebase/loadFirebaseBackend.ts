@@ -15,6 +15,7 @@ import {
 import { doc, getDoc, getFirestore, setDoc, type Firestore } from 'firebase/firestore/lite'
 import {
   AuthFailure,
+  type AdminDirectory,
   type AuthService,
   type AuthUser,
   type CloudBackend,
@@ -105,12 +106,24 @@ class FirestoreProgressRepository implements CloudProgressRepository {
   }
 }
 
+/** A regra só deixa cada pessoa ler o próprio `admins/{uid}`; não existir (ou negar) = não é admin. */
+function createAdminDirectory(db: Firestore): AdminDirectory {
+  return {
+    async isAdmin(uid) {
+      const snapshot = await getDoc(doc(db, 'admins', uid))
+      return snapshot.exists()
+    },
+  }
+}
+
 export function loadFirebaseBackend(config: FirebaseConfig, journeyId: string): CloudBackend {
   const app = initializeApp(config)
   const auth = getAuth(app)
   auth.languageCode = 'pt-BR'
+  const db = getFirestore(app)
   return {
     auth: new FirebaseAuthService(auth),
-    cloud: new FirestoreProgressRepository(getFirestore(app), journeyId),
+    cloud: new FirestoreProgressRepository(db, journeyId),
+    admins: createAdminDirectory(db),
   }
 }

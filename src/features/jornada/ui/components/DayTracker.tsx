@@ -5,7 +5,7 @@ import { useJourney } from '../useJourney'
 
 /** Rastreador dos dias: só mostra o caminho (os dias se concluem dentro de cada semana). */
 export function DayTracker({ label }: { label: string }) {
-  const { journey, progress } = useJourney()
+  const { journey, progress, access } = useJourney()
   const days = allDays(journey)
   const total = days.length
   const doneCount = days.filter((day) => progress.completedDays.includes(day.number)).length
@@ -23,7 +23,7 @@ export function DayTracker({ label }: { label: string }) {
         {days.map((day, index) => {
           const position = index + 1
           const isDone = progress.completedDays.includes(day.number)
-          const isOpen = isDayUnlocked(journey, progress, day.number)
+          const isOpen = isDayUnlocked(journey, progress, day.number, access)
           const state = isDone ? 'concluído' : isOpen ? 'aberto' : 'fechado'
           return (
             <li

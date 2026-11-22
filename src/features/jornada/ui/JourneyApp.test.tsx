@@ -1,10 +1,12 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { createAccount } from '../application/account'
 import { createJourneyContent } from '../application/JourneyContent'
 import { createJourneyStore } from '../application/JourneyStore'
 import { chamaInterna21 } from '../content/chama-interna-21'
 import { START_STEP, VICTORIES_STEP } from '../domain/access'
 import { emptyProgress, markStepDone, type JourneyProgress } from '../domain/progress'
+import { createInMemoryBackend } from '../infrastructure/InMemoryCloudBackend'
 import { InMemoryProgressRepository } from '../infrastructure/InMemoryProgressRepository'
 import { JourneyApp } from './JourneyApp'
 import { JourneyContext } from './JourneyContext'
@@ -137,6 +139,31 @@ describe('JourneyApp', () => {
     expect(within(nav).getByRole('link', { name: /Semana I progresso: 3\/7/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Dia 4: Procrastinação/ })).toBeEnabled()
     expect(screen.getByRole('button', { name: /Dia 5: A voz/ })).toBeDisabled()
+  })
+
+  it('a admin vê todas as abas e dias abertos, sem ter começado', async () => {
+    const backend = createInMemoryBackend()
+    backend.admins.uids.add('google-uid')
+    const store = createJourneyStore({ repository: new InMemoryProgressRepository() })
+    const account = createAccount({
+      store,
+      local: new InMemoryProgressRepository(),
+      loadBackend: () => Promise.resolve(backend),
+      hint: { get: () => false, set: () => {} },
+    })
+    await account.signInWithGoogle()
+    await waitFor(() => expect(account.getSnapshot().isAdmin).toBe(true))
+
+    render(
+      <JourneyContext.Provider
+        value={{ content: createJourneyContent({ fallback: chamaInterna21 }), store, account }}
+      >
+        <JourneyApp path="/jornada/semana-2" />
+      </JourneyContext.Provider>,
+    )
+    const nav = screen.getByRole('navigation', { name: 'Etapas da jornada' })
+    expect(nav.querySelectorAll('[aria-disabled="true"]')).toHaveLength(0)
+    expect(screen.getByRole('button', { name: /Dia 8:/ })).toBeEnabled()
   })
 
   it('registra vitórias como texto puro, sem interpretar HTML', () => {

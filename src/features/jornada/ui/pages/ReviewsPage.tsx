@@ -8,10 +8,10 @@ import { QuestionCard } from '../components/QuestionCard'
 import { useJourney } from '../useJourney'
 
 export function ReviewsPage() {
-  const { journey, progress, store } = useJourney()
+  const { journey, progress, store, access } = useJourney()
   const isOpen = (review: WeeklyReview) =>
     review.questions[0] !== undefined &&
-    isReviewQuestionUnlocked(journey, progress, review.questions[0].fieldId)
+    isReviewQuestionUnlocked(journey, progress, review.questions[0].fieldId, access)
   // Abre na revisão em andamento: a primeira que ainda tem pergunta por fazer.
   const inProgress =
     journey.reviews.find(
@@ -48,7 +48,7 @@ export function ReviewsPage() {
       {active && (
         <div className="flex flex-col gap-5">
           {active.questions.map((question) => {
-            if (!isReviewQuestionUnlocked(journey, progress, question.fieldId)) {
+            if (!isReviewQuestionUnlocked(journey, progress, question.fieldId, access)) {
               return (
                 <div
                   key={question.fieldId}

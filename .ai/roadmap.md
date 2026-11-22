@@ -63,7 +63,11 @@ Plano (2026-11-21), um commit por passo:
        falhar ou o conteúdo vier quebrado
    - [ ] **Desenvolvedor:** colar o `firestore.rules` novo no console (Firestore → Regras → Publicar).
          Até lá a leitura dá "permissão negada" e o site segue com a versão do código (sem erro visível)
-3. [ ] Papel de admin (`admins/{uid}`), link "Modo Andreía" no menu da conta, jornada sem cadeados para ela
+3. [x] Papel de admin (`admins/{uid}`, regras com `isAdmin()`), aviso "Modo Andreía" no menu da conta,
+       jornada sem cadeados para a admin (o link para a tela de edição entra no passo 4)
+   - [x] Regras novas publicadas e `admins/{uid}` do desenvolvedor criado (2026-11-21), para testar
+   - [ ] `admins/{uid}` da Andreía: quando ela puder entrar (o Google pediu verificação pelo celular).
+         Alternativa: criar a conta dela por e-mail e senha no console (`firebase-setup.md`, seção 7)
 4. [ ] Tela de admin: visão geral, editor do dia, "Salvar dia", "Publicar" e histórico
 5. [ ] Tela da participante mostra os blocos novos
 6. [ ] Envio de imagem (WebP no Firestore)

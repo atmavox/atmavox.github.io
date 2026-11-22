@@ -88,6 +88,12 @@ export function AccountButton() {
             />
             {statusText}
           </p>
+          {state.isAdmin && (
+            <p className="mt-3 rounded-xl border border-accent/40 bg-accent/10 px-3 py-2 text-sm text-ink-muted">
+              <span className="font-semibold text-accent">Modo Andreía</span> · você vê a jornada
+              inteira, sem cadeados.
+            </p>
+          )}
           {isConfirmingExit ? (
             <div className="mt-4 flex flex-col gap-3 border-t border-line pt-4">
               <p className="text-sm text-ink-muted">

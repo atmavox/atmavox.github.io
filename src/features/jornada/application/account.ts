@@ -15,6 +15,8 @@ export interface AccountState {
   user: AuthUser | null
   sync: SyncStatus
   isBackendLoading: boolean
+  /** A conta tem o papel de admin: vê a jornada inteira, sem cadeados. */
+  isAdmin: boolean
 }
 
 export interface Account {
@@ -54,7 +56,7 @@ export function createAccount({
   debounceMs = 800,
   onReconnect,
 }: AccountDeps): Account {
-  let state: AccountState = { user: null, sync: 'idle', isBackendLoading: false }
+  let state: AccountState = { user: null, sync: 'idle', isBackendLoading: false, isAdmin: false }
   const listeners = new Set<() => void>()
   let backendPromise: Promise<CloudBackend> | null = null
   let pushTimer: ReturnType<typeof setTimeout> | null = null
@@ -95,11 +97,12 @@ export function createAccount({
   async function handleUser(backend: CloudBackend, user: AuthUser | null) {
     if (!user) {
       cancelPush()
-      set({ user: null, sync: 'idle' })
+      set({ user: null, sync: 'idle', isAdmin: false })
       return
     }
     hint.set(true)
     set({ user, sync: 'connecting' })
+    void checkAdmin(backend, user.uid)
     try {
       const remote = await backend.cloud.load(user.uid)
       const merged = remote ? mergeProgress(store.getSnapshot(), remote) : store.getSnapshot()
@@ -109,6 +112,12 @@ export function createAccount({
     } catch {
       set({ sync: 'offline' })
     }
+  }
+
+  async function checkAdmin(backend: CloudBackend, uid: string) {
+    const isAdmin = await backend.admins.isAdmin(uid).catch(() => false)
+    // Só vale se a mesma pessoa ainda estiver logada quando a resposta chegar.
+    if (state.user?.uid === uid && isAdmin !== state.isAdmin) set({ isAdmin })
   }
 
   function cancelPush() {
@@ -174,7 +183,7 @@ export function createAccount({
       hint.set(false)
       applyFromCloud(emptyProgress())
       local.clear()
-      set({ user: null, sync: 'idle' })
+      set({ user: null, sync: 'idle', isAdmin: false })
     },
   }
 }

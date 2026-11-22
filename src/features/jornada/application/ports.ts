@@ -49,8 +49,14 @@ export interface JourneyContentCache {
   save(journeyId: string, json: string): void
 }
 
+/** Quem é admin (a Andreía): `admins/{uid}` no Firestore, criado à mão no console. */
+export interface AdminDirectory {
+  isAdmin(uid: string): Promise<boolean>
+}
+
 /** O que só existe quando o Firebase está configurado; carregado sob demanda (ADR-005). */
 export interface CloudBackend {
   auth: AuthService
   cloud: CloudProgressRepository
+  admins: AdminDirectory
 }

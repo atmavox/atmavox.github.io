@@ -58,7 +58,7 @@ export function CoverPage() {
 
 /** "Começar a jornada" completa a Abertura e libera a Semana I; depois vira "Continuar no dia N". */
 function StartOrContinue() {
-  const { journey, progress, store } = useJourney()
+  const { journey, progress, store, access } = useJourney()
   const buttonClass =
     'inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-8 font-semibold tracking-wide text-bg transition-opacity hover:opacity-90'
 
@@ -84,7 +84,9 @@ function StartOrContinue() {
         label: `Continuar no dia ${nextDay}`,
       }
     : (() => {
-        const tab = JOURNEY_TABS.find((t) => t.id === furthestUnlockedTab(journey, progress))
+        const tab = JOURNEY_TABS.find(
+          (t) => t.id === furthestUnlockedTab(journey, progress, access),
+        )
         return { href: tab?.href ?? '#/jornada', label: `Continuar em ${tab?.label ?? 'Abertura'}` }
       })()
 

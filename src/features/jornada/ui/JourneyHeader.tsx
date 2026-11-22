@@ -20,7 +20,7 @@ function stageColor(ratio: number): string {
  * (nenhuma fica cortada); no celular rolam para o lado e a aba atual se centraliza sozinha.
  */
 export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
-  const { journey, progress } = useJourney()
+  const { journey, progress, access } = useJourney()
   const overall = overallProgress(progress)
   const activeRef = useRef<HTMLAnchorElement>(null)
 
@@ -60,7 +60,7 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
           {JOURNEY_TABS.map((tab) => {
             const isActive = tab.id === activeTab
             const stage = tabProgress(tab.id, journey, progress)
-            if (!isTabUnlocked(tab.id, journey, progress)) {
+            if (!isTabUnlocked(tab.id, journey, progress, access)) {
               return (
                 <li key={tab.id} className="relative shrink-0 snap-center md:min-w-0">
                   <span
