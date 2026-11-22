@@ -54,6 +54,9 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Retrato da Andreía mais nítido no hub: reprocessado a partir da imagem do Keepo com limpeza leve de
+  ruído, realce de nitidez e WebP de qualidade alta (68 kB e 24 kB). A foto original do Keepo já é
+  pequena; alta definição de verdade depende do arquivo original da fotógrafa.
 - Documentação do Modo Andreía (Fase 4, passo 7): F7 em `features.md`, coleções e regras do Firestore
   em `architecture.md`, `guia-modo-andreia.md` (passo a passo simples para ela) e roadmap da Fase 4
   com as pendências.
