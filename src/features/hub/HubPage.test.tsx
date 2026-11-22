@@ -40,6 +40,15 @@ describe('hub no celular (abas)', () => {
     expectNoPlaceholders()
   })
 
+  it('abre com o retrato da Andreía e a mensagem com o nome dela', () => {
+    render(<HubPage path="/" />)
+    expect(screen.getByRole('img', { name: /Andreía Oliveirà sorrindo/ })).toHaveAttribute(
+      'srcset',
+      expect.stringContaining('andreia-600.webp 600w'),
+    )
+    expect(screen.getByText(/Com Andreía Oliveirà\./)).toBeInTheDocument()
+  })
+
   it('sem horário definido, os encontros apontam para o Instagram', () => {
     render(<HubPage path="/" />)
     expect(screen.getAllByRole('link', { name: 'Horários no Instagram' })).toHaveLength(2)

@@ -7,6 +7,7 @@ import { AboutAndreia } from '../components/AboutAndreia'
 import { AudioItem } from '../components/AudioItem'
 import { EncounterCard } from '../components/EncounterCard'
 import { JourneyCard } from '../components/JourneyCard'
+import { Portrait } from '../components/Portrait'
 import { SocialLinks } from '../components/SocialLinks'
 import {
   contactCta,
@@ -81,6 +82,7 @@ export function HubMagazine({ section }: { section: HubSection }) {
               <p className="max-w-xl text-lg leading-relaxed text-ink-muted">{hero.intro}</p>
             </div>
             <div className="flex flex-col gap-4">
+              <Portrait sizes="(min-width: 1000px) 480px, (min-width: 700px) 90vw, 100vw" />
               <AudioItem item={introAudio} variant="card" eyebrow="Comece aqui" />
               {otherAudios.length > 0 && (
                 <ul className="flex flex-col rounded-2xl border border-line bg-surface px-5">

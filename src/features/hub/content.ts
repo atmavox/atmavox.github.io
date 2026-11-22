@@ -138,11 +138,20 @@ export const journeys: readonly JourneyLink[] = [
 /** Vídeos em destaque. Vazio: a seção não aparece. */
 export const videos: readonly HubVideo[] = []
 
+/** Retrato da Andreía (o mesmo do Keepo), em duas larguras: o navegador baixa a que precisa. */
+export const portrait = {
+  src: '/images/andreia-1200.webp',
+  srcSet: '/images/andreia-600.webp 600w, /images/andreia-1200.webp 1200w',
+  width: 1200,
+  height: 900,
+  alt: `${BRAND_PERSON} sorrindo, com anéis de luz dourada ao redor`,
+}
+
 export const about = {
   name: BRAND_PERSON,
   role: 'Ativadora de consciência e possibilidades.',
-  /** Foto em public/ (ex.: "/andreia.webp"). Sem ela, os anéis da marca ocupam o lugar. */
-  photoSrc: undefined as string | undefined,
+  /** Sem foto, os anéis da marca ocupam o lugar. */
+  photoSrc: '/images/andreia-600.webp' as string | undefined,
   text: undefined as string | undefined,
 }
 

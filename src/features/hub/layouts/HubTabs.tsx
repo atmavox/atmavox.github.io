@@ -3,11 +3,11 @@ import { useEffect, useState, type ComponentType } from 'react'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
-import { BrandRings } from '../../../shared/ui/BrandRings'
 import { AboutAndreia } from '../components/AboutAndreia'
 import { AudioItem } from '../components/AudioItem'
 import { EncounterCard } from '../components/EncounterCard'
 import { JourneyCard } from '../components/JourneyCard'
+import { Portrait } from '../components/Portrait'
 import { SocialLinks } from '../components/SocialLinks'
 import {
   contactCta,
@@ -35,10 +35,12 @@ function InicioPanel() {
   const featuredVideo = videos[0]
   return (
     <>
-      <section className="flex flex-col items-center gap-4 pt-2 text-center">
-        <BrandRings className="w-24" />
-        <h1 className="font-display text-3xl leading-tight text-ink">{hero.slogan}</h1>
-        <p className="leading-relaxed text-ink-muted">{hero.principle}</p>
+      <section className="flex flex-col gap-4 pt-1">
+        <Portrait sizes="(max-width: 700px) 100vw, 600px" />
+        <div className="flex flex-col items-center gap-3 text-center">
+          <h1 className="font-display text-3xl leading-tight text-ink">{hero.slogan}</h1>
+          <p className="leading-relaxed text-ink-muted">{hero.intro}</p>
+        </div>
       </section>
       <AudioItem item={introAudio} variant="card" eyebrow="Comece aqui" />
       <section aria-labelledby="encontros-titulo" className="flex flex-col gap-3">

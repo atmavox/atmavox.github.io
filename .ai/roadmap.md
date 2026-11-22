@@ -32,10 +32,12 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Mini player fino no topo, abaixo do cabeçalho; fecha sozinho quando o áudio termina
 - [x] Logo não fica mais por trás do cartão "Comece aqui" no computador
 - [x] README no estilo do Tabi
-- [ ] Limpar o ruído do áudio de boas-vindas (deixar só a voz) — precisa do ffmpeg instalado
+- [x] Retrato da Andreía (foto do Keepo) no início do hub e na seção "Sobre"
+- [ ] Limpar o ruído do áudio de boas-vindas: 3 versões geradas (leve, média, forte) em Downloads;
+      falta escolher uma para substituir no site
 - [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar
-- [ ] Receber da Andreía: horários dos encontros, título do áudio de boas-vindas, foto, texto curto, links
-      de Threads/Telegram (TikTok @atmavox ✅, áudio de boas-vindas ✅)
+- [ ] Receber da Andreía: horários dos encontros, título do áudio de boas-vindas, texto curto, links
+      de Threads/Telegram (TikTok @atmavox ✅, áudio de boas-vindas ✅, foto ✅)
 - [ ] Trocar o link da bio do Instagram para atmavox.github.io
 
 ## Fase 3 · Login opcional 🔨 (no ar; falta conferir o login de ponta a ponta)

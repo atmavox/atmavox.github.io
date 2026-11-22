@@ -13,7 +13,7 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 **Layout (decidido em 2026-11 com protótipos clicáveis):** o mesmo conteúdo em duas estruturas (ADR-010):
 
 - **Celular (< 700 px): "app com abas".** Barra fixa embaixo com Início · Ouvir · Jornadas · Contato.
-  - Início: anéis + slogan + princípio editorial; cartão "Comece aqui" (áudio curto de boas-vindas,
+  - Início: retrato da Andreía + slogan + "Um espaço para perceber… Com Andreía Oliveirà."; cartão "Comece aqui" (áudio curto de boas-vindas,
     `public/audio/atmavox-boas-vindas.m4a`, 48 s); próximos encontros; vídeo em destaque (quando houver).
   - Ouvir: áudios e encontros gravados, com filtro (Tudo · Áudios · Encontros gravados).
   - Jornadas: A Chama Interna (→ `#/jornada`), Ritual Matinal (lista de espera), Sessão individual.
@@ -47,8 +47,12 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 **Aceite:** abre bem em celular de 360 px e no computador; todos os links funcionam; o áudio continua
 tocando ao trocar de aba; Lighthouse ≥ 90 em performance e acessibilidade; funciona nos dois temas.
 
+**Retrato:** a foto da Andreía do Keepo (`public/images/andreia-600.webp` e `-1200.webp`, ~13 e 33 kB) abre
+o Início no celular e fica acima do cartão "Comece aqui" no computador; recortada no rosto, vira a foto
+redonda de "Sobre".
+
 **Pendências com a Andreía:** horários dos encontros; título do áudio de boas-vindas (provisório:
-"Boas-vindas"); foto e texto curto;
+"Boas-vindas"); texto curto de apresentação;
 links do Threads e do Telegram; textos novos do hub (hero, descrições), que foram escritos a partir do PDF
 de posicionamento.
 

@@ -8,10 +8,14 @@ export function AboutAndreia({ headingLevel = 2 }: { headingLevel?: 1 | 2 }) {
   return (
     <div className="flex items-center gap-4">
       {about.photoSrc ? (
+        // O nome vem logo ao lado, então a foto é decorativa (alt vazio) e enquadrada no rosto.
         <img
           src={about.photoSrc}
-          alt={about.name}
-          className="size-20 shrink-0 rounded-full border border-line object-cover"
+          alt=""
+          loading="lazy"
+          width={80}
+          height={80}
+          className="size-20 shrink-0 rounded-full border border-line object-cover object-[48%_18%]"
         />
       ) : (
         <BrandRings className="w-20 shrink-0" />
