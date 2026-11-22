@@ -1,7 +1,14 @@
 // Regra de avanço da jornada: a participante só avança quando a etapa anterior está completa.
 // Vale para as etapas de cada dia, os dias, as semanas e as abas (a ordem das abas fica em
 // application/tabAccess.ts). Progresso feito antes desta regra é respeitado ("legado").
-import { allDays, type DaySection, type Journey, type JourneyDay, type Question } from './journey'
+import {
+  allDays,
+  isStepSection,
+  type DaySection,
+  type Journey,
+  type JourneyDay,
+  type Question,
+} from './journey'
 import type { JourneyProgress } from './progress'
 
 /** "Começar a jornada", no fim da Abertura. */
@@ -15,13 +22,6 @@ export interface AccessOptions {
 }
 
 // ---------- etapas de um dia ----------
-
-/** Id da etapa: o id do campo quando existe; check-in e ritual (um por dia) ganham um id do dia. */
-export function stepIdOf(day: number, section: DaySection): string {
-  if (section.type === 'checkin') return `d${day}:checkin`
-  if (section.type === 'ritual') return `d${day}:ritual`
-  return section.fieldId
-}
 
 /** Pode marcar "Feito"? Perguntas pedem uma resposta; o fechamento, a temperatura ou um texto. */
 export function isStepSatisfied(
@@ -38,10 +38,22 @@ export function isStepSatisfied(
   return true
 }
 
+/** Blocos só de leitura (texto, citação, imagem…) contam como feitos: não seguram o avanço. */
 export function isStepDone(progress: JourneyProgress, day: number, section: DaySection): boolean {
   return (
-    progress.completedDays.includes(day) || progress.completedSteps.includes(stepIdOf(day, section))
+    !isStepSection(section) ||
+    progress.completedDays.includes(day) ||
+    progress.completedSteps.includes(section.id)
   )
+}
+
+/** Quantas etapas o dia tem e quantas já foram feitas (para o "2/5" do cartão). */
+export function dayStepCount(progress: JourneyProgress, day: JourneyDay) {
+  const steps = day.sections.filter(isStepSection)
+  return {
+    total: steps.length,
+    done: steps.filter((section) => isStepDone(progress, day.number, section)).length,
+  }
 }
 
 /** Índice da primeira etapa ainda não feita (ou o total, se todas estão feitas). */
@@ -85,13 +97,22 @@ function dayHasOwnProgress(progress: JourneyProgress, dayNumber: number): boolea
   )
 }
 
+/**
+ * O número do dia é a identidade dele (as respostas são salvas por `d{número}:…`); a sequência é a
+ * ordem dos dias na jornada. Assim, se a Andreía reordenar os dias, as respostas seguem o dia certo.
+ */
 export function isDayUnlocked(
+  journey: Journey,
   progress: JourneyProgress,
   dayNumber: number,
   { bypass = false }: AccessOptions = {},
 ): boolean {
   if (bypass || dayHasOwnProgress(progress, dayNumber)) return true
-  return dayNumber === 1 ? hasStarted(progress) : progress.completedDays.includes(dayNumber - 1)
+  const days = allDays(journey)
+  const position = days.findIndex((day) => day.number === dayNumber)
+  if (position === -1) return false
+  const previous = days[position - 1]
+  return previous ? progress.completedDays.includes(previous.number) : hasStarted(progress)
 }
 
 /** O primeiro dia ainda não concluído (o "dia de hoje" da jornada), ou null se terminou. */

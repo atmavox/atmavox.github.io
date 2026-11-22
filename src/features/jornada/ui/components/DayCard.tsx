@@ -2,12 +2,11 @@ import { Check, Lock } from 'lucide-react'
 import { useId, useState } from 'react'
 import {
   canCompleteDay,
-  currentStepIndex,
+  dayStepCount,
   isDayUnlocked,
   isStepDone,
   isStepSatisfied,
   isStepUnlocked,
-  stepIdOf,
 } from '../../domain/access'
 import type { DaySection, JourneyDay } from '../../domain/journey'
 import { useJourney } from '../useJourney'
@@ -19,6 +18,12 @@ const SECTION_NAMES: Record<DaySection['type'], string> = {
   prompt: 'Reflexão',
   affirmation: 'Afirmação',
   closing: 'Fechamento',
+  text: 'Texto',
+  quote: 'Citação',
+  divider: 'Divisor',
+  image: 'Imagem',
+  video: 'Vídeo',
+  audio: 'Áudio',
 }
 
 function sectionTitle(section: DaySection): string {
@@ -52,7 +57,7 @@ function StepDoneButton({ day, section }: { day: number; section: DaySection }) 
         type="button"
         disabled={!satisfied}
         aria-describedby={satisfied ? undefined : hintId}
-        onClick={() => store.markStepDone(stepIdOf(day, section))}
+        onClick={() => store.markStepDone(section.id)}
         className="rounded-full border border-accent px-4 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:border-line disabled:text-ink-faint disabled:hover:bg-transparent"
       >
         Feito ✦
@@ -67,16 +72,15 @@ function StepDoneButton({ day, section }: { day: number; section: DaySection }) 
 }
 
 export function DayCard({ day }: { day: JourneyDay }) {
-  const { progress, store } = useJourney()
+  const { journey, progress, store } = useJourney()
   const [isOpen, setIsOpen] = useState(false)
   const contentId = useId()
   const isDone = progress.completedDays.includes(day.number)
-  const isUnlocked = isDayUnlocked(progress, day.number)
+  const isUnlocked = isDayUnlocked(journey, progress, day.number)
   const isHighlighted = isDone || day.isReview
   const dayLabel = String(day.number).padStart(2, '0')
-  const current = currentStepIndex(progress, day)
   const canComplete = canCompleteDay(progress, day)
-  const stepsDone = Math.min(current, day.sections.length)
+  const steps = dayStepCount(progress, day)
 
   return (
     <article
@@ -134,7 +138,7 @@ export function DayCard({ day }: { day: JourneyDay }) {
           title={isDone ? 'Dia concluído' : isUnlocked ? 'Em andamento' : 'Fechado'}
         >
           {isUnlocked ? (
-            <span aria-hidden="true">{isDone ? '✦' : `${stepsDone}/${day.sections.length}`}</span>
+            <span aria-hidden="true">{isDone ? '✦' : `${steps.done}/${steps.total}`}</span>
           ) : (
             <Lock aria-hidden size={14} />
           )}
@@ -142,7 +146,7 @@ export function DayCard({ day }: { day: JourneyDay }) {
             {isDone
               ? `Dia ${day.number} concluído`
               : isUnlocked
-                ? `Dia ${day.number}: ${stepsDone} de ${day.sections.length} etapas feitas`
+                ? `Dia ${day.number}: ${steps.done} de ${steps.total} etapas feitas`
                 : `Dia ${day.number} fechado`}
           </span>
         </span>
@@ -155,10 +159,10 @@ export function DayCard({ day }: { day: JourneyDay }) {
       >
         {day.sections.map((section, index) => {
           if (!isStepUnlocked(progress, day, index)) {
-            return <LockedStep key={index} section={section} />
+            return <LockedStep key={section.id} section={section} />
           }
           return (
-            <div key={index}>
+            <div key={section.id}>
               <DaySectionView day={day.number} section={section} />
               {!isStepDone(progress, day.number, section) && (
                 <StepDoneButton day={day.number} section={section} />

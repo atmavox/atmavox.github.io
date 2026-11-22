@@ -29,11 +29,16 @@ export type Mood = (typeof MOODS)[number]['value']
  */
 export type FieldId = `d${number}:${string}` | `r${7 | 14 | 21}:q${number}` | `enc:${string}`
 
+/**
+ * Uma seção (bloco) do dia. Todo bloco tem um `id` fixo: é por ele que o "Feito" da etapa fica salvo.
+ * Nos blocos com resposta escrita, `id` e `fieldId` são o mesmo valor (e nunca mudam depois de publicados).
+ */
 export type DaySection =
-  | { type: 'checkin' }
-  | { type: 'ritual'; label: string; text: string }
+  | { type: 'checkin'; id: string }
+  | { type: 'ritual'; id: string; label: string; text: string }
   | {
       type: 'prompt'
+      id: string
       fieldId: FieldId
       label: string
       question?: string
@@ -41,15 +46,62 @@ export type DaySection =
       editable?: boolean
       size?: 'short' | 'regular'
     }
-  | { type: 'affirmation'; fieldId: FieldId; label: string; text: string; hint?: string }
+  | {
+      type: 'affirmation'
+      id: string
+      fieldId: FieldId
+      label: string
+      text: string
+      hint?: string
+    }
   | {
       type: 'closing'
+      id: string
       fieldId: FieldId
       label: string
       question?: string
       moodHint?: string
       placeholder: string
     }
+  // Blocos novos do modo Andreía (Fase 4).
+  | { type: 'text'; id: string; text: string }
+  | { type: 'quote'; id: string; text: string }
+  | { type: 'divider'; id: string }
+  | { type: 'image'; id: string; mediaId: string; alt: string; caption?: string }
+  | { type: 'video'; id: string; label: string; title: string; url: string }
+  | { type: 'audio'; id: string; label: string; title: string; url: string }
+
+export type SectionType = DaySection['type']
+
+/** Blocos só de leitura não são etapas: não pedem "Feito" e não seguram o avanço. */
+const READING_ONLY: ReadonlySet<SectionType> = new Set(['text', 'quote', 'divider', 'image'])
+
+export function isStepSection(section: DaySection): boolean {
+  return !READING_ONLY.has(section.type)
+}
+
+type WithoutId<T> = T extends unknown ? Omit<T, 'id'> : never
+/** Seção escrita no código, antes de ganhar id (o id sai do campo ou do tipo). */
+export type DaySectionInput = WithoutId<DaySection>
+export interface JourneyDayInput extends Omit<JourneyDay, 'sections'> {
+  sections: readonly DaySectionInput[]
+}
+
+/**
+ * Dá a cada seção o id fixo usado pelo "Feito": o `fieldId` quando existe, senão `d{dia}:{tipo}`
+ * (`d1:checkin`, `d1:ritual`), que é o formato já gravado no progresso de quem começou a jornada.
+ */
+export function withSectionIds(day: JourneyDayInput): JourneyDay {
+  const used = new Set<string>()
+  const sections = day.sections.map((section) => {
+    const base = 'fieldId' in section ? section.fieldId : `d${day.number}:${section.type}`
+    let id = base
+    for (let n = 2; used.has(id); n++) id = `${base}-${n}`
+    used.add(id)
+    return { ...section, id } as DaySection
+  })
+  return { ...day, sections }
+}
 
 export interface JourneyDay {
   number: number

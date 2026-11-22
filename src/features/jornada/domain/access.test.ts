@@ -4,6 +4,7 @@ import {
   areReviewsComplete,
   canCompleteDay,
   currentStepIndex,
+  dayStepCount,
   hasStarted,
   isDayUnlocked,
   isReviewQuestionUnlocked,
@@ -11,9 +12,8 @@ import {
   isStepUnlocked,
   nextDayToDo,
   START_STEP,
-  stepIdOf,
 } from './access'
-import { allDays } from './journey'
+import { allDays, withSectionIds, type Journey } from './journey'
 import {
   completeDay,
   emptyProgress,
@@ -33,7 +33,7 @@ function finishSteps(progress: JourneyProgress, dayNumber: number): JourneyProgr
   for (const section of day.sections) {
     if (section.type === 'prompt') p = setEntry(p, section.fieldId, 'resposta', 1)
     if (section.type === 'closing') p = setMood(p, dayNumber, 3, 1)
-    p = markStepDone(p, stepIdOf(dayNumber, section), 1)
+    p = markStepDone(p, section.id, 1)
   }
   return p
 }
@@ -47,7 +47,7 @@ describe('etapas de um dia', () => {
   })
 
   it('marcar "Feito" libera a etapa seguinte', () => {
-    const p = markStepDone(started(), stepIdOf(1, day1.sections[0]!), 2)
+    const p = markStepDone(started(), day1.sections[0]!.id, 2)
     expect(isStepUnlocked(p, day1, 1)).toBe(true)
     expect(isStepUnlocked(p, day1, 2)).toBe(false)
   })
@@ -55,7 +55,7 @@ describe('etapas de um dia', () => {
   it('pergunta de escrever só pode ser marcada com resposta', () => {
     const prompt = day1.sections.find((s) => s.type === 'prompt')!
     expect(isStepSatisfied(started(), 1, prompt)).toBe(false)
-    const answered = setEntry(started(), stepIdOf(1, prompt), 'Peço permissão demais', 2)
+    const answered = setEntry(started(), prompt.id, 'Peço permissão demais', 2)
     expect(isStepSatisfied(answered, 1, prompt)).toBe(true)
   })
 
@@ -78,30 +78,74 @@ describe('etapas de um dia', () => {
 describe('dias e semanas', () => {
   it('o dia 1 abre ao "Começar a jornada"; antes disso, nada abre', () => {
     expect(hasStarted(emptyProgress())).toBe(false)
-    expect(isDayUnlocked(emptyProgress(), 1)).toBe(false)
-    expect(isDayUnlocked(started(), 1)).toBe(true)
+    expect(isDayUnlocked(chamaInterna21, emptyProgress(), 1)).toBe(false)
+    expect(isDayUnlocked(chamaInterna21, started(), 1)).toBe(true)
   })
 
   it('o próximo dia abre na hora em que o anterior é concluído', () => {
     const p = completeDay(finishSteps(started(), 1), 1, 3)
-    expect(isDayUnlocked(started(), 2)).toBe(false)
-    expect(isDayUnlocked(p, 2)).toBe(true)
-    expect(isDayUnlocked(p, 3)).toBe(false)
+    expect(isDayUnlocked(chamaInterna21, started(), 2)).toBe(false)
+    expect(isDayUnlocked(chamaInterna21, p, 2)).toBe(true)
+    expect(isDayUnlocked(chamaInterna21, p, 3)).toBe(false)
     expect(nextDayToDo(chamaInterna21, p)).toBe(2)
   })
 
   it('respeita quem já tinha dias marcados antes da regra (fora de ordem também)', () => {
     const legacy = { ...emptyProgress(), completedDays: [1, 2, 5] }
     expect(hasStarted(legacy)).toBe(true)
-    expect(isDayUnlocked(legacy, 5)).toBe(true)
-    expect(isDayUnlocked(legacy, 3)).toBe(true)
-    expect(isDayUnlocked(legacy, 4)).toBe(false)
+    expect(isDayUnlocked(chamaInterna21, legacy, 5)).toBe(true)
+    expect(isDayUnlocked(chamaInterna21, legacy, 3)).toBe(true)
+    expect(isDayUnlocked(chamaInterna21, legacy, 4)).toBe(false)
     expect(canCompleteDay(legacy, allDays(chamaInterna21)[4]!)).toBe(true)
   })
 
   it('concluir é definitivo: concluir de novo não muda nada', () => {
     const p = completeDay(started(), 1, 2)
     expect(completeDay(p, 1, 3)).toBe(p)
+  })
+})
+
+describe('blocos e ordem editáveis (modo Andreía)', () => {
+  const day = withSectionIds({
+    number: 30,
+    title: 'Dia novo',
+    subtitle: '',
+    isReview: false,
+    sections: [
+      { type: 'text', text: 'Leia com calma.' },
+      { type: 'ritual', label: 'Ritual', text: 'Respire.' },
+      { type: 'divider' },
+      { type: 'ritual', label: 'Outro ritual', text: 'Respire de novo.' },
+    ],
+  })
+
+  it('cada seção ganha um id fixo, sem repetir', () => {
+    expect(day.sections.map((s) => s.id)).toEqual([
+      'd30:text',
+      'd30:ritual',
+      'd30:divider',
+      'd30:ritual-2',
+    ])
+  })
+
+  it('blocos só de leitura não pedem "Feito" nem seguram a etapa seguinte', () => {
+    const p = started()
+    expect(currentStepIndex(p, day)).toBe(1)
+    expect(dayStepCount(p, day)).toEqual({ total: 2, done: 0 })
+    const afterRitual = markStepDone(p, 'd30:ritual', 2)
+    expect(isStepUnlocked(afterRitual, day, 3)).toBe(true)
+    expect(canCompleteDay(markStepDone(afterRitual, 'd30:ritual-2', 3), day)).toBe(true)
+  })
+
+  it('a sequência segue a ordem dos dias na jornada, não o número', () => {
+    const [d1, d2, d3] = allDays(chamaInterna21)
+    const reordered: Journey = {
+      ...chamaInterna21,
+      weeks: [{ number: 1, roman: 'I', theme: 'Teste', days: [d1!, d3!, d2!] }],
+    }
+    const p = completeDay(started(), 1, 2)
+    expect(isDayUnlocked(reordered, p, 3)).toBe(true)
+    expect(isDayUnlocked(reordered, p, 2)).toBe(false)
   })
 })
 

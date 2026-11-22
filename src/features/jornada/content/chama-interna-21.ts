@@ -2,13 +2,18 @@
 // Não reescreva os textos: corrija só erros evidentes de digitação (regra 3 do CLAUDE.md).
 // Marcação aceita: *itálico*, **negrito**, [texto](https://link ou #/rota).
 import { brandLinks } from '../../../shared/brand/links'
-import type { DaySection, Journey, JourneyDay } from '../domain/journey'
+import {
+  withSectionIds,
+  type DaySectionInput,
+  type Journey,
+  type JourneyDayInput,
+} from '../domain/journey'
 
 const affirmation = (
   day: number,
   text: string,
   { label = 'Afirmação da Chama', hint }: { label?: string; hint?: string } = {},
-): DaySection => ({
+): DaySectionInput => ({
   type: 'affirmation',
   fieldId: `d${day}:afirmacao`,
   label,
@@ -20,7 +25,7 @@ const closing = (
   day: number,
   label: 'Fechamento do dia' | 'Fechamento',
   extra: { question?: string; moodHint?: string; placeholder?: string } = {},
-): DaySection => ({
+): DaySectionInput => ({
   type: 'closing',
   fieldId: `d${day}:fechamento`,
   label,
@@ -36,7 +41,7 @@ const standardDay = (
   subtitle: string,
   ritual: string,
   affirmationText: string,
-): JourneyDay => ({
+): JourneyDayInput => ({
   number,
   title,
   subtitle,
@@ -55,7 +60,7 @@ const standardDay = (
   ],
 })
 
-const week1: JourneyDay[] = [
+const week1: JourneyDayInput[] = [
   {
     number: 1,
     title: 'O Estado que você não consegue nomear',
@@ -261,7 +266,7 @@ const week1: JourneyDay[] = [
 ]
 
 // A Semana II aparecia duas vezes no original; esta é a versão mais completa (ver .ai/features.md).
-const week2: JourneyDay[] = [
+const week2: JourneyDayInput[] = [
   standardDay(
     8,
     'O desbloqueio emocional começa',
@@ -313,7 +318,7 @@ const week2: JourneyDay[] = [
   ),
 ]
 
-const week3: JourneyDay[] = [
+const week3: JourneyDayInput[] = [
   standardDay(
     15,
     'Quem sou quando não estou no cinza?',
@@ -368,9 +373,14 @@ const week3: JourneyDay[] = [
 export const chamaInterna21: Journey = {
   id: 'chama-interna-21',
   weeks: [
-    { number: 1, roman: 'I', theme: 'Nomeando o Cinza', days: week1 },
-    { number: 2, roman: 'II', theme: 'Desbloqueio Emocional', days: week2 },
-    { number: 3, roman: 'III', theme: 'Nova Identidade e Direção', days: week3 },
+    { number: 1, roman: 'I', theme: 'Nomeando o Cinza', days: week1.map(withSectionIds) },
+    { number: 2, roman: 'II', theme: 'Desbloqueio Emocional', days: week2.map(withSectionIds) },
+    {
+      number: 3,
+      roman: 'III',
+      theme: 'Nova Identidade e Direção',
+      days: week3.map(withSectionIds),
+    },
   ],
   reviews: [
     {

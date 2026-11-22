@@ -88,5 +88,14 @@ export function DaySectionView({ day, section }: DaySectionViewProps) {
           />
         </section>
       )
+
+    // Blocos do modo Andreía: a tela da participante chega no passo 5 da Fase 4.
+    case 'text':
+    case 'quote':
+    case 'divider':
+    case 'image':
+    case 'video':
+    case 'audio':
+      return null
   }
 }

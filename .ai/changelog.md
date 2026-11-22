@@ -54,6 +54,11 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Base do modo Andreía (Fase 4, passo 1): cada bloco do dia tem um id fixo, tipos novos de bloco
+  (texto, citação, divisor, imagem, vídeo e áudio por link; os só de leitura não pedem "Feito"), a
+  sequência dos dias segue a ordem na jornada e o rastreador da Abertura acompanha a quantidade de dias.
+  Leitura segura de jornada vinda da nuvem (`parseJourney`): recusa blocos desconhecidos, ids repetidos
+  e links que não sejam http(s).
 - Jornada em sequência (ADR-013): etapas do dia com "Feito ✦", dias que abrem só depois do anterior,
   abas na ordem Abertura → Semanas → Revisões → Vitórias → Encerramento, com cadeados e aviso para
   links de abas ainda fechadas; botão "Começar a jornada" / "Continuar no dia N" na Abertura.

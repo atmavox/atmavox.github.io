@@ -51,7 +51,22 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [ ] Andreía trocar o e-mail de suporte do login do Google para o dela (logada na conta dela)
 - [ ] Conferir o aceite da F5 no site publicado (passo a passo no fim do guia)
 
-## Fase 4 · Modo Andreía (admin) 🔲 · forma de editar escolhida; aguardando plano
+## Fase 4 · Modo Andreía (admin) 🔨 · em construção
+
+Plano (2026-11-21), um commit por passo:
+
+1. [x] Domínio: id fixo por bloco (`withSectionIds`), blocos novos (texto, citação, divisor, imagem,
+       vídeo, áudio; os só de leitura não pedem "Feito"), sequência dos dias pela ordem na jornada (o
+       número do dia é a identidade das respostas) e `parseJourney` para conteúdo vindo da nuvem
+2. [ ] Conteúdo publicado na nuvem, lido sem carregar o Firebase para participantes; cópia do build se
+       a nuvem falhar
+3. [ ] Papel de admin (`admins/{uid}`), link "Modo Andreía" no menu da conta, jornada sem cadeados para ela
+4. [ ] Tela de admin: visão geral, editor do dia, "Salvar dia", "Publicar" e histórico
+5. [ ] Tela da participante mostra os blocos novos
+6. [ ] Envio de imagem (WebP no Firestore)
+7. [ ] Documentação, regras e guia para cadastrar a Andreía como admin
+
+Detalhes e decisões:
 
 Um login especial que libera para a Andreía **ver a jornada como participante** e **editar as jornadas com
 bastante liberdade**. Protótipos: `Downloads/atmavox-modo-admin.html` (5 formas) e
