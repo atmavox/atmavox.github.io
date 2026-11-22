@@ -12,11 +12,33 @@ service cloud.firestore {
         && request.resource.size() < 900 * 1024;
     }
 
+    // Admin = existe o documento admins/{uid}, criado à mão no console (sem custo; custom claims
+    // exigiriam Cloud Functions, plano pago). Ninguém se torna admin pelo site.
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
     // Versão publicada de cada jornada (modo Andreía): qualquer pessoa lê, sem login.
-    // A gravação entra com o papel de admin (Fase 4, passo 3).
     match /published/{journeyId} {
       allow read: if true;
-      allow write: if false;
+      allow write: if isAdmin() && request.resource.size() < 1000 * 1024;
+    }
+
+    // Rascunhos e histórico de versões: só a admin.
+    match /drafts/{journeyId}/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Imagens dos blocos (WebP pequeno, ADR-014): qualquer pessoa vê, só a admin envia.
+    match /media/{mediaId} {
+      allow read: if true;
+      allow write: if isAdmin() && request.resource.size() < 1000 * 1024;
     }
 
     // Todo o resto é negado.

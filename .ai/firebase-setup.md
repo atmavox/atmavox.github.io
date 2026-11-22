@@ -72,6 +72,22 @@ No **Google Cloud Console → APIs e serviços → Credenciais**, abra a chave "
 4. Abra o site em outro navegador ou no celular, entre com a mesma conta: o mesmo progresso aparece.
 5. **Sair da conta**: o progresso some deste aparelho e volta ao entrar de novo.
 
+## 7. Cadastrar a Andreía como admin (modo Andreía, Fase 4)
+
+Ser admin = existir o documento `admins/{uid}`. Só se cria pelo console (o site não tem como).
+
+1. A Andreía entra **uma vez** no site (atmavox.github.io → Jornada → **Entrar**) com a conta que ela
+   vai usar para editar (Google ou e-mail).
+2. No console: **Authentication → Usuários**. Ache a linha com o e-mail dela e copie o valor da coluna
+   **UID do usuário** (um código como `aB3dE...`; há um botão de copiar ao passar o mouse).
+3. **Firestore Database → Dados → + Iniciar coleção**:
+   - **ID da coleção:** `admins` → Próxima;
+   - **ID do documento:** cole o UID (não use "ID automático");
+   - campo: `nome`, tipo `string`, valor `Andreía Oliveirà` → **Salvar**.
+4. Confira que as regras publicadas são as do `firestore.rules` atual (com `isAdmin()`).
+
+Para tirar o acesso, apague o documento. Dá para ter mais de uma admin (um documento por UID).
+
 ## Limites do plano gratuito
 
 Spark: 50 mil leituras e 20 mil gravações por dia no Firestore. O site lê uma vez ao entrar e grava no
