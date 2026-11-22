@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { BrandRings } from '../../../shared/ui/BrandRings'
@@ -57,12 +58,13 @@ export function HubMagazine({ section }: { section: HubSection }) {
           </nav>
           <ThemeToggle />
         </div>
+        <MiniPlayer />
       </header>
 
       <main>
         <section
           id="ouvir"
-          className="scroll-mt-20 bg-[radial-gradient(120%_80%_at_30%_20%,color-mix(in_oklab,var(--accent)_20%,transparent),transparent_60%)]"
+          className="scroll-mt-32 bg-[radial-gradient(120%_80%_at_30%_20%,color-mix(in_oklab,var(--accent)_20%,transparent),transparent_60%)]"
         >
           <div
             className={`${wrap} grid items-center gap-12 py-16 lg:min-h-[34rem] lg:grid-cols-[1.4fr_1fr] lg:gap-16 lg:py-24`}
@@ -92,7 +94,7 @@ export function HubMagazine({ section }: { section: HubSection }) {
           </div>
         </section>
 
-        <section id="encontros" aria-labelledby="encontros-titulo" className="scroll-mt-20 py-12">
+        <section id="encontros" aria-labelledby="encontros-titulo" className="scroll-mt-32 py-12">
           <div className={`${wrap} flex flex-col gap-6`}>
             <h2 id="encontros-titulo" className={sectionTitle}>
               Encontros ao vivo
@@ -106,7 +108,7 @@ export function HubMagazine({ section }: { section: HubSection }) {
         </section>
 
         {videos.length > 0 && (
-          <section id="videos" aria-labelledby="videos-titulo" className="scroll-mt-20 py-12">
+          <section id="videos" aria-labelledby="videos-titulo" className="scroll-mt-32 py-12">
             <div className={`${wrap} flex flex-col gap-6`}>
               <h2 id="videos-titulo" className={sectionTitle}>
                 Conversas em vídeo
@@ -123,7 +125,7 @@ export function HubMagazine({ section }: { section: HubSection }) {
           </section>
         )}
 
-        <section id="jornadas" aria-labelledby="jornadas-titulo" className="scroll-mt-20 py-12">
+        <section id="jornadas" aria-labelledby="jornadas-titulo" className="scroll-mt-32 py-12">
           <div className={`${wrap} flex flex-col gap-4`}>
             <h2 id="jornadas-titulo" className={sectionTitle}>
               Jornadas
@@ -145,7 +147,7 @@ export function HubMagazine({ section }: { section: HubSection }) {
           </div>
         </section>
 
-        <section id="contato" aria-labelledby="contato-titulo" className="scroll-mt-20 py-16">
+        <section id="contato" aria-labelledby="contato-titulo" className="scroll-mt-32 py-16">
           <div className={`${wrap} grid items-center gap-10 md:grid-cols-[1.3fr_1fr]`}>
             <div className="flex flex-col gap-6">
               <h2 id="contato-titulo" className="sr-only">
@@ -168,7 +170,7 @@ export function HubMagazine({ section }: { section: HubSection }) {
         </section>
       </main>
 
-      <footer className="border-t border-line pb-28">
+      <footer className="border-t border-line pb-4">
         <div
           className={`${wrap} flex flex-col gap-2 py-8 md:flex-row md:items-center md:justify-between`}
         >

@@ -26,12 +26,18 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Slogan, assinatura e grafia do nome aplicados no site e na jornada
 - [x] Player de áudio próprio + mini player + vídeos com fachada (ADR-011)
 - [x] Hub: abas no celular, revista no computador (F1, ADR-010)
+- [x] Paleta nova: escuro "Sépia" + claro "Areia" (o claro anterior ofuscava)
+- [x] Áudio de boas-vindas (48 s) no player do site; vídeos saíram da tela inicial
+- [x] Logo "Anéis nítidos": transparente, traço grosso, favicon que se adapta ao tema
+- [x] Mini player fino no topo, abaixo do cabeçalho
+- [x] README no estilo do Tabi
+- [ ] Limpar o ruído do áudio de boas-vindas (deixar só a voz) — precisa do ffmpeg instalado
 - [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar
 - [ ] Receber da Andreía: horários dos encontros, título do áudio de boas-vindas, foto, texto curto, links
       de Threads/Telegram (TikTok @atmavox ✅, áudio de boas-vindas ✅)
 - [ ] Trocar o link da bio do Instagram para atmavox.github.io
 
-## Fase 3 · Login opcional 🔨 (código pronto; falta o console)
+## Fase 3 · Login opcional 🔨 (no ar; falta conferir o login de ponta a ponta)
 
 - [x] Sincronização aparelho + nuvem (merge, envio com pausa, limpeza ao sair)
 - [x] Firebase sob demanda (Auth + Firestore lite), regras em `firestore.rules`, variáveis no deploy

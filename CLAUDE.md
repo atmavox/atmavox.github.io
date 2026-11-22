@@ -80,8 +80,9 @@ npm run format      # prettier
 2. **Passos pequenos.** Uma mudança coesa por vez, do tamanho de um commit.
 3. **Teste junto.** Toda regra nova em `domain/` ganha teste. Todo bug corrigido ganha um teste que o
    reproduz.
-4. **Feche o ciclo:** rode `npm run check`, atualize `.ai/changelog.md` (seção "Não lançado") e
-   `.ai/features.md` se o comportamento mudou, e então sugira o commit.
+4. **Feche o ciclo:** rode `npm run check`, atualize `.ai/changelog.md` (seção "Não lançado"),
+   **`.ai/roadmap.md` (sempre: marque o que foi feito e anote o que surgiu)** e `.ai/features.md` se o
+   comportamento mudou, e então sugira o commit.
 5. **Toda decisão de arquitetura nova** (biblioteca, padrão, mudança de estrutura) ganha um registro em
    `.ai/decisions.md`.
 6. Responda em **português do Brasil** (ver a seção "Idioma").

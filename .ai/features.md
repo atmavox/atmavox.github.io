@@ -26,8 +26,9 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 
 **Mídia (ADR-011):**
 
-- Áudio com **player próprio** (`<audio>` + arquivo MP3/M4A em `public/audio/`), com **mini player** fixo
-  que continua tocando ao trocar de aba ou rolar. O cartão "Comece aqui" é só áudio: **vídeos não entram
+- Áudio com **player próprio** (`<audio>` + arquivo MP3/M4A em `public/audio/`), com **mini player fino
+  no topo, logo abaixo do cabeçalho fixo** (hub e jornada), que continua tocando ao trocar de aba, rolar
+  ou ir para a jornada. O cartão "Comece aqui" é só áudio: **vídeos não entram
   na tela inicial** (pedido do cliente; eles ficam para a jornada). Um item de "Ouvir" sem arquivo ainda
   pode abrir o YouTube como alternativa.
 - Vídeos do YouTube como **fachada**: só a miniatura carrega; o player (`youtube-nocookie.com`) entra

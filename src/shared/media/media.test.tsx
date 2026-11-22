@@ -33,15 +33,17 @@ describe('MiniPlayer', () => {
     })
 
     expect(screen.getByText('Retorne ao Seu Centro')).toBeInTheDocument()
-    expect(screen.getByText('1:05 de 5:00')).toBeInTheDocument()
+    expect(screen.getByText('1:05 / 5:00')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Pausar' }))
     expect(player.getSnapshot().status).toBe('paused')
     fireEvent.click(screen.getByRole('button', { name: 'Continuar' }))
     expect(player.getSnapshot().status).toBe('playing')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Voltar 15 segundos' }))
-    expect(player.getSnapshot().position).toBe(50)
+    fireEvent.change(screen.getByRole('slider', { name: 'Posição no áudio' }), {
+      target: { value: '120' },
+    })
+    expect(player.getSnapshot().position).toBe(120)
 
     fireEvent.click(screen.getByRole('button', { name: 'Fechar o player' }))
     expect(screen.queryByRole('region', { name: 'Player de áudio' })).toBeNull()

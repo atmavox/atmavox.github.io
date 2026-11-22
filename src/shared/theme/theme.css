@@ -68,6 +68,17 @@
   }
 }
 
+/* O ponto do símbolo da marca "respira" (BrandRings). */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

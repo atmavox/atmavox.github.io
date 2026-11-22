@@ -1,3 +1,4 @@
+import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { JOURNEY_TABS, type JourneyTabId } from '../application/navigation'
 import { tabProgress } from '../application/tabProgress'
@@ -82,6 +83,7 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
           style={{ width: `${Math.round(overall.ratio * 100)}%` }}
         />
       </div>
+      <MiniPlayer />
     </header>
   )
 }

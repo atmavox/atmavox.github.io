@@ -1,6 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#211a14"/>
-  <circle cx="32" cy="32" r="24" fill="none" stroke="#d8b25f" stroke-opacity=".55" stroke-width="2"/>
-  <circle cx="32" cy="32" r="16" fill="none" stroke="#dc9530" stroke-opacity=".75" stroke-width="2"/>
-  <circle cx="32" cy="32" r="6" fill="#dc9530"/>
+  <title>ATMAVOX</title>
+  <!-- Logo "Anéis nítidos": fundo transparente; tons mais escuros em fundo claro, mais claros em fundo escuro. -->
+  <style>
+    .outer { stroke: #8a6319; }
+    .inner { stroke: #a5600f; }
+    .core { fill: #a5600f; }
+    @media (prefers-color-scheme: dark) {
+      .outer { stroke: #d8b25f; }
+      .inner { stroke: #dc9530; }
+      .core { fill: #dc9530; }
+    }
+  </style>
+  <circle class="outer" cx="32" cy="32" r="26.5" fill="none" stroke-width="4"/>
+  <circle class="inner" cx="32" cy="32" r="16.5" fill="none" stroke-width="4.5"/>
+  <circle class="core" cx="32" cy="32" r="7.5"/>
 </svg>

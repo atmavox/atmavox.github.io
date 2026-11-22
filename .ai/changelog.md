@@ -52,6 +52,11 @@ versão com data.
 - Firebase sob demanda (ADR-012): login com Google e e-mail/senha, recuperação de senha, mensagens de erro
   em português, Firestore "lite" em `users/{uid}/journeys/{journeyId}`, regras de segurança em
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
+- Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
+  navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Mini player agora é uma barra fina no topo, logo abaixo do cabeçalho (no celular o cabeçalho do hub
+  ficou fixo para o player continuar visível).
+- README novo, com apresentação do projeto, como rodar, deploy, custo zero e roadmap.
 - Áudio de boas-vindas (48 s) no cartão "Comece aqui" do hub, tocando no player do site com mini player;
   o vídeo do YouTube saiu da tela inicial (fica para a jornada, dia 5).
 - Firebase configurado no projeto `atmavox-b72a4`; o deploy lê as variáveis das Variables ou dos Secrets

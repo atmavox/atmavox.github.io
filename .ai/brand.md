@@ -6,8 +6,20 @@ O eixo da marca é **cinza → âmbar → dourado**: sair do Estado Cinza e acen
 na evolução das abas, no rastreador de dias e nos destaques. O visual é elegante, quente, com muito respiro e
 sem fotos genéricas de banco de imagens.
 
-Elementos recorrentes: **três anéis concêntricos** girando devagar com um ponto âmbar no centro (capa), e uma
-**chama** estilizada (encerramento). O símbolo ✦ marca conclusão.
+Elementos recorrentes: o **símbolo** (abaixo), uma **chama** estilizada (encerramento da jornada) e o ✦, que
+marca conclusão.
+
+### Símbolo / logo ("Anéis nítidos", escolhido em 2026-11-21)
+
+Dois anéis concêntricos com traço grosso (externo dourado, interno âmbar) e um ponto âmbar no centro,
+**sem fundo**. Substituiu a versão com fundo preto e linhas finas, difícil de ler em tamanhos pequenos.
+
+- Arquivo: `public/favicon.svg` (também usado no README). No fundo claro usa tons mais escuros; no escuro,
+  mais claros (`prefers-color-scheme` dentro do SVG).
+- No site: `shared/ui/BrandRings.tsx`, com as cores do tema; o ponto "respira" devagar (parado com
+  movimento reduzido).
+- Proporções (viewBox 64): anel externo r 26,5 / traço 4; anel interno r 16,5 / traço 4,5; ponto r 7,5.
+- Junto do nome: "ATMAVOX" em Playfair Display, caixa alta, espaçamento ~0,2em, em dourado.
 
 ## Paleta (tokens)
 

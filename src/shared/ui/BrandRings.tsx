@@ -2,14 +2,22 @@ interface BrandRingsProps {
   className?: string
 }
 
-/** Três anéis concêntricos girando devagar com o ponto âmbar no centro: o símbolo da capa. */
+/**
+ * O símbolo da marca ("Anéis nítidos", o mesmo do favicon): dois anéis e o ponto âmbar, sem fundo.
+ * As cores vêm do tema; o ponto "respira" devagar (parado com prefers-reduced-motion).
+ */
 export function BrandRings({ className = '' }: BrandRingsProps) {
   return (
-    <div aria-hidden="true" className={`relative aspect-square ${className}`}>
-      <span className="absolute inset-0 animate-[spin_40s_linear_infinite] rounded-full border border-dashed border-gold/40" />
-      <span className="absolute inset-[16%] animate-[spin_28s_linear_infinite_reverse] rounded-full border border-accent/50" />
-      <span className="absolute inset-[32%] animate-[spin_18s_linear_infinite] rounded-full border border-dotted border-gold/60" />
-      <span className="absolute inset-[46%] rounded-full bg-accent shadow-[0_0_24px_var(--accent)]" />
-    </div>
+    <svg viewBox="0 0 64 64" aria-hidden="true" className={`aspect-square ${className}`}>
+      <circle cx="32" cy="32" r="26.5" fill="none" stroke="var(--gold)" strokeWidth="4" />
+      <circle cx="32" cy="32" r="16.5" fill="none" stroke="var(--accent)" strokeWidth="4.5" />
+      <circle
+        cx="32"
+        cy="32"
+        r="7.5"
+        fill="var(--accent)"
+        className="origin-center animate-[breathe_5s_ease-in-out_infinite] [transform-box:fill-box]"
+      />
+    </svg>
   )
 }

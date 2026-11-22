@@ -1,5 +1,6 @@
 import { CircleDot, Flame, Headphones, MessageCircle, type LucideIcon } from 'lucide-react'
 import { useEffect, useState, type ComponentType } from 'react'
+import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { BrandRings } from '../../../shared/ui/BrandRings'
@@ -27,9 +28,6 @@ const TAB_ICONS: Record<HubTab, LucideIcon> = {
   jornadas: Flame,
   contato: MessageCircle,
 }
-
-/** Altura da barra de abas: o mini player fica logo acima dela. */
-const TAB_BAR_HEIGHT = '72px'
 
 const eyebrowClass = 'text-[0.7rem] font-semibold tracking-[0.22em] text-accent uppercase'
 
@@ -159,23 +157,19 @@ export function HubTabs({ activeTab }: { activeTab: HubTab }) {
   const Panel = PANELS[activeTab]
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--bottom-bar', TAB_BAR_HEIGHT)
-    return () => {
-      document.documentElement.style.removeProperty('--bottom-bar')
-    }
-  }, [])
-
-  useEffect(() => {
     window.scrollTo({ top: 0 })
   }, [activeTab])
 
   return (
-    <div className="min-h-dvh pb-48">
-      <header className="flex items-center justify-between px-5 pt-3.5 pb-1.5">
-        <span className="font-display text-[0.95rem] tracking-[0.18em] text-gold uppercase">
-          Atmavox
-        </span>
-        <ThemeToggle />
+    <div className="min-h-dvh pb-28">
+      <header className="sticky top-0 z-20 bg-bg/95 backdrop-blur">
+        <div className="flex items-center justify-between px-5 pt-3 pb-2">
+          <span className="font-display text-[0.95rem] tracking-[0.18em] text-gold uppercase">
+            Atmavox
+          </span>
+          <ThemeToggle />
+        </div>
+        <MiniPlayer />
       </header>
 
       <main className="mx-auto flex max-w-xl flex-col gap-6 px-5 pt-2">
