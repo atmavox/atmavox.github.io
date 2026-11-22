@@ -165,6 +165,15 @@ normalmente.
 - Indicador discreto: "Salvando…", "Salvo na nuvem", "Sem conexão — salvo no aparelho".
 - Regras do Firestore: cada pessoa só acessa os próprios dados.
 
+**Como funciona (`application/account.ts`):**
+
+- O Firebase só carrega quando a pessoa toca em "Entrar", ou ao abrir o site se ela já estava logada (um
+  marcador `atmavox:sessao` no `localStorage`, sem dado pessoal, lembra isso).
+- Ao entrar: carrega a nuvem → `mergeProgress(aparelho, nuvem)` → grava nos dois → "Salvo na nuvem".
+- Cada mudança marca "Salvando…" e sobe para a nuvem após 800 ms sem novas mudanças.
+- Falhou o envio: "Sem conexão — salvo no aparelho"; tenta de novo quando a conexão volta.
+- Ao sair: envia o pendente, sai, apaga o progresso deste aparelho e o marcador de sessão.
+
 **Aceite:** escrever sem login → entrar → o texto continua lá e aparece no console do Firestore; abrir em
 outro navegador com a mesma conta → mesmo progresso.
 

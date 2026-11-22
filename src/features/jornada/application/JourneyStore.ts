@@ -26,6 +26,8 @@ export interface JourneyStore {
   /** Devolve os erros de validação; lista vazia significa que a vitória foi registrada. */
   addVictory(draft: VictoryDraft): VictoryDraftError[]
   removeVictory(id: string): void
+  /** Troca o progresso inteiro (ex.: depois de mesclar com a nuvem, ou vazio ao sair da conta). */
+  replace(progress: JourneyProgress): void
 }
 
 interface JourneyStoreDeps {
@@ -66,5 +68,6 @@ export function createJourneyStore({
       return errors
     },
     removeVictory: (id) => commit(removeVictory(progress, id, now())),
+    replace: commit,
   }
 }

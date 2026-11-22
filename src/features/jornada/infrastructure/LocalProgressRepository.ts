@@ -23,6 +23,14 @@ export class LocalProgressRepository implements ProgressRepository {
     }
   }
 
+  clear(): void {
+    try {
+      this.storage.removeItem(this.key)
+    } catch {
+      // Sem acesso ao armazenamento: não há nada salvo para apagar.
+    }
+  }
+
   save(progress: JourneyProgress): void {
     try {
       this.storage.setItem(this.key, JSON.stringify(progress))
