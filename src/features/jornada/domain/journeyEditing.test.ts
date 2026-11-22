@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { chamaInterna21 } from '../content/chama-interna-21'
-import { allDays } from './journey'
+import { allDays, type DaySection } from './journey'
 import {
   addDay,
   createSection,
@@ -87,5 +87,18 @@ describe('validação antes de salvar', () => {
       'Bloco 1: falta o texto.',
       'Bloco 2: cole um link que comece com https://',
     ])
+  })
+
+  it('imagem pede o arquivo e depois a descrição (acessibilidade)', () => {
+    const image = createSection('image', 1, 'i')
+    expect(dayProblems({ ...day1, sections: [image] })).toEqual([
+      'Bloco 1: falta escolher a imagem.',
+    ])
+    const chosen: DaySection = { type: 'image', id: image.id, mediaId: 'img1', alt: '' }
+    expect(dayProblems({ ...day1, sections: [chosen] })).toEqual([
+      'Bloco 1: descreva a imagem (para quem usa leitor de tela).',
+    ])
+    const described: DaySection = { ...chosen, alt: 'Mãos no peito' }
+    expect(dayProblems({ ...day1, sections: [described] })).toEqual([])
   })
 })

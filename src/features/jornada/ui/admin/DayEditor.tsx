@@ -179,6 +179,7 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
                 )
                 editor.notify('Bloco duplicado')
               }}
+              onUploadImage={(file) => editor.uploadImage(file)}
               onRemove={() => {
                 update(removeSection(day, at))
                 editor.notify('Bloco removido (respostas já escritas ficam guardadas)')
@@ -211,6 +212,7 @@ interface BlockProps {
   onMove: (delta: number) => void
   onDuplicate: () => void
   onRemove: () => void
+  onUploadImage: (file: File) => Promise<string | null>
 }
 
 /** Um bloco com a moldura tracejada azul e as ferramentas no canto ao passar o mouse ou focar. */
@@ -223,6 +225,7 @@ function Block({
   onMove,
   onDuplicate,
   onRemove,
+  onUploadImage,
 }: BlockProps) {
   return (
     <div className="group/block relative -mx-2 rounded-[14px] p-2 outline-2 outline-transparent outline-dashed transition-[outline-color] focus-within:outline-admin-ink hover:outline-admin/35">
@@ -232,7 +235,7 @@ function Block({
         <Tool icon="copy" label={`Duplicar ${where}`} onClick={onDuplicate} />
         <Tool icon="trash" label={`Apagar ${where}`} onClick={onRemove} danger />
       </div>
-      <BlockContent section={section} onChange={onChange} />
+      <BlockContent section={section} onChange={onChange} onUploadImage={onUploadImage} />
     </div>
   )
 }

@@ -49,6 +49,22 @@ export interface JourneyContentCache {
   save(journeyId: string, json: string): void
 }
 
+/** Imagem já reduzida no navegador, pronta para gravar (ADR-014). */
+export interface CompressedImage {
+  /** `data:image/webp;base64,…` (ou jpeg, no Safari). */
+  dataUrl: string
+  width: number
+  height: number
+}
+
+/** Reduz a foto escolhida pela Andreía; rejeita se o arquivo não for uma imagem legível. */
+export type ImageCompressor = (file: Blob) => Promise<CompressedImage>
+
+/** Onde as participantes leem as imagens dos blocos (`media/{id}`), devolvidas como data URL. */
+export interface MediaSource {
+  loadImage(mediaId: string): Promise<string | null>
+}
+
 export interface VersionSummary {
   id: string
   publishedAt: number
@@ -66,6 +82,8 @@ export interface JourneyEditorBackend {
   /** As publicações mais recentes primeiro. */
   listVersions(journeyId: string): Promise<VersionSummary[]>
   loadVersion(journeyId: string, versionId: string): Promise<string | null>
+  /** Grava a imagem em `media/{id}` e devolve o id. */
+  saveImage(image: CompressedImage): Promise<string>
 }
 
 /** Quem é admin (a Andreía): `admins/{uid}` no Firestore, criado à mão no console. */

@@ -54,6 +54,10 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Bloco de imagem (Fase 4, passo 6, ADR-014): no Modo Andreía, "Escolher imagem" reduz a foto no
+  navegador (WebP até 1200 px, ~200 kB) e grava no Firestore; a descrição para leitor de tela é
+  obrigatória e a legenda, opcional. Na jornada, a imagem aparece com a descrição e a legenda, lida por
+  REST sem carregar o Firebase.
 - Blocos novos na tela da participante (Fase 4, passo 5): texto, citação, divisor, vídeo e áudio por
   link. YouTube aparece com a miniatura e só carrega ao tocar; arquivo de áudio toca no player do site;
   links de outros sites (Drive, SoundCloud, Instagram, Vimeo…) viram um cartão que abre o link numa aba

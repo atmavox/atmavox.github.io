@@ -5,6 +5,7 @@ import { findDay } from '../domain/journeyEditing'
 import { InMemoryEditorBackend } from '../infrastructure/InMemoryCloudBackend'
 import { createJourneyContent } from './JourneyContent'
 import { createJourneyEditor, dayStatus, draftDayCount, publishBlocker } from './JourneyEditor'
+import { createMediaCache } from './MediaCache'
 import type { JourneyContentCache } from './ports'
 
 function memoryCache(): JourneyContentCache & { data: Map<string, string> } {
@@ -107,6 +108,38 @@ describe('JourneyEditor', () => {
     const state = editor.getSnapshot()
     expect(findDay(state.saved, 1)?.title).toBe('Título novo')
     expect(dayStatus(state, 1)).toBe('saved')
+  })
+
+  it('envia a imagem reduzida, devolve o id e já deixa a prévia pronta', async () => {
+    const backend = new InMemoryEditorBackend()
+    const media = createMediaCache(null)
+    const editor = createJourneyEditor({
+      content: createJourneyContent({ fallback: chamaInterna21 }),
+      loadBackend: () => Promise.resolve(backend),
+      workingCopy: memoryCache(),
+      media,
+      compressImage: () =>
+        Promise.resolve({ dataUrl: 'data:image/webp;base64,AAA=', width: 1200, height: 900 }),
+    })
+
+    const mediaId = await editor.uploadImage(new Blob(['foto']))
+    expect(mediaId).toBe('img1')
+    expect(backend.images.get('img1')?.width).toBe(1200)
+    expect(media.get('img1')).toBe('data:image/webp;base64,AAA=')
+    expect(editor.getSnapshot().message).toBe('Imagem enviada.')
+  })
+
+  it('arquivo que não é foto não é enviado e vira um aviso claro', async () => {
+    const backend = new InMemoryEditorBackend()
+    const editor = createJourneyEditor({
+      content: createJourneyContent({ fallback: chamaInterna21 }),
+      loadBackend: () => Promise.resolve(backend),
+      workingCopy: memoryCache(),
+      compressImage: () => Promise.reject(new Error('não é imagem')),
+    })
+    await expect(editor.uploadImage(new Blob(['texto']))).resolves.toBeNull()
+    expect(backend.images.size).toBe(0)
+    expect(editor.getSnapshot().message).toMatch(/Escolha uma foto/)
   })
 
   it('sem conexão, avisa e mantém as edições na tela', async () => {

@@ -13,6 +13,7 @@ import {
   type Auth,
 } from 'firebase/auth'
 import {
+  addDoc,
   collection,
   doc,
   getDoc,
@@ -36,6 +37,7 @@ import {
 } from '../../application/ports'
 import { parseProgress, type JourneyProgress } from '../../domain/progress'
 import { PUBLISHED_COLLECTION } from '../FirestoreRestJourneySource'
+import { MEDIA_COLLECTION } from '../FirestoreRestMediaSource'
 import { authErrorMessage } from './authErrors'
 import type { FirebaseConfig } from './config'
 
@@ -177,6 +179,15 @@ function createEditorBackend(db: Firestore): JourneyEditorBackend {
     async loadVersion(journeyId, versionId) {
       const snapshot = await getDoc(doc(db, 'drafts', journeyId, 'versions', versionId))
       return snapshot.exists() ? contentOf(snapshot.data()) : null
+    },
+    async saveImage({ dataUrl, width, height }) {
+      const created = await addDoc(collection(db, MEDIA_COLLECTION), {
+        dataUrl,
+        width,
+        height,
+        createdAt: Date.now(),
+      })
+      return created.id
     },
   }
 }

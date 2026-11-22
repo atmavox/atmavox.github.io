@@ -3,6 +3,7 @@ import { RichText } from '../../../../shared/ui/RichText'
 import type { DaySection } from '../../domain/journey'
 import { CheckinSection } from './CheckinSection'
 import { EditableTag } from './EditableTag'
+import { ImageSection } from './ImageSection'
 import { JournalField } from './JournalField'
 import { MediaLinkSection } from './MediaLinkSection'
 import { MoodPicker } from './MoodPicker'
@@ -109,8 +110,7 @@ export function DaySectionView({ day, section }: DaySectionViewProps) {
     case 'audio':
       return <MediaLinkSection section={section} />
 
-    // A imagem entra com o envio de imagem (Fase 4, passo 6).
     case 'image':
-      return null
+      return <ImageSection section={section} />
   }
 }

@@ -5,6 +5,7 @@ import {
   type AuthUser,
   type CloudBackend,
   type CloudProgressRepository,
+  type CompressedImage,
   type JourneyEditorBackend,
   type VersionSummary,
 } from '../application/ports'
@@ -108,6 +109,15 @@ export class InMemoryEditorBackend implements JourneyEditorBackend {
       .filter((v) => v.journeyId === journeyId)
       .map(({ id, publishedAt }) => ({ id, publishedAt }))
       .reverse()
+  }
+
+  readonly images = new Map<string, CompressedImage>()
+
+  async saveImage(image: CompressedImage) {
+    this.check()
+    const id = `img${this.images.size + 1}`
+    this.images.set(id, image)
+    return id
   }
 
   async loadVersion(journeyId: string, versionId: string) {

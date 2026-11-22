@@ -15,7 +15,13 @@ import {
 } from '../domain/journeyEditing'
 import { parseJourney } from '../domain/parseJourney'
 import type { JourneyContent } from './JourneyContent'
-import type { JourneyContentCache, JourneyEditorBackend, VersionSummary } from './ports'
+import type { MediaCache } from './MediaCache'
+import type {
+  ImageCompressor,
+  JourneyContentCache,
+  JourneyEditorBackend,
+  VersionSummary,
+} from './ports'
 
 export type DayStatus = 'draft' | 'saved' | 'published'
 
@@ -46,6 +52,8 @@ export interface JourneyEditor {
   restoreVersion(versionId: string): Promise<void>
   /** Aviso curto vindo da tela (ex.: "Bloco removido"). */
   notify(message: string): void
+  /** Reduz e grava a imagem escolhida; devolve o id para o bloco, ou null se não deu. */
+  uploadImage(file: Blob): Promise<string | null>
 }
 
 export function dayStatus(state: EditorState, dayNumber: number): DayStatus {
@@ -83,8 +91,12 @@ interface Dependencies {
   workingCopy: JourneyContentCache
   /** Sufixo único para ids novos (data em base 36 + sorteio). */
   newSuffix?: () => string
+  compressImage?: ImageCompressor
+  /** Recebe a imagem enviada, para a prévia aparecer sem buscar de novo. */
+  media?: MediaCache
 }
 
+const IMAGE_ERROR = 'Não deu para usar este arquivo. Escolha uma foto (JPG, PNG, WebP ou HEIC).'
 const CONNECTION_ERROR = 'Não foi possível falar com a nuvem. Verifique a internet e tente de novo.'
 
 export function createJourneyEditor({
@@ -92,6 +104,8 @@ export function createJourneyEditor({
   loadBackend,
   workingCopy,
   newSuffix = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+  compressImage,
+  media,
 }: Dependencies): JourneyEditor {
   const initial = content.getSnapshot()
   const journeyId = initial.id
@@ -220,6 +234,27 @@ export function createJourneyEditor({
 
     notify(message) {
       set({ message })
+    },
+
+    async uploadImage(file) {
+      if (!compressImage) return null
+      set({ isBusy: true, message: null })
+      let image
+      try {
+        image = await compressImage(file)
+      } catch {
+        set({ isBusy: false, message: IMAGE_ERROR })
+        return null
+      }
+      try {
+        const mediaId = await (await loadBackend()).saveImage(image)
+        media?.put(mediaId, image.dataUrl)
+        set({ isBusy: false, message: 'Imagem enviada.' })
+        return mediaId
+      } catch {
+        set({ isBusy: false, message: CONNECTION_ERROR })
+        return null
+      }
     },
 
     async restoreVersion(versionId) {

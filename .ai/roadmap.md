@@ -83,7 +83,10 @@ Plano (2026-11-21), um commit por passo:
        player; arquivo .mp3/.m4a = player do site com mini player; Drive, SoundCloud e outros = cartão
        "Assistir ↗"/"Ouvir ↗" que abre o site do link). Vídeo e áudio pedem "Feito"; texto, citação e
        divisor não
-6. [ ] Envio de imagem (WebP no Firestore)
+6. [x] Envio de imagem (ADR-014): a Andreía escolhe a foto, o navegador reduz (maior lado 1200 px,
+       WebP; JPEG no Safari; meta ~200 kB) e grava em `media/{id}`; descrição obrigatória para leitor
+       de tela; legenda opcional; "Trocar imagem". Participantes leem por REST, sem o SDK. Conferido
+       no navegador: foto de 1200×900 virou WebP de 31 kB
 7. [ ] Documentação, regras e guia para cadastrar a Andreía como admin
 
 Detalhes e decisões:
@@ -118,7 +121,8 @@ bastante liberdade**. Protótipos: `Downloads/atmavox-modo-admin.html` (5 formas
   - **vídeo**: só link (YouTube com miniatura; outros sites viram cartão "Assistir ↗")
   - **áudio**: link (Drive, SoundCloud, YouTube) ou arquivo incluído pelo desenvolvedor (com o tratamento
     de ruído documentado em `features.md`)
-- [ ] Implementar o envio de imagem (redução para WebP, coleção `media`, regras só para admin)
+- [x] Implementar o envio de imagem (redução para WebP, coleção `media`, regras só para admin)
+- [ ] Depois: apagar da coleção `media` as imagens que nenhum bloco usa mais (hoje ficam guardadas)
 
 ## Regra nova da jornada: avançar só depois de completar ✅
 

@@ -1,11 +1,14 @@
 import { hostOf, youtubeIdFromUrl } from '../../../../shared/media/mediaLinks'
 import { EMOTIONS, MOODS, type DaySection } from '../../domain/journey'
 import { EditorIcon } from './EditorIcon'
+import { ImageEditor } from './ImageEditor'
 import { InlineText } from './InlineText'
 
 interface BlockContentProps {
   section: DaySection
   onChange: (section: DaySection) => void
+  /** Reduz e grava a foto; devolve o id da imagem, ou null se não deu. */
+  onUploadImage: (file: File) => Promise<string | null>
 }
 
 /** Título da seção em maiúsculas com a linha ao lado, como na tela da participante. */
@@ -151,7 +154,7 @@ function VideoPreview({
   )
 }
 
-export function BlockContent({ section, onChange }: BlockContentProps) {
+export function BlockContent({ section, onChange, onUploadImage }: BlockContentProps) {
   switch (section.type) {
     case 'checkin':
       return (
@@ -303,19 +306,7 @@ export function BlockContent({ section, onChange }: BlockContentProps) {
       )
 
     case 'image':
-      return (
-        <div className="flex aspect-4/3 flex-col items-center justify-center gap-2 rounded-2xl border border-line bg-field text-ink-faint">
-          <EditorIcon name="image" size={28} />
-          <InlineText
-            singleLine
-            label="Legenda da imagem"
-            placeholder="Legenda da imagem"
-            value={section.caption ?? ''}
-            onChange={(caption) => onChange({ ...section, caption })}
-            className="text-center"
-          />
-        </div>
-      )
+      return <ImageEditor section={section} onChange={onChange} onUploadImage={onUploadImage} />
 
     case 'quote':
       return (

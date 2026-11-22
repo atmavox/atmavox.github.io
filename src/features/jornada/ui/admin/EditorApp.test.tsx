@@ -4,6 +4,7 @@ import { createAccount } from '../../application/account'
 import { createJourneyContent } from '../../application/JourneyContent'
 import { createJourneyEditor } from '../../application/JourneyEditor'
 import { createJourneyStore } from '../../application/JourneyStore'
+import { createMediaCache } from '../../application/MediaCache'
 import type { JourneyContentCache } from '../../application/ports'
 import { chamaInterna21 } from '../../content/chama-interna-21'
 import { createInMemoryBackend } from '../../infrastructure/InMemoryCloudBackend'
@@ -28,14 +29,18 @@ async function renderEditor({ admin = true } = {}) {
   await waitFor(() => expect(account.getSnapshot().user).not.toBeNull())
   if (admin) await waitFor(() => expect(account.getSnapshot().isAdmin).toBe(true))
 
+  const media = createMediaCache(null)
   const createEditor = () =>
     createJourneyEditor({
       content,
+      media,
       loadBackend: () => account.loadEditorBackend(),
       workingCopy: noCache,
+      compressImage: () =>
+        Promise.resolve({ dataUrl: 'data:image/webp;base64,AAA=', width: 800, height: 600 }),
     })
   render(
-    <JourneyContext.Provider value={{ content, store, account, createEditor }}>
+    <JourneyContext.Provider value={{ content, store, account, media, createEditor }}>
       <JourneyApp path="/jornada/editar" />
     </JourneyContext.Provider>,
   )
@@ -76,6 +81,29 @@ describe('Modo Andreía', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Histórico' }))
     const drawer = screen.getByRole('dialog', { name: 'Histórico' })
     expect(within(drawer).getByText('Versão 1')).toBeVisible()
+  })
+
+  it('bloco de imagem: escolhe a foto, mostra a prévia e pede a descrição antes de salvar', async () => {
+    const { backend } = await renderEditor()
+    await openDay1()
+    fireEvent.click(screen.getAllByRole('button', { name: 'Adicionar bloco aqui' }).at(-1)!)
+    fireEvent.click(screen.getByRole('button', { name: /^Imagem/ }))
+
+    const file = new File(['foto'], 'foto.jpg', { type: 'image/jpeg' })
+    fireEvent.change(screen.getByLabelText('Escolher imagem'), { target: { files: [file] } })
+
+    // Sem descrição ainda, a imagem é "decorativa" para o leitor de tela: procura pela fonte.
+    await waitFor(() =>
+      expect(document.querySelector('img[src="data:image/webp;base64,AAA="]')).not.toBeNull(),
+    )
+    expect(backend.editor.images.size).toBe(1)
+    expect(screen.getByText(/descreva a imagem/)).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Salvar dia' })).toBeDisabled()
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Descrição da imagem' }), {
+      target: { value: 'Mãos sobre o peito' },
+    })
+    expect(screen.getByRole('button', { name: 'Salvar dia' })).toBeEnabled()
   })
 
   it('o "+" entre blocos abre os ladrilhos e aponta o que falta para salvar', async () => {

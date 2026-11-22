@@ -9,7 +9,7 @@ import {
   type SectionType,
 } from './journey'
 
-/** Tipos que a Andreía pode adicionar pelo "+ bloco" (imagem entra com o envio de imagem). */
+/** Tipos que a Andreía pode adicionar pelo "+ bloco". */
 export const ADDABLE_SECTION_TYPES = [
   'ritual',
   'prompt',
@@ -19,6 +19,7 @@ export const ADDABLE_SECTION_TYPES = [
   'text',
   'quote',
   'divider',
+  'image',
   'video',
   'audio',
 ] as const satisfies readonly SectionType[]
@@ -60,6 +61,8 @@ export function createSection(type: AddableSectionType, day: number, suffix: str
       return { type, id, label: 'Vídeo', title: '', url: '' }
     case 'audio':
       return { type, id, label: 'Áudio', title: '', url: '' }
+    case 'image':
+      return { type, id, mediaId: '', alt: '' }
   }
 }
 
@@ -185,6 +188,9 @@ export function dayProblems(day: JourneyDay): string[] {
         break
       case 'image':
         if (section.mediaId === '') problems.push(`${where}: falta escolher a imagem.`)
+        else if (section.alt.trim() === '') {
+          problems.push(`${where}: descreva a imagem (para quem usa leitor de tela).`)
+        }
         break
       default:
         break

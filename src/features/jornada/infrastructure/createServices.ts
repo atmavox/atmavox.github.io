@@ -2,10 +2,12 @@ import { createAccount } from '../application/account'
 import { createJourneyContent } from '../application/JourneyContent'
 import { createJourneyEditor } from '../application/JourneyEditor'
 import { createJourneyStore } from '../application/JourneyStore'
+import { createMediaCache } from '../application/MediaCache'
 import type { JourneyServices } from '../application/services'
 import { chamaInterna21 } from '../content/chama-interna-21'
 import { readFirebaseConfig } from './firebase/config'
 import { createFirestoreRestJourneySource } from './FirestoreRestJourneySource'
+import { createFirestoreRestMediaSource } from './FirestoreRestMediaSource'
 import { createLocalJourneyContentCache } from './LocalJourneyContentCache'
 import { createLocalSessionHint } from './LocalSessionHint'
 import { LocalProgressRepository } from './LocalProgressRepository'
@@ -40,14 +42,22 @@ export function createServices(): JourneyServices {
       })
     : null
 
+  const media = createMediaCache(
+    firebaseConfig ? createFirestoreRestMediaSource(firebaseConfig) : null,
+  )
+
   const createEditor = account
     ? () =>
         createJourneyEditor({
           content,
+          media,
           loadBackend: () => account.loadEditorBackend(),
           workingCopy: createLocalJourneyContentCache(localStorage, 'atmavox:editor'),
+          // Só a admin usa: o código de redução de imagem carrega sob demanda.
+          compressImage: (file) =>
+            import('./compressImage').then((module) => module.compressImageInBrowser(file)),
         })
     : null
 
-  return { content, store, account, createEditor }
+  return { content, store, account, media, createEditor }
 }
