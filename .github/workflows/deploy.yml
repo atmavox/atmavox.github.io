@@ -27,6 +27,13 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run build
+        # Configuração web do Firebase (pública por natureza; a segurança está nas regras do Firestore).
+        # Sem estas variáveis o site funciona e o botão "Entrar" simplesmente não aparece.
+        env:
+          VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
       - name: Guardar o build para publicação
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4

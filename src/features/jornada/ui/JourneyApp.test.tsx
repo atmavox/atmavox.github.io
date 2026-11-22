@@ -9,7 +9,7 @@ import { JourneyContext } from './JourneyContext'
 function renderJourney(path: string, repository = new InMemoryProgressRepository()) {
   const store = createJourneyStore({ repository })
   const view = render(
-    <JourneyContext.Provider value={{ journey: chamaInterna21, store }}>
+    <JourneyContext.Provider value={{ journey: chamaInterna21, store, account: null }}>
       <JourneyApp path={path} />
     </JourneyContext.Provider>,
   )

@@ -49,6 +49,9 @@ versão com data.
 - Sincronização da jornada com a nuvem (F5, `application/account.ts`): mescla aparelho + nuvem ao entrar,
   envia mudanças com 800 ms de pausa, avisa quando está sem conexão e tenta de novo, e ao sair envia o
   pendente e apaga o progresso do aparelho. Testada com nuvem e login em memória.
+- Firebase sob demanda (ADR-012): login com Google e e-mail/senha, recuperação de senha, mensagens de erro
+  em português, Firestore "lite" em `users/{uid}/journeys/{journeyId}`, regras de segurança em
+  `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Hub novo (F1, ADR-010) no lugar da página "em breve": abas no celular (Início · Ouvir · Jornadas ·
   Contato) e revista a partir de 700 px, com áudio grátis, encontros Zerando o Dia e Pausa Sagrada,
   jornadas, sobre a Andreía, redes e assinatura. O que ainda falta (horários, foto, MP3, algumas redes)
@@ -59,6 +62,10 @@ versão com data.
   fachada (o player só carrega ao tocar). Ícones com `lucide-react`.
 - Abas com evolução (F3): cada aba vai do cinza ao âmbar conforme o progresso, com barrinha, legenda
   (`14%`, `3/7`, `4/11`…) e ✦ quando completa; barra de progresso geral no cabeçalho.
+
+### Segurança
+
+- `@grpc/grpc-js` (dependência do Firebase) forçado para `^1.14.7`: `npm audit` sem vulnerabilidades.
 
 ### Corrigido
 

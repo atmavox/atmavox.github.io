@@ -119,6 +119,18 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ leve, bonito, funciona com a tela bloqueada, custo zero. ➖ arquivos de áudio no
   repositório (manter cada um com poucos MB; o Pages tem limite de 1 GB por site).
 
+## ADR-012 · Firestore "lite" e login do Google por janela
+
+- **Status:** aceita · 2026-11-21
+- **Contexto:** a nuvem só guarda um documento por pessoa e jornada; não precisamos de tempo real nem de
+  cache offline do Firestore (o `localStorage` já é a base).
+- **Decisão:** `firebase/firestore/lite` (REST, bem menor) + `firebase/auth`, num chunk carregado sob
+  demanda. Google entra por janela (`signInWithPopup`); se o navegador bloquear, cai para redirecionamento.
+  `@grpc/grpc-js` forçado para `^1.14.7` via `overrides` (alerta de segurança; só é usado no Node, não no
+  site).
+- **Consequências:** ➕ ~62 kB gzip só para quem loga; nada muda para quem não loga. ➖ sem atualização em
+  tempo real entre dois aparelhos abertos ao mesmo tempo (vale o merge ao entrar e o último envio).
+
 ---
 
 ## Modelo
