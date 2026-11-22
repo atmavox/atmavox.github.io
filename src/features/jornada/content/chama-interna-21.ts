@@ -178,7 +178,7 @@ const week1: JourneyDay[] = [
       {
         type: 'ritual',
         label: 'Ritual',
-        text: `Ouça por 5 minutos o áudio gratuito [*Retorne ao Seu Centro*](${brandLinks.freeAudio}) antes de começar. Se não tiver acesso, respire em coerência cardíaca: inspire 5s, expire 5s, por 3 minutos.`,
+        text: `Ouça por 5 minutos o áudio gratuito [*Retorne ao Seu Centro*](${brandLinks.retorneAoSeuCentro}) antes de começar. Se não tiver acesso, respire em coerência cardíaca: inspire 5s, expire 5s, por 3 minutos.`,
       },
       {
         type: 'prompt',

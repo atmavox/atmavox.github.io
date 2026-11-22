@@ -1,5 +1,8 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { createAudioPlayer } from '../../shared/media/audioPlayer'
+import { FakeAudio } from '../../shared/media/FakeAudio'
+import { setAudioPlayerForTests } from '../../shared/media/useAudioPlayer'
 import { setWideViewport } from '../../test/viewport'
 import { HubPage } from './HubPage'
 import { hubSectionFromPath, tabOfSection } from './navigation'
@@ -42,12 +45,19 @@ describe('hub no celular (abas)', () => {
     expect(screen.getAllByRole('link', { name: 'Horários no Instagram' })).toHaveLength(2)
   })
 
-  it('sem MP3, o play do áudio grátis abre o vídeo do YouTube', () => {
+  it('o áudio de boas-vindas toca no player do site, sem YouTube', () => {
+    const audio = new FakeAudio()
+    const player = createAudioPlayer(audio)
+    setAudioPlayerForTests(player)
     render(<HubPage path="/" />)
-    fireEvent.click(screen.getByRole('button', { name: 'Ouvir Retorne ao Seu Centro' }))
-    expect(document.querySelector('iframe')?.getAttribute('src')).toContain(
-      'youtube-nocookie.com/embed/jKuKSAQUTCA',
-    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ouvir Boas-vindas' }))
+
+    expect(audio.src).toBe('/audio/atmavox-boas-vindas.m4a')
+    expect(player.getSnapshot()).toMatchObject({ status: 'playing' })
+    expect(screen.getByRole('button', { name: 'Pausar Boas-vindas' })).toBeInTheDocument()
+    expect(document.querySelector('iframe')).toBeNull()
+    setAudioPlayerForTests(null)
   })
 
   it('a aba Jornadas leva à jornada e ao WhatsApp', () => {

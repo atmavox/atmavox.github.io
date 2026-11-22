@@ -9,7 +9,7 @@
 | Fontes             | **Fontsource** (Jost e Playfair Display, variáveis)                    | Hospedadas junto com o site: sem chamar o Google, funciona offline |
 | Ícones             | **lucide-react**                                                       | Leves, consistentes, tree-shaking                                  |
 | Rotas              | Hash routing (`#/jornada`)                                             | Funciona no GitHub Pages sem configurar servidor (sem erro 404)    |
-| Login e dados      | **Firebase** Auth + Firestore, plano Spark (grátis)                    | Projeto `atmavox-ativacao`; login Google e e-mail/senha            |
+| Login e dados      | **Firebase** Auth + Firestore, plano Spark (grátis)                    | Projeto `atmavox-b72a4`; login Google e e-mail/senha               |
 | Persistência local | `localStorage`                                                         | Jornada funciona sem login e sem internet                          |
 | Testes             | **Vitest** + Testing Library + jsdom                                   | Integrado ao Vite, rápido                                          |
 | Lint               | **ESLint 9** (typescript-eslint, react-hooks, react-refresh, jsx-a11y) | Padrão do template Vite; acessibilidade (9, não 10: ADR-008)       |
@@ -30,8 +30,8 @@
 ```bash
 # .env.local (não vai para o git) e variáveis do GitHub Actions
 VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=atmavox-ativacao.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=atmavox-ativacao
+VITE_FIREBASE_AUTH_DOMAIN=atmavox-b72a4.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=atmavox-b72a4
 VITE_FIREBASE_APP_ID=
 ```
 

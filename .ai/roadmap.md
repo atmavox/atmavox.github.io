@@ -27,7 +27,8 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Player de áudio próprio + mini player + vídeos com fachada (ADR-011)
 - [x] Hub: abas no celular, revista no computador (F1, ADR-010)
 - [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar
-- [ ] Receber da Andreía: horários dos encontros, MP3, foto, texto curto, links de Threads/Telegram (TikTok: @atmavox ✅)
+- [ ] Receber da Andreía: horários dos encontros, título do áudio de boas-vindas, foto, texto curto, links
+      de Threads/Telegram (TikTok @atmavox ✅, áudio de boas-vindas ✅)
 - [ ] Trocar o link da bio do Instagram para atmavox.github.io
 
 ## Fase 3 · Login opcional 🔨 (código pronto; falta o console)
@@ -35,7 +36,8 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Sincronização aparelho + nuvem (merge, envio com pausa, limpeza ao sair)
 - [x] Firebase sob demanda (Auth + Firestore lite), regras em `firestore.rules`, variáveis no deploy
 - [x] Tela de login, status de sincronização e "Sair da conta" (F5)
-- [ ] Configurar o Firebase `atmavox-ativacao` e as variáveis do GitHub (`.ai/firebase-setup.md`)
+- [x] Configurar o Firebase `atmavox-b72a4` e as variáveis do GitHub (`.ai/firebase-setup.md`)
+- [ ] Andreía trocar o e-mail de suporte do login do Google para o dela (logada na conta dela)
 - [ ] Conferir o aceite da F5 no site publicado (passo a passo no fim do guia)
 
 ## Depois

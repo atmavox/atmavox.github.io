@@ -23,7 +23,8 @@ mas estão travadas. Não são pessoas técnicas: tudo precisa ser óbvio, acolh
 ## O que este projeto entrega
 
 1. **Hub** (`/`): a página da bio do Instagram. Apresenta o universo Atmavox e leva a cada parte dele:
-   - áudio gratuito **"Retorne ao Seu Centro"** (5 min), que é a porta de entrada;
+   - um **áudio curto de boas-vindas** (48 s, introdutório e estimulante), que é a porta de entrada. Os
+     vídeos (como "Retorne ao Seu Centro", 5 min) ficam para a jornada;
    - encontros ao vivo recorrentes: **Zerando o Dia** e **Pausa Sagrada**;
    - **A Chama Interna** (21 dias), que leva à jornada deste projeto;
    - **Ritual Matinal** (7 dias), lista de espera;

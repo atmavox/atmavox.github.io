@@ -13,8 +13,8 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 **Layout (decidido em 2026-11 com protótipos clicáveis):** o mesmo conteúdo em duas estruturas (ADR-010):
 
 - **Celular (< 700 px): "app com abas".** Barra fixa embaixo com Início · Ouvir · Jornadas · Contato.
-  - Início: anéis + slogan + princípio editorial; cartão "Comece aqui" (áudio grátis); próximos encontros;
-    vídeo em destaque (quando houver).
+  - Início: anéis + slogan + princípio editorial; cartão "Comece aqui" (áudio curto de boas-vindas,
+    `public/audio/atmavox-boas-vindas.m4a`, 48 s); próximos encontros; vídeo em destaque (quando houver).
   - Ouvir: áudios e encontros gravados, com filtro (Tudo · Áudios · Encontros gravados).
   - Jornadas: A Chama Interna (→ `#/jornada`), Ritual Matinal (lista de espera), Sessão individual.
   - Contato: sobre a Andreía, botão do WhatsApp, redes, assinatura.
@@ -26,9 +26,10 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 
 **Mídia (ADR-011):**
 
-- Áudio com **player próprio** (`<audio>` + MP3 no próprio site), com **mini player** fixo que continua
-  tocando ao trocar de aba ou rolar. Enquanto o MP3 de um áudio não existir, o cartão abre o vídeo do
-  YouTube.
+- Áudio com **player próprio** (`<audio>` + arquivo MP3/M4A em `public/audio/`), com **mini player** fixo
+  que continua tocando ao trocar de aba ou rolar. O cartão "Comece aqui" é só áudio: **vídeos não entram
+  na tela inicial** (pedido do cliente; eles ficam para a jornada). Um item de "Ouvir" sem arquivo ainda
+  pode abrir o YouTube como alternativa.
 - Vídeos do YouTube como **fachada**: só a miniatura carrega; o player (`youtube-nocookie.com`) entra
   quando a pessoa toca.
 
@@ -45,7 +46,8 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 **Aceite:** abre bem em celular de 360 px e no computador; todos os links funcionam; o áudio continua
 tocando ao trocar de aba; Lighthouse ≥ 90 em performance e acessibilidade; funciona nos dois temas.
 
-**Pendências com a Andreía:** horários dos encontros; MP3 do "Retorne ao Seu Centro"; foto e texto curto;
+**Pendências com a Andreía:** horários dos encontros; título do áudio de boas-vindas (provisório:
+"Boas-vindas"); foto e texto curto;
 links do Threads e do Telegram; textos novos do hub (hero, descrições), que foram escritos a partir do PDF
 de posicionamento.
 
@@ -157,7 +159,7 @@ normalmente.
 
 **Regras:**
 
-- Firebase `atmavox-ativacao`: login com Google e com e-mail/senha; recuperar senha; mensagens de erro em
+- Firebase `atmavox-b72a4`: login com Google e com e-mail/senha; recuperar senha; mensagens de erro em
   português.
 - Sem as variáveis do Firebase, o botão "Entrar" não aparece e nada quebra.
 - SDK carregado sob demanda.

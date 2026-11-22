@@ -52,6 +52,10 @@ versão com data.
 - Firebase sob demanda (ADR-012): login com Google e e-mail/senha, recuperação de senha, mensagens de erro
   em português, Firestore "lite" em `users/{uid}/journeys/{journeyId}`, regras de segurança em
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
+- Áudio de boas-vindas (48 s) no cartão "Comece aqui" do hub, tocando no player do site com mini player;
+  o vídeo do YouTube saiu da tela inicial (fica para a jornada, dia 5).
+- Firebase configurado no projeto `atmavox-b72a4`; o deploy lê as variáveis das Variables ou dos Secrets
+  do GitHub.
 - Login na jornada (F5): botão "Entrar" no cabeçalho (só aparece com o Firebase configurado), janela com
   Google ou e-mail/senha, criar conta e recuperar senha; depois de entrar, a inicial da pessoa com um
   ponto de status ("Salvando…", "Salvo na nuvem", "Sem conexão — salvo no aparelho") e "Sair da conta"

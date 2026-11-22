@@ -5,11 +5,12 @@ Enquanto isso não for feito, o site funciona normalmente e o botão "Entrar" n�
 
 ## 1. Projeto e app web
 
-1. Acesse https://console.firebase.google.com e abra o projeto **`atmavox-ativacao`** (se não existir, crie
-   com esse nome; o Google Analytics pode ficar desativado).
+1. Acesse https://console.firebase.google.com e abra o projeto **atmavox** (ID **`atmavox-b72a4`**, criado
+   em 2026-11-21; o ID `atmavox` já existia no mundo). Dona: a Andreía (Proprietária em _Usuários e
+   permissões_).
 2. Em **Configurações do projeto → Geral**, defina o **Nome público** como `ATMAVOX`. É o nome que aparece
    na tela "Escolha uma conta" do Google.
-3. Ainda em **Geral → Seus apps**, clique no ícone **Web `</>`**, dê o apelido `atmavox-site` e **não**
+3. Ainda em **Geral → Seus apps**, clique no ícone **Web `</>`**, dê o apelido `atmavox-web` e **não**
    marque o Firebase Hosting. Copie os quatro valores do `firebaseConfig`: `apiKey`, `authDomain`,
    `projectId` e `appId`.
 
@@ -17,6 +18,10 @@ Enquanto isso não for feito, o site funciona normalmente e o botão "Entrar" n�
 > regras do Firestore (passo 3). Mesmo assim, ficam fora do repositório, como manda o CLAUDE.md.
 
 ## 2. Authentication
+
+> **E-mail de suporte:** a lista só mostra o e-mail de quem está logado no console (e Grupos do Google que
+> essa pessoa administra). Para usar o e-mail da Andreía, ela mesma entra com a conta dela e troca em
+> _Authentication → Método de login → Google_. Hoje está provisoriamente com o e-mail do desenvolvedor.
 
 1. **Authentication → Vamos começar → Método de login**:
    - **Google**: ativar e escolher o e-mail de suporte.
@@ -36,14 +41,15 @@ Enquanto isso não for feito, o site funciona normalmente e o botão "Entrar" n�
 ## 4. Variáveis do deploy (GitHub)
 
 No repositório `atmavox/atmavox.github.io`: **Settings → Secrets and variables → Actions → aba
-Variables → New repository variable**, uma para cada valor do passo 1.3:
+Variables → New repository variable**, uma para cada valor do passo 1.3. (O workflow também aceita os
+mesmos nomes cadastrados na aba **Secrets**; se existirem nas duas, vale a Variable.)
 
-| Nome                        | Valor                              |
-| --------------------------- | ---------------------------------- |
-| `VITE_FIREBASE_API_KEY`     | o `apiKey`                         |
-| `VITE_FIREBASE_AUTH_DOMAIN` | `atmavox-ativacao.firebaseapp.com` |
-| `VITE_FIREBASE_PROJECT_ID`  | `atmavox-ativacao`                 |
-| `VITE_FIREBASE_APP_ID`      | o `appId`                          |
+| Nome                        | Valor                           |
+| --------------------------- | ------------------------------- |
+| `VITE_FIREBASE_API_KEY`     | o `apiKey`                      |
+| `VITE_FIREBASE_AUTH_DOMAIN` | `atmavox-b72a4.firebaseapp.com` |
+| `VITE_FIREBASE_PROJECT_ID`  | `atmavox-b72a4`                 |
+| `VITE_FIREBASE_APP_ID`      | o `appId`                       |
 
 Depois, em **Actions → Checar e publicar → Run workflow**, publique de novo (ou espere o próximo push).
 

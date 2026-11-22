@@ -48,7 +48,8 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 
 - **Status:** aceita · 2026-11-21
 - **Contexto:** o login serve só para salvar o progresso; ninguém deve ser obrigado a criar conta.
-- **Decisão:** Firebase Auth + Firestore (projeto `atmavox-ativacao`, plano Spark gratuito), importado com
+- **Decisão:** Firebase Auth + Firestore (projeto planejado como `atmavox-ativacao`; criado em 2026-11-21
+  com o nome `atmavox` e ID `atmavox-b72a4`, porque `atmavox` já existia; plano Spark gratuito), importado com
   `import()` só quando configurado. `localStorage` sempre como base.
 - **Consequências:** ➕ funciona offline e sem conta; quem não loga não baixa o SDK. ➖ precisa de merge ao
   logar (regra documentada e testada).

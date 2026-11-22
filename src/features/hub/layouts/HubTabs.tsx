@@ -11,7 +11,7 @@ import { SocialLinks } from '../components/SocialLinks'
 import {
   contactCta,
   encounters,
-  freeAudio,
+  introAudio,
   hero,
   journeys,
   listenItems,
@@ -42,7 +42,7 @@ function InicioPanel() {
         <h1 className="font-display text-3xl leading-tight text-ink">{hero.slogan}</h1>
         <p className="leading-relaxed text-ink-muted">{hero.principle}</p>
       </section>
-      <AudioItem item={freeAudio} variant="card" eyebrow="Comece aqui · grátis" />
+      <AudioItem item={introAudio} variant="card" eyebrow="Comece aqui" />
       <section aria-labelledby="encontros-titulo" className="flex flex-col gap-3">
         <h2 id="encontros-titulo" className={eyebrowClass}>
           Encontros ao vivo

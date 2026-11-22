@@ -69,16 +69,20 @@ export const hero = {
   intro: `Um espaço para perceber, questionar e experimentar. Com ${BRAND_PERSON}.`,
 } as const
 
-export const freeAudio: HubAudio = {
-  id: 'retorne-ao-seu-centro',
+/**
+ * Áudio curto de boas-vindas da tela inicial: introdutório e estimulante, tocado no player do site.
+ * (Os vídeos, como "Retorne ao Seu Centro", ficam para a jornada.) Título provisório: confirmar com a Andreía.
+ */
+export const introAudio: HubAudio = {
+  id: 'boas-vindas',
   kind: 'audio',
-  title: 'Retorne ao Seu Centro',
-  meta: 'Áudio guiado · 5 min · grátis',
-  youtubeId: 'jKuKSAQUTCA',
+  title: 'Boas-vindas',
+  meta: 'Áudio · 48 s',
+  audioSrc: '/audio/atmavox-boas-vindas.m4a',
 }
 
 /** Tudo o que aparece em "Ouvir". Encontros gravados entram aqui quando forem publicados. */
-export const listenItems: readonly HubAudio[] = [freeAudio]
+export const listenItems: readonly HubAudio[] = [introAudio]
 
 export const encounters: readonly Encounter[] = [
   {

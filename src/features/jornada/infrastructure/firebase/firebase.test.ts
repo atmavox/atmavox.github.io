@@ -5,16 +5,16 @@ import { readFirebaseConfig } from './config'
 describe('readFirebaseConfig', () => {
   const full = {
     VITE_FIREBASE_API_KEY: 'chave',
-    VITE_FIREBASE_AUTH_DOMAIN: 'atmavox-ativacao.firebaseapp.com',
-    VITE_FIREBASE_PROJECT_ID: 'atmavox-ativacao',
+    VITE_FIREBASE_AUTH_DOMAIN: 'atmavox-b72a4.firebaseapp.com',
+    VITE_FIREBASE_PROJECT_ID: 'atmavox-b72a4',
     VITE_FIREBASE_APP_ID: '1:123:web:abc',
   }
 
   it('monta a configuração quando as quatro variáveis existem', () => {
     expect(readFirebaseConfig(full)).toEqual({
       apiKey: 'chave',
-      authDomain: 'atmavox-ativacao.firebaseapp.com',
-      projectId: 'atmavox-ativacao',
+      authDomain: 'atmavox-b72a4.firebaseapp.com',
+      projectId: 'atmavox-b72a4',
       appId: '1:123:web:abc',
     })
   })

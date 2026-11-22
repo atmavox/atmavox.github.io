@@ -11,7 +11,8 @@ export const BRAND_SIGNATURE = `Com presença — ${BRAND_PERSON}`
 export const WHATSAPP_PHONE = '5547991889442'
 
 export const brandLinks = {
-  freeAudio: 'https://youtu.be/jKuKSAQUTCA',
+  /** Vídeo "Retorne ao Seu Centro" (5 min), usado na jornada (ritual do dia 5). */
+  retorneAoSeuCentro: 'https://youtu.be/jKuKSAQUTCA',
   instagram: 'https://instagram.com/atmavox',
   facebook: 'https://facebook.com/atmavox',
   youtube: 'https://youtube.com/@atmavox',

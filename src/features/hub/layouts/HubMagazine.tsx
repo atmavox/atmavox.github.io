@@ -10,7 +10,7 @@ import { SocialLinks } from '../components/SocialLinks'
 import {
   contactCta,
   encounters,
-  freeAudio,
+  introAudio,
   hero,
   journeys,
   listenItems,
@@ -32,7 +32,7 @@ export function HubMagazine({ section }: { section: HubSection }) {
     else document.getElementById(section)?.scrollIntoView({ behavior, block: 'start' })
   }, [section])
 
-  const otherAudios = listenItems.filter((item) => item.id !== freeAudio.id)
+  const otherAudios = listenItems.filter((item) => item.id !== introAudio.id)
 
   return (
     <div className="min-h-dvh">
@@ -78,7 +78,7 @@ export function HubMagazine({ section }: { section: HubSection }) {
             </div>
             <div className="relative flex flex-col gap-4">
               <BrandRings className="pointer-events-none absolute -top-24 -right-10 hidden w-56 opacity-60 lg:block" />
-              <AudioItem item={freeAudio} variant="card" eyebrow="Comece aqui · grátis" />
+              <AudioItem item={introAudio} variant="card" eyebrow="Comece aqui" />
               {otherAudios.length > 0 && (
                 <ul className="flex flex-col rounded-2xl border border-line bg-surface px-5">
                   {otherAudios.map((item) => (
