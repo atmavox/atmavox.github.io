@@ -5,6 +5,8 @@ import {
   type AuthUser,
   type CloudBackend,
   type CloudProgressRepository,
+  type JourneyEditorBackend,
+  type VersionSummary,
 } from '../application/ports'
 import type { JourneyProgress } from '../domain/progress'
 
@@ -71,10 +73,59 @@ export class InMemoryAdmins implements AdminDirectory {
   }
 }
 
+/** Rascunho, publicada e histórico na memória, para testar o editor sem nuvem. */
+export class InMemoryEditorBackend implements JourneyEditorBackend {
+  readonly drafts = new Map<string, string>()
+  readonly published = new Map<string, string>()
+  readonly versions: { journeyId: string; id: string; publishedAt: number; json: string }[] = []
+  isOffline = false
+  private clock = 0
+
+  private check() {
+    if (this.isOffline) throw new Error('offline')
+  }
+
+  async loadDraft(journeyId: string) {
+    this.check()
+    return this.drafts.get(journeyId) ?? null
+  }
+
+  async saveDraft(journeyId: string, json: string) {
+    this.check()
+    this.drafts.set(journeyId, json)
+  }
+
+  async publish(journeyId: string, json: string) {
+    this.check()
+    this.published.set(journeyId, json)
+    this.clock += 1
+    this.versions.push({ journeyId, id: `v${this.clock}`, publishedAt: this.clock, json })
+  }
+
+  async listVersions(journeyId: string): Promise<VersionSummary[]> {
+    this.check()
+    return this.versions
+      .filter((v) => v.journeyId === journeyId)
+      .map(({ id, publishedAt }) => ({ id, publishedAt }))
+      .reverse()
+  }
+
+  async loadVersion(journeyId: string, versionId: string) {
+    this.check()
+    return this.versions.find((v) => v.journeyId === journeyId && v.id === versionId)?.json ?? null
+  }
+}
+
 export function createInMemoryBackend(): CloudBackend & {
   auth: InMemoryAuth
   cloud: InMemoryCloud
   admins: InMemoryAdmins
+  editor: InMemoryEditorBackend
 } {
-  return { auth: new InMemoryAuth(), cloud: new InMemoryCloud(), admins: new InMemoryAdmins() }
+  return {
+    auth: new InMemoryAuth(),
+    cloud: new InMemoryCloud(),
+    admins: new InMemoryAdmins(),
+    editor: new InMemoryEditorBackend(),
+  }
 }

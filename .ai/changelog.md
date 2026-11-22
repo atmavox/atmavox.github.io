@@ -54,6 +54,11 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Modo Andreía, editor da jornada (Fase 4, passo 4, ADR-015): botão "Editar a jornada" no menu da
+  conta admin leva a `#/jornada/editar`. Visão geral com os dias por semana e o estado de cada um, tema
+  da semana, novo dia e ordem dos dias; editor de cada dia com blocos (ritual, pergunta, afirmação,
+  fechamento, check-in, texto, citação, divisor, vídeo e áudio por link), "Salvar dia", "Descartar",
+  "Publicar jornada" (só sem rascunhos e sem campos faltando) e histórico com "Voltar para esta versão".
 - Papel de admin (Fase 4, passo 3): ao entrar, o site confere se existe `admins/{uid}`; a admin vê a
   jornada inteira sem cadeados e o menu da conta mostra "Modo Andreía". Regras do Firestore: só a admin
   grava a versão publicada, os rascunhos e as imagens; cada pessoa só lê o próprio `admins/{uid}`.

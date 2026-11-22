@@ -1,12 +1,14 @@
 import { Lock } from 'lucide-react'
 import { useEffect } from 'react'
 import {
+  EDITOR_PATH,
   JOURNEY_TABS,
   tabFromPath,
   weekNumberOfTab,
   type JourneyTabId,
 } from '../application/navigation'
 import { furthestUnlockedTab, isTabUnlocked } from '../application/tabAccess'
+import { EditorApp } from './admin/EditorApp'
 import { JourneyHeader } from './JourneyHeader'
 import { ClosingPage } from './pages/ClosingPage'
 import { CoverPage } from './pages/CoverPage'
@@ -58,6 +60,10 @@ function TabContent({ tab }: { tab: JourneyTabId }) {
 }
 
 export function JourneyApp({ path }: { path: string }) {
+  return path === EDITOR_PATH ? <EditorApp /> : <ParticipantApp path={path} />
+}
+
+function ParticipantApp({ path }: { path: string }) {
   const tab = tabFromPath(path)
 
   useEffect(() => {

@@ -49,6 +49,25 @@ export interface JourneyContentCache {
   save(journeyId: string, json: string): void
 }
 
+export interface VersionSummary {
+  id: string
+  publishedAt: number
+}
+
+/**
+ * O que o editor grava (só a admin, pelas regras): o rascunho salvo da jornada, a versão publicada
+ * e o histórico de publicações. O conteúdo vai sempre como JSON.
+ */
+export interface JourneyEditorBackend {
+  loadDraft(journeyId: string): Promise<string | null>
+  saveDraft(journeyId: string, json: string): Promise<void>
+  /** Grava a versão publicada e guarda uma cópia no histórico. */
+  publish(journeyId: string, json: string): Promise<void>
+  /** As publicações mais recentes primeiro. */
+  listVersions(journeyId: string): Promise<VersionSummary[]>
+  loadVersion(journeyId: string, versionId: string): Promise<string | null>
+}
+
 /** Quem é admin (a Andreía): `admins/{uid}` no Firestore, criado à mão no console. */
 export interface AdminDirectory {
   isAdmin(uid: string): Promise<boolean>
@@ -59,4 +78,5 @@ export interface CloudBackend {
   auth: AuthService
   cloud: CloudProgressRepository
   admins: AdminDirectory
+  editor: JourneyEditorBackend
 }

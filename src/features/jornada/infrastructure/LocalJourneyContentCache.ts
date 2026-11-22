@@ -1,11 +1,14 @@
 import type { JourneyContentCache } from '../application/ports'
 
-const keyOf = (journeyId: string) => `atmavox:conteudo:${journeyId}`
-
-/** Cópia da jornada publicada no `localStorage`. Falhas (modo privado, cota cheia) são ignoradas. */
+/**
+ * Cópia de uma jornada no `localStorage` (`{prefixo}:{id}`): a publicada, ou as edições não salvas do
+ * modo Andreía. Falhas (modo privado, cota cheia) são ignoradas.
+ */
 export function createLocalJourneyContentCache(
   storage: Storage = localStorage,
+  prefix = 'atmavox:conteudo',
 ): JourneyContentCache {
+  const keyOf = (journeyId: string) => `${prefix}:${journeyId}`
   return {
     load(journeyId) {
       try {

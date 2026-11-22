@@ -1,5 +1,6 @@
 import { LogIn } from 'lucide-react'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { EDITOR_HREF } from '../../application/navigation'
 import { useAccount } from '../useAccount'
 import { LoginDialog } from './LoginDialog'
 import { SYNC_DOT_CLASS, SYNC_TEXT } from './syncCopy'
@@ -92,6 +93,13 @@ export function AccountButton() {
             <p className="mt-3 rounded-xl border border-accent/40 bg-accent/10 px-3 py-2 text-sm text-ink-muted">
               <span className="font-semibold text-accent">Modo Andreía</span> · você vê a jornada
               inteira, sem cadeados.
+              <a
+                href={EDITOR_HREF}
+                onClick={() => setIsMenuOpen(false)}
+                className="mt-2 flex min-h-10 items-center justify-center rounded-full bg-accent font-semibold text-bg hover:opacity-90"
+              >
+                Editar a jornada →
+              </a>
             </p>
           )}
           {isConfirmingExit ? (

@@ -165,6 +165,24 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   ➖ serve para poucas imagens por jornada; leituras contam na cota diária do Firestore (folgada para o
   público esperado); se um dia houver muitas imagens, reavaliar.
 
+## ADR-015 · Conteúdo editável: rascunho, publicada e histórico como JSON no Firestore
+
+- **Status:** aceita · 2026-11-21
+- **Contexto:** o modo Andreía edita a jornada sem desenvolvedor, com "Salvar dia" e "Publicar" separados
+  (Fase 4). As participantes não podem baixar o SDK do Firebase só para ler o conteúdo, e conteúdo
+  quebrado não pode chegar à tela delas.
+- **Decisão:** a jornada inteira vai como um JSON num campo `content`: `drafts/{id}` (rascunho salvo),
+  `published/{id}` (no ar) e `drafts/{id}/versions/{auto}` (uma cópia por publicação). As participantes
+  leem `published` por `fetch` na API REST; o site guarda uma cópia no aparelho e usa a versão do código
+  se a nuvem falhar. Tudo que vem da nuvem passa por `parseJourney`. Edições não salvas ficam no aparelho
+  da Andreía. O **número do dia é a identidade** (respostas `d{n}:…`); a ordem na jornada define a
+  sequência, então reordenar não mistura respostas. Blocos novos ganham ids novos; remover um bloco não
+  apaga respostas.
+- **Alternativas consideradas:** um documento por dia (mais leituras e publicação não atômica);
+  conteúdo no repositório com commit pela API do GitHub (exigiria token no navegador).
+- **Consequências:** ➕ publicação atômica, leitura leve, histórico com "voltar para esta versão".
+  ➖ limite de 1 MB por documento (a jornada tem ~60 kB); editar revisões e encerramento fica para depois.
+
 ---
 
 ## Modelo

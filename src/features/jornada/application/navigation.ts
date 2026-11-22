@@ -19,6 +19,10 @@ export const JOURNEY_TABS: readonly JourneyTab[] = [
   { id: 'encerramento', label: 'Encerramento', href: '#/jornada/encerramento' },
 ]
 
+/** Modo Andreía (editor da jornada). */
+export const EDITOR_PATH = `${JOURNEY_BASE_PATH}/editar`
+export const EDITOR_HREF = `#${EDITOR_PATH}`
+
 export function isJourneyPath(path: string): boolean {
   return path === JOURNEY_BASE_PATH || path.startsWith(`${JOURNEY_BASE_PATH}/`)
 }

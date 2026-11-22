@@ -68,7 +68,13 @@ Plano (2026-11-21), um commit por passo:
    - [x] Regras novas publicadas e `admins/{uid}` do desenvolvedor criado (2026-11-21), para testar
    - [ ] `admins/{uid}` da Andreía: quando ela puder entrar (o Google pediu verificação pelo celular).
          Alternativa: criar a conta dela por e-mail e senha no console (`firebase-setup.md`, seção 7)
-4. [ ] Tela de admin: visão geral, editor do dia, "Salvar dia", "Publicar" e histórico
+4. [x] Tela de admin em `#/jornada/editar` (ADR-015): visão geral por semana com o estado de cada dia
+       (Rascunho / Salvo · falta publicar / No ar), tema da semana, novo dia, subir/descer dias; editor
+       do dia no lugar (título, subtítulo, blocos com subir/descer/duplicar/remover, "+ bloco" com
+       ícones), "Salvar dia" e "Descartar", "Publicar jornada" só sem rascunhos, histórico com "Voltar
+       para esta versão"; edições não salvas ficam no aparelho
+   - [ ] Conferir no site publicado com a conta admin (salvar, publicar, ver como participante)
+   - [ ] Depois: editar revisões e encerramento; remover dia; "ver como participante" (item abaixo)
 5. [ ] Tela da participante mostra os blocos novos
 6. [ ] Envio de imagem (WebP no Firestore)
 7. [ ] Documentação, regras e guia para cadastrar a Andreía como admin

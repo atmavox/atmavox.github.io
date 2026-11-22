@@ -1,5 +1,6 @@
 import { createAccount } from '../application/account'
 import { createJourneyContent } from '../application/JourneyContent'
+import { createJourneyEditor } from '../application/JourneyEditor'
 import { createJourneyStore } from '../application/JourneyStore'
 import type { JourneyServices } from '../application/services'
 import { chamaInterna21 } from '../content/chama-interna-21'
@@ -39,5 +40,14 @@ export function createServices(): JourneyServices {
       })
     : null
 
-  return { content, store, account }
+  const createEditor = account
+    ? () =>
+        createJourneyEditor({
+          content,
+          loadBackend: () => account.loadEditorBackend(),
+          workingCopy: createLocalJourneyContentCache(localStorage, 'atmavox:editor'),
+        })
+    : null
+
+  return { content, store, account, createEditor }
 }

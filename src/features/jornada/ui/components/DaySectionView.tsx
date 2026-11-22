@@ -74,7 +74,8 @@ export function DaySectionView({ day, section }: DaySectionViewProps) {
         <section>
           <SectionLabel id={labelId}>{section.label}</SectionLabel>
           <p id={questionId} className="mb-2 text-sm text-ink-muted">
-            {section.question ?? 'Temperatura energética'}
+            {/* `||`: uma pergunta apagada no editor ('') volta ao texto padrão. */}
+            {section.question || 'Temperatura energética'}
           </p>
           <div className="mb-3 flex flex-wrap items-center gap-3">
             <MoodPicker day={day} labelledBy={questionId} />

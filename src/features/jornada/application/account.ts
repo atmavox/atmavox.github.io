@@ -1,6 +1,12 @@
 import { emptyProgress, mergeProgress } from '../domain/progress'
 import type { JourneyStore } from './JourneyStore'
-import { AuthFailure, type AuthUser, type CloudBackend, type ProgressRepository } from './ports'
+import {
+  AuthFailure,
+  type AuthUser,
+  type CloudBackend,
+  type JourneyEditorBackend,
+  type ProgressRepository,
+} from './ports'
 
 /**
  * - idle: sem conta (tudo só no aparelho)
@@ -26,6 +32,8 @@ export interface Account {
   signInWithEmail(email: string, password: string): Promise<void>
   signUpWithEmail(email: string, password: string): Promise<void>
   sendPasswordReset(email: string): Promise<void>
+  /** O que o modo Andreía grava; as regras da nuvem recusam quem não é admin. */
+  loadEditorBackend(): Promise<JourneyEditorBackend>
   /** Envia o que estiver pendente, sai da conta e apaga o progresso deste aparelho. */
   signOut(): Promise<void>
 }
@@ -175,6 +183,7 @@ export function createAccount({
     signUpWithEmail: (email, password) =>
       withBackend((b) => b.auth.signUpWithEmail(email, password)),
     sendPasswordReset: (email) => withBackend((b) => b.auth.sendPasswordReset(email)),
+    loadEditorBackend: () => ensureBackend().then((backend) => backend.editor),
     async signOut() {
       if (!backendPromise || !state.user) return
       if (pushTimer || state.sync === 'offline') await push()

@@ -12,7 +12,19 @@ import {
   signOut,
   type Auth,
 } from 'firebase/auth'
-import { doc, getDoc, getFirestore, setDoc, type Firestore } from 'firebase/firestore/lite'
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  limit,
+  orderBy,
+  query,
+  setDoc,
+  writeBatch,
+  type Firestore,
+} from 'firebase/firestore/lite'
 import {
   AuthFailure,
   type AdminDirectory,
@@ -20,8 +32,10 @@ import {
   type AuthUser,
   type CloudBackend,
   type CloudProgressRepository,
+  type JourneyEditorBackend,
 } from '../../application/ports'
 import { parseProgress, type JourneyProgress } from '../../domain/progress'
+import { PUBLISHED_COLLECTION } from '../FirestoreRestJourneySource'
 import { authErrorMessage } from './authErrors'
 import type { FirebaseConfig } from './config'
 
@@ -116,6 +130,57 @@ function createAdminDirectory(db: Firestore): AdminDirectory {
   }
 }
 
+/**
+ * Rascunho em `drafts/{journeyId}`, histórico em `drafts/{journeyId}/versions/{id}` e versão no ar em
+ * `published/{journeyId}` (lida pelas participantes por REST). Só a admin grava (firestore.rules).
+ */
+function createEditorBackend(db: Firestore): JourneyEditorBackend {
+  const contentOf = (data: unknown): string | null =>
+    typeof data === 'object' &&
+    data !== null &&
+    'content' in data &&
+    typeof data.content === 'string'
+      ? data.content
+      : null
+
+  return {
+    async loadDraft(journeyId) {
+      const snapshot = await getDoc(doc(db, 'drafts', journeyId))
+      return snapshot.exists() ? contentOf(snapshot.data()) : null
+    },
+    async saveDraft(journeyId, json) {
+      await setDoc(doc(db, 'drafts', journeyId), { content: json, updatedAt: Date.now() })
+    },
+    async publish(journeyId, json) {
+      const publishedAt = Date.now()
+      const batch = writeBatch(db)
+      batch.set(doc(db, PUBLISHED_COLLECTION, journeyId), { content: json, publishedAt })
+      batch.set(doc(collection(db, 'drafts', journeyId, 'versions')), {
+        content: json,
+        publishedAt,
+      })
+      await batch.commit()
+    },
+    async listVersions(journeyId) {
+      const snapshot = await getDocs(
+        query(
+          collection(db, 'drafts', journeyId, 'versions'),
+          orderBy('publishedAt', 'desc'),
+          limit(10),
+        ),
+      )
+      return snapshot.docs.map((version) => {
+        const publishedAt: unknown = version.get('publishedAt')
+        return { id: version.id, publishedAt: typeof publishedAt === 'number' ? publishedAt : 0 }
+      })
+    },
+    async loadVersion(journeyId, versionId) {
+      const snapshot = await getDoc(doc(db, 'drafts', journeyId, 'versions', versionId))
+      return snapshot.exists() ? contentOf(snapshot.data()) : null
+    },
+  }
+}
+
 export function loadFirebaseBackend(config: FirebaseConfig, journeyId: string): CloudBackend {
   const app = initializeApp(config)
   const auth = getAuth(app)
@@ -125,5 +190,6 @@ export function loadFirebaseBackend(config: FirebaseConfig, journeyId: string): 
     auth: new FirebaseAuthService(auth),
     cloud: new FirestoreProgressRepository(db, journeyId),
     admins: createAdminDirectory(db),
+    editor: createEditorBackend(db),
   }
 }
