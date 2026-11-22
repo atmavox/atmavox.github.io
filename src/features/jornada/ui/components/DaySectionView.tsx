@@ -4,6 +4,7 @@ import type { DaySection } from '../../domain/journey'
 import { CheckinSection } from './CheckinSection'
 import { EditableTag } from './EditableTag'
 import { JournalField } from './JournalField'
+import { MediaLinkSection } from './MediaLinkSection'
 import { MoodPicker } from './MoodPicker'
 import { SectionLabel } from './SectionLabel'
 
@@ -90,13 +91,26 @@ export function DaySectionView({ day, section }: DaySectionViewProps) {
         </section>
       )
 
-    // Blocos do modo Andreía: a tela da participante chega no passo 5 da Fase 4.
+    // Blocos criados no Modo Andreía.
     case 'text':
+      return <RichText text={section.text} className="leading-relaxed text-ink" />
+
     case 'quote':
+      return (
+        <blockquote className="font-display text-[22px] leading-snug text-gold italic">
+          <RichText text={section.text} as="span" />
+        </blockquote>
+      )
+
     case 'divider':
-    case 'image':
+      return <hr className="border-0 border-t border-line" />
+
     case 'video':
     case 'audio':
+      return <MediaLinkSection section={section} />
+
+    // A imagem entra com o envio de imagem (Fase 4, passo 6).
+    case 'image':
       return null
   }
 }

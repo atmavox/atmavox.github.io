@@ -78,7 +78,11 @@ Plano (2026-11-21), um commit por passo:
    - [x] Conferido no site publicado com a conta admin (2026-11-21); ajuste: etiqueta de estado
          alinhada com os botões na barra do dia
    - [ ] Depois: editar revisões e encerramento; remover dia; "ver como participante" (item abaixo)
-5. [ ] Tela da participante mostra os blocos novos
+5. [x] Tela da participante mostra os blocos novos: texto e citação (com a marcação `*itálico*`,
+       `**negrito**`, `[link](…)`), divisor, vídeo e áudio por link (YouTube = miniatura que vira
+       player; arquivo .mp3/.m4a = player do site com mini player; Drive, SoundCloud e outros = cartão
+       "Assistir ↗"/"Ouvir ↗" que abre o site do link). Vídeo e áudio pedem "Feito"; texto, citação e
+       divisor não
 6. [ ] Envio de imagem (WebP no Firestore)
 7. [ ] Documentação, regras e guia para cadastrar a Andreía como admin
 

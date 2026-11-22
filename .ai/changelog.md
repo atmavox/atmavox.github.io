@@ -54,6 +54,10 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Blocos novos na tela da participante (Fase 4, passo 5): texto, citação, divisor, vídeo e áudio por
+  link. YouTube aparece com a miniatura e só carrega ao tocar; arquivo de áudio toca no player do site;
+  links de outros sites (Drive, SoundCloud, Instagram, Vimeo…) viram um cartão que abre o link numa aba
+  nova. No editor, uma dica explica como cada link de áudio vai aparecer.
 - Modo Andreía refeito fiel ao protótipo aprovado (`Downloads/atmavox-modo-admin-v2.html`): barra
   azul-petróleo no topo (tokens `admin`, `ok`, `draft`), quadro com cartões por semana (arrastar ou
   setas para reordenar, "X de Y dias salvos", "Ver como participante", confirmação antes de publicar),

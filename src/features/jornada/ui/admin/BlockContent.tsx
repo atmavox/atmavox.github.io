@@ -1,4 +1,4 @@
-import { hostOf, youtubeIdFromUrl } from '../../../../shared/media/youtube'
+import { hostOf, youtubeIdFromUrl } from '../../../../shared/media/mediaLinks'
 import { EMOTIONS, MOODS, type DaySection } from '../../domain/journey'
 import { EditorIcon } from './EditorIcon'
 import { InlineText } from './InlineText'
@@ -278,6 +278,10 @@ export function BlockContent({ section, onChange }: BlockContentProps) {
             value={section.url}
             onChange={(url) => onChange({ ...section, url })}
           />
+          <p className="mt-1.5 text-xs text-ink-faint">
+            Arquivo de áudio (.mp3, .m4a) toca aqui no site. Drive, SoundCloud e outros abrem no
+            site deles; YouTube aparece com a miniatura.
+          </p>
         </>
       )
 
