@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { createJourneyContent } from '../application/JourneyContent'
 import { createJourneyStore } from '../application/JourneyStore'
 import { chamaInterna21 } from '../content/chama-interna-21'
 import { START_STEP, VICTORIES_STEP } from '../domain/access'
@@ -11,7 +12,9 @@ import { JourneyContext } from './JourneyContext'
 function renderJourney(path: string, repository = new InMemoryProgressRepository()) {
   const store = createJourneyStore({ repository })
   const view = render(
-    <JourneyContext.Provider value={{ journey: chamaInterna21, store, account: null }}>
+    <JourneyContext.Provider
+      value={{ content: createJourneyContent({ fallback: chamaInterna21 }), store, account: null }}
+    >
       <JourneyApp path={path} />
     </JourneyContext.Provider>,
   )

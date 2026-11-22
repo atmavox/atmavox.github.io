@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { createAccount } from '../../application/account'
+import { createJourneyContent } from '../../application/JourneyContent'
 import { createJourneyStore } from '../../application/JourneyStore'
 import { chamaInterna21 } from '../../content/chama-interna-21'
 import { createInMemoryBackend } from '../../infrastructure/InMemoryCloudBackend'
@@ -22,7 +23,9 @@ function renderWithAccount({ withAccount = true } = {}) {
       })
     : null
   render(
-    <JourneyContext.Provider value={{ journey: chamaInterna21, store, account }}>
+    <JourneyContext.Provider
+      value={{ content: createJourneyContent({ fallback: chamaInterna21 }), store, account }}
+    >
       <JourneyApp path="/jornada" />
     </JourneyContext.Provider>,
   )

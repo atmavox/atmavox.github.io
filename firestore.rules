@@ -12,6 +12,13 @@ service cloud.firestore {
         && request.resource.size() < 900 * 1024;
     }
 
+    // Versão publicada de cada jornada (modo Andreía): qualquer pessoa lê, sem login.
+    // A gravação entra com o papel de admin (Fase 4, passo 3).
+    match /published/{journeyId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // Todo o resto é negado.
     match /{document=**} {
       allow read, write: if false;

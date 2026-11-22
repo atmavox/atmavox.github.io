@@ -54,6 +54,10 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Conteúdo da jornada pode vir da nuvem (Fase 4, passo 2): o site abre com a cópia do aparelho ou a
+  versão do código e troca pela versão publicada em `published/{journeyId}` quando ela chega, lida por
+  `fetch` na API REST do Firestore (quem não loga continua sem baixar o SDK). Conteúdo inválido, de
+  outra jornada ou nuvem fora do ar são ignorados. Regra de leitura pública em `firestore.rules`.
 - Base do modo Andreía (Fase 4, passo 1): cada bloco do dia tem um id fixo, tipos novos de bloco
   (texto, citação, divisor, imagem, vídeo e áudio por link; os só de leitura não pedem "Feito"), a
   sequência dos dias segue a ordem na jornada e o rastreador da Abertura acompanha a quantidade de dias.

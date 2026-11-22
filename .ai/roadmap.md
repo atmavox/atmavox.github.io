@@ -58,8 +58,11 @@ Plano (2026-11-21), um commit por passo:
 1. [x] Domínio: id fixo por bloco (`withSectionIds`), blocos novos (texto, citação, divisor, imagem,
        vídeo, áudio; os só de leitura não pedem "Feito"), sequência dos dias pela ordem na jornada (o
        número do dia é a identidade das respostas) e `parseJourney` para conteúdo vindo da nuvem
-2. [ ] Conteúdo publicado na nuvem, lido sem carregar o Firebase para participantes; cópia do build se
-       a nuvem falhar
+2. [x] Conteúdo publicado na nuvem (`published/{journeyId}`, campo `content` com o JSON), lido por
+       `fetch` na API REST sem carregar o Firebase; cópia no aparelho; versão do código se a nuvem
+       falhar ou o conteúdo vier quebrado
+   - [ ] **Desenvolvedor:** colar o `firestore.rules` novo no console (Firestore → Regras → Publicar).
+         Até lá a leitura dá "permissão negada" e o site segue com a versão do código (sem erro visível)
 3. [ ] Papel de admin (`admins/{uid}`), link "Modo Andreía" no menu da conta, jornada sem cadeados para ela
 4. [ ] Tela de admin: visão geral, editor do dia, "Salvar dia", "Publicar" e histórico
 5. [ ] Tela da participante mostra os blocos novos

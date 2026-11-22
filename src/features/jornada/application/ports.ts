@@ -35,6 +35,20 @@ export interface AuthService {
   signOut(): Promise<void>
 }
 
+/**
+ * Onde a versão publicada da jornada fica (escrita pela Andreía no modo admin). Devolve o JSON cru,
+ * que a aplicação valida; `null` quando ainda não há nada publicado.
+ */
+export interface PublishedJourneySource {
+  load(journeyId: string): Promise<string | null>
+}
+
+/** Cópia da última versão publicada no aparelho, para abrir já com ela na próxima visita. */
+export interface JourneyContentCache {
+  load(journeyId: string): string | null
+  save(journeyId: string, json: string): void
+}
+
 /** O que só existe quando o Firebase está configurado; carregado sob demanda (ADR-005). */
 export interface CloudBackend {
   auth: AuthService
