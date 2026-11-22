@@ -54,6 +54,9 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Controle de volume no mini player: alto-falante (toca para silenciar e voltar) e barra fina horizontal,
+  no estilo da barra de posição. Começa em 70% e lembra a escolha na próxima visita. No iPhone/iPad, onde
+  o Safari só aceita os botões do aparelho, o controle não aparece.
 - Retrato da Andreía em alta definição no hub: a imagem (gerada por IA, pequena no Keepo) foi ampliada 4×
   com o Real-ESRGAN, rodando no computador do desenvolvedor, e misturada ao original (65/35, com grão
   leve) para não ficar com pele "pintada". Três larguras: 600, 1200 e 1800 px (18, 40 e 68 kB).

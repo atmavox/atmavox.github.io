@@ -38,6 +38,7 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Tema claro como padrão na primeira visita
 - [x] Limpar o ruído do áudio de boas-vindas (versão 6 "só voz": silêncios totais, voz nítida; receita
       em `features.md`, F1 → Mídia)
+- [x] Controle de volume no mini player (barra fina + silenciar; lembra a escolha; some no iPhone/iPad)
 - [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar
 - [ ] Receber da Andreía: horários dos encontros, título do áudio de boas-vindas, texto curto, links
       de Threads/Telegram (TikTok @atmavox ✅, áudio de boas-vindas ✅, foto ✅)
@@ -52,7 +53,7 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [ ] Andreía trocar o e-mail de suporte do login do Google para o dela (logada na conta dela)
 - [ ] Conferir o aceite da F5 no site publicado (passo a passo no fim do guia)
 
-## Fase 4 · Modo Andreía (admin) ✅ · falta a Andreía entrar como admin
+## Fase 4 · Modo Andreía (admin) ✅
 
 Spec em `features.md` (F7), decisões em ADR-013/014/015, guia para ela em `guia-modo-andreia.md`.
 Telas fiéis ao protótipo aprovado (`Downloads/atmavox-modo-admin-v2.html`).
@@ -75,8 +76,7 @@ Feito (2026-11-21/22), um commit por passo:
 
 Pendências:
 
-- [ ] **Andreía como admin:** criar `admins/{uid}` dela quando puder entrar (o Google pediu verificação
-      pelo celular); alternativa: conta por e-mail e senha criada no console (`firebase-setup.md`, seção 7)
+- [x] **Andreía como admin** (2026-11-22): `admins/{uid}` dela criado
 - [ ] Passar o `guia-modo-andreia.md` para ela e acompanhar a primeira edição
 - [ ] "Ver como participante" completo: escolher celular/PC, claro/escuro, "estou no dia N", ver o
       rascunho antes de publicar (hoje o botão abre a jornada publicada, sem cadeados)

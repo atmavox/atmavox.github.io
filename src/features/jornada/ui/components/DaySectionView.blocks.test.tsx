@@ -1,23 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import { createAudioPlayer, type AudioElementLike } from '../../../../shared/media/audioPlayer'
+import { createAudioPlayer } from '../../../../shared/media/audioPlayer'
+import { FakeAudio } from '../../../../shared/media/FakeAudio'
 import { setAudioPlayerForTests } from '../../../../shared/media/useAudioPlayer'
 import type { DaySection } from '../../domain/journey'
 import { DaySectionView } from './DaySectionView'
 
 const show = (section: DaySection) => render(<DaySectionView day={1} section={section} />)
-
-function fakeAudio(): AudioElementLike {
-  const target = new EventTarget()
-  return Object.assign(target, {
-    src: '',
-    currentTime: 0,
-    duration: 60,
-    play: () => Promise.resolve(),
-    pause: () => {},
-    load: () => {},
-  })
-}
 
 describe('blocos do Modo Andreía na tela da participante', () => {
   afterEach(() => setAudioPlayerForTests(null))
@@ -60,7 +49,7 @@ describe('blocos do Modo Andreía na tela da participante', () => {
   })
 
   it('arquivo de áudio toca no player do site', () => {
-    const player = createAudioPlayer(fakeAudio())
+    const player = createAudioPlayer(new FakeAudio())
     setAudioPlayerForTests(player)
     show({
       type: 'audio',

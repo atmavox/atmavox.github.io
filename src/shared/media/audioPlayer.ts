@@ -12,11 +12,16 @@ export interface PlayerState {
   status: PlayerStatus
   position: number
   duration: number
+  /** De 0 a 1. */
+  volume: number
+  /** O iPhone/iPad ignora o volume da página (só os botões do aparelho): aí o controle some. */
+  canChangeVolume: boolean
 }
 
 /** O pedaço do HTMLAudioElement que o player usa (permite um falso nos testes). */
 export interface AudioElementLike extends EventTarget {
   src: string
+  volume: number
   currentTime: number
   readonly duration: number
   play(): Promise<void>
@@ -34,16 +39,37 @@ export interface AudioPlayer {
   seek(seconds: number): void
   skip(deltaSeconds: number): void
   close(): void
+  setVolume(volume: number): void
+  /** Silencia; tocando de novo, volta ao volume de antes. */
+  toggleMute(): void
 }
 
-const IDLE: PlayerState = { track: null, status: 'paused', position: 0, duration: 0 }
+export interface PlayerOptions {
+  /** Volume guardado da última visita (padrão: 0,7, um pouco abaixo do máximo). */
+  initialVolume?: number
+  /** Avisa quem guarda a preferência (localStorage). */
+  onVolumeChange?: (volume: number) => void
+}
+
+export const DEFAULT_VOLUME = 0.7
+const clampVolume = (value: number) => Math.min(1, Math.max(0, Number.isFinite(value) ? value : 1))
+
+const IDLE = { track: null, status: 'paused', position: 0, duration: 0 } as const
 
 /**
  * Um único <audio> para o site inteiro: o som continua ao trocar de aba ou de página, e o mini player
  * mostra sempre a mesma faixa. O estado é imutável e lido via useSyncExternalStore.
  */
-export function createAudioPlayer(audio: AudioElementLike): AudioPlayer {
-  let state: PlayerState = IDLE
+export function createAudioPlayer(
+  audio: AudioElementLike,
+  { initialVolume = DEFAULT_VOLUME, onVolumeChange }: PlayerOptions = {},
+): AudioPlayer {
+  const startVolume = clampVolume(initialVolume)
+  audio.volume = startVolume
+  // Se o navegador não guardou o valor (Safari do iPhone), o volume não é controlável pela página.
+  const canChangeVolume = Math.abs(audio.volume - startVolume) < 0.01
+  let state: PlayerState = { ...IDLE, volume: canChangeVolume ? startVolume : 1, canChangeVolume }
+  let volumeBeforeMute = startVolume > 0 ? startVolume : DEFAULT_VOLUME
   const listeners = new Set<() => void>()
 
   function set(patch: Partial<PlayerState>) {
@@ -68,7 +94,16 @@ export function createAudioPlayer(audio: AudioElementLike): AudioPlayer {
   function close() {
     audio.pause()
     audio.src = ''
-    set(IDLE)
+    set(IDLE) // o volume continua o mesmo
+  }
+
+  function setVolume(value: number) {
+    if (!state.canChangeVolume) return
+    const volume = clampVolume(value)
+    if (volume > 0) volumeBeforeMute = volume
+    audio.volume = volume
+    set({ volume })
+    onVolumeChange?.(volume)
   }
 
   function start() {
@@ -106,5 +141,7 @@ export function createAudioPlayer(audio: AudioElementLike): AudioPlayer {
     seek,
     skip: (delta) => seek(audio.currentTime + delta),
     close,
+    setVolume,
+    toggleMute: () => setVolume(state.volume > 0 ? 0 : volumeBeforeMute),
   }
 }

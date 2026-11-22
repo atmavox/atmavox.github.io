@@ -75,6 +75,46 @@ describe('audioPlayer', () => {
   })
 })
 
+describe('volume', () => {
+  it('começa um pouco abaixo do máximo, ou no volume guardado da última visita', () => {
+    expect(setup().player.getSnapshot().volume).toBe(0.7)
+    const audio = new FakeAudio()
+    const player = createAudioPlayer(audio, { initialVolume: 0.3 })
+    expect(player.getSnapshot()).toMatchObject({ volume: 0.3, canChangeVolume: true })
+    expect(audio.volume).toBe(0.3)
+  })
+
+  it('ajusta, avisa para guardar e não passa dos limites', () => {
+    const saved: number[] = []
+    const audio = new FakeAudio()
+    const player = createAudioPlayer(audio, { onVolumeChange: (v) => saved.push(v) })
+    player.setVolume(0.4)
+    player.setVolume(2)
+    expect(audio.volume).toBe(1)
+    expect(saved).toEqual([0.4, 1])
+  })
+
+  it('silenciar e voltar retoma o volume de antes; fechar o player não muda o volume', () => {
+    const { audio, player } = setup()
+    player.setVolume(0.5)
+    player.toggleMute()
+    expect(audio.volume).toBe(0)
+    player.toggleMute()
+    expect(audio.volume).toBe(0.5)
+    player.toggle(centro)
+    player.close()
+    expect(player.getSnapshot().volume).toBe(0.5)
+  })
+
+  it('no iPhone/iPad (volume só pelos botões do aparelho), o controle fica desligado', () => {
+    const audio = new FakeAudio(true)
+    const player = createAudioPlayer(audio)
+    expect(player.getSnapshot()).toMatchObject({ canChangeVolume: false, volume: 1 })
+    player.setVolume(0.2)
+    expect(player.getSnapshot().volume).toBe(1)
+  })
+})
+
 describe('formatTime', () => {
   it('formata minutos e horas', () => {
     expect(formatTime(0)).toBe('0:00')

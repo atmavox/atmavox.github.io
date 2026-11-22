@@ -213,7 +213,7 @@ rodam só a checagem.
 
 ---
 
-## F7 · Modo Andreía (editar a jornada) ✅ (falta a Andreía entrar como admin)
+## F7 · Modo Andreía (editar a jornada) ✅
 
 **Objetivo:** a Andreía edita a jornada sozinha, com bastante liberdade, sem desenvolvedor e sem custo.
 Telas fiéis ao protótipo aprovado (`Downloads/atmavox-modo-admin-v2.html`). Guia para ela:
