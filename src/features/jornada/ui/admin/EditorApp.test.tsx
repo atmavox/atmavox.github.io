@@ -45,7 +45,7 @@ async function renderEditor({ admin = true } = {}) {
 describe('Modo Andreía', () => {
   it('quem não é admin vê o aviso, não o editor', async () => {
     await renderEditor({ admin: false })
-    expect(screen.getByRole('heading', { name: 'Só para a admin' })).toBeVisible()
+    expect(await screen.findByRole('heading', { name: 'Só para a admin' })).toBeVisible()
   })
 
   it('edita um dia, salva e publica', async () => {

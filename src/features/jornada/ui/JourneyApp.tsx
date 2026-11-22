@@ -1,5 +1,5 @@
 import { Lock } from 'lucide-react'
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import {
   EDITOR_PATH,
   JOURNEY_TABS,
@@ -8,7 +8,6 @@ import {
   type JourneyTabId,
 } from '../application/navigation'
 import { furthestUnlockedTab, isTabUnlocked } from '../application/tabAccess'
-import { EditorApp } from './admin/EditorApp'
 import { JourneyHeader } from './JourneyHeader'
 import { ClosingPage } from './pages/ClosingPage'
 import { CoverPage } from './pages/CoverPage'
@@ -59,8 +58,16 @@ function TabContent({ tab }: { tab: JourneyTabId }) {
   return <CoverPage />
 }
 
+// O editor só é baixado por quem abre o Modo Andreía: as participantes não carregam esse código.
+const EditorApp = lazy(() => import('./admin/EditorApp').then((m) => ({ default: m.EditorApp })))
+
 export function JourneyApp({ path }: { path: string }) {
-  return path === EDITOR_PATH ? <EditorApp /> : <ParticipantApp path={path} />
+  if (path !== EDITOR_PATH) return <ParticipantApp path={path} />
+  return (
+    <Suspense fallback={<p className="py-20 text-center text-ink-muted">Carregando…</p>}>
+      <EditorApp />
+    </Suspense>
+  )
 }
 
 function ParticipantApp({ path }: { path: string }) {
