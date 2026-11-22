@@ -94,6 +94,17 @@ describe('JourneyEditor', () => {
     expect(publishBlocker(state)).toBe('Há dias com campos para completar.')
   })
 
+  it('apagar um dia vai direto para o rascunho salvo e libera publicar', async () => {
+    const { editor, backend } = await setup()
+    await editor.removeDay(21)
+    const state = editor.getSnapshot()
+    expect(findDay(state.working, 21)).toBeUndefined()
+    expect(findDay(state.saved, 21)).toBeUndefined()
+    expect(findDay(state.published, 21)).toBeDefined() // continua no ar até publicar
+    expect(backend.drafts.get(chamaInterna21.id)).toContain('"retiredDays":[21]')
+    expect(publishBlocker(state)).toBeNull()
+  })
+
   it('restaurar uma versão antiga vira o rascunho salvo', async () => {
     const { editor } = await setup()
     editor.editDay(renamed)

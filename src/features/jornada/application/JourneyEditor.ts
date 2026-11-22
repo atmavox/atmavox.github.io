@@ -9,6 +9,7 @@ import {
   dayProblems,
   findDay,
   moveDay as moveDayIn,
+  removeDay as removeDayFrom,
   replaceDay,
   sameDay,
   setWeekTheme as setWeekThemeIn,
@@ -47,6 +48,8 @@ export interface JourneyEditor {
   discardDay(dayNumber: number): void
   addDay(weekNumber: number): Promise<void>
   moveDay(dayNumber: number, delta: number): Promise<void>
+  /** Tira o dia da jornada (vai para o rascunho salvo; sai do ar ao publicar). */
+  removeDay(dayNumber: number): Promise<void>
   setWeekTheme(weekNumber: number, theme: string): Promise<void>
   publish(): Promise<void>
   restoreVersion(versionId: string): Promise<void>
@@ -208,6 +211,12 @@ export function createJourneyEditor({
       const suffix = newSuffix()
       return structural((journey) => addDayTo(journey, weekNumber, suffix), 'Dia novo criado.')
     },
+
+    removeDay: (dayNumber) =>
+      structural(
+        (journey) => removeDayFrom(journey, dayNumber),
+        'Dia apagado. Ele sai da jornada quando você publicar.',
+      ),
 
     moveDay: (dayNumber, delta) =>
       structural((journey) => moveDayIn(journey, dayNumber, delta), 'Ordem dos dias salva.'),

@@ -27,10 +27,22 @@ const victories = (count: number): Victory[] =>
 
 describe('medidas de evolução das abas', () => {
   it('Abertura: porcentagem dos 21 dias', () => {
-    expect(overallProgress(withProgress({ completedDays: [1, 2, 3] }))).toEqual({
+    expect(overallProgress(chamaInterna21, withProgress({ completedDays: [1, 2, 3] }))).toEqual({
       ratio: 3 / 21,
       caption: '14%',
       isComplete: false,
+    })
+  })
+
+  it('Abertura conta os dias que a jornada tem hoje (dias novos entram, apagados saem)', () => {
+    const twoDays = {
+      ...chamaInterna21,
+      weeks: [{ ...chamaInterna21.weeks[0]!, days: chamaInterna21.weeks[0]!.days.slice(0, 2) }],
+    }
+    // O dia 5 foi concluído antes de ser apagado: não conta mais.
+    expect(overallProgress(twoDays, withProgress({ completedDays: [1, 2, 5] }))).toMatchObject({
+      ratio: 1,
+      isComplete: true,
     })
   })
 

@@ -25,6 +25,6 @@ export function tabProgress(
     case 'encerramento':
       return closingProgress(journey, progress)
     default:
-      return overallProgress(progress)
+      return overallProgress(journey, progress)
   }
 }

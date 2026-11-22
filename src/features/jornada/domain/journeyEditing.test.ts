@@ -3,6 +3,7 @@ import { chamaInterna21 } from '../content/chama-interna-21'
 import { allDays, type DaySection } from './journey'
 import {
   addDay,
+  canRemoveDay,
   createSection,
   dayProblems,
   duplicateSection,
@@ -10,6 +11,7 @@ import {
   moveDay,
   moveSection,
   nextDayNumber,
+  removeDay,
   removeSection,
   replaceDay,
   sameDay,
@@ -57,6 +59,30 @@ describe('dias e semanas', () => {
   it('subir um dia mantém o número (a identidade) e muda só a ordem', () => {
     const journey = moveDay(chamaInterna21, 2, -1)
     expect(journey.weeks[0]?.days.slice(0, 2).map((d) => d.number)).toEqual([2, 1])
+  })
+
+  it('apagar um dia tira ele da semana e aposenta o número (dia novo não reusa)', () => {
+    const journey = removeDay(chamaInterna21, 21)
+    expect(findDay(journey, 21)).toBeUndefined()
+    expect(journey.retiredDays).toEqual([21])
+    expect(nextDayNumber(journey)).toBe(22)
+    // Mesmo apagando o maior número, o próximo dia não volta a usá-lo.
+    const added = addDay(journey, 3, 's')
+    expect(nextDayNumber(removeDay(added, 22))).toBe(23)
+  })
+
+  it('não deixa uma semana sem nenhum dia', () => {
+    const oneDayWeek = {
+      ...chamaInterna21,
+      weeks: [{ ...chamaInterna21.weeks[0]!, days: chamaInterna21.weeks[0]!.days.slice(0, 1) }],
+    }
+    expect(canRemoveDay(oneDayWeek, 1)).toBe(false)
+    expect(removeDay(oneDayWeek, 1)).toBe(oneDayWeek)
+  })
+
+  it('a jornada com dias apagados passa pela leitura da nuvem sem perder os números aposentados', () => {
+    const journey = removeDay(chamaInterna21, 21)
+    expect(parseJourney(JSON.parse(JSON.stringify(journey)))?.retiredDays).toEqual([21])
   })
 
   it('muda o tema da semana', () => {

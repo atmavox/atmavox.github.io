@@ -1,4 +1,4 @@
-import { EMOTIONS, MOODS, TOTAL_DAYS, type Emotion, type Mood } from './journey'
+import { EMOTIONS, MOODS, type Emotion, type Mood } from './journey'
 
 export const PROGRESS_VERSION = 1
 
@@ -38,8 +38,14 @@ export function emptyProgress(): JourneyProgress {
   }
 }
 
+/**
+ * Teto de segurança para números de dia vindos de fora. Não é "21": a Andreía cria dias novos no
+ * Modo Andreía (22, 23…), e eles precisam poder ser concluídos.
+ */
+export const MAX_DAY_NUMBER = 999
+
 export function isValidDay(day: unknown): day is number {
-  return typeof day === 'number' && Number.isInteger(day) && day >= 1 && day <= TOTAL_DAYS
+  return typeof day === 'number' && Number.isInteger(day) && day >= 1 && day <= MAX_DAY_NUMBER
 }
 
 // ---------- comandos (puros: recebem o estado e devolvem um novo) ----------

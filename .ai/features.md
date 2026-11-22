@@ -235,7 +235,10 @@ Editar a jornada →" e o mesmo atalho no menu da conta. Qualquer outra pessoa q
   em rascunho, sem campos faltando e com algo diferente do que está no ar. Cada publicação vira uma
   versão no **Histórico** (gaveta lateral), com "Voltar para esta" (vira rascunho salvo; publica-se de
   novo para ir ao ar).
-- **Estrutura** (novo dia, ordem dos dias, tema da semana) vai direto para o rascunho salvo.
+- **Estrutura** (novo dia, apagar dia, ordem dos dias, tema da semana) vai direto para o rascunho salvo.
+- **Apagar dia** (no editor do dia, com confirmação): o dia sai da jornada ao publicar; cada semana
+  fica com pelo menos um dia; o número do dia apagado é **aposentado** (`retiredDays`) e nunca volta a
+  ser usado por um dia novo; o que as participantes escreveram nele continua guardado.
 - **Ids nunca mudam:** o número do dia é a identidade das respostas (`d{n}:…`); reordenar só muda a
   posição. Blocos novos e cópias ganham ids novos. Apagar um bloco não apaga respostas já escritas.
 - **Blocos:** check-in, ritual, pergunta, afirmação, fechamento (etapas, pedem "Feito"), áudio e vídeo
@@ -247,7 +250,7 @@ Editar a jornada →" e o mesmo atalho no menu da conta. Qualquer outra pessoa q
 - Tudo que vem da nuvem passa por `parseJourney`: bloco desconhecido, id repetido ou link que não seja
   `http(s)` faz o site usar a versão do código.
 
-**Ainda não faz (roadmap):** editar Revisões e Encerramento, apagar dia, "ver como participante" com
+**Ainda não faz (roadmap):** editar Revisões e Encerramento, "ver como participante" com
 escolha de dia/aparelho, limpar imagens que nenhum bloco usa.
 
 **Aceite (conferido em 2026-11-21 com a conta do desenvolvedor):** editar o dia 1, salvar, publicar e ver

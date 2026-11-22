@@ -33,7 +33,7 @@ describe('JourneyStore', () => {
 
   it('não grava quando nada mudou', () => {
     const { repository, store } = setup()
-    store.completeDay(99)
+    store.completeDay(1000)
     expect(repository.saveCount).toBe(0)
   })
 

@@ -119,9 +119,35 @@ export function replaceDay(journey: Journey, day: JourneyDay): Journey {
   }
 }
 
-/** Número novo nunca usado: o número é a identidade do dia (as respostas são `d{número}:…`). */
+/**
+ * Número novo nunca usado, nem por dias apagados: o número é a identidade do dia (as respostas são
+ * `d{número}:…`).
+ */
 export function nextDayNumber(journey: Journey): number {
-  return Math.max(0, ...allDays(journey).map((day) => day.number)) + 1
+  const used = [...allDays(journey).map((day) => day.number), ...(journey.retiredDays ?? [])]
+  return Math.max(0, ...used) + 1
+}
+
+/** Cada semana precisa de pelo menos um dia (uma semana vazia contaria como "completa" sem nada). */
+export function canRemoveDay(journey: Journey, dayNumber: number): boolean {
+  const week = journey.weeks.find((w) => w.days.some((day) => day.number === dayNumber))
+  return week !== undefined && week.days.length > 1
+}
+
+/**
+ * Tira o dia da jornada e aposenta o número dele. O que as participantes escreveram nele continua
+ * guardado no progresso de cada uma (nada é apagado), só deixa de aparecer.
+ */
+export function removeDay(journey: Journey, dayNumber: number): Journey {
+  if (!canRemoveDay(journey, dayNumber)) return journey
+  return {
+    ...journey,
+    weeks: journey.weeks.map((week) => ({
+      ...week,
+      days: week.days.filter((day) => day.number !== dayNumber),
+    })),
+    retiredDays: [...(journey.retiredDays ?? []), dayNumber],
+  }
 }
 
 export function addDay(journey: Journey, weekNumber: number, suffix: string): Journey {

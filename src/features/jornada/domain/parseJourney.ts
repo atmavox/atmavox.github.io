@@ -188,6 +188,17 @@ export function parseJourney(raw: unknown): Journey | null {
   const reviews = every(raw.reviews, parseReview)
   const closingQuestions = every(raw.closingQuestions, parseQuestion)
   if (!id || !weeks || weeks.length === 0 || !reviews || !closingQuestions) return null
-  const journey: Journey = { id, weeks, reviews, closingQuestions }
+  const retiredDays = Array.isArray(raw.retiredDays)
+    ? raw.retiredDays.filter(
+        (day): day is number => typeof day === 'number' && Number.isInteger(day) && day >= 1,
+      )
+    : []
+  const journey: Journey = {
+    id,
+    weeks,
+    reviews,
+    closingQuestions,
+    ...(retiredDays.length > 0 ? { retiredDays } : {}),
+  }
   return hasUniqueIds(journey) ? journey : null
 }

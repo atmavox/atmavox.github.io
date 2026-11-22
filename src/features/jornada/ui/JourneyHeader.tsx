@@ -21,7 +21,7 @@ function stageColor(ratio: number): string {
  */
 export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
   const { journey, progress, access, isAdmin } = useJourney()
-  const overall = overallProgress(progress)
+  const overall = overallProgress(journey, progress)
   const activeRef = useRef<HTMLAnchorElement>(null)
 
   // Centraliza a aba atual rolando só a fileira de abas (scrollIntoView rolaria a página inteira).
@@ -65,7 +65,11 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
         </div>
       </div>
 
-      <nav aria-label="Etapas da jornada" className="mx-auto max-w-6xl md:px-8">
+      <nav
+        aria-label="Etapas da jornada"
+        className="mx-auto max-w-6xl md:px-8"
+        style={{ paddingTop: '5px' }}
+      >
         <ul className="relative flex snap-x overflow-x-auto px-2 [scrollbar-width:none] md:grid md:grid-cols-7 md:overflow-visible md:px-0">
           {JOURNEY_TABS.map((tab) => {
             const isActive = tab.id === activeTab

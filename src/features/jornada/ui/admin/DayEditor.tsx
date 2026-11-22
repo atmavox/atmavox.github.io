@@ -1,6 +1,8 @@
+import { useCallback, useState } from 'react'
 import { dayStatus, type EditorState, type JourneyEditor } from '../../application/JourneyEditor'
 import { allDays, type DaySection, type JourneyDay } from '../../domain/journey'
 import {
+  canRemoveDay,
   createSection,
   dayProblems,
   duplicateSection,
@@ -11,6 +13,7 @@ import {
 } from '../../domain/journeyEditing'
 import { BlockAdder } from './BlockAdder'
 import { BlockContent } from './BlockContent'
+import { ConfirmDialog } from './ConfirmDialog'
 import { EditorIcon, type EditorIconName } from './EditorIcon'
 import { InlineText } from './InlineText'
 import { SECTION_META } from './sectionMeta'
@@ -70,6 +73,9 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
   const previous = days[index - 1]
   const next = days[index + 1]
   const update = (changed: JourneyDay) => editor.editDay(changed)
+  const [isConfirmingRemove, setIsConfirmingRemove] = useState(false)
+  const cancelRemove = useCallback(() => setIsConfirmingRemove(false), [setIsConfirmingRemove])
+  const removable = canRemoveDay(state.working, day.number)
   const add = (at: number, type: Parameters<typeof createSection>[0]) => {
     update(insertSection(day, at, createSection(type, day.number, newSuffix())))
     editor.notify(`${SECTION_META[type].name} adicionado`)
@@ -137,8 +143,35 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
           >
             <EditorIcon name="next" />
           </button>
+          <button
+            type="button"
+            className={`${ghost} hover:border-wine hover:text-wine`}
+            disabled={!removable || state.isBusy}
+            title={removable ? undefined : 'Cada semana precisa de pelo menos um dia'}
+            onClick={() => setIsConfirmingRemove(true)}
+          >
+            <EditorIcon name="trash" size={16} /> Apagar dia
+          </button>
         </div>
       </div>
+
+      {isConfirmingRemove && (
+        <ConfirmDialog
+          title={`Apagar o Dia ${position}?`}
+          confirmLabel="Apagar dia"
+          danger
+          onCancel={cancelRemove}
+          onConfirm={() => {
+            setIsConfirmingRemove(false)
+            onBack()
+            void editor.removeDay(day.number)
+          }}
+        >
+          “{day.title}” sai da jornada quando você publicar. O que as participantes já escreveram
+          nele fica guardado. Se mudar de ideia antes de publicar, use o Histórico para voltar à
+          versão anterior.
+        </ConfirmDialog>
+      )}
 
       <article className="flex flex-col gap-1 rounded-[18px] border border-line bg-surface p-6">
         <div className="rounded-[14px] p-2">

@@ -1,4 +1,4 @@
-import { TOTAL_DAYS, type Journey, type Question } from './journey'
+import { allDays, type Journey, type Question } from './journey'
 import type { JourneyProgress } from './progress'
 
 /** Quantas vitórias "acendem" a aba Vitórias. */
@@ -24,12 +24,15 @@ function answeredCount(questions: readonly Question[], progress: JourneyProgress
   return questions.filter((q) => progress.entries[q.fieldId] !== undefined).length
 }
 
-export function overallProgress(progress: JourneyProgress): StageProgress {
-  const ratio = progress.completedDays.length / TOTAL_DAYS
+/** Dias concluídos sobre os dias que a jornada tem hoje (a Andreía pode criar ou apagar dias). */
+export function overallProgress(journey: Journey, progress: JourneyProgress): StageProgress {
+  const days = allDays(journey)
+  const done = days.filter((day) => progress.completedDays.includes(day.number)).length
+  const ratio = days.length === 0 ? 0 : done / days.length
   return {
     ratio,
     caption: `${Math.round(ratio * 100)}%`,
-    isComplete: progress.completedDays.length >= TOTAL_DAYS,
+    isComplete: days.length > 0 && done >= days.length,
   }
 }
 

@@ -137,6 +137,11 @@ export interface Journey {
   weeks: readonly JourneyWeek[]
   reviews: readonly WeeklyReview[]
   closingQuestions: readonly Question[]
+  /**
+   * Números de dias apagados no Modo Andreía. Nunca são reusados: as respostas das pessoas são salvas
+   * por `d{número}:…`, e um dia novo com o mesmo número mostraria respostas de outro dia.
+   */
+  retiredDays?: readonly number[]
 }
 
 export function allDays(journey: Journey): JourneyDay[] {

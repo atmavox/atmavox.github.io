@@ -14,6 +14,14 @@ import {
   type Victory,
 } from './progress'
 
+describe('dias criados no Modo Andreía', () => {
+  it('um dia novo (22 em diante) pode ser concluído e sobrevive à leitura do aparelho', () => {
+    const done = completeDay(emptyProgress(), 22, 1)
+    expect(done.completedDays).toEqual([22])
+    expect(parseProgress(JSON.parse(JSON.stringify(done))).completedDays).toEqual([22])
+  })
+})
+
 const victory = (id: string, createdAt: number): Victory => ({
   id,
   date: '',
@@ -36,10 +44,10 @@ describe('comandos de progresso', () => {
     expect(completeDay(p, 5, 3)).toBe(p)
   })
 
-  it('ignora dias fora de 1 a 21', () => {
+  it('ignora números de dia inválidos (zero ou acima do teto de segurança)', () => {
     const p = emptyProgress()
     expect(completeDay(p, 0, 1)).toBe(p)
-    expect(completeDay(p, 22, 1)).toBe(p)
+    expect(completeDay(p, 1000, 1)).toBe(p)
   })
 
   it('marca etapas como feitas, sem repetir', () => {
@@ -104,7 +112,7 @@ describe('parseProgress', () => {
 
   it('descarta só as partes corrompidas', () => {
     const parsed = parseProgress({
-      completedDays: [3, 3, 'x', 40, 1],
+      completedDays: [3, 3, 'x', 1000, 1],
       entries: { 'd1:reflexao': 'ok', 'd2:sinais': 42, 'd3:raiz': '  ' },
       emotions: { '1': ['Pesada', 'Inventada'], abc: ['Pesada'], '2': 'Pesada' },
       moods: { '1': 9, '2': 3 },

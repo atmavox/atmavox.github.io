@@ -54,6 +54,9 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- "Apagar dia" no Modo Andreía: botão no editor do dia, com confirmação. O dia sai do rascunho salvo
+  (e do ar ao publicar); o número dele fica aposentado para nenhum dia novo herdar respostas antigas;
+  nenhuma semana fica vazia. A barra de progresso geral passa a contar os dias que a jornada tem hoje.
 - Controle de volume no mini player: alto-falante (toca para silenciar e voltar) e barra fina horizontal,
   no estilo da barra de posição. Começa em 70% e lembra a escolha na próxima visita. No iPhone/iPad, onde
   o Safari só aceita os botões do aparelho, o controle não aparece.
@@ -134,6 +137,9 @@ versão com data.
 - `@grpc/grpc-js` (dependência do Firebase) forçado para `^1.14.7`: `npm audit` sem vulnerabilidades.
 
 ### Corrigido
+
+- Dias criados no Modo Andreía (22 em diante) não podiam ser concluídos: o progresso só aceitava os
+  dias 1 a 21. Agora aceita qualquer dia da jornada (com teste).
 
 - No celular, a página da jornada "arrastava" para o lado: os textos só para leitor de tela das abas
   (posição absoluta) escapavam da fileira de abas e alargavam a página para 625 px numa tela de 375 px.

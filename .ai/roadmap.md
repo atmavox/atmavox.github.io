@@ -81,7 +81,7 @@ Pendências:
 - [ ] "Ver como participante" completo: escolher celular/PC, claro/escuro, "estou no dia N", ver o
       rascunho antes de publicar (hoje o botão abre a jornada publicada, sem cadeados)
 - [ ] Editar Revisões e Encerramento no Modo Andreía
-- [ ] Apagar dia (hoje só dá para criar e reordenar)
+- [x] Apagar dia (2026-11-22): com confirmação; número aposentado; semana nunca fica vazia
 - [ ] Jornadas novas pelo editor (ex.: Ritual Matinal — 7 dias)
 - [ ] Apagar da coleção `media` as imagens que nenhum bloco usa mais (hoje ficam guardadas, sem custo)
 

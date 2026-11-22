@@ -8,7 +8,7 @@ import { AdminBar } from './AdminBar'
 import { DayEditor } from './DayEditor'
 import { EditorOverview } from './EditorOverview'
 import { HistoryDrawer } from './HistoryDrawer'
-import { PublishDialog } from './PublishDialog'
+import { ConfirmDialog } from './ConfirmDialog'
 import { Toast } from './Toast'
 
 function Notice({ title, text }: { title: string; text: string }) {
@@ -88,14 +88,18 @@ function Editor({ editor }: { editor: JourneyEditor }) {
       <main className="mx-auto max-w-295 px-5">{content}</main>
       {isHistoryOpen && <HistoryDrawer editor={editor} state={state} onClose={closeHistory} />}
       {isConfirmingPublish && (
-        <PublishDialog
-          dayCount={allDays(state.saved).length}
+        <ConfirmDialog
+          title="Publicar a jornada?"
+          confirmLabel="Publicar"
           onCancel={cancelPublish}
           onConfirm={() => {
             setIsConfirmingPublish(false)
             void editor.publish()
           }}
-        />
+        >
+          Os {allDays(state.saved).length} dias estão salvos. Ao publicar, todas as participantes
+          passam a ver esta versão. Dá para voltar à anterior pelo Histórico.
+        </ConfirmDialog>
       )}
       <Toast message={state.message} seq={state.messageSeq} />
     </>
