@@ -39,6 +39,8 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Limpar o ruído do áudio de boas-vindas (versão 6 "só voz": silêncios totais, voz nítida; receita
       em `features.md`, F1 → Mídia)
 - [x] Controle de volume no mini player (barra fina + silenciar; lembra a escolha; some no iPhone/iPad)
+- [x] Áudio da página inicial não vai mais junto para a jornada (ADR-016)
+- [ ] Barra de progresso do mini player anda aos saltos (parece travada): deixar o movimento fluido
 - [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar
 - [ ] Receber da Andreía: horários dos encontros, título do áudio de boas-vindas, texto curto, links
       de Threads/Telegram (TikTok @atmavox ✅, áudio de boas-vindas ✅, foto ✅)
