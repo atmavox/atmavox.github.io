@@ -51,14 +51,21 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [ ] Andreía trocar o e-mail de suporte do login do Google para o dela (logada na conta dela)
 - [ ] Conferir o aceite da F5 no site publicado (passo a passo no fim do guia)
 
-## Fase 4 · Modo Andreía (admin) 🔲 · ideia, aguardando escolha da forma de editar
+## Fase 4 · Modo Andreía (admin) 🔲 · forma de editar escolhida; aguardando plano
 
 Um login especial que libera para a Andreía **ver a jornada como participante** e **editar as jornadas com
-bastante liberdade**. Protótipo com 5 formas de edição: `Downloads/atmavox-modo-admin.html`
-(A · editar no lugar, B · painel estruturado, C · blocos livres "/", D · quadro dos 21 dias,
-E · ver como participante).
+bastante liberdade**. Protótipos: `Downloads/atmavox-modo-admin.html` (5 formas) e
+`Downloads/atmavox-modo-admin-v2.html` (a escolhida).
 
-- [ ] Escolher a forma de editar (pode ser uma combinação, ex.: D para planejar + A ou C para escrever + E)
+- [x] Forma de editar escolhida (2026-11-21): **quadro dos dias por semana (D)** como visão geral +
+      **editar no lugar (A)** dentro de cada dia
+- [x] Regras decididas:
+  - cada dia tem **"Salvar dia"** (sai de rascunho) e "Descartar alterações"; editar de novo volta a rascunho
+  - **"Publicar jornada" fica só na visão de todos os dias** e só libera quando **nenhum dia está em
+    rascunho** ("Faltam N dias…")
+  - menu "+ bloco" com **ícones próprios** (nada de emoji)
+  - **vídeo é só um link** (YouTube com miniatura; outros sites viram cartão "Assistir ↗"): nada de upload
+- [ ] Ver como participante (E) a partir da visão geral
 - [ ] Papel de admin sem custo: documento `admins/{uid}` no Firestore, criado à mão no console, e regras
       que só deixam admin gravar o conteúdo (custom claims exigiriam Cloud Functions, plano pago)
 - [ ] Conteúdo sai do código para o Firestore (`journeys/{id}` com dias e seções), com o conteúdo atual como
@@ -71,8 +78,14 @@ E · ver como participante).
 - [ ] "Ver como participante": celular/PC, claro/escuro, "estou no dia N", rascunho ou publicada, sem gravar
       progresso de ninguém
 - [ ] Uploads de áudio e imagem: o Firebase Storage gratuito não está disponível para projetos novos sem
-      plano pago; alternativas sem custo a decidir (links do YouTube/Drive, ou o arquivo entra no repositório
-      pelo desenvolvedor)
+      plano pago; vídeo já resolvido como link; áudio e imagem: alternativas sem custo a decidir (link do
+      Drive, ou o arquivo entra no repositório pelo desenvolvedor)
+
+## Regra nova da jornada: avançar só depois de completar 🔲 · detalhes a confirmar
+
+A participante só avança para a próxima etapa quando a anterior estiver completa. Vale para as etapas de
+cada dia, os dias, as semanas e as abas. Detalhes em definição (o que conta como "completo", o que fica
+liberado sempre, se o admin ignora o bloqueio).
 
 ## Depois
 
