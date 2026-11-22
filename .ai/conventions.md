@@ -32,7 +32,10 @@
 
 - Use **apenas tokens semânticos** (`bg-surface`, `text-ink`, `text-accent`, `border-line`…), definidos em
   `src/shared/theme/`. **Nunca use cores soltas** (`#fff`, `text-amber-500`), porque quebram o tema claro
-  ou o escuro.
+  ou o escuro. Única exceção: logos de terceiros com cores obrigatórias (o "G" do Google em
+  `shared/ui/GoogleLogo.tsx`).
+- O Modo Andreía usa os tokens `admin` (barra azul-petróleo), `admin-ink`, `on-admin`, `ok` (salvo) e
+  `draft` (rascunho). Telas com protótipo aprovado seguem o protótipo de perto.
 - Mobile-first: comece pelo layout de celular e adicione `sm:`/`md:` depois.
 - Respeite `prefers-reduced-motion`.
 

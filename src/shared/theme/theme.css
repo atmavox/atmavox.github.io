@@ -18,6 +18,13 @@
   --wine: #74283a;
   --gray-state: #625d57;
   --line: color-mix(in oklab, var(--text) 14%, transparent);
+  /* Modo Andreía: azul-petróleo, para nunca confundir a edição com a jornada da participante. */
+  --admin: #2f5d6e;
+  --admin-ink: #2f5d6e;
+  --on-admin: #ffffff;
+  /* Estados do editor: salvo (verde) e rascunho (laranja). */
+  --ok: #2e6b3f;
+  --draft: #9a4a0c;
 }
 
 :root[data-theme='dark'] {
@@ -33,6 +40,11 @@
   --gold: #d8b25f;
   --wine: #6b2536;
   --gray-state: #9d958e;
+  --admin: #2f5d6e;
+  /* Texto e ícones azuis sobre o fundo escuro precisam ser mais claros (contraste AA). */
+  --admin-ink: #8cc0d0;
+  --ok: #8fcf9c;
+  --draft: #e8a45c;
 }
 
 /* `inline` faz as classes apontarem para as variáveis, então trocar o tema não exige recompilar. */
@@ -49,6 +61,11 @@
   --color-wine: var(--wine);
   --color-gray-state: var(--gray-state);
   --color-line: var(--line);
+  --color-admin: var(--admin);
+  --color-admin-ink: var(--admin-ink);
+  --color-on-admin: var(--on-admin);
+  --color-ok: var(--ok);
+  --color-draft: var(--draft);
 
   --font-sans: 'Jost Variable', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Playfair Display Variable', ui-serif, Georgia, serif;
@@ -76,6 +93,24 @@
   }
   50% {
     transform: scale(1.12);
+  }
+}
+
+/* Aviso curto do editor ("Dia salvo"): aparece, fica e some sozinho. */
+@keyframes toast {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  8%,
+  85% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+    visibility: hidden;
   }
 }
 

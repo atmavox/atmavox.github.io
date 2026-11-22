@@ -1,31 +1,31 @@
-import {
-  AlignLeft,
-  Flame,
-  Gauge,
-  Headphones,
-  Image,
-  Minus,
-  Moon,
-  PenLine,
-  Quote,
-  Sparkles,
-  Video,
-  type LucideIcon,
-} from 'lucide-react'
 import type { SectionType } from '../../domain/journey'
 
-/** Nome, ícone e explicação curta de cada tipo de bloco (o menu "+ bloco" usa ícones, não emojis). */
-export const SECTION_META: Record<SectionType, { name: string; icon: LucideIcon; about: string }> =
-  {
-    ritual: { name: 'Ritual', icon: Flame, about: 'Uma prática guiada, com "Feito".' },
-    prompt: { name: 'Pergunta', icon: PenLine, about: 'A pessoa escreve a resposta.' },
-    affirmation: { name: 'Afirmação', icon: Sparkles, about: 'Frase + versão da pessoa.' },
-    closing: { name: 'Fechamento', icon: Moon, about: 'Temperatura energética + texto.' },
-    checkin: { name: 'Check-in', icon: Gauge, about: 'Como a pessoa chega hoje.' },
-    text: { name: 'Texto', icon: AlignLeft, about: 'Um parágrafo para ler.' },
-    quote: { name: 'Citação', icon: Quote, about: 'Frase em destaque.' },
-    divider: { name: 'Divisor', icon: Minus, about: 'Uma linha para separar.' },
-    image: { name: 'Imagem', icon: Image, about: 'Uma foto ou ilustração.' },
-    video: { name: 'Vídeo', icon: Video, about: 'Link do YouTube ou outro site.' },
-    audio: { name: 'Áudio', icon: Headphones, about: 'Link do Drive, SoundCloud…' },
-  }
+/** Nome e descrição curta de cada bloco no menu "Adicionar bloco" (textos do protótipo aprovado). */
+export const SECTION_META: Record<SectionType, { name: string; about: string }> = {
+  checkin: { name: 'Check-in', about: 'Como chega ao dia' },
+  ritual: { name: 'Ritual', about: 'Prática guiada' },
+  prompt: { name: 'Pergunta', about: 'Para escrever' },
+  affirmation: { name: 'Afirmação', about: 'Frase em destaque' },
+  closing: { name: 'Fechamento', about: 'Temperatura do dia' },
+  audio: { name: 'Áudio', about: 'Link do áudio' },
+  video: { name: 'Vídeo', about: 'Link do YouTube ou outro' },
+  image: { name: 'Imagem', about: 'Foto ou ilustração' },
+  quote: { name: 'Citação', about: 'Trecho em destaque' },
+  text: { name: 'Texto', about: 'Parágrafo livre' },
+  divider: { name: 'Divisor', about: 'Um respiro' },
+}
+
+/** Ordem dos ladrilhos no menu, como no protótipo. */
+export const PICKER_ORDER: readonly SectionType[] = [
+  'checkin',
+  'ritual',
+  'prompt',
+  'affirmation',
+  'closing',
+  'audio',
+  'video',
+  'image',
+  'quote',
+  'text',
+  'divider',
+]

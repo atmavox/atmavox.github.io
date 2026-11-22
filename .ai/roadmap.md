@@ -73,6 +73,8 @@ Plano (2026-11-21), um commit por passo:
        do dia no lugar (título, subtítulo, blocos com subir/descer/duplicar/remover, "+ bloco" com
        ícones), "Salvar dia" e "Descartar", "Publicar jornada" só sem rascunhos, histórico com "Voltar
        para esta versão"; edições não salvas ficam no aparelho
+   - [x] Telas refeitas fiéis ao protótipo v2 (barra azul, quadro de cartões, dia editável no lugar,
+         ladrilhos de blocos, histórico em gaveta) — conferidas lado a lado com o protótipo
    - [ ] Conferir no site publicado com a conta admin (salvar, publicar, ver como participante)
    - [ ] Depois: editar revisões e encerramento; remover dia; "ver como participante" (item abaixo)
 5. [ ] Tela da participante mostra os blocos novos

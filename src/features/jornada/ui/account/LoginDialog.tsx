@@ -1,6 +1,7 @@
 import { X } from 'lucide-react'
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
+import { GoogleLogo } from '../../../../shared/ui/GoogleLogo'
 import type { Account } from '../../application/account'
 import { AuthFailure } from '../../application/ports'
 
@@ -132,9 +133,7 @@ export function LoginDialog({ account, onClose }: LoginDialogProps) {
               onClick={() => void run(() => account.signInWithGoogle())}
               className="mb-4 flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-line bg-bg font-medium text-ink transition-colors hover:border-accent disabled:opacity-60"
             >
-              <span aria-hidden="true" className="font-display text-lg text-accent">
-                G
-              </span>
+              <GoogleLogo size={20} />
               Entrar com Google
             </button>
             <p className="mb-4 flex items-center gap-3 text-xs text-ink-faint before:h-px before:flex-1 before:bg-line after:h-px after:flex-1 after:bg-line">

@@ -1,0 +1,25 @@
+import { EditorIcon } from './EditorIcon'
+
+const pill = 'rounded-full bg-on-admin/16 px-3 py-0.5 text-[13px]'
+
+/** A barra azul do Modo Andreía: deixa claro, o tempo todo, que ela está editando. */
+export function AdminBar({ onHistory }: { onHistory?: () => void }) {
+  return (
+    <header className="sticky top-0 z-40 flex h-13 items-center gap-3 bg-admin px-4 text-on-admin sm:px-5">
+      <span className="font-display tracking-[0.12em]">ATMAVOX</span>
+      <span className={pill}>Modo Andreía</span>
+      <span className={`${pill} hidden sm:inline`}>A Chama Interna · 21 dias</span>
+      <span className="flex-1" />
+      {onHistory && (
+        <button
+          type="button"
+          onClick={onHistory}
+          className="inline-flex items-center gap-2 rounded-full border border-on-admin/45 px-3.5 py-1.5 text-sm hover:bg-on-admin/10"
+        >
+          <EditorIcon name="clock" size={18} />
+          Histórico
+        </button>
+      )}
+    </header>
+  )
+}

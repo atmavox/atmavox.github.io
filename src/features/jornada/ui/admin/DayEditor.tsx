@@ -1,7 +1,5 @@
-import { ArrowDown, ArrowLeft, ArrowUp, Copy, Trash2 } from 'lucide-react'
-import { useState } from 'react'
 import { dayStatus, type EditorState, type JourneyEditor } from '../../application/JourneyEditor'
-import type { DaySection, JourneyDay } from '../../domain/journey'
+import { allDays, type DaySection, type JourneyDay } from '../../domain/journey'
 import {
   createSection,
   dayProblems,
@@ -11,106 +9,44 @@ import {
   removeSection,
   replaceSection,
 } from '../../domain/journeyEditing'
-import { Field } from './Field'
-import { AddBlockMenu } from './AddBlockMenu'
-import { SectionFields } from './SectionFields'
+import { BlockAdder } from './BlockAdder'
+import { BlockContent } from './BlockContent'
+import { EditorIcon, type EditorIconName } from './EditorIcon'
+import { InlineText } from './InlineText'
 import { SECTION_META } from './sectionMeta'
-import { StatusChip } from './StatusChip'
+import { StatusTag } from './StatusTag'
 
 const newSuffix = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5)
 
-const iconButton =
-  'grid size-8 place-items-center rounded-full text-ink-muted hover:bg-accent/10 hover:text-accent disabled:opacity-30 disabled:hover:bg-transparent'
+const btn =
+  'inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-sm text-ink transition-colors hover:border-admin-ink disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:border-line'
+const ghost =
+  'inline-flex items-center gap-1 rounded-full border border-line px-3 py-2 text-sm text-ink hover:border-admin-ink disabled:opacity-30 disabled:hover:border-line'
+const primary =
+  'inline-flex items-center gap-2 rounded-full border border-accent bg-accent px-4 py-2 text-sm font-semibold text-bg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45'
 
-interface BlockProps {
-  section: DaySection
-  index: number
-  total: number
-  onChange: (section: DaySection) => void
-  onMove: (delta: number) => void
-  onDuplicate: () => void
-  onRemove: () => void
+interface ToolProps {
+  icon: EditorIconName
+  label: string
+  onClick: () => void
+  disabled?: boolean
+  danger?: boolean
 }
 
-function Block({ section, index, total, onChange, onMove, onDuplicate, onRemove }: BlockProps) {
-  const [isConfirmingRemove, setIsConfirmingRemove] = useState(false)
-  const { name, icon: Icon } = SECTION_META[section.type]
-  const where = `bloco ${index + 1} (${name})`
-
+function Tool({ icon, label, onClick, disabled, danger }: ToolProps) {
   return (
-    <li className="rounded-2xl border border-line bg-surface p-4">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="grid size-8 place-items-center rounded-lg bg-accent/12 text-accent">
-          <Icon aria-hidden size={16} />
-        </span>
-        <span className="text-sm font-medium text-ink">{name}</span>
-        <span className="ml-auto flex items-center">
-          <button
-            type="button"
-            className={iconButton}
-            disabled={index === 0}
-            onClick={() => onMove(-1)}
-            aria-label={`Subir ${where}`}
-          >
-            <ArrowUp aria-hidden size={16} />
-          </button>
-          <button
-            type="button"
-            className={iconButton}
-            disabled={index === total - 1}
-            onClick={() => onMove(1)}
-            aria-label={`Descer ${where}`}
-          >
-            <ArrowDown aria-hidden size={16} />
-          </button>
-          <button
-            type="button"
-            className={iconButton}
-            onClick={onDuplicate}
-            aria-label={`Duplicar ${where}`}
-          >
-            <Copy aria-hidden size={16} />
-          </button>
-          <button
-            type="button"
-            className={iconButton}
-            onClick={() => setIsConfirmingRemove(true)}
-            aria-label={`Remover ${where}`}
-          >
-            <Trash2 aria-hidden size={16} />
-          </button>
-        </span>
-      </div>
-
-      {isConfirmingRemove && (
-        <div
-          role="alert"
-          className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-wine/50 bg-wine/10 p-3 text-sm text-ink"
-        >
-          Remover este bloco? (O que as pessoas já escreveram nele fica guardado.)
-          <span className="ml-auto flex gap-2">
-            <button
-              type="button"
-              onClick={onRemove}
-              className="rounded-full bg-accent px-3 py-1 font-medium text-bg"
-            >
-              Remover
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsConfirmingRemove(false)}
-              className="rounded-full border border-line px-3 py-1 text-ink-muted"
-            >
-              Cancelar
-            </button>
-          </span>
-        </div>
-      )}
-
-      <div className="flex flex-col gap-3">
-        <SectionFields section={section} onChange={onChange} />
-      </div>
-    </li>
+    <button
+      type="button"
+      title={label.split(' ')[0]}
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+      className={`grid size-7.5 place-items-center rounded-lg text-ink-muted disabled:opacity-30 ${
+        danger ? 'hover:bg-wine/10 hover:text-wine' : 'hover:bg-admin/10 hover:text-admin-ink'
+      }`}
+    >
+      <EditorIcon name={icon} size={16} />
+    </button>
   )
 }
 
@@ -118,102 +54,185 @@ interface DayEditorProps {
   editor: JourneyEditor
   state: EditorState
   day: JourneyDay
-  position: number
   onBack: () => void
+  onOpenDay: (dayNumber: number) => void
 }
 
-/** Editar no lugar: o dia inteiro numa página, bloco a bloco, com "Salvar dia" e "Descartar". */
-export function DayEditor({ editor, state, day, position, onBack }: DayEditorProps) {
+/** Editar no lugar: o dia aparece como a participante vê, e cada texto se edita com um clique. */
+export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorProps) {
   const status = dayStatus(state, day.number)
+  const isDraft = status === 'draft'
   const problems = dayProblems(day)
-  const update = (next: JourneyDay) => editor.editDay(next)
-  const total = day.sections.length
+  const days = allDays(state.working)
+  const index = days.findIndex((d) => d.number === day.number)
+  const position = index + 1
+  const week = state.working.weeks.find((w) => w.days.some((d) => d.number === day.number))
+  const previous = days[index - 1]
+  const next = days[index + 1]
+  const update = (changed: JourneyDay) => editor.editDay(changed)
+  const add = (at: number, type: Parameters<typeof createSection>[0]) => {
+    update(insertSection(day, at, createSection(type, day.number, newSuffix())))
+    editor.notify(`${SECTION_META[type].name} adicionado`)
+  }
 
   return (
-    <div className="flex flex-col gap-6 py-6">
-      <button
-        type="button"
-        onClick={onBack}
-        className="inline-flex items-center gap-2 self-start text-sm text-ink-muted hover:text-accent"
-      >
-        <ArrowLeft aria-hidden size={16} /> Todos os dias
-      </button>
-
-      <header className="flex flex-col gap-3">
-        <div className="flex items-center gap-3">
-          <h1 className="font-display text-3xl text-ink">Dia {position}</h1>
-          <StatusChip status={status} />
-        </div>
-        <Field
-          label="Título do dia"
-          value={day.title}
-          onChange={(title) => update({ ...day, title })}
-        />
-        <Field
-          label="Subtítulo"
-          value={day.subtitle}
-          onChange={(subtitle) => update({ ...day, subtitle })}
-        />
-      </header>
-
-      <ol aria-label="Blocos do dia" className="flex flex-col gap-4">
-        {day.sections.map((section, index) => (
-          <Block
-            key={section.id}
-            section={section}
-            index={index}
-            total={total}
-            onChange={(next) => update(replaceSection(day, index, next))}
-            onMove={(delta) => update(moveSection(day, index, delta))}
-            onDuplicate={() =>
-              update(
-                insertSection(day, index + 1, duplicateSection(section, day.number, newSuffix())),
-              )
-            }
-            onRemove={() => update(removeSection(day, index))}
-          />
-        ))}
-      </ol>
-
-      <AddBlockMenu
-        onAdd={(type) =>
-          update(insertSection(day, total, createSection(type, day.number, newSuffix())))
-        }
-      />
-
-      <footer className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-line bg-bg/95 px-4 py-3 backdrop-blur">
-        {status === 'draft' && problems.length > 0 && (
-          <ul aria-label="O que falta para salvar" className="text-sm text-wine">
+    <div className="mx-auto max-w-195 pt-0 pb-24">
+      <div className="sticky top-13 z-30 mb-4 flex flex-wrap items-center gap-2.5 border-b border-line bg-bg py-2.5">
+        <button type="button" onClick={onBack} className={ghost}>
+          <EditorIcon name="back" /> Todos os dias
+        </button>
+        <span className="flex-1" />
+        <StatusTag status={status} long />
+        <button
+          type="button"
+          disabled={!isDraft}
+          onClick={() => {
+            editor.discardDay(day.number)
+            editor.notify('Alterações descartadas')
+          }}
+          className={btn}
+        >
+          Descartar alterações
+        </button>
+        <button
+          type="button"
+          disabled={!isDraft || problems.length > 0 || state.isBusy}
+          onClick={() => void editor.saveDay(day.number)}
+          className={primary}
+        >
+          <EditorIcon name="check" /> {state.isBusy ? 'Salvando…' : 'Salvar dia'}
+        </button>
+        {isDraft && problems.length > 0 && (
+          <ul aria-label="O que falta para salvar" className="w-full text-[13px] text-draft">
             {problems.map((problem) => (
               <li key={problem}>• {problem}</li>
             ))}
           </ul>
         )}
-        <div className="flex flex-wrap items-center gap-2">
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-[11px] font-semibold tracking-[0.2em] text-accent uppercase">
+          {week ? `Semana ${week.roman} · ${week.theme} · ` : ''}Dia {position}
+        </p>
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            disabled={status !== 'draft' || problems.length > 0 || state.isBusy}
-            onClick={() => void editor.saveDay(day.number)}
-            className="min-h-10 rounded-full bg-accent px-5 text-sm font-semibold text-bg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            className={ghost}
+            disabled={!previous}
+            onClick={() => previous && onOpenDay(previous.number)}
+            aria-label="Dia anterior"
           >
-            {state.isBusy ? 'Salvando…' : 'Salvar dia'}
+            <EditorIcon name="back" />
           </button>
-          {status === 'draft' && (
-            <button
-              type="button"
-              onClick={() => editor.discardDay(day.number)}
-              className="min-h-10 rounded-full border border-line px-5 text-sm text-ink-muted hover:border-accent hover:text-accent"
-            >
-              Descartar alterações
-            </button>
-          )}
-          {state.message && (
-            <p role="status" className="text-sm text-ink-muted">
-              {state.message}
-            </p>
-          )}
+          <span className="text-sm text-ink-faint">
+            {position} de {days.length}
+          </span>
+          <button
+            type="button"
+            className={ghost}
+            disabled={!next}
+            onClick={() => next && onOpenDay(next.number)}
+            aria-label="Próximo dia"
+          >
+            <EditorIcon name="next" />
+          </button>
         </div>
-      </footer>
+      </div>
+
+      <article className="flex flex-col gap-1 rounded-[18px] border border-line bg-surface p-6">
+        <div className="rounded-[14px] p-2">
+          <div className="flex items-baseline gap-2">
+            <span aria-hidden="true" className="font-display text-[34px] text-accent">
+              {String(position).padStart(2, '0')}
+            </span>
+            <InlineText
+              label="Título do dia"
+              placeholder="Título do dia"
+              value={day.title}
+              onChange={(title) => update({ ...day, title })}
+              className="font-display text-[26px] leading-tight text-ink"
+            />
+          </div>
+          <InlineText
+            label="Subtítulo do dia"
+            placeholder="Subtítulo do dia"
+            value={day.subtitle}
+            onChange={(subtitle) => update({ ...day, subtitle })}
+            className="mt-1.5 text-ink-muted"
+          />
+        </div>
+
+        <BlockAdder onAdd={(type) => add(0, type)} />
+        {day.sections.map((section, at) => (
+          <div key={section.id}>
+            <Block
+              section={section}
+              where={`bloco ${at + 1} (${SECTION_META[section.type].name})`}
+              isFirst={at === 0}
+              isLast={at === day.sections.length - 1}
+              onChange={(changed) => update(replaceSection(day, at, changed))}
+              onMove={(delta) => update(moveSection(day, at, delta))}
+              onDuplicate={() => {
+                update(
+                  insertSection(day, at + 1, duplicateSection(section, day.number, newSuffix())),
+                )
+                editor.notify('Bloco duplicado')
+              }}
+              onRemove={() => {
+                update(removeSection(day, at))
+                editor.notify('Bloco removido (respostas já escritas ficam guardadas)')
+              }}
+            />
+            <BlockAdder onAdd={(type) => add(at + 1, type)} />
+          </div>
+        ))}
+
+        <div className="p-2" aria-hidden="true">
+          <span className="inline-flex rounded-full bg-accent px-4 py-2 text-sm font-semibold text-bg">
+            Concluir dia
+          </span>
+        </div>
+      </article>
+      <p className="mt-3.5 text-sm text-ink-faint">
+        Clique em qualquer texto para editar. Passe o mouse num bloco para subir, descer, duplicar
+        ou apagar. Passe entre dois blocos para ver o <b>+</b> e adicionar outro.
+      </p>
+    </div>
+  )
+}
+
+interface BlockProps {
+  section: DaySection
+  where: string
+  isFirst: boolean
+  isLast: boolean
+  onChange: (section: DaySection) => void
+  onMove: (delta: number) => void
+  onDuplicate: () => void
+  onRemove: () => void
+}
+
+/** Um bloco com a moldura tracejada azul e as ferramentas no canto ao passar o mouse ou focar. */
+function Block({
+  section,
+  where,
+  isFirst,
+  isLast,
+  onChange,
+  onMove,
+  onDuplicate,
+  onRemove,
+}: BlockProps) {
+  return (
+    <div className="group/block relative -mx-2 rounded-[14px] p-2 outline-2 outline-transparent outline-dashed transition-[outline-color] focus-within:outline-admin-ink hover:outline-admin/35">
+      <div className="absolute -top-4 right-2.5 z-10 hidden gap-1 rounded-[10px] border border-line bg-surface p-0.75 shadow-[0_4px_14px_rgb(0_0_0/0.08)] group-focus-within/block:flex group-hover/block:flex">
+        <Tool icon="up" label={`Subir ${where}`} disabled={isFirst} onClick={() => onMove(-1)} />
+        <Tool icon="down" label={`Descer ${where}`} disabled={isLast} onClick={() => onMove(1)} />
+        <Tool icon="copy" label={`Duplicar ${where}`} onClick={onDuplicate} />
+        <Tool icon="trash" label={`Apagar ${where}`} onClick={onRemove} danger />
+      </div>
+      <BlockContent section={section} onChange={onChange} />
     </div>
   )
 }

@@ -1,21 +1,22 @@
-import { ArrowLeft } from 'lucide-react'
-import { useContext, useEffect, useState, useSyncExternalStore } from 'react'
-import { ThemeToggle } from '../../../../shared/theme/ThemeToggle'
+import { useCallback, useContext, useEffect, useState, useSyncExternalStore } from 'react'
 import type { JourneyEditor } from '../../application/JourneyEditor'
 import { allDays } from '../../domain/journey'
-import { findDay } from '../../domain/journeyEditing'
-import { AccountButton } from '../account/AccountButton'
+import { findDay, nextDayNumber } from '../../domain/journeyEditing'
 import { JourneyContext } from '../JourneyContext'
 import { useJourney } from '../useJourney'
+import { AdminBar } from './AdminBar'
 import { DayEditor } from './DayEditor'
 import { EditorOverview } from './EditorOverview'
+import { HistoryDrawer } from './HistoryDrawer'
+import { PublishDialog } from './PublishDialog'
+import { Toast } from './Toast'
 
 function Notice({ title, text }: { title: string; text: string }) {
   return (
     <div className="flex flex-col items-center gap-3 py-20 text-center">
       <h1 className="font-display text-3xl text-ink">{title}</h1>
       <p className="max-w-md text-ink-muted">{text}</p>
-      <a href="#/jornada" className="text-accent hover:underline">
+      <a href="#/jornada" className="text-admin-ink hover:underline">
         Voltar para a jornada
       </a>
     </div>
@@ -25,44 +26,80 @@ function Notice({ title, text }: { title: string; text: string }) {
 function Editor({ editor }: { editor: JourneyEditor }) {
   const state = useSyncExternalStore(editor.subscribe, editor.getSnapshot)
   const [openDay, setOpenDay] = useState<number | null>(null)
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [isConfirmingPublish, setIsConfirmingPublish] = useState(false)
+  const closeHistory = useCallback(() => setIsHistoryOpen(false), [])
+  const cancelPublish = useCallback(() => setIsConfirmingPublish(false), [])
 
   useEffect(() => {
     void editor.load()
   }, [editor])
 
-  useEffect(() => window.scrollTo({ top: 0 }), [openDay])
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [openDay])
 
-  if (state.status === 'loading')
-    return <p className="py-20 text-center text-ink-muted">Carregando…</p>
-  if (state.status === 'error') {
-    return (
+  const day = openDay === null ? undefined : findDay(state.working, openDay)
+
+  let content
+  if (state.status === 'loading') {
+    content = <p className="py-20 text-center text-ink-muted">Carregando…</p>
+  } else if (state.status === 'error') {
+    content = (
       <div className="flex flex-col items-center gap-3 py-20 text-center">
         <p className="text-ink-muted">{state.message}</p>
         <button
           type="button"
           onClick={() => void editor.load()}
-          className="rounded-full border border-accent px-5 py-2 text-accent"
+          className="rounded-full bg-admin px-5 py-2 font-semibold text-on-admin"
         >
           Tentar de novo
         </button>
       </div>
     )
-  }
-
-  const day = openDay === null ? undefined : findDay(state.working, openDay)
-  if (day) {
-    const position = allDays(state.working).findIndex((d) => d.number === day.number) + 1
-    return (
+  } else if (day) {
+    content = (
       <DayEditor
         editor={editor}
         state={state}
         day={day}
-        position={position}
         onBack={() => setOpenDay(null)}
+        onOpenDay={setOpenDay}
+      />
+    )
+  } else {
+    content = (
+      <EditorOverview
+        editor={editor}
+        state={state}
+        onOpenDay={setOpenDay}
+        onPublish={() => setIsConfirmingPublish(true)}
+        onAddDay={(weekNumber) => {
+          const created = nextDayNumber(state.working)
+          void editor.addDay(weekNumber).then(() => setOpenDay(created))
+        }}
       />
     )
   }
-  return <EditorOverview editor={editor} state={state} onOpenDay={setOpenDay} />
+
+  return (
+    <>
+      <AdminBar onHistory={() => setIsHistoryOpen(true)} />
+      <main className="mx-auto max-w-295 px-5">{content}</main>
+      {isHistoryOpen && <HistoryDrawer editor={editor} state={state} onClose={closeHistory} />}
+      {isConfirmingPublish && (
+        <PublishDialog
+          dayCount={allDays(state.saved).length}
+          onCancel={cancelPublish}
+          onConfirm={() => {
+            setIsConfirmingPublish(false)
+            void editor.publish()
+          }}
+        />
+      )}
+      <Toast message={state.message} seq={state.messageSeq} />
+    </>
+  )
 }
 
 /** Modo Andreía: só para a admin (as regras da nuvem também recusam qualquer outra pessoa). */
@@ -75,35 +112,26 @@ export function EditorApp() {
     document.title = 'Modo Andreía · ATMAVOX'
   }, [])
 
+  if (!editor || !isAdmin) {
+    return (
+      <div className="min-h-dvh">
+        <AdminBar />
+        <main className="mx-auto max-w-3xl px-4">
+          {!editor ? (
+            <Notice title="Edição indisponível" text="O login não está configurado neste site." />
+          ) : (
+            <Notice
+              title="Só para a admin"
+              text="Entre na jornada com a conta de admin para editar."
+            />
+          )}
+        </main>
+      </div>
+    )
+  }
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-10 border-b border-line bg-bg/95 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-2.5">
-          <a
-            href="#/jornada"
-            className="inline-flex items-center gap-2 text-sm text-ink-muted hover:text-accent"
-          >
-            <ArrowLeft aria-hidden size={16} /> Jornada
-          </a>
-          <span className="font-display text-gold">Modo Andreía</span>
-          <div className="ml-auto flex items-center gap-2">
-            <AccountButton />
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-      <main className="mx-auto max-w-3xl px-4 pb-16">
-        {!editor ? (
-          <Notice title="Edição indisponível" text="O login não está configurado neste site." />
-        ) : !isAdmin ? (
-          <Notice
-            title="Só para a admin"
-            text="Entre com a conta de admin (botão no topo) para editar a jornada."
-          />
-        ) : (
-          <Editor editor={editor} />
-        )}
-      </main>
+      <Editor editor={editor} />
     </div>
   )
 }

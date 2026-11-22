@@ -1,212 +1,197 @@
-import { ArrowDown, ArrowUp, Plus, Send } from 'lucide-react'
-import { useId, useState } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import {
   dayStatus,
+  draftDayCount,
   publishBlocker,
   type EditorState,
   type JourneyEditor,
 } from '../../application/JourneyEditor'
 import { allDays, type JourneyWeek } from '../../domain/journey'
-import { StatusChip } from './StatusChip'
+import { EditorIcon } from './EditorIcon'
+import { InlineText } from './InlineText'
+import { StatusTag } from './StatusTag'
 
 interface OverviewProps {
   editor: JourneyEditor
   state: EditorState
   onOpenDay: (dayNumber: number) => void
+  onPublish: () => void
+  onAddDay: (weekNumber: number) => void
 }
 
-const smallIcon =
-  'grid size-7 place-items-center rounded-full text-ink-faint hover:bg-accent/10 hover:text-accent disabled:opacity-30 disabled:hover:bg-transparent'
+const btn =
+  'inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-sm text-ink transition-colors hover:border-admin-ink'
 
-/** O tema salva ao sair do campo (e não a cada letra, que gravaria na nuvem a cada tecla). */
-function WeekTheme({ week, editor }: { week: JourneyWeek; editor: JourneyEditor }) {
+/** O tema da semana salva ao sair do campo (gravar a cada letra encheria a nuvem de escritas). */
+function WeekHeading({ week, editor }: { week: JourneyWeek; editor: JourneyEditor }) {
   const [theme, setTheme] = useState(week.theme)
-  const id = useId()
   return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-xs text-ink-faint">
-        Tema da Semana {week.roman}
-      </label>
-      <input
-        id={id}
+    <h2 className="mb-2.5 flex items-center gap-2.5 text-[13px] font-semibold tracking-[0.2em] text-accent uppercase">
+      <span className="shrink-0">Semana {week.roman} ·</span>
+      <InlineText
+        singleLine
+        label={`Tema da Semana ${week.roman}`}
         value={theme}
-        onChange={(event) => setTheme(event.target.value)}
+        onChange={setTheme}
         onBlur={() => {
-          if (theme.trim() !== '' && theme !== week.theme)
+          if (theme.trim() !== '' && theme !== week.theme) {
             void editor.setWeekTheme(week.number, theme)
+          }
         }}
-        className="rounded-lg border border-transparent bg-transparent px-2 py-1 font-display text-xl text-ink hover:border-line focus:border-accent"
+        fit
+        className="tracking-[0.2em] uppercase"
       />
-    </div>
+      <span aria-hidden="true" className="h-px flex-1 bg-line" />
+    </h2>
   )
 }
 
-function PublishBar({ editor, state }: { editor: JourneyEditor; state: EditorState }) {
+/** Quadro de todos os dias: cartões por semana, arrastar para reordenar, "Publicar" só aqui. */
+export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }: OverviewProps) {
+  const [dragging, setDragging] = useState<number | null>(null)
+  const [over, setOver] = useState<number | null>(null)
+  const days = allDays(state.working)
+  const positions = new Map(days.map((day, index) => [day.number, index + 1]))
+  const total = days.length
+  const drafts = draftDayCount(state)
   const blocker = publishBlocker(state)
+  const lastWeek = state.working.weeks.at(-1)?.number
+
+  /** Solta um cartão sobre outro da mesma semana: ocupa o lugar dele. */
+  function drop(week: JourneyWeek, targetNumber: number) {
+    if (dragging === null || dragging === targetNumber) return
+    const from = week.days.findIndex((d) => d.number === dragging)
+    const to = week.days.findIndex((d) => d.number === targetNumber)
+    if (from !== -1 && to !== -1) void editor.moveDay(dragging, to - from)
+  }
+
+  // Teclado: as setas no "puxador" movem o dia (o arrastar com mouse não serve para todo mundo).
+  function onGripKey(event: KeyboardEvent, dayNumber: number) {
+    const delta = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[event.key]
+    if (delta === undefined) return
+    event.preventDefault()
+    void editor.moveDay(dayNumber, delta)
+  }
+
   return (
-    <section
-      aria-label="Publicar"
-      className="flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-surface p-4"
-    >
-      <div className="flex-1">
-        <p className="font-medium text-ink">
-          {blocker === null ? 'Pronta para publicar' : 'Publicar jornada'}
-        </p>
-        <p className="text-sm text-ink-muted">
-          {blocker ?? 'As participantes passam a ver a versão salva assim que você publicar.'}
-        </p>
+    <div className="pt-6 pb-24">
+      <div className="mb-4.5 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-[32px] text-ink">A Chama Interna</h1>
+          <p className="mt-1.5 mb-2.5 text-ink-muted">
+            Clique num dia para editar. Arraste os cartões para mudar a ordem.
+          </p>
+          <div className="flex items-center gap-2.5 text-sm text-ink-muted">
+            <div
+              role="progressbar"
+              aria-label="Dias salvos"
+              aria-valuemin={0}
+              aria-valuemax={total}
+              aria-valuenow={total - drafts}
+              className="h-1.5 w-65 max-w-[50vw] overflow-hidden rounded-full bg-line"
+            >
+              <div
+                className="h-full bg-ok transition-[width] duration-300"
+                style={{ width: `${((total - drafts) / Math.max(total, 1)) * 100}%` }}
+              />
+            </div>
+            <span>
+              {total - drafts} de {total} dias salvos
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1.5">
+          <div className="flex flex-wrap justify-end gap-2">
+            <a href="#/jornada" className={btn}>
+              <EditorIcon name="eye" /> Ver como participante
+            </a>
+            <button
+              type="button"
+              disabled={blocker !== null || state.isBusy}
+              onClick={onPublish}
+              className="rounded-full bg-admin px-4 py-2 text-sm font-semibold text-on-admin disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              {state.isBusy ? 'Aguarde…' : 'Publicar jornada'}
+            </button>
+          </div>
+          {blocker && <span className="text-[13px] text-draft">{blocker}</span>}
+        </div>
       </div>
-      <button
-        type="button"
-        disabled={blocker !== null || state.isBusy}
-        onClick={() => void editor.publish()}
-        className="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-6 font-semibold text-bg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        <Send aria-hidden size={16} />
-        {state.isBusy ? 'Aguarde…' : 'Publicar jornada'}
-      </button>
-    </section>
-  )
-}
-
-function VersionHistory({ editor, state }: { editor: JourneyEditor; state: EditorState }) {
-  const [confirming, setConfirming] = useState<string | null>(null)
-  if (state.versions.length === 0) return null
-  const format = (time: number) =>
-    new Date(time).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
-
-  return (
-    <section aria-labelledby="history-title" className="flex flex-col gap-3">
-      <h2 id="history-title" className="font-display text-xl text-ink">
-        Publicações anteriores
-      </h2>
-      <ol className="flex flex-col gap-2">
-        {state.versions.map((version, index) => (
-          <li
-            key={version.id}
-            className="flex flex-wrap items-center gap-3 rounded-xl border border-line px-4 py-2.5 text-sm"
-          >
-            <span className="text-ink">{format(version.publishedAt)}</span>
-            {index === 0 && <span className="text-xs text-accent">a mais recente</span>}
-            {confirming === version.id ? (
-              <span className="ml-auto flex items-center gap-2">
-                <span className="text-ink-muted">Trocar o rascunho por esta versão?</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setConfirming(null)
-                    void editor.restoreVersion(version.id)
-                  }}
-                  className="rounded-full bg-accent px-3 py-1 font-medium text-bg"
-                >
-                  Sim
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirming(null)}
-                  className="rounded-full border border-line px-3 py-1 text-ink-muted"
-                >
-                  Não
-                </button>
-              </span>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setConfirming(version.id)}
-                className="ml-auto text-accent hover:underline"
-              >
-                Voltar para esta versão
-              </button>
-            )}
-          </li>
-        ))}
-      </ol>
-    </section>
-  )
-}
-
-/** Visão geral: os dias por semana, com o estado de cada um, e o "Publicar" (só aqui). */
-export function EditorOverview({ editor, state, onOpenDay }: OverviewProps) {
-  // Posição na jornada (o que a participante vê como "Dia N"); o número do dia é só a identidade.
-  const positions = new Map(allDays(state.working).map((day, index) => [day.number, index + 1]))
-  return (
-    <div className="flex flex-col gap-8 py-6">
-      <header>
-        <h1 className="font-display text-3xl text-ink">Editar a jornada</h1>
-        <p className="mt-1 text-ink-muted">
-          Edite cada dia e toque em “Salvar dia”. Quando nenhum dia estiver em rascunho, publique.
-        </p>
-      </header>
-
-      <PublishBar editor={editor} state={state} />
-      {state.message && (
-        <p role="status" className="-mt-4 text-sm text-ink-muted">
-          {state.message}
-        </p>
-      )}
 
       {state.working.weeks.map((week) => (
-        <section
-          key={week.number}
-          aria-label={`Semana ${week.roman}`}
-          className="flex flex-col gap-3"
-        >
-          <WeekTheme key={week.theme} week={week} editor={editor} />
-          <ol className="grid gap-2 sm:grid-cols-2">
-            {week.days.map((day, index) => {
-              const label = `Dia ${positions.get(day.number) ?? ''}`
+        <section key={week.number} className="mt-4.5" aria-label={`Semana ${week.roman}`}>
+          <WeekHeading key={week.theme} week={week} editor={editor} />
+          <ol className="grid grid-cols-2 gap-2.5 lg:grid-cols-7">
+            {week.days.map((day) => {
+              const status = dayStatus(state, day.number)
+              const position = positions.get(day.number) ?? 0
               return (
                 <li
                   key={day.number}
-                  className="flex items-center gap-2 rounded-xl border border-line bg-surface p-2 pl-3"
+                  draggable
+                  onDragStart={() => setDragging(day.number)}
+                  onDragEnd={() => {
+                    setDragging(null)
+                    setOver(null)
+                  }}
+                  onDragOver={(event) => {
+                    event.preventDefault()
+                    setOver(day.number)
+                  }}
+                  onDragLeave={() => setOver(null)}
+                  onDrop={() => {
+                    drop(week, day.number)
+                    setOver(null)
+                  }}
+                  className={`flex min-h-37.5 cursor-grab flex-col gap-2 rounded-[18px] border bg-surface px-3 pt-3 pb-2.5 transition-[box-shadow,transform] hover:-translate-y-px hover:shadow-[0_6px_18px_rgb(0_0_0/0.08)] ${
+                    status === 'draft' ? 'border-draft/45' : 'border-line'
+                  } ${dragging === day.number ? 'opacity-40' : ''} ${
+                    over === day.number && dragging !== day.number
+                      ? 'outline-2 outline-admin-ink outline-dashed'
+                      : ''
+                  }`}
                 >
+                  <span className="flex items-center justify-between font-display text-[28px] leading-none text-accent">
+                    {String(position).padStart(2, '0')}
+                    <button
+                      type="button"
+                      aria-label={`Mover dia ${position} (use as setas)`}
+                      onKeyDown={(event) => onGripKey(event, day.number)}
+                      className="cursor-grab rounded text-ink-faint"
+                    >
+                      <EditorIcon name="grip" size={16} />
+                    </button>
+                  </span>
+                  <span className="flex-1 text-sm leading-snug text-ink">{day.title}</span>
+                  <StatusTag status={status} />
                   <button
                     type="button"
                     onClick={() => onOpenDay(day.number)}
-                    className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left"
+                    aria-label={`Editar dia ${position}: ${day.title}`}
+                    className={`${btn} justify-center px-2.5 py-1.5 text-[13px]`}
                   >
-                    <span className="text-xs text-ink-faint">{label}</span>
-                    <span className="w-full truncate font-medium text-ink">{day.title}</span>
-                    <StatusChip status={dayStatus(state, day.number)} />
+                    Editar dia
                   </button>
-                  <span className="flex flex-col">
-                    <button
-                      type="button"
-                      className={smallIcon}
-                      disabled={index === 0 || state.isBusy}
-                      onClick={() => void editor.moveDay(day.number, -1)}
-                      aria-label={`Subir ${label}`}
-                    >
-                      <ArrowUp aria-hidden size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      className={smallIcon}
-                      disabled={index === week.days.length - 1 || state.isBusy}
-                      onClick={() => void editor.moveDay(day.number, 1)}
-                      aria-label={`Descer ${label}`}
-                    >
-                      <ArrowDown aria-hidden size={14} />
-                    </button>
-                  </span>
                 </li>
               )
             })}
-            <li>
-              <button
-                type="button"
-                disabled={state.isBusy}
-                onClick={() => void editor.addDay(week.number)}
-                className="flex h-full min-h-20 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-line text-sm text-ink-muted hover:border-accent hover:text-accent"
-              >
-                <Plus aria-hidden size={16} /> Novo dia na Semana {week.roman}
-              </button>
-            </li>
+            {week.number === lastWeek && (
+              <li>
+                <button
+                  type="button"
+                  disabled={state.isBusy}
+                  onClick={() => onAddDay(week.number)}
+                  className="grid h-full min-h-37.5 w-full place-items-center rounded-[18px] border-[1.5px] border-dashed border-line text-sm text-ink-faint hover:border-admin-ink hover:text-admin-ink"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <EditorIcon name="plus" size={18} /> Novo dia
+                  </span>
+                </button>
+              </li>
+            )}
           </ol>
         </section>
       ))}
-
-      <VersionHistory editor={editor} state={state} />
     </div>
   )
 }

@@ -54,6 +54,13 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Modo Andreía refeito fiel ao protótipo aprovado (`Downloads/atmavox-modo-admin-v2.html`): barra
+  azul-petróleo no topo (tokens `admin`, `ok`, `draft`), quadro com cartões por semana (arrastar ou
+  setas para reordenar, "X de Y dias salvos", "Ver como participante", confirmação antes de publicar),
+  dia como documento editável no lugar (cada texto se edita com um clique, ferramentas ao passar o
+  mouse, "+" entre blocos com ladrilhos de ícones próprios), histórico em gaveta lateral e avisos curtos
+  no rodapé. Na jornada, a admin vê uma faixa azul com "Editar a jornada →".
+- Botão "Entrar com Google" com o logo oficial do Google.
 - Modo Andreía, editor da jornada (Fase 4, passo 4, ADR-015): botão "Editar a jornada" no menu da
   conta admin leva a `#/jornada/editar`. Visão geral com os dias por semana e o estado de cada um, tema
   da semana, novo dia e ordem dos dias; editor de cada dia com blocos (ritual, pergunta, afirmação,

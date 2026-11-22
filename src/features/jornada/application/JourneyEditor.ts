@@ -28,6 +28,8 @@ export interface EditorState {
   isBusy: boolean
   /** Última mensagem para a Andreía ("Dia salvo", erro de conexão…). */
   message: string | null
+  /** Muda a cada mensagem nova, para o aviso reaparecer mesmo com o mesmo texto. */
+  messageSeq: number
 }
 
 export interface JourneyEditor {
@@ -42,6 +44,8 @@ export interface JourneyEditor {
   setWeekTheme(weekNumber: number, theme: string): Promise<void>
   publish(): Promise<void>
   restoreVersion(versionId: string): Promise<void>
+  /** Aviso curto vindo da tela (ex.: "Bloco removido"). */
+  notify(message: string): void
 }
 
 export function dayStatus(state: EditorState, dayNumber: number): DayStatus {
@@ -99,11 +103,13 @@ export function createJourneyEditor({
     versions: [],
     isBusy: false,
     message: null,
+    messageSeq: 0,
   }
   const listeners = new Set<() => void>()
 
   function set(patch: Partial<EditorState>) {
-    state = { ...state, ...patch }
+    const isNewMessage = typeof patch.message === 'string'
+    state = { ...state, ...patch, messageSeq: state.messageSeq + (isNewMessage ? 1 : 0) }
     listeners.forEach((listener) => listener())
   }
 
@@ -210,6 +216,10 @@ export function createJourneyEditor({
         set({ published: saved, versions })
         void content.refresh()
       }, 'Jornada publicada. As participantes já veem a versão nova.')
+    },
+
+    notify(message) {
+      set({ message })
     },
 
     async restoreVersion(versionId) {

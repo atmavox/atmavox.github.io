@@ -2,7 +2,7 @@ import { Lock } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
-import { JOURNEY_TABS, type JourneyTabId } from '../application/navigation'
+import { EDITOR_HREF, JOURNEY_TABS, type JourneyTabId } from '../application/navigation'
 import { isTabUnlocked } from '../application/tabAccess'
 import { tabProgress } from '../application/tabProgress'
 import { overallProgress } from '../domain/measures'
@@ -20,7 +20,7 @@ function stageColor(ratio: number): string {
  * (nenhuma fica cortada); no celular rolam para o lado e a aba atual se centraliza sozinha.
  */
 export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
-  const { journey, progress, access } = useJourney()
+  const { journey, progress, access, isAdmin } = useJourney()
   const overall = overallProgress(progress)
   const activeRef = useRef<HTMLAnchorElement>(null)
 
@@ -34,6 +34,16 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
 
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-bg/95 backdrop-blur">
+      {isAdmin && (
+        // A faixa azul do Modo Andreía: ela sabe que está vendo tudo aberto, e volta a editar num toque.
+        <div className="flex items-center gap-3 bg-admin px-4 py-1.5 text-sm text-on-admin md:px-8">
+          <span className="rounded-full bg-on-admin/16 px-2.5 py-0.5 text-xs">Modo Andreía</span>
+          <span className="hidden truncate sm:inline">você vê a jornada inteira, sem cadeados</span>
+          <a href={EDITOR_HREF} className="ml-auto font-semibold whitespace-nowrap hover:underline">
+            Editar a jornada →
+          </a>
+        </div>
+      )}
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 pt-2.5 md:px-8">
         <a
           href="#/"
