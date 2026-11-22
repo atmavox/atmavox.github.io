@@ -18,6 +18,7 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] Conteúdo dos 21 dias migrado, com os erros do original corrigidos (F2)
 - [x] Telas da jornada salvando no `localStorage`
 - [x] Abas com evolução (F3)
+- [x] Cabeçalho da jornada no computador (abas cortadas) e página "arrastando" para o lado no celular
 - [ ] Revisão visual no celular e validação dos textos com a Andreia (pendências em `features.md`, F2)
 
 ## Fase 2 · Hub 🔨 (código pronto; falta conteúdo e revisão visual)

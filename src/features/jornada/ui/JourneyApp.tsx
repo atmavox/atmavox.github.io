@@ -37,7 +37,7 @@ export function JourneyApp({ path }: { path: string }) {
   return (
     <div className="min-h-dvh">
       <JourneyHeader activeTab={tab} />
-      <main className="mx-auto max-w-2xl px-4 pb-16">
+      <main className="mx-auto max-w-2xl px-4 pb-16 lg:max-w-3xl">
         <TabContent tab={tab} />
       </main>
     </div>

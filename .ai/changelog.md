@@ -54,6 +54,9 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Cabeçalho da jornada em duas linhas: no computador as 7 abas dividem a largura toda (antes "Vitórias"
+  ficava cortada e "Encerramento" sumia), com barras e legendas maiores e o % geral da jornada; no celular
+  a aba atual se centraliza sozinha. Conteúdo um pouco mais largo no computador.
 - Áudio de boas-vindas tratado: sem o ruído de fundo ("crunchy"), silêncios totais nas pausas e voz
   nítida, com volume no padrão de podcast (−16 LUFS).
 - Tema claro ("Areia") é o padrão na primeira visita; quem já escolheu um tema continua nele.
@@ -87,6 +90,9 @@ versão com data.
 - `@grpc/grpc-js` (dependência do Firebase) forçado para `^1.14.7`: `npm audit` sem vulnerabilidades.
 
 ### Corrigido
+
+- No celular, a página da jornada "arrastava" para o lado: os textos só para leitor de tela das abas
+  (posição absoluta) escapavam da fileira de abas e alargavam a página para 625 px numa tela de 375 px.
 
 - Letras cirílicas no original: "Neutра" (dia 1) e "aprenди" (dia 3).
 - Semana II definida duas vezes no original: ficou a versão mais completa.
