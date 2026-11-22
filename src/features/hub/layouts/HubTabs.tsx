@@ -1,5 +1,7 @@
 import { CircleDot, Flame, Headphones, MessageCircle, type LucideIcon } from 'lucide-react'
 import { useEffect, useState, type ComponentType } from 'react'
+import { SITE } from '../../../shared/brand/site'
+import { BrandMark } from '../../../shared/ui/BrandMark'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
@@ -143,6 +145,7 @@ function ContatoPanel() {
       </a>
       <SocialLinks variant="list" />
       <p className="text-center font-display text-sm text-ink-faint italic">{signature}</p>
+      <p className="text-center text-xs text-ink-faint">Atmavox v{SITE.version}</p>
     </>
   )
 }
@@ -166,7 +169,8 @@ export function HubTabs({ activeTab }: { activeTab: HubTab }) {
     <div className="min-h-dvh pb-28">
       <header className="sticky top-0 z-20 bg-bg/95 backdrop-blur">
         <div className="flex items-center justify-between px-5 pt-3 pb-2">
-          <span className="font-display text-[0.95rem] tracking-[0.18em] text-gold uppercase">
+          <span className="flex items-center gap-2 font-display text-[0.95rem] tracking-[0.18em] text-gold uppercase">
+            <BrandMark className="w-[22px]" />
             Atmavox
           </span>
           <ThemeToggle />

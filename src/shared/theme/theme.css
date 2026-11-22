@@ -17,6 +17,9 @@
   --gold: #735214;
   --wine: #74283a;
   --gray-state: #625d57;
+  /* Cores da logo (iguais às do favicon): barras de fora e barra do centro. */
+  --logo: #8a6319;
+  --logo-center: #a5600f;
   --line: color-mix(in oklab, var(--text) 14%, transparent);
   /* Modo Andreía: azul-petróleo, para nunca confundir a edição com a jornada da participante. */
   --admin: #2f5d6e;
@@ -40,6 +43,8 @@
   --gold: #d8b25f;
   --wine: #6b2536;
   --gray-state: #9d958e;
+  --logo: #d8b25f;
+  --logo-center: #dc9530;
   --admin: #2f5d6e;
   /* Texto e ícones azuis sobre o fundo escuro precisam ser mais claros (contraste AA). */
   --admin-ink: #8cc0d0;
@@ -85,14 +90,14 @@
   }
 }
 
-/* O ponto do símbolo da marca "respira" (BrandRings). */
-@keyframes breathe {
+/* As barras do símbolo da marca "falam" devagar (BrandMark com `speaking`). */
+@keyframes speak {
   0%,
   100% {
-    transform: scale(1);
+    transform: scaleY(1);
   }
   50% {
-    transform: scale(1.12);
+    transform: scaleY(0.82);
   }
 }
 

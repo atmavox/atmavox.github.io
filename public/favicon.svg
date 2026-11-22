@@ -1,17 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <title>ATMAVOX</title>
-  <!-- Logo "Anéis nítidos": fundo transparente; tons mais escuros em fundo claro, mais claros em fundo escuro. -->
+  <!-- Logo "Forma de onda": fundo transparente; tons mais escuros em fundo claro, mais claros em fundo escuro. -->
   <style>
-    .outer { stroke: #8a6319; }
-    .inner { stroke: #a5600f; }
-    .core { fill: #a5600f; }
+    .side { stroke: #8a6319; }
+    .center { stroke: #a5600f; }
     @media (prefers-color-scheme: dark) {
-      .outer { stroke: #d8b25f; }
-      .inner { stroke: #dc9530; }
-      .core { fill: #dc9530; }
+      .side { stroke: #d8b25f; }
+      .center { stroke: #dc9530; }
     }
   </style>
-  <circle class="outer" cx="32" cy="32" r="26.5" fill="none" stroke-width="4"/>
-  <circle class="inner" cx="32" cy="32" r="16.5" fill="none" stroke-width="4.5"/>
-  <circle class="core" cx="32" cy="32" r="7.5"/>
+  <g fill="none" stroke-linecap="round" stroke-width="6">
+    <path class="side" d="M12 27V37M22 19V45M42 19V45M52 27V37"/>
+    <path class="center" d="M32 9V55"/>
+  </g>
 </svg>

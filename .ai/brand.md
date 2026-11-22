@@ -9,17 +9,31 @@ sem fotos genéricas de banco de imagens.
 Elementos recorrentes: o **símbolo** (abaixo), uma **chama** estilizada (encerramento da jornada) e o ✦, que
 marca conclusão.
 
-### Símbolo / logo ("Anéis nítidos", escolhido em 2026-11-21)
+### Símbolo / logo ("Forma de onda", escolhido em 2026-11-22)
 
-Dois anéis concêntricos com traço grosso (externo dourado, interno âmbar) e um ponto âmbar no centro,
-**sem fundo**. Substituiu a versão com fundo preto e linhas finas, difícil de ler em tamanhos pequenos.
+Cinco barras de áudio arredondadas, **simétricas em torno de uma linha central** (como a voz num gravador),
+sem fundo: as quatro de fora em dourado, a do centro, mais alta, em âmbar. Representa a voz ("vox").
+Substituiu os "Anéis nítidos" (2026-11-21), que pareciam um alvo.
 
+- Escolhida pela cliente entre oito rodadas de mocks, todas guardadas em `Downloads/atmavox-icones.html`
+  (opção v3 · 06). O que ela recusou: formas de fogo, linhas em diagonal (parecem gráfico financeiro),
+  barras apoiadas numa base e qualquer coisa que lembre wifi.
 - Arquivo: `public/favicon.svg` (também usado no README). No fundo claro usa tons mais escuros; no escuro,
   mais claros (`prefers-color-scheme` dentro do SVG).
-- No site: `shared/ui/BrandRings.tsx`, com as cores do tema; o ponto "respira" devagar (parado com
-  movimento reduzido).
-- Proporções (viewBox 64): anel externo r 26,5 / traço 4; anel interno r 16,5 / traço 4,5; ponto r 7,5.
+- No site: `shared/ui/BrandMark.tsx`, com os tokens `--logo` (barras de fora) e `--logo-center` (centro),
+  iguais às cores do favicon. Com `speaking`, cada barra "fala" bem devagar (ciclo de 8 s, ritmos
+  diferentes; parada com movimento reduzido).
+- Onde aparece (mock aprovado em 2026-11-22, `Downloads/atmavox-hub-logo-fundo.html`):
+  - **Hub no computador:** grande (760 px) e 25% visível no fundo do topo, cortada pela borda esquerda,
+    atrás da pergunta, falando. Não há mais logo pequena acima de "Consciência · presença · expansão".
+  - **Hub no celular:** pequena (22 px), parada e nas cores normais, ao lado de "ATMAVOX" no cabeçalho.
+    Sem logo no fundo.
+  - **Capa da jornada:** grande, falando. **"Sobre" sem foto:** parada.
+- Proporções (viewBox 64): barras com traço 6 e ponta redonda em x 12, 22, 32, 42, 52; meias-alturas 5, 13,
+  23, 13, 5 em torno de y 32.
 - Junto do nome: "ATMAVOX" em Playfair Display, caixa alta, espaçamento ~0,2em, em dourado.
+- Em estudo: paleta "Sombra/Estado Cinza/Luz/Pérola" tirada do briefing de marca de 10/2026 (v8 no arquivo
+  de ícones). A cliente manteve a paleta atual por enquanto.
 
 ## Paleta (tokens)
 

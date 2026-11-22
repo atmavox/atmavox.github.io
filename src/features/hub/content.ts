@@ -154,7 +154,7 @@ export const portrait = {
 export const about = {
   name: BRAND_PERSON,
   role: 'Ativadora de consciência e possibilidades.',
-  /** Sem foto, os anéis da marca ocupam o lugar. */
+  /** Sem foto, o símbolo da marca ocupa o lugar. */
   photoSrc: '/images/andreia-600.webp' as string | undefined,
   text: undefined as string | undefined,
 }

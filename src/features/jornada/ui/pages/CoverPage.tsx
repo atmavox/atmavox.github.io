@@ -1,4 +1,4 @@
-import { BrandRings } from '../../../../shared/ui/BrandRings'
+import { BrandMark } from '../../../../shared/ui/BrandMark'
 import { RichText } from '../../../../shared/ui/RichText'
 import { JOURNEY_TABS } from '../../application/navigation'
 import { furthestUnlockedTab } from '../../application/tabAccess'
@@ -11,7 +11,7 @@ import { useJourney } from '../useJourney'
 export function CoverPage() {
   return (
     <div className="flex flex-col items-center gap-8 py-8 text-center">
-      <BrandRings className="w-32" />
+      <BrandMark speaking className="w-32" />
 
       <header>
         <p className="mb-4 text-xs font-medium tracking-[0.3em] text-accent uppercase">

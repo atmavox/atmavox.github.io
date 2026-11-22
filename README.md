@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/favicon.svg" alt="Símbolo da ATMAVOX: dois anéis e um ponto âmbar no centro" width="96" height="96">
+<img src="public/favicon.svg" alt="Símbolo da ATMAVOX: cinco barras de áudio, a do centro em âmbar" width="96" height="96">
 
 # ATMAVOX
 

@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
+import { SITE } from '../../../shared/brand/site'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
-import { BrandRings } from '../../../shared/ui/BrandRings'
+import { BrandMark } from '../../../shared/ui/BrandMark'
 import { AboutAndreia } from '../components/AboutAndreia'
 import { AudioItem } from '../components/AudioItem'
 import { EncounterCard } from '../components/EncounterCard'
@@ -65,14 +66,16 @@ export function HubMagazine({ section }: { section: HubSection }) {
       <main>
         <section
           id="ouvir"
-          className="scroll-mt-32 bg-[radial-gradient(120%_80%_at_30%_20%,color-mix(in_oklab,var(--accent)_20%,transparent),transparent_60%)]"
+          className="relative scroll-mt-32 overflow-hidden bg-[radial-gradient(120%_80%_at_30%_20%,color-mix(in_oklab,var(--accent)_20%,transparent),transparent_60%)]"
         >
+          {/* Logo grande e transparente, cortada pela borda esquerda, atrás da pergunta (mock aprovado). */}
+          <div className="pointer-events-none absolute top-1/2 -left-[260px] w-[760px] -translate-y-1/2 opacity-25">
+            <BrandMark speaking className="w-full" />
+          </div>
           <div
-            className={`${wrap} grid items-center gap-12 py-16 lg:min-h-[34rem] lg:grid-cols-[1.4fr_1fr] lg:gap-16 lg:py-24`}
+            className={`${wrap} relative grid items-center gap-12 py-16 lg:min-h-[34rem] lg:grid-cols-[1.4fr_1fr] lg:gap-16 lg:py-24`}
           >
             <div className="flex flex-col gap-6">
-              {/* O símbolo fica em cima do texto, nunca por trás de outro bloco. */}
-              <BrandRings className="w-16 lg:w-20" />
               <p className="text-xs font-medium tracking-[0.3em] text-accent uppercase">
                 Consciência · presença · expansão
               </p>
@@ -178,7 +181,12 @@ export function HubMagazine({ section }: { section: HubSection }) {
           className={`${wrap} flex flex-col gap-2 py-8 md:flex-row md:items-center md:justify-between`}
         >
           <p className="font-display text-sm text-ink-faint italic">{signature}</p>
-          <p className="font-display text-sm tracking-[0.18em] text-ink-faint uppercase">Atmavox</p>
+          <p className="font-display text-sm tracking-[0.18em] text-ink-faint uppercase">
+            Atmavox{' '}
+            <span className="ml-2 font-sans text-xs tracking-normal normal-case">
+              v{SITE.version}
+            </span>
+          </p>
         </div>
       </footer>
     </div>

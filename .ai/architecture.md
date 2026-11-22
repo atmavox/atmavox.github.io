@@ -32,7 +32,7 @@ src/
   shared/
     brand/                links da marca (redes, áudio, WhatsApp) e assinatura
     theme/                tokens CSS, useTheme, botão de tema
-    ui/                   componentes genéricos (BrandRings, RichText)
+    ui/                   componentes genéricos (BrandMark, RichText)
     lib/                  utilitários sem regra de negócio (whatsapp, inlineMarkup, useHashRoute, useMediaQuery)
     media/                player de áudio único + MiniPlayer + YouTubeFacade (ADR-011) + mediaLinks
 ```
