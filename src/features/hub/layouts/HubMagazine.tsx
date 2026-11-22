@@ -70,6 +70,8 @@ export function HubMagazine({ section }: { section: HubSection }) {
             className={`${wrap} grid items-center gap-12 py-16 lg:min-h-[34rem] lg:grid-cols-[1.4fr_1fr] lg:gap-16 lg:py-24`}
           >
             <div className="flex flex-col gap-6">
+              {/* O símbolo fica em cima do texto, nunca por trás de outro bloco. */}
+              <BrandRings className="w-16 lg:w-20" />
               <p className="text-xs font-medium tracking-[0.3em] text-accent uppercase">
                 Consciência · presença · expansão
               </p>
@@ -78,8 +80,7 @@ export function HubMagazine({ section }: { section: HubSection }) {
               </h1>
               <p className="max-w-xl text-lg leading-relaxed text-ink-muted">{hero.intro}</p>
             </div>
-            <div className="relative flex flex-col gap-4">
-              <BrandRings className="pointer-events-none absolute -top-24 -right-10 hidden w-56 opacity-60 lg:block" />
+            <div className="flex flex-col gap-4">
               <AudioItem item={introAudio} variant="card" eyebrow="Comece aqui" />
               {otherAudios.length > 0 && (
                 <ul className="flex flex-col rounded-2xl border border-line bg-surface px-5">
