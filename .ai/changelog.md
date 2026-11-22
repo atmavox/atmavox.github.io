@@ -54,6 +54,8 @@ versão com data.
   `firestore.rules`, `.env.example` e variáveis do Firebase no deploy.
 - Logo nova "Anéis nítidos": fundo transparente, anéis grossos e ponto âmbar maior; o favicon se adapta ao
   navegador claro ou escuro, e os anéis do site seguem o mesmo desenho.
+- Áudio de boas-vindas tratado: sem o ruído de fundo ("crunchy"), silêncios totais nas pausas e voz
+  nítida, com volume no padrão de podcast (−16 LUFS).
 - Tema claro ("Areia") é o padrão na primeira visita; quem já escolheu um tema continua nele.
 - Retrato da Andreía (a foto do Keepo, em WebP de 13 e 33 kB) no início do hub, junto da mensagem "Um
   espaço para perceber, questionar e experimentar. Com Andreía Oliveirà.", e como foto redonda em "Sobre".

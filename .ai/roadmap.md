@@ -34,8 +34,8 @@ Ordem sugerida. Cada etapa termina com `npm run check` passando e um commit.
 - [x] README no estilo do Tabi
 - [x] Retrato da Andreía (foto do Keepo) no início do hub e na seção "Sobre"
 - [x] Tema claro como padrão na primeira visita
-- [ ] Limpar o ruído do áudio de boas-vindas: 3 versões geradas (leve, média, forte) em Downloads;
-      falta escolher uma para substituir no site
+- [x] Limpar o ruído do áudio de boas-vindas (versão 6 "só voz": silêncios totais, voz nítida; receita
+      em `features.md`, F1 → Mídia)
 - [ ] Revisar o hub no celular e no computador de verdade (visual) e ajustar
 - [ ] Receber da Andreía: horários dos encontros, título do áudio de boas-vindas, texto curto, links
       de Threads/Telegram (TikTok @atmavox ✅, áudio de boas-vindas ✅, foto ✅)

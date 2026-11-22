@@ -31,6 +31,15 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
   ou ir para a jornada. O cartão "Comece aqui" é só áudio: **vídeos não entram
   na tela inicial** (pedido do cliente; eles ficam para a jornada). Um item de "Ouvir" sem arquivo ainda
   pode abrir o YouTube como alternativa.
+- **Tratamento dos áudios** (feito no computador com ffmpeg, antes de entrar em `public/audio/`; o do
+  áudio de boas-vindas foi escolhido de ouvido entre 7 versões). Em etapas separadas, porque o `arnndn` do
+  ffmpeg 9.1 trava quando encadeado com outros filtros:
+  1. `highpass=f=140:poles=2` (duas vezes), `adeclick`, e `afftdn` com perfil de ruído aprendido no
+     silêncio do início (`asendcmd ... afftdn sn start/stop`, `nr=24`), saída em WAV 48 kHz;
+  2. `arnndn` (RNNoise, modelo `sh` de GregorR/rnnoise-models, `mix=1`);
+  3. `agate` nas pausas (limiar −55 dBFS), realce de presença (+3 dB em 3,5 kHz e agudos +3 dB) e
+     `loudnorm=I=-16:TP=-1.5:LRA=11`; AAC 96 kbps mono.
+     Resultado medido: silêncios em −121 dB e pausas 23 dB mais baixas que o original, sem perder nitidez.
 - Vídeos do YouTube como **fachada**: só a miniatura carrega; o player (`youtube-nocookie.com`) entra
   quando a pessoa toca.
 
