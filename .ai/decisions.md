@@ -194,6 +194,34 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ cada área começa em silêncio; continua um `<audio>` só. ➖ quem quiser ouvir o
   áudio da página inicial enquanto faz a jornada não consegue (não é um uso esperado).
 
+## ADR-017 · Versão do site no `site.json`
+
+- **Status:** aceita · 2026-11-22
+- **Contexto:** o cliente quer saber qual versão do site está no ar e controlar quando ela muda.
+- **Decisão:** `site.json` na raiz guarda `site`, `client` e `version` (SemVer). O site lê o arquivo por
+  `shared/brand/site.ts`, que valida o formato, e mostra a versão no rodapé. O `package.json` repete a
+  mesma versão, e um teste garante que as duas não se separam. **Major** e **minor** sobem só quando o
+  desenvolvedor pede; **patch** o Claude sobe a cada correção ou ajuste pequeno.
+- **Alternativas consideradas:** só o `package.json` (o cliente pediu um arquivo com o nome do site e do
+  cliente); injetar a versão no build pelo Vite (mais uma configuração sem ganho real).
+- **Consequências:** ➕ versão visível e conferida por teste. ➖ duas cópias do número (protegidas pelo
+  teste).
+
+## ADR-018 · PWA só com manifest, sem service worker (por enquanto)
+
+- **Status:** aceita · 2026-11-22
+- **Contexto:** ao "baixar" o site no celular, ele abria com a barra do navegador e a barra de botões
+  branca: sem manifest, o Android cria só um atalho para uma página do navegador.
+- **Decisão:** `public/manifest.webmanifest` com `display: standalone` e cores Areia, ícones PNG gerados por
+  `scripts/generate-pwa-icons.ps1` (System.Drawing, sem dependência nova) e as metatags da Apple no
+  `index.html`. Sem service worker e sem plugin (ex.: `vite-plugin-pwa`).
+- **Alternativas consideradas:** `vite-plugin-pwa` com Workbox (resolve o uso offline, mas um service
+  worker mal configurado pode servir versões velhas do site depois de cada deploy; fica para quando o
+  offline for prioridade, item "PWA offline" do roadmap); gerar os ícones com `sharp` (mais uma dependência
+  para um trabalho feito uma vez).
+- **Consequências:** ➕ app instalável e sem barra do navegador, sem risco de cache velho, zero dependências.
+  ➖ não funciona offline; o script de ícones só roda no Windows.
+
 ---
 
 ## Modelo

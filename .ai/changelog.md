@@ -5,13 +5,35 @@ Todas as mudanças relevantes do projeto. Formato baseado em
 [SemVer](https://semver.org/lang/pt-BR/).
 
 Categorias: **Adicionado**, **Alterado**, **Corrigido**, **Removido**, **Segurança**.
-Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Ao publicar, a seção vira uma
-versão com data.
+Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Quando a versão do
+`site.json` sobe, a seção vira essa versão, com data (regras de versão em `conventions.md`).
 
 ## [Não lançado]
 
 ### Adicionado
 
+- App na tela inicial (PWA, F8): `manifest.webmanifest` com abertura sem a barra do navegador e cores
+  Areia, ícones 192/512/maskable/Apple gerados por `scripts/generate-pwa-icons.ps1`, metatags da Apple e
+  teste do manifest (ADR-018).
+
+### Alterado
+
+- Logo nova "Forma de onda": cinco barras de áudio simétricas, a do centro em âmbar e "falando" devagar.
+  Substitui os "Anéis nítidos", que pareciam um alvo. Vale para o favicon, o hub, a capa da jornada e o
+  README (`shared/ui/BrandMark.tsx`, que substitui o `BrandRings.tsx`).
+- Hub no computador: a logo pequena acima do título saiu; no lugar, a logo grande e transparente (25%)
+  no fundo do topo, cortada pela borda esquerda, com as barras "falando" bem devagar.
+- Hub no celular: logo pequena e parada ao lado de "ATMAVOX" no cabeçalho.
+- Logo com tokens próprios (`--logo`, `--logo-center`), iguais às cores do favicon.
+
+## [1.0.0] · 2026-11-22
+
+Primeira versão numerada: tudo o que foi feito até o site entrar no ar.
+
+### Adicionado
+
+- Controle de versão do site: `site.json` (site, cliente e versão) mostrado no rodapé do hub; o
+  `package.json` acompanha (ADR-017).
 - Repositório `atmavox/atmavox.github.io` criado na organização `atmavox`.
 - `CLAUDE.md` e pasta `.ai/` com propósito, convenções, stack, arquitetura, marca, glossário, features,
   decisões, roadmap e changelog.

@@ -95,11 +95,39 @@ Pendências:
 - [x] Progresso antigo respeitado; `bypass` pronto para a admin (Fase 4)
 - [ ] Ver no celular de verdade com a Andreía se o ritmo "uma etapa por vez" ficou bom
 
+## Fase 5 · Versão, marca, PWA e jornadas como produto 🔨 (pedido de 2026-11-22)
+
+Ordem aprovada; cada etapa pode virar uma versão minor quando o desenvolvedor pedir. Telas novas e logo passam por mocks com várias opções,
+aprovados antes do código.
+
+1. [x] Controle de versão: `site.json` + versão no rodapé (ADR-017) — 1.0.0
+2. [x] Logo nova: "Forma de onda" (v3 · 06), escolhida após 8 rodadas de mocks em
+       `Downloads/atmavox-icones.html`; aplicada no favicon, hub, capa da jornada e README
+3. [x] PWA: manifest (`standalone`, ícones, cores Areia) para abrir sem a barra do navegador (F8,
+       ADR-018)
+   - [ ] Conferir no celular depois do deploy: sem barra de endereço, barra do topo Areia/Sépia, cor da
+         barra de botões do Android; remover o atalho antigo e instalar de novo
+4. [ ] "Começar jornada" com mais destaque na página inicial
+5. [ ] Hub de jornadas (`#/jornadas`) com banner, nome, frase e temas; jornada só com login (mocks antes;
+       muda o `purpose.md`, com ADR)
+6. [ ] Modo Andreía: criar jornadas (estrutura por dias, dias + semanas ou temas; grátis/paga, preço,
+       validade do acesso, banner, frase, temas)
+7. [ ] Pagamento por jornada sem custo fixo (decidir: Mercado Pago + Worker gratuito ou liberação manual);
+       conteúdo pago sai do código do site e fica só na nuvem
+
+Surgiu no caminho:
+
+- [ ] Avaliar com a cliente a paleta do briefing de marca 10/2026 (Sombra/Estado Cinza/Luz/Pérola, v8 em
+      `Downloads/atmavox-icones.html`); por enquanto ela manteve Areia/Sépia
+- [ ] Alinhar os nomes dos produtos ao briefing antes do hub de jornadas: lá "Saindo do Estado Cinza"
+      (jornada em áudio) e "A Chama Interna" (21 dias, futura) são produtos diferentes; o briefing também
+      pede não anunciar como disponível o que não está pronto
+
 ## Depois
 
 - [ ] Validar textos e experiência com a Andreia e com 2 ou 3 pessoas reais
 - [ ] Exportar "meu diário dos 21 dias" em PDF
-- [ ] PWA: instalar na tela inicial e usar offline
+- [ ] PWA offline (service worker; instalar já funciona desde a Fase 5, ADR-018)
 - [ ] Lembrete diário
 - [ ] Política de privacidade (o site guarda reflexões pessoais)
 - [ ] Jornada "Ritual Matinal — 7 dias" reaproveitando a mesma base

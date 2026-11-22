@@ -1,0 +1,23 @@
+{
+  "name": "ATMAVOX",
+  "short_name": "ATMAVOX",
+  "description": "Consciência, presença e expansão. Áudios, encontros e jornadas com Andreía Oliveirà.",
+  "lang": "pt-BR",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ebe2d4",
+  "theme_color": "#ebe2d4",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

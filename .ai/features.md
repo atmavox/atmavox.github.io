@@ -213,6 +213,32 @@ rodam só a checagem.
 
 ---
 
+## F8 · App na tela inicial (PWA) 🔨 (no código; falta conferir no celular depois do deploy)
+
+**Objetivo:** quem toca em "Instalar app" / "Adicionar à tela inicial" ganha um ícone da ATMAVOX que abre
+como aplicativo, **sem a barra do navegador**, nas cores do site.
+
+**Regras:**
+
+- `public/manifest.webmanifest`: `display: standalone`, `start_url` e `scope` em `/`, nome "ATMAVOX".
+- Fundo da tela de abertura e barra do sistema na cor Areia (`#ebe2d4`, a mesma do `theme-color`). No tema
+  escuro, o `useTheme` troca o `theme-color` para Sépia em tempo real, e o app instalado acompanha.
+- Ícones em `public/icons/`: 192 e 512 px (logo grande), `maskable` de 512 px (logo dentro da zona segura,
+  para o Android recortar em círculo, gota etc.) e `apple-touch-icon` de 180 px para o iPhone.
+- Os PNGs saem de `scripts/generate-pwa-icons.ps1` (Windows), com as mesmas medidas e cores da logo. Só
+  precisa rodar de novo se a logo ou as cores mudarem.
+- Sem service worker por enquanto (ADR-018): o app instalado precisa de internet, como o site.
+
+**Aceite:** no Android (Chrome), "Instalar app" cria o ícone; ao abrir, não aparece a barra de endereço e a
+barra do topo fica Areia (ou Sépia no tema escuro). No iPhone (Safari → Compartilhar → "Adicionar à Tela de
+Início"), o ícone aparece e abre sem a barra do Safari. Quem tinha instalado o atalho antigo precisa
+removê-lo e instalar de novo.
+
+**Ponto em aberto:** a cor da barra de botões do Android (voltar, apps abertos, início) é decidida pelo
+sistema e pelo Chrome; o manifest não tem um campo só para ela. Conferir no aparelho depois do deploy.
+
+---
+
 ## F7 · Modo Andreía (editar a jornada) ✅
 
 **Objetivo:** a Andreía edita a jornada sozinha, com bastante liberdade, sem desenvolvedor e sem custo.
