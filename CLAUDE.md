@@ -48,6 +48,9 @@ Os demais arquivos da `.ai/` devem ser lidos **sob demanda**, conforme a tarefa 
    `switch`, `reset`, `restore`, `rebase`, `merge`, `stash`, `tag`, `clean`) **sem que eu peça
    explicitamente na mensagem atual.** Leitura (`status`, `diff`, `log`, `show`) é permitida. Ao terminar
    uma tarefa, **sugira** a mensagem de commit, sem executar.
+   **Exceção autorizada (2026-11-22):** quando eu respondo a um "Commit sugerido" com "pode seguir para o
+   próximo passo" (ou equivalente), isso autoriza fazer **commit e push** do passo terminado antes de
+   começar o próximo. Só `add`, `commit` e `push` na `main`; nada de `reset`, `rebase`, `push --force` etc.
 2. **Custo zero:** nada de serviços, planos ou dependências pagas. Firebase só no plano gratuito (Spark).
 3. **O conteúdo é da Andreia:** não reescreva textos terapêuticos (rituais, afirmações, perguntas,
    manifesto). Corrija só erros evidentes de digitação e pergunte antes de mudar o sentido. A fonte original
