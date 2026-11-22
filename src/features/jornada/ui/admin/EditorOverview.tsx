@@ -163,7 +163,7 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
                     </button>
                   </span>
                   <span className="flex-1 text-sm leading-snug text-ink">{day.title}</span>
-                  <StatusTag status={status} />
+                  <StatusTag status={status} className="self-start" />
                   <button
                     type="button"
                     onClick={() => onOpenDay(day.number)}

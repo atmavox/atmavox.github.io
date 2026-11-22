@@ -6,12 +6,19 @@ const TEXT: Record<DayStatus, { short: string; long: string }> = {
   published: { short: 'Salvo', long: 'Salvo' },
 }
 
+interface StatusTagProps {
+  status: DayStatus
+  long?: boolean
+  /** Alinhamento vem de quem usa (no cartão do quadro, `self-start` para não esticar). */
+  className?: string
+}
+
 /** Etiqueta com bolinha: laranja para rascunho, verde para salvo (como no protótipo). */
-export function StatusTag({ status, long }: { status: DayStatus; long?: boolean }) {
+export function StatusTag({ status, long, className = '' }: StatusTagProps) {
   const color = status === 'draft' ? 'bg-draft/10 text-draft' : 'bg-ok/12 text-ok'
   return (
     <span
-      className={`inline-flex items-center gap-1.5 self-start rounded-full px-2.5 py-0.5 text-xs font-medium ${color}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${color} ${className}`}
     >
       <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
       {long ? TEXT[status].long : TEXT[status].short}
