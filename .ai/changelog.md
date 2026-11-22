@@ -82,3 +82,5 @@ versão com data.
 - Versão do Node na documentação: de 22 para 24 LTS.
 - ESLint de 10 para 9, por compatibilidade com o jsx-a11y (ADR-008).
 - Tokens `text-faint`, `gray-state`, `accent` e `gold` ajustados para contraste AA (ver `brand.md`).
+- Paleta nova: escuro "Sépia" e claro "Areia" (o claro anterior, quase branco, ofuscava). Favicon e
+  `theme-color` acompanham.

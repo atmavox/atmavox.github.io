@@ -3,36 +3,36 @@
 @import '@fontsource-variable/playfair-display';
 @import '@fontsource-variable/playfair-display/wght-italic.css';
 
-/* Paleta da marca (.ai/brand.md). O escuro é o padrão; o claro entra por data-theme="light". */
+/* Paleta da marca (.ai/brand.md): escuro "Sépia" (padrão) e claro "Areia" (data-theme="light"). */
 :root {
   color-scheme: dark;
-  --bg: #1b1714;
-  --surface: #25201c;
-  --surface-2: #2e2823;
-  --field: #1f1b18;
-  --text: #f5efe6;
-  --text-muted: #cbbfb1;
-  --text-faint: #9a9186;
-  --accent: #d9922b;
-  --gold: #d9b261;
+  --bg: #211a14;
+  --surface: #2c231b;
+  --surface-2: #362c22;
+  --field: #261e17;
+  --text: #f3e9dc;
+  --text-muted: #cdbca6;
+  --text-faint: #a39580;
+  --accent: #dc9530;
+  --gold: #d8b25f;
   --wine: #6b2536;
-  --gray-state: #96918b;
+  --gray-state: #9d958e;
   --line: color-mix(in oklab, var(--text) 14%, transparent);
 }
 
 :root[data-theme='light'] {
   color-scheme: light;
-  --bg: #f6f0e7;
-  --surface: #fffcf7;
-  --surface-2: #f1e8db;
-  --field: #fbf7f1;
+  --bg: #ebe2d4;
+  --surface: #f2eadf;
+  --surface-2: #e3d8c7;
+  --field: #f5eee4;
   --text: #2a231d;
-  --text-muted: #5c5046;
-  --text-faint: #71665b;
-  --accent: #96590e;
-  --gold: #876119;
-  --wine: #7a2a3d;
-  --gray-state: #6d6760;
+  --text-muted: #54483e;
+  --text-faint: #665a4e;
+  --accent: #8a510b;
+  --gold: #735214;
+  --wine: #74283a;
+  --gray-state: #625d57;
 }
 
 /* `inline` faz as classes apontarem para as variáveis, então trocar o tema não exige recompilar. */

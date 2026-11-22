@@ -11,30 +11,33 @@ Elementos recorrentes: **três anéis concêntricos** girando devagar com um pon
 
 ## Paleta (tokens)
 
+Escuro **"Sépia"** (padrão) e claro **"Areia"**, escolhidos em 2026-11-21 entre 5 opções de cada, num
+protótipo com contraste medido (o claro anterior, quase branco, ofuscava).
+
 | Token          | Escuro    | Claro     | Uso                                |
 | -------------- | --------- | --------- | ---------------------------------- |
-| `--bg`         | `#1b1714` | `#f6f0e7` | fundo                              |
-| `--surface`    | `#25201c` | `#fffcf7` | cartões                            |
-| `--surface-2`  | `#2e2823` | `#f1e8db` | hover, áreas secundárias           |
-| `--field`      | `#1f1b18` | `#fbf7f1` | campos de texto                    |
-| `--text`       | `#f5efe6` | `#2a231d` | texto principal                    |
-| `--text-muted` | `#cbbfb1` | `#5c5046` | texto secundário                   |
-| `--text-faint` | `#9a9186` | `#71665b` | dicas, legendas                    |
-| `--accent`     | `#d9922b` | `#96590e` | âmbar: ações, destaque, progresso  |
-| `--gold`       | `#d9b261` | `#876119` | dourado: afirmações, logo          |
-| `--wine`       | `#6b2536` | `#7a2a3d` | vinho: profundidade (rituais, CTA) |
-| `--gray-state` | `#96918b` | `#6d6760` | o "cinza" de onde as abas partem   |
+| `--bg`         | `#211a14` | `#ebe2d4` | fundo                              |
+| `--surface`    | `#2c231b` | `#f2eadf` | cartões                            |
+| `--surface-2`  | `#362c22` | `#e3d8c7` | hover, áreas secundárias           |
+| `--field`      | `#261e17` | `#f5eee4` | campos de texto                    |
+| `--text`       | `#f3e9dc` | `#2a231d` | texto principal                    |
+| `--text-muted` | `#cdbca6` | `#54483e` | texto secundário                   |
+| `--text-faint` | `#a39580` | `#665a4e` | dicas, legendas                    |
+| `--accent`     | `#dc9530` | `#8a510b` | âmbar: ações, destaque, progresso  |
+| `--gold`       | `#d8b25f` | `#735214` | dourado: afirmações, logo          |
+| `--wine`       | `#6b2536` | `#74283a` | vinho: profundidade (rituais, CTA) |
+| `--gray-state` | `#9d958e` | `#625d57` | o "cinza" de onde as abas partem   |
 | `--line`       | texto 14% | texto 14% | bordas e divisórias                |
 
 - Classes do Tailwind (em `src/shared/theme/theme.css`): `bg`, `surface`, `surface-2`, `field`, `ink`
   (`--text`), `ink-muted`, `ink-faint`, `accent`, `gold`, `wine`, `gray-state`, `line`. Ex.: `bg-surface`,
   `text-ink-muted`, `border-line`. Fontes: `font-sans` (Jost) e `font-display` (Playfair Display).
-- O **escuro** é mais claro que o original (`#0A0A0A` → `#1b1714`, um marrom quente), por pedido da Andreia.
+- O **escuro** é mais claro que o original (`#0A0A0A` → `#211a14`, um marrom-sépia), por pedido da
+  Andreía.
 - No **claro**, o âmbar escurece para manter contraste AA em textos pequenos.
 - Contraste medido em 2026-11-21: todo texto tem **≥ 4,5:1** sobre `bg`, `surface` e `surface-2` nos dois
-  temas. Para chegar lá, `text-faint`, `gray-state` (escuro e claro), `accent` e `gold` (claro) foram
-  ajustados o mínimo possível em relação à paleta proposta (antes: `#8e8377`/`#8a7c6f`, `#6f6860`/`#a59c92`,
-  `#a1600f`, `#8a6319`). **Pendente:** aprovação visual da Andreia.
+  temas (pior par: 4,6:1), e o texto dos botões sobre `accent` também.
+- Histórico: a primeira paleta era escuro `#1b1714` / claro `#f6f0e7` (cartões `#fffcf7`).
 - Paleta original do HTML, para referência: preto `#0A0A0A`, âmbar `#C9831A`, branco quente `#F5EFE6`,
   cinza névoa `#2C2C2C`, dourado `#D4A853`, vinho `#5C1F2E`, nude `#C4A882`.
 
