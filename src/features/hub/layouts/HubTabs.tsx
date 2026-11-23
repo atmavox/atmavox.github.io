@@ -15,6 +15,7 @@ import { AboutAndreia } from '../components/AboutAndreia'
 import { AudioItem } from '../components/AudioItem'
 import { CardRow } from '../components/CardRow'
 import { EncountersBand } from '../components/EncountersBand'
+import { JourneysHub } from '../components/JourneysHub'
 import { MeditationCover } from '../components/MeditationCover'
 import { PhraseBand } from '../components/PhraseBand'
 import { Portrait } from '../components/Portrait'
@@ -23,11 +24,9 @@ import { SocialLinks } from '../components/SocialLinks'
 import { Testimonials } from '../components/Testimonials'
 import {
   about,
-  allJourneys,
   contactCta,
   hero,
   introAudio,
-  journeysIntro,
   listenItems,
   meditationsIntro,
   showcaseJourneys,
@@ -177,21 +176,7 @@ function MeditacoesPanel() {
 }
 
 function JornadasPanel() {
-  return (
-    <>
-      <header>
-        <h1 className="font-display text-3xl text-ink">Jornadas</h1>
-        <p className="mt-1 text-ink-muted">{journeysIntro.title}</p>
-      </header>
-      <ul className="flex flex-col gap-4">
-        {allJourneys.map((journey) => (
-          <li key={journey.id}>
-            <ShowcaseJourneyCard journey={journey} size="full" />
-          </li>
-        ))}
-      </ul>
-    </>
-  )
+  return <JourneysHub layout="narrow" />
 }
 
 function ContatoPanel() {

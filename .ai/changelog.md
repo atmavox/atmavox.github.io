@@ -21,13 +21,18 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
   Centro"; faixa dos encontros levando ao TikTok; frase da marca com a logo falando atrás; redes
   sociais; A Ativadora com as práticas e o botão "Ativação individual". Fileiras sem barra de rolagem:
   setas no computador (só quando sobra cartão), deslizar e pontinhos no celular.
-- "Quem já viveu" pronto para depoimentos reais (carrossel com mais de um); fica escondido enquanto não
+- Hub de jornadas (`#/jornadas`, F9): visão expandida (cartões largos por território) e compacta (uma
+  linha por jornada), com a escolha lembrada no aparelho; filtros abertos por padrão e recolhíveis
+  (busca sem acento por nome, frase, território ou tema; territórios com contagem; disponíveis ou em
+  breve; duração); "Limpar filtros" quando nada aparece. No celular, compacta por padrão, filtros que
+  deslizam e botão "Filtros". Sem login, as pagas mostram "Pago" e nenhum preço.- "Quem já viveu" pronto para depoimentos reais (carrossel com mais de um); fica escondido enquanto não
   houver nenhum.
 
 ### Alterado
 
 - Celular: abas Início · Jornadas · Meditações · Contato ("Ouvir" virou "Meditações"; `#/ouvir` continua
-  funcionando). Computador: menu Início, Jornadas, Meditações, Encontros, Sobre, Contato.
+  funcionando). Computador: menu Início, Jornadas, Meditações, Encontros, Sobre, Contato; "Jornadas"
+  abre o hub numa página própria, e "Conhecer" nos cartões da vitrine leva a ele.
 - Encontros sem horário: a faixa diz que acontecem como quadro ao vivo no TikTok e leva para lá (antes,
   "Horários no Instagram").
 - Propósito do site: a página inicial vira vitrine, nascem os hubs de jornadas e de meditações, e

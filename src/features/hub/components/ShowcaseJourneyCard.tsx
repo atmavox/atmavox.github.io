@@ -5,8 +5,8 @@ import { notifyMeHref } from '../content'
 import { TONE_BY_TERRITORY } from './bannerTones'
 import { ProductBanner } from './ProductBanner'
 
-/** Até existirem as rotas por jornada (Etapa D, passo 4), "Conhecer" abre a jornada de 21 dias. */
-const JOURNEY_HREF = '#/jornada'
+/** "Conhecer" leva ao hub de jornadas (F9); é lá que a pessoa começa (com login, a partir do passo 4). */
+const JOURNEY_HREF = '#/jornadas'
 
 const WIDTH = { wide: 'w-[340px]', narrow: 'w-[290px]', full: 'w-full' } as const
 

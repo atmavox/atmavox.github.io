@@ -18,7 +18,7 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
     cartão "Comece aqui" (áudio de boas-vindas, 48 s); fileiras de jornadas e de meditações (deslizar
     com o dedo, pontinhos); faixa dos encontros (TikTok); frase da marca com "Ver as jornadas";
     "Quem já viveu" (só com depoimento real); redes sociais; A Ativadora (retrato, práticas, WhatsApp).
-  - Jornadas: todas as jornadas do catálogo (`shared/catalog`), sem preço.
+  - Jornadas: o hub de jornadas (F9), compacto por padrão.
   - Meditações: áudios e vídeos grátis, com filtro (Tudo · Áudios · Vídeos · Encontros gravados).
   - Contato: sobre a Andreía, botão do WhatsApp, redes, assinatura.
 - **Tablet e computador (≥ 700 px): "revista".** Página única com menu no topo (Início, Jornadas,
@@ -26,7 +26,7 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
   jornadas" e "Ouvir uma meditação"; fileira de jornadas (setas no cabeçalho só quando sobra cartão);
   meditações em lista de duas colunas; faixa dos encontros; frase com a logo falando atrás; depoimentos;
   redes sociais; A Ativadora; rodapé com assinatura e versão.
-- Cartões de jornada da vitrine **sem preço** (F9): "Conhecer" (por enquanto abre `#/jornada`) ou, se
+- Cartões de jornada da vitrine **sem preço** (F9): "Conhecer" (leva ao hub, `#/jornadas`) ou, se
   "Em breve", "Quero ser avisada" (WhatsApp, até existir a lista de interesse com login).
 - Rotas: `#/` (início), `#/jornadas`, `#/meditacoes` (`#/ouvir` continua valendo), `#/encontros`,
   `#/sobre`, `#/contato`. No celular trocam a aba; no computador rolam até a seção.
@@ -288,7 +288,7 @@ escolha de dia/aparelho, limpar imagens que nenhum bloco usa.
 **Aceite (conferido em 2026-11-21 com a conta do desenvolvedor):** editar o dia 1, salvar, publicar e ver
 a mudança numa janela anônima; voltar uma versão pelo Histórico.
 
-## F9 · Vitrine, hubs e produtos pagos 📐 (mocks aprovados em 2026-11-22; código a partir da Etapa D)
+## F9 · Vitrine, hubs e produtos pagos 🔨 (vitrine e hub de jornadas no ar; login, meditações e pagamento a seguir)
 
 Mocks: `Downloads/atmavox-pagina-inicial.html` (direção 4) e `Downloads/atmavox-hubs.html`. Decisões:
 ADR-019 (catálogo), ADR-020 (login e acesso), ADR-021 (página inicial).

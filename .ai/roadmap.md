@@ -120,7 +120,9 @@ aprovados antes do código.
           breve)
    2. [x] Página inicial vitrine (F9), encontros apontando para o TikTok; abas do celular Início ·
           Jornadas · Meditações · Contato; "Quem já viveu" só aparece com depoimento real
-   3. [ ] Hub de jornadas (`#/jornadas`): expandida/compacta, filtros, tag
+   3. [x] Hub de jornadas (`#/jornadas`): expandida/compacta (lembrada no aparelho), filtros recolhíveis
+          (busca sem acento, território, disponível/em breve, duração), tag "Pago"; "Conhecer" da vitrine
+          leva ao hub; "Começar jornada" ainda abre a de 21 dias direto (login no passo 4)
    4. [ ] Login obrigatório na jornada + janela de login sobre a tela desfocada; rotas
           `#/jornada/{id}`
    5. [ ] Hub de meditações (`#/meditacoes`) e página da meditação (play + e-book)

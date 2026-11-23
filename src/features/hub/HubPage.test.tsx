@@ -84,10 +84,20 @@ describe('hub no celular (abas)', () => {
     setAudioPlayerForTests(null)
   })
 
-  it('a aba Jornadas mostra o catálogo: "Conhecer" abre a jornada e "Em breve" avisa pelo WhatsApp', () => {
-    render(<HubPage path="/jornadas" />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Jornadas' })).toBeInTheDocument()
+  it('na vitrine, "Conhecer" leva ao hub de jornadas', () => {
+    render(<HubPage path="/" />)
     expect(screen.getByRole('link', { name: 'Conhecer A Chama Interna' })).toHaveAttribute(
+      'href',
+      '#/jornadas',
+    )
+  })
+
+  it('a aba Jornadas é o hub: começar abre a jornada e "Em breve" avisa pelo WhatsApp', () => {
+    render(<HubPage path="/jornadas" />)
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Caminhos para atravessar o Estado Cinza' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Começar jornada: A Chama Interna' })).toHaveAttribute(
       'href',
       '#/jornada',
     )
