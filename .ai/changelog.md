@@ -10,6 +10,19 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.26.3] · 2026-11-23
+
+### Alterado
+
+- Agenda do Modo Andreía:
+  - o horário livre tem o mesmo tracejado da seleção ao arrastar, no marrom do site (semana, dia no
+    celular e legenda);
+  - depois de "Agenda" vêm as setas e "Hoje" (sempre no mesmo lugar) e o período, menor e mais claro,
+    por extenso ("23 a 29 de novembro");
+  - a grade da semana cobre o dia todo (0h a 24h) e rola por dentro, sempre abrindo das 9h às 21h, que
+    cabem inteiras na tela; barra de rolagem fina, no marrom do site;
+  - as bolinhas das terapias usam uma cor sólida por tom (Barras e Ativação não se confundem mais).
+
 ## [1.26.2] · 2026-11-23
 
 ### Alterado

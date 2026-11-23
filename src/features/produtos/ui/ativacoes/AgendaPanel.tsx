@@ -31,11 +31,21 @@ import { Overlay } from './Overlay'
 import { Switch } from './TherapyFields'
 import { TherapyChecks, ToneDot, WindowForm } from './WindowForm'
 import { LoadingNote } from '../../../../shared/ui/LoadingNote'
+import { TONE_DOT } from '../../../../shared/ui/bannerTones'
 
-/** A grade mostra das 7h às 22h; cada hora tem 48 px e o arrastar anda de meia em meia hora. */
-const FIRST_HOUR = 7
-const LAST_HOUR = 22
-const HOUR_PX = 48
+/**
+ * A grade da semana mostra o dia inteiro (0h a 24h) e rola dentro dela, abrindo no começo do
+ * expediente; cada hora tem 46 px e o arrastar anda de meia em meia hora. No celular, a lista do dia
+ * vai das 7h às 22h.
+ */
+const FIRST_HOUR = 0
+const LAST_HOUR = 24
+const HOUR_PX = 46
+/** A grade sempre abre mostrando das 9h às 21h (pedido de 2026-11-23); o resto do dia, rolando. */
+const VIEW_FROM_HOUR = 9
+const VIEW_HOURS = 12
+const PHONE_FIRST_HOUR = 7
+const PHONE_LAST_HOUR = 22
 const SNAP = 30
 
 let windowCounter = 0
@@ -45,10 +55,13 @@ const snapDown = (minutes: number) => Math.floor(minutes / SNAP) * SNAP
 const snapUp = (minutes: number) => Math.ceil(minutes / SNAP) * SNAP
 const clampDay = (minutes: number) => Math.min(LAST_HOUR * 60, Math.max(FIRST_HOUR * 60, minutes))
 
+/** "23 a 29 de novembro"; virando o mês, "30 de novembro a 6 de dezembro". */
 function weekLabel(monday: string): string {
   const sunday = addDays(monday, 6)
-  const month = (date: string) => monthName(Number(date.slice(5, 7))).slice(0, 3)
-  return `${dayOfMonth(monday)} ${month(monday)} a ${dayOfMonth(sunday)} ${month(sunday)}`
+  const month = (date: string) => monthName(Number(date.slice(5, 7)))
+  return monday.slice(5, 7) === sunday.slice(5, 7)
+    ? `${dayOfMonth(monday)} a ${dayOfMonth(sunday)} de ${month(sunday)}`
+    : `${dayOfMonth(monday)} de ${month(monday)} a ${dayOfMonth(sunday)} de ${month(sunday)}`
 }
 
 interface Editing {
@@ -79,6 +92,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   const [isSaving, setIsSaving] = useState(false)
   const [drag, setDrag] = useState<{ date: string; from: number; to: number } | null>(null)
   const dragOrigin = useRef<number | null>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -95,6 +109,13 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     }
   }, [backend])
 
+  // A grade abre sempre das 9h às 21h; antes e depois, rolando dentro dela.
+  const weekStart = startOfWeek(day)
+  const isLoaded = availability !== null
+  useEffect(() => {
+    if (!isLoaded || view !== 'semana' || !gridRef.current) return
+    gridRef.current.scrollTop = (VIEW_FROM_HOUR - FIRST_HOUR) * HOUR_PX
+  }, [isLoaded, view, weekStart])
   if (!availability) return <LoadingNote text="Carregando a agenda…" />
 
   const monday = startOfWeek(day)
@@ -206,7 +227,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
         type="button"
         aria-label={`${label} anterior`}
         onClick={() => setDay(addDays(day, -step))}
-        className="grid size-8 place-items-center rounded-full border border-line text-ink-muted hover:text-admin-ink"
+        className="grid size-8 place-items-center rounded-full border border-line text-ink-muted transition-colors hover:border-accent hover:bg-accent/12 hover:text-accent"
       >
         <UiIcon name="back" size={16} />
       </button>
@@ -214,14 +235,14 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
         type="button"
         aria-label={`Próxima ${label.toLowerCase()}`}
         onClick={() => setDay(addDays(day, step))}
-        className="grid size-8 place-items-center rounded-full border border-line text-ink-muted hover:text-admin-ink"
+        className="grid size-8 place-items-center rounded-full border border-line text-ink-muted transition-colors hover:border-accent hover:bg-accent/12 hover:text-accent"
       >
         <UiIcon name="next" size={16} />
       </button>
       <button
         type="button"
         onClick={() => setDay(today)}
-        className="ml-1 rounded-full px-2.5 py-1 text-sm text-ink-muted hover:text-admin-ink"
+        className="ml-1 rounded-full border border-line px-3 py-1 text-sm text-ink-muted transition-colors hover:border-accent hover:bg-accent/8 hover:text-accent"
       >
         Hoje
       </button>
@@ -231,7 +252,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   const legend = (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-ink-muted">
       <span className="flex items-center gap-1.5">
-        <span className="inline-block h-3 w-3.5 rounded-[2px_4px_4px_2px] border border-l-[3px] border-line border-l-gold bg-field" />
+        <span className="inline-block size-3 rounded-[4px] border-[1.5px] border-dashed border-accent bg-accent/12" />
         Livre
       </span>
       <span className="flex items-center gap-1.5">
@@ -255,7 +276,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
       onClick={() => openExisting(window, date)}
       aria-label={`Livre ${longDate(date)}, ${timeLabel(window.start)} às ${timeLabel(window.end)}`}
       style={style}
-      className="flex flex-col items-start gap-0.5 overflow-hidden rounded-[4px_12px_12px_4px] border border-l-4 border-line border-l-gold bg-field px-2.5 py-1.5 text-left text-[11px] leading-tight text-ink transition-colors hover:border-gold/60 hover:border-l-gold"
+      className="flex flex-col items-start gap-0.5 overflow-hidden rounded-lg border-2 border-dashed border-accent/70 bg-accent/12 px-2.5 py-1.5 text-left text-[11px] leading-tight text-ink transition-colors hover:border-accent hover:bg-accent/18"
     >
       <b className="font-semibold">
         {timeLabel(window.start)}–{timeLabel(window.end)}
@@ -270,7 +291,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     </button>
   )
 
-  /** A faixa livre na grade (mock aprovado: grade da A, faixa da C): papel claro com a fita dourada. */
+  /** A faixa livre na grade: o mesmo tracejado da seleção ao arrastar, no marrom do site (pedido de 2026-11-23). */
   const gridBlock = (window: AvailabilityWindow, date: string, top: number, height: number) => (
     <button
       key={window.id}
@@ -279,7 +300,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
       onClick={() => openExisting(window, date)}
       aria-label={`Livre ${longDate(date)}, ${timeLabel(window.start)} às ${timeLabel(window.end)}`}
       style={{ top: top + 1, height: height - 2 }}
-      className="absolute inset-x-1.5 z-[1] flex flex-col items-start gap-0.5 overflow-hidden rounded-[4px_10px_10px_4px] border border-l-4 border-line border-l-gold bg-field px-2 py-1.5 text-left text-[11.5px] leading-tight text-ink transition-colors hover:border-gold/60 hover:border-l-gold"
+      className="absolute inset-x-[3px] z-[1] flex flex-col items-start gap-0.5 overflow-hidden rounded-lg border-2 border-dashed border-accent/70 bg-accent/12 px-1.5 py-1 text-left text-[11.5px] leading-tight text-ink transition-colors hover:border-accent hover:bg-accent/18"
     >
       <span className="text-[10.5px] font-semibold tracking-[0.16em] text-gold uppercase">
         Livre
@@ -296,7 +317,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
               <span
                 key={id}
                 className="inline-block size-2.5 rounded-full"
-                style={{ background: `var(--tone-${t.tone})` }}
+                style={{ background: TONE_DOT[t.tone] }}
               />
             ) : null
           })}
@@ -391,14 +412,18 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     return (
       <div className="mx-auto flex w-full max-w-6xl animate-[page-in_400ms_ease-out] flex-col gap-3.5 px-7 py-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="flex items-center gap-4">
+          {/* Como no mock aprovado: "Agenda", o período menor e mais claro e as setas. */}
+          <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h1 className="font-display text-[2rem] text-ink">Agenda</h1>
-            {nav(view === 'semana' ? 7 : 30, view === 'semana' ? 'Semana' : 'Mês')}
-            <b className="font-display text-xl font-medium text-ink">
+            {/* Largura fixa (cabe "30 de novembro a 6 de dezembro"): as setas não mudam de lugar. */}
+            <span className="w-[19.5rem] font-display text-xl text-ink-faint">
               {view === 'semana'
                 ? weekLabel(monday)
                 : `${monthName(Number(day.slice(5, 7)))} de ${day.slice(0, 4)}`}
-            </b>
+            </span>
+            <span className="self-center">
+              {nav(view === 'semana' ? 7 : 30, view === 'semana' ? 'Semana' : 'Mês')}
+            </span>
           </span>
           <span className="flex items-center gap-3">
             <Segmented
@@ -422,8 +447,13 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
         {view === 'semana' ? (
           // A semana no estilo do site (mock aprovado, A): cada dia é um cartão claro, com o nome do
           // dia pequeno e o número em Playfair; linhas bem leves; a linha de agora em âmbar.
-          <div className="relative rounded-[22px] bg-surface-2 px-1 pt-1 pb-2.5">
-            <div className="grid grid-cols-[56px_repeat(7,minmax(0,1fr))]">
+          <div
+            ref={gridRef}
+            // Cabeçalho dos dias (~76 px) + 12 horas: das 9h às 21h cabem inteiras na tela.
+            style={{ height: 76 + VIEW_HOURS * HOUR_PX }}
+            className="thin-scroll relative overflow-y-auto rounded-[22px] bg-surface-2 px-1 pb-2.5"
+          >
+            <div className="sticky top-0 z-10 grid grid-cols-[56px_repeat(7,minmax(0,1fr))] bg-surface-2 pt-1">
               <span />
               {week.map((date) => {
                 const isToday = date === today
@@ -663,7 +693,10 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   /* ---------- celular ---------- */
 
   const occurrences = occurrencesOn(availability, day)
-  const hours = Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) => FIRST_HOUR + i)
+  const hours = Array.from(
+    { length: PHONE_LAST_HOUR - PHONE_FIRST_HOUR },
+    (_, i) => PHONE_FIRST_HOUR + i,
+  )
   const covered = (hour: number) =>
     occurrences.some(
       ({ window }) =>

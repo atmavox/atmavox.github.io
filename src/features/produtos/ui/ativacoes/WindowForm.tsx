@@ -7,6 +7,7 @@ import {
   type WindowErrors,
 } from '../../../../shared/ativacao/availability'
 import { type Therapy } from '../../../../shared/ativacao/therapy'
+import { TONE_DOT } from '../../../../shared/ui/bannerTones'
 import { Field, Segmented } from '../fields'
 import { inputClass } from '../styles'
 
@@ -16,7 +17,7 @@ export function ToneDot({ tone }: { tone: Therapy['tone'] }) {
     <span
       aria-hidden="true"
       className="inline-block size-2.5 shrink-0 rounded-full"
-      style={{ background: `var(--tone-${tone})` }}
+      style={{ background: TONE_DOT[tone] }}
     />
   )
 }

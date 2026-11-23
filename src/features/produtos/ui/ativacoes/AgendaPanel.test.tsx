@@ -38,10 +38,10 @@ describe('Modo Andreía · agenda no computador', () => {
     const backend = createInMemoryAtivacoesBackend({ therapies: priced })
     render(<AtivacoesApp backend={backend} section="agenda" />)
     const column = await screen.findByTestId('dia-2026-12-02')
-    // Sem medidas no teste, o topo da coluna é 0: 480 px = 17h e 624 px = 20h (48 px por hora).
-    fireEvent.pointerDown(column, { clientY: 480, pointerId: 1 })
-    fireEvent.pointerMove(column, { clientY: 624, pointerId: 1 })
-    fireEvent.pointerUp(column, { clientY: 624, pointerId: 1 })
+    // Sem medidas no teste, o topo da coluna (0h) é 0: 782 px = 17h e 920 px = 20h (46 px por hora).
+    fireEvent.pointerDown(column, { clientY: 782, pointerId: 1 })
+    fireEvent.pointerMove(column, { clientY: 920, pointerId: 1 })
+    fireEvent.pointerUp(column, { clientY: 920, pointerId: 1 })
 
     const popover = screen.getByRole('dialog', { name: 'Novo horário livre' })
     expect(within(popover).getByText(/17h às 20h/)).toBeInTheDocument()
@@ -103,7 +103,7 @@ describe('Modo Andreía · agenda no computador', () => {
     fireEvent.click(await screen.findByRole('radio', { name: 'Mês' }))
     expect(screen.getAllByText('17h–20h').length).toBeGreaterThanOrEqual(5)
     fireEvent.click(screen.getByRole('button', { name: /^16/ }))
-    expect(screen.getByText('14 dez a 20 dez')).toBeInTheDocument()
+    expect(screen.getByText('14 a 20 de dezembro')).toBeInTheDocument()
   })
 })
 
