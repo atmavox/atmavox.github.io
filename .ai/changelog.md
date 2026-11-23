@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.8.1] · 2026-11-23
+
+### Corrigido
+
+- O vídeo da página inicial (ao pausar) e o mini player (ao fechar ou quando o áudio termina) saem
+  devagar, esmaecendo e recolhendo em menos de meio segundo, em vez de sumir de uma vez. Sem animação
+  para quem pede menos movimento no aparelho.
+
 ## [1.8.0] · 2026-11-23
 
 ### Adicionado

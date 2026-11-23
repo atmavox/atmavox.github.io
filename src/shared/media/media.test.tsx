@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createAudioPlayer } from './audioPlayer'
@@ -25,7 +25,7 @@ describe('MiniPlayer', () => {
     expect(screen.queryByRole('region', { name: 'Player de áudio' })).toBeNull()
   })
 
-  it('aparece com a faixa, pausa, retoma e fecha', () => {
+  it('aparece com a faixa, pausa, retoma e fecha (saindo devagar)', async () => {
     const { audio, player } = setup()
     act(() => {
       player.toggle(track)
@@ -46,7 +46,9 @@ describe('MiniPlayer', () => {
     expect(player.getSnapshot().position).toBe(120)
 
     fireEvent.click(screen.getByRole('button', { name: 'Fechar o player' }))
-    expect(screen.queryByRole('region', { name: 'Player de áudio' })).toBeNull()
+    await waitFor(() =>
+      expect(screen.queryByRole('region', { name: 'Player de áudio' })).toBeNull(),
+    )
   })
 })
 

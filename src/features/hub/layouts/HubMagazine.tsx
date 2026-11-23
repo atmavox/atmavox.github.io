@@ -5,6 +5,8 @@ import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { BrandMark } from '../../../shared/ui/BrandMark'
+import { LeaveTransition } from '../../../shared/ui/LeaveTransition'
+import { useLingering } from '../../../shared/ui/useLingering'
 import { AudioItem } from '../components/AudioItem'
 import { CardRow } from '../components/CardRow'
 import { EncountersBand } from '../components/EncountersBand'
@@ -49,6 +51,8 @@ export function HubMagazine({
   meditationId: string | null
 }) {
   const [openVideo, setOpenVideo] = useState<HubAudio | null>(null)
+  // Ao pausar, o vídeo sai devagar (esmaece e recolhe) em vez de sumir de uma vez.
+  const { shown: shownVideo, leaving: videoLeaving } = useLingering(openVideo)
   const activeItem = activeMenuItem(section)
   // Trechos da página inicial piscam no menu ao serem clicados e devolvem a marca ao "Início".
   const [flashing, setFlashing] = useState<HubSection | null>(null)
@@ -200,8 +204,14 @@ export function HubMagazine({
               ))}
             </ul>
             {/* O vídeo abre na largura toda da seção, e não espremido na coluna do item. */}
-            {openVideo?.youtubeId && (
-              <YouTubeFacade videoId={openVideo.youtubeId} title={openVideo.title} startActive />
+            {shownVideo?.youtubeId && (
+              <LeaveTransition leaving={videoLeaving}>
+                <YouTubeFacade
+                  videoId={shownVideo.youtubeId}
+                  title={shownVideo.title}
+                  startActive
+                />
+              </LeaveTransition>
             )}
           </section>
 
