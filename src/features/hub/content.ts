@@ -76,7 +76,7 @@ export const introAudio: HubAudio = {
   id: 'boas-vindas',
   kind: 'audio',
   title: 'Boas-vindas',
-  meta: 'Áudio · 48 s',
+  meta: 'Áudio · 1 min',
   audioSrc: '/audio/atmavox-boas-vindas.m4a',
 }
 
