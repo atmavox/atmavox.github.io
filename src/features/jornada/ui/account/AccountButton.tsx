@@ -2,7 +2,7 @@ import { LogIn } from 'lucide-react'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { EDITOR_HREF } from '../../application/navigation'
 import { useAccount } from '../useAccount'
-import { LoginDialog } from './LoginDialog'
+import { LoginDialog } from '../../../../shared/auth/LoginDialog'
 import { SYNC_DOT_CLASS, SYNC_TEXT } from './syncCopy'
 
 /** "Entrar" para quem não tem conta; para quem tem, a inicial com o status de sincronização. */

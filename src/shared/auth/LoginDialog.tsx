@@ -1,11 +1,11 @@
 import { X } from 'lucide-react'
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
-import type { BannerTone } from '../../../../shared/ui/bannerTones'
-import { GoogleLogo } from '../../../../shared/ui/GoogleLogo'
-import { ProductBanner } from '../../../../shared/ui/ProductBanner'
-import type { Account } from '../../application/account'
-import { AuthFailure } from '../../application/ports'
+import type { BannerTone } from '../ui/bannerTones'
+import { GoogleLogo } from '../ui/GoogleLogo'
+import { ProductBanner } from '../ui/ProductBanner'
+import type { LoginActions } from './session'
+import { AuthFailure } from './ports'
 
 type Mode = 'entrar' | 'criar' | 'recuperar'
 
@@ -33,7 +33,7 @@ const inputClass =
   'w-full rounded-lg border border-line bg-field px-3 py-3 text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none'
 
 interface LoginDialogProps {
-  account: Account
+  account: LoginActions
   /** Fechar sem entrar (X, Esc ou toque fora). */
   onClose: () => void
   /**

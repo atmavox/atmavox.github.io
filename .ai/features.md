@@ -193,7 +193,7 @@ pura, testada) + `useTheme` (o `data-theme` do `<html>` é a fonte da verdade, s
 login** (ADR-020): sem conta, abre a janela "Entre para guardar sua jornada" sobre o hub desfocado, com
 a jornada escolhida; fechar volta a `#/jornadas`. O que a pessoa já tinha feito no aparelho antes do
 login é mesclado à conta. Com sessão lembrada, a jornada mostra "Carregando…" até a nuvem responder
-(`authChecked`), para a janela não piscar.
+(`authChecked`), para a janela não piscar. O login é do site todo (`shared/auth`, ADR-022): quem
 
 **Regras:**
 

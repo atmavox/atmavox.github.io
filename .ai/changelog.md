@@ -10,6 +10,22 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.7.0] · 2026-11-22
+
+### Adicionado
+
+- Login do site todo em `shared/auth` (ADR-022): quem entra no hub já está logado na jornada. No hub,
+  depois do login, as gratuitas mostram "Grátis", as pagas o preço com cadeado, e aparece o filtro
+  "Grátis" (jornadas e meditações).
+- Produto pago: sem login, a janela de login abre no próprio hub mostrando o produto; depois, a janela
+  de preço (mock F·2) com o que inclui, o prazo de acesso e o pagamento pelo Mercado Pago, ainda
+  desativado ("Pagamento em breve") até a integração.
+
+### Alterado
+
+- A jornada só sincroniza o progresso por cima da sessão do site; o Firebase continua baixando só quando
+  alguém entra.
+
 ## [1.6.2] · 2026-11-22
 
 ### Corrigido

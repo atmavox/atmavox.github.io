@@ -14,26 +14,8 @@ export interface CloudProgressRepository {
   save(uid: string, progress: JourneyProgress): Promise<void>
 }
 
-export interface AuthUser {
-  uid: string
-  displayName: string | null
-  email: string | null
-}
-
-/** Erro de login já com a mensagem pronta para mostrar à pessoa, em português. */
-export class AuthFailure extends Error {
-  override readonly name = 'AuthFailure'
-}
-
-export interface AuthService {
-  /** Chama o ouvinte já com o usuário atual e depois a cada mudança. Devolve como parar. */
-  onChange(listener: (user: AuthUser | null) => void): () => void
-  signInWithGoogle(): Promise<void>
-  signInWithEmail(email: string, password: string): Promise<void>
-  signUpWithEmail(email: string, password: string): Promise<void>
-  sendPasswordReset(email: string): Promise<void>
-  signOut(): Promise<void>
-}
+// O login mora em `shared/auth` (ADR-022); a jornada só sincroniza o progresso de quem entrou.
+export { AuthFailure, type AuthUser } from '../../../shared/auth/ports'
 
 /**
  * Onde a versão publicada da jornada fica (escrita pela Andreía no modo admin). Devolve o JSON cru,
@@ -91,9 +73,8 @@ export interface AdminDirectory {
   isAdmin(uid: string): Promise<boolean>
 }
 
-/** O que só existe quando o Firebase está configurado; carregado sob demanda (ADR-005). */
+/** A nuvem da jornada (sem o login, que é do site todo); carregada sob demanda (ADR-005). */
 export interface CloudBackend {
-  auth: AuthService
   cloud: CloudProgressRepository
   admins: AdminDirectory
   editor: JourneyEditorBackend

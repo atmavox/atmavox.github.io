@@ -14,6 +14,7 @@ import {
 } from '../meditations'
 import { MeditationCover } from './MeditationCover'
 import { OfferBadge } from './OfferBits'
+import { usePurchaseFlow } from './usePurchaseFlow'
 
 const intro = 'Áudios e vídeos curtos para perceber, respirar e voltar a si.'
 
@@ -27,7 +28,8 @@ const chip = (on: boolean) =>
 /** Hub de meditações (`#/meditacoes`, variante B do mock): grade de capas com filtros. */
 export function MeditationsHub({ layout }: { layout: 'wide' | 'narrow' }) {
   const [filter, setFilter] = useState<MeditationFilter>('todas')
-  const filters = availableMeditationFilters(allMeditations)
+  const purchase = usePurchaseFlow()
+  const filters = availableMeditationFilters(allMeditations, { logged: purchase.isLogged })
   const visible = filterMeditations(allMeditations, filter)
   const isWide = layout === 'wide'
 
@@ -56,8 +58,8 @@ export function MeditationsHub({ layout }: { layout: 'wide' | 'narrow' }) {
       className={`grid ${isWide ? 'grid-cols-3 gap-[22px] lg:grid-cols-4' : 'grid-cols-2 gap-3.5'}`}
     >
       {visible.map((m, index) => {
-        // Sem login, a regra da tag não depende do relógio: pagas mostram "Pago", grátis nada (F9).
-        const { tag } = productOffer(m, { place: 'hub', logged: false, now: 0 })
+        // Sem login: "Pago" nas pagas, nada nas grátis; logada: preço ou "Grátis" (F9). O acesso entra no passo 7.
+        const { tag } = productOffer(m, { place: 'hub', logged: purchase.isLogged, now: 0 })
         return (
           <li key={m.id}>
             <MeditationCover
@@ -87,6 +89,7 @@ export function MeditationsHub({ layout }: { layout: 'wide' | 'narrow' }) {
         </header>
         {chips}
         {grid}
+        {purchase.dialogs}
       </>
     )
   }
@@ -107,6 +110,7 @@ export function MeditationsHub({ layout }: { layout: 'wide' | 'narrow' }) {
         </div>
       </section>
       <div className="mx-auto w-full max-w-6xl px-6 pb-16 md:px-12">{grid}</div>
+      {purchase.dialogs}
     </>
   )
 }

@@ -4,19 +4,26 @@ import { createInMemoryBackend } from '../infrastructure/InMemoryCloudBackend'
 import { InMemoryProgressRepository } from '../infrastructure/InMemoryProgressRepository'
 import { createAccount } from './account'
 import { createJourneyStore } from './JourneyStore'
+import type { AuthService } from '../../../shared/auth/ports'
+import { createAuthSession } from '../../../shared/auth/session'
 import { AuthFailure } from './ports'
 
 function setup({ hint = false, local = new InMemoryProgressRepository() } = {}) {
   const backend = createInMemoryBackend()
-  const loadBackend = vi.fn(async () => backend)
+  // "Baixar o Firebase" é baixar o login (a sessão do site, ADR-022); a nuvem da jornada vem depois.
+  const loadBackend = vi.fn(async (): Promise<AuthService> => backend.auth)
   let hintValue = hint
   let reconnect: () => void = () => {}
   const store = createJourneyStore({ repository: local })
+  const session = createAuthSession({
+    loadAuth: loadBackend,
+    hint: { get: () => hintValue, set: (value) => (hintValue = value) },
+  })
   const account = createAccount({
     store,
     local,
-    loadBackend,
-    hint: { get: () => hintValue, set: (value) => (hintValue = value) },
+    session,
+    loadBackend: async () => backend,
     onReconnect: (listener) => {
       reconnect = listener
       return () => {}

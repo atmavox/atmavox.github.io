@@ -3,6 +3,7 @@ import { useId, useState } from 'react'
 import { productOffer } from '../../../shared/catalog/offer'
 import { TERRITORIES, TERRITORY_LABELS, type JourneyProduct } from '../../../shared/catalog/product'
 import { BrandMark } from '../../../shared/ui/BrandMark'
+import { usePurchaseFlow } from './usePurchaseFlow'
 import { allJourneys, journeysIntro } from '../content'
 import {
   countByTerritory,
@@ -58,15 +59,15 @@ const chip = (on: boolean) =>
 const toolButton =
   'inline-flex min-h-[42px] shrink-0 items-center gap-2 rounded-full border bg-surface px-4 text-[0.92rem] transition-colors hover:text-accent'
 
-// Na vitrine sem login, a regra da tag não depende do relógio; o login entra no passo 4 da Etapa D.
-const offerOf = (journey: JourneyProduct) =>
-  productOffer(journey, { place: 'hub', logged: false, now: 0 })
-
 /** Hub de jornadas (`#/jornadas`, F9): expandida (A5) ou compacta (A4), com filtros recolhíveis. */
 export function JourneysHub({ layout }: { layout: Layout }) {
   const [filters, setFilters] = useState<JourneyFilters>(EMPTY_FILTERS)
   const [view, setViewState] = useState<View>(() => readView(layout))
   const [filtersOpen, setFiltersOpen] = useState(true)
+  const purchase = usePurchaseFlow()
+  // Acesso a produtos pagos entra no passo 7; até lá ninguém tem acesso, e o relógio não importa.
+  const offerOf = (journey: JourneyProduct) =>
+    productOffer(journey, { place: 'hub', logged: purchase.isLogged, now: 0 })
   const searchId = useId()
   const filtersId = useId()
 
@@ -142,7 +143,11 @@ export function JourneysHub({ layout }: { layout: Layout }) {
     </div>
   )
 
-  const showChips = (Object.keys(SHOW_LABELS) as ShowFilter[]).map((id) => (
+  // "Grátis" só depois do login: antes dele, a vitrine não fala de preço (F9).
+  const showIds = (Object.keys(SHOW_LABELS) as ShowFilter[]).filter(
+    (id) => id !== 'gratis' || purchase.isLogged,
+  )
+  const showChips = showIds.map((id) => (
     <button
       key={id}
       type="button"
@@ -219,7 +224,12 @@ export function JourneysHub({ layout }: { layout: Layout }) {
         ) : view === 'compact' ? (
           <div className="-mt-3 flex flex-col">
             {results.map((journey) => (
-              <PhoneCompactRow key={journey.id} journey={journey} offer={offerOf(journey)} />
+              <PhoneCompactRow
+                key={journey.id}
+                journey={journey}
+                offer={offerOf(journey)}
+                onPurchase={purchase.start}
+              />
             ))}
           </div>
         ) : (
@@ -232,11 +242,17 @@ export function JourneysHub({ layout }: { layout: Layout }) {
                 </small>
               </h2>
               {group.journeys.map((journey) => (
-                <PhoneExpandedCard key={journey.id} journey={journey} offer={offerOf(journey)} />
+                <PhoneExpandedCard
+                  key={journey.id}
+                  journey={journey}
+                  offer={offerOf(journey)}
+                  onPurchase={purchase.start}
+                />
               ))}
             </section>
           ))
         )}
+        {purchase.dialogs}
       </>
     )
   }
@@ -354,12 +370,14 @@ export function JourneysHub({ layout }: { layout: Layout }) {
                           key={journey.id}
                           journey={journey}
                           offer={offerOf(journey)}
+                          onPurchase={purchase.start}
                         />
                       ) : (
                         <ExpandedJourneyCard
                           key={journey.id}
                           journey={journey}
                           offer={offerOf(journey)}
+                          onPurchase={purchase.start}
                         />
                       ),
                     )}
@@ -368,6 +386,7 @@ export function JourneysHub({ layout }: { layout: Layout }) {
           </div>
         </div>
       </div>
+      {purchase.dialogs}
     </>
   )
 }

@@ -41,8 +41,18 @@ const ACTION_LABELS: Record<Exclude<OfferAction, 'notify'>, string> = {
   renew: 'Renovar',
 }
 
+const buttonClass =
+  'inline-flex min-h-10 items-center gap-2 rounded-full bg-accent px-[18px] font-semibold whitespace-nowrap text-bg hover:opacity-90'
+
+interface OfferButtonProps {
+  action: OfferAction
+  journey: JourneyProduct
+  /** Pagas sem acesso: abre o login ou o preço no próprio hub (`usePurchaseFlow`). */
+  onPurchase: (journey: JourneyProduct) => void
+}
+
 /** O botão de cada jornada no hub. "Em breve" vira o link "Quero ser avisada". */
-export function OfferButton({ action, journey }: { action: OfferAction; journey: JourneyProduct }) {
+export function OfferButton({ action, journey, onPurchase }: OfferButtonProps) {
   if (action === 'notify') {
     return (
       <a
@@ -58,11 +68,29 @@ export function OfferButton({ action, journey }: { action: OfferAction; journey:
     )
   }
   const label = ACTION_LABELS[action]
+  // Paga e sem acesso: antes de abrir a jornada, login e preço aqui mesmo (ADR-020).
+  const needsPurchase =
+    action === 'see-price' ||
+    action === 'renew' ||
+    (action === 'login' && journey.pricing.type === 'paid')
+  if (needsPurchase) {
+    return (
+      <button
+        type="button"
+        onClick={() => onPurchase(journey)}
+        aria-label={`${label}: ${journey.title}`}
+        className={buttonClass}
+      >
+        {label}
+        <ArrowRight aria-hidden size={18} />
+      </button>
+    )
+  }
   return (
     <a
       href={journeyHref(journey)}
       aria-label={`${label}: ${journey.title}`}
-      className="inline-flex min-h-10 items-center gap-2 rounded-full bg-accent px-[18px] font-semibold whitespace-nowrap text-bg hover:opacity-90"
+      className={buttonClass}
     >
       {label}
       <ArrowRight aria-hidden size={18} />

@@ -3,7 +3,10 @@ import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import { FREE_MEDIA, findMeditation, formatDuration, mediaLabel, toHubAudio } from '../meditations'
+import { productOffer } from '../../../shared/catalog/offer'
 import { AudioItem } from './AudioItem'
+import { OfferBadge } from './OfferBits'
+import { usePurchaseFlow } from './usePurchaseFlow'
 
 const backLink = (
   <a
@@ -18,6 +21,7 @@ const backLink = (
 /** Página de uma meditação (`#/meditacao/{id}`): capa, play e, quando houver, o e-book. */
 export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'narrow' }) {
   const meditation = findMeditation(id)
+  const purchase = usePurchaseFlow()
   const isWide = layout === 'wide'
   const wrap = isWide ? 'mx-auto w-full max-w-3xl px-6 py-10 md:px-12' : ''
 
@@ -32,6 +36,7 @@ export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'n
   }
 
   const media = FREE_MEDIA[meditation.id]
+  const offer = productOffer(meditation, { place: 'hub', logged: purchase.isLogged, now: 0 })
   const item = toHubAudio(meditation)
 
   return (
@@ -61,12 +66,20 @@ export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'n
       {media && 'audioSrc' in media && (
         <AudioItem item={item} variant="card" eyebrow="Ouvir agora" />
       )}
-      {!media && (
-        // Pagas: o conteúdo só chega com acesso (ADR-020); a compra entra na Etapa D.
-        <p className="rounded-2xl border border-dashed border-line p-5 text-ink-muted">
-          Esta meditação ainda não está disponível por aqui.
-        </p>
+      {!media && meditation.pricing.type === 'paid' && (
+        // Paga: o conteúdo só chega com acesso (ADR-020). Sem login, entra; depois, o preço.
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-surface p-5">
+          <OfferBadge tag={offer.tag} />
+          <button
+            type="button"
+            onClick={() => purchase.start(meditation)}
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-6 font-semibold text-bg hover:opacity-90"
+          >
+            {purchase.isLogged ? 'Ver e ouvir' : 'Entrar para ouvir'}
+          </button>
+        </div>
       )}
+      {purchase.dialogs}
     </article>
   )
 }

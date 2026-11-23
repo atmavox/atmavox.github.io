@@ -1,4 +1,5 @@
-import { useState, type ReactNode } from 'react'
+import { useContext, useState, type ReactNode } from 'react'
+import { AuthContext } from '../../shared/auth/AuthContext'
 import { createServices } from './infrastructure/createServices'
 import { JourneyApp } from './ui/JourneyApp'
 import { JourneyContext } from './ui/JourneyContext'
@@ -11,7 +12,9 @@ export function JourneyEntry({
   path: string
   loginBackground?: ReactNode
 }) {
-  const [services] = useState(createServices)
+  // A sessão de login é do site todo (ADR-022): vem de pp/, e a jornada sincroniza por cima dela.
+  const session = useContext(AuthContext)
+  const [services] = useState(() => createServices(session))
   return (
     <JourneyContext.Provider value={services}>
       <JourneyApp path={path} loginBackground={loginBackground} />

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { authErrorMessage } from './authErrors'
-import { readFirebaseConfig } from './config'
+import { readFirebaseConfig } from '../firebase/config'
 
 describe('readFirebaseConfig', () => {
   const full = {

@@ -1,10 +1,9 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { createAccount } from '../../application/account'
 import { createJourneyContent } from '../../application/JourneyContent'
 import { createJourneyStore } from '../../application/JourneyStore'
 import { chamaInterna21 } from '../../content/chama-interna-21'
-import { createInMemoryBackend } from '../../infrastructure/InMemoryCloudBackend'
+import { createInMemoryBackend, createTestAccount } from '../../infrastructure/InMemoryCloudBackend'
 import { InMemoryProgressRepository } from '../../infrastructure/InMemoryProgressRepository'
 import { JourneyApp } from '../JourneyApp'
 import { JourneyContext } from '../JourneyContext'
@@ -14,13 +13,7 @@ function renderWithAccount({ withAccount = true, hint = false } = {}) {
   const store = createJourneyStore({ repository: local })
   const backend = createInMemoryBackend()
   const account = withAccount
-    ? createAccount({
-        store,
-        local,
-        loadBackend: async () => backend,
-        hint: { get: () => hint, set: () => {} },
-        debounceMs: 0,
-      })
+    ? createTestAccount({ store, local, backend, hint, debounceMs: 0 }).account
     : null
   render(
     <JourneyContext.Provider

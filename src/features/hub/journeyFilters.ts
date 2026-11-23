@@ -7,7 +7,7 @@ import {
   type Territory,
 } from '../../shared/catalog/product'
 
-export type ShowFilter = 'todas' | 'disponiveis' | 'em-breve'
+export type ShowFilter = 'todas' | 'disponiveis' | 'em-breve' | 'gratis'
 export type DurationFilter = 'ate-7' | '8-14' | '15-mais'
 
 export interface JourneyFilters {
@@ -28,6 +28,7 @@ export const SHOW_LABELS: Record<ShowFilter, string> = {
   todas: 'Todas',
   disponiveis: 'Disponíveis',
   'em-breve': 'Em breve',
+  gratis: 'Grátis',
 }
 
 export const DURATION_LABELS: Record<DurationFilter, string> = {
@@ -70,6 +71,13 @@ function matchesQuery(journey: JourneyProduct, query: string): boolean {
   return haystack.some((text) => normalize(text).includes(wanted))
 }
 
+function matchesShow(journey: JourneyProduct, show: ShowFilter): boolean {
+  if (show === 'todas') return true
+  if (show === 'em-breve') return journey.status === 'soon'
+  if (show === 'gratis') return journey.status === 'published' && journey.pricing.type === 'free'
+  return journey.status === 'published'
+}
+
 export function filterJourneys(
   journeys: readonly JourneyProduct[],
   filters: JourneyFilters,
@@ -78,8 +86,7 @@ export function filterJourneys(
     (j) =>
       matchesQuery(j, filters.query) &&
       (filters.territory === null || j.territory === filters.territory) &&
-      (filters.show === 'todas' ||
-        (filters.show === 'em-breve' ? j.status === 'soon' : j.status === 'published')) &&
+      matchesShow(j, filters.show) &&
       (filters.duration === null || inDuration(durationDays(j.durationLabel), filters.duration)),
   )
 }

@@ -65,6 +65,18 @@ describe('filterJourneys', () => {
     )
   })
 
+  it('"Grátis" mostra só as disponíveis e gratuitas', () => {
+    const paid = journey({
+      id: 'paga',
+      pricing: { type: 'paid', priceCents: 9700, accessMonths: 12 },
+    })
+    expect(ids(filterJourneys([...all, paid], { ...EMPTY_FILTERS, show: 'gratis' }))).toEqual([
+      'chama',
+      'raizes',
+      'audio',
+    ])
+  })
+
   it('filtra por duração; jornada sem número de dias fica de fora', () => {
     expect(ids(filterJourneys(all, { ...EMPTY_FILTERS, duration: 'ate-7' }))).toEqual(['ritual'])
     expect(ids(filterJourneys(all, { ...EMPTY_FILTERS, duration: '8-14' }))).toEqual(['raizes'])

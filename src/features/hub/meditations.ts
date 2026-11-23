@@ -38,10 +38,11 @@ export function toHubAudio(m: MeditationProduct): HubAudio {
   }
 }
 
-export type MeditationFilter = 'todas' | 'audio' | 'video' | 'ebook'
+export type MeditationFilter = 'todas' | 'gratis' | 'audio' | 'video' | 'ebook'
 
 export const MEDITATION_FILTER_LABELS: Record<MeditationFilter, string> = {
   todas: 'Todas',
+  gratis: 'Grátis',
   audio: 'Áudio',
   video: 'Vídeo',
   ebook: 'Com e-book',
@@ -53,15 +54,21 @@ export function filterMeditations(
 ): MeditationProduct[] {
   if (filter === 'todas') return [...meditations]
   if (filter === 'ebook') return meditations.filter((m) => m.ebook !== undefined)
+  if (filter === 'gratis') return meditations.filter((m) => m.pricing.type === 'free')
   return meditations.filter((m) => m.media === filter)
 }
 
-/** Só os filtros que mostram alguma coisa (sem "Com e-book" enquanto nenhuma tiver e-book). */
+/**
+ * Só os filtros que mostram alguma coisa (sem "Com e-book" enquanto nenhuma tiver e-book). "Grátis" só
+ * depois do login: antes dele, o hub não fala de preço (F9).
+ */
 export function availableMeditationFilters(
   meditations: readonly MeditationProduct[],
+  { logged = false }: { logged?: boolean } = {},
 ): MeditationFilter[] {
   return (Object.keys(MEDITATION_FILTER_LABELS) as MeditationFilter[]).filter(
-    (f) => f === 'todas' || filterMeditations(meditations, f).length > 0,
+    (f) =>
+      f === 'todas' || ((f !== 'gratis' || logged) && filterMeditations(meditations, f).length > 0),
   )
 }
 

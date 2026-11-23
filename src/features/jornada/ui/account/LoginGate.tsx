@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { seedCatalog } from '../../../../shared/catalog/seedCatalog'
 import { TONE_BY_TERRITORY } from '../../../../shared/ui/bannerTones'
 import type { Account } from '../../application/account'
-import { LoginDialog } from './LoginDialog'
+import { LoginDialog } from '../../../../shared/auth/LoginDialog'
 
 const HUB_HREF = '#/jornadas'
 const noop = () => {}

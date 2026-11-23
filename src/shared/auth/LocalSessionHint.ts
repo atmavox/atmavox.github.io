@@ -1,4 +1,4 @@
-import type { SessionHint } from '../application/account'
+import type { SessionHint } from './ports'
 
 const KEY = 'atmavox:sessao'
 

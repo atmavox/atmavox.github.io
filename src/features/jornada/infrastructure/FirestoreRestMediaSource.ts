@@ -1,5 +1,5 @@
 import type { MediaSource } from '../application/ports'
-import type { FirebaseConfig } from './firebase/config'
+import type { FirebaseConfig } from '../../../shared/firebase/config'
 
 /** Imagens dos blocos: `media/{id}`, campo `dataUrl` (ADR-014). */
 export const MEDIA_COLLECTION = 'media'

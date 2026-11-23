@@ -30,6 +30,8 @@ src/
       ui/                 JourneyApp, JourneyHeader, pages/ (uma por aba), components/ (dia, blocos…),
                           account/ (login), admin/ (Modo Andreía, carregado sob demanda)
   shared/
+    auth/                 login do site (ADR-022): sessão, janela de login, Firebase Auth sob demanda
+    firebase/             config e app do Firebase, divididos entre o login e a nuvem da jornada
     brand/                links da marca (redes, áudio, WhatsApp) e assinatura
     catalog/              produtos do catálogo (ADR-019): product.ts (tipos), parseCatalog.ts, offer.ts
                           (tag e botão de cada produto, acesso, preço), seedCatalog.ts (catálogo do código)

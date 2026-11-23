@@ -297,6 +297,27 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ a vitrine muda sozinha quando a Andreía publica um produto; menos trabalho agora.
   ➖ trocar frase, depoimento ou encontro ainda pede desenvolvedor.
 
+## ADR-022 · Login do site em `shared/auth`, com a jornada sincronizando por cima
+
+- **Status:** aceita · 2026-11-22 · ajusta o ADR-005 (o Firebase continua carregando sob demanda)
+- **Contexto:** o login vivia dentro da jornada (`account.ts`), misturado com a sincronização do
+  progresso. O hub agora também precisa dele: preço e "Grátis" depois do login, e login antes de comprar
+  uma jornada ou meditação paga (ADR-020). O hub e a jornada não podem importar um do outro.
+- **Decisão:**
+  - `shared/auth` guarda a **sessão do site** (`createAuthSession`): quem está logado, entrar com Google
+    ou e-mail, sair, token para leituras protegidas e a sessão lembrada no aparelho. Também a janela de
+    login (`LoginDialog`) e o Firebase Auth (`loadFirebaseAuth`), baixado só quando alguém entra.
+  - `app/` cria a sessão uma vez e a entrega pelo `AuthContext` (`null` sem as variáveis do Firebase).
+  - A jornada (`createAccount`) recebe a sessão e só cuida do que é dela: mesclar e enviar o progresso,
+    o papel de admin e o editor. A nuvem da jornada usa o mesmo app do Firebase (`getFirebaseApp`).
+  - No hub, `usePurchaseFlow` decide o caminho de um produto pago: login (mostrando o produto) e depois
+    a janela de preço.
+- **Alternativas consideradas:** o hub importar a conta da jornada (quebra a fronteira entre as
+  features); duas sessões independentes (o Firebase teria dois "logados" que podem divergir).
+- **Consequências:** ➕ um login só, visto pelo site inteiro; a jornada ficou menor; testes com
+  `createTestAccount`. ➖ a sessão e a conta são dois objetos para manter em sincronia (a conta escuta a
+  sessão); `shared/` passou a conhecer o Firebase (a regra do ESLint ganhou uma exceção para `firebase/*`).
+
 ---
 
 ## Modelo

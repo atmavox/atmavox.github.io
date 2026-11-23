@@ -1,12 +1,11 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { createAccount } from '../application/account'
 import { createJourneyContent } from '../application/JourneyContent'
 import { createJourneyStore } from '../application/JourneyStore'
 import { chamaInterna21 } from '../content/chama-interna-21'
 import { START_STEP, VICTORIES_STEP } from '../domain/access'
 import { emptyProgress, markStepDone, type JourneyProgress } from '../domain/progress'
-import { createInMemoryBackend } from '../infrastructure/InMemoryCloudBackend'
+import { createInMemoryBackend, createTestAccount } from '../infrastructure/InMemoryCloudBackend'
 import { InMemoryProgressRepository } from '../infrastructure/InMemoryProgressRepository'
 import { JourneyApp } from './JourneyApp'
 import { JourneyContext } from './JourneyContext'
@@ -145,11 +144,10 @@ describe('JourneyApp', () => {
     const backend = createInMemoryBackend()
     backend.admins.uids.add('google-uid')
     const store = createJourneyStore({ repository: new InMemoryProgressRepository() })
-    const account = createAccount({
+    const { account } = createTestAccount({
       store,
       local: new InMemoryProgressRepository(),
-      loadBackend: () => Promise.resolve(backend),
-      hint: { get: () => false, set: () => {} },
+      backend,
     })
     await account.signInWithGoogle()
     await waitFor(() => expect(account.getSnapshot().isAdmin).toBe(true))

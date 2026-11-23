@@ -1,5 +1,5 @@
 import type { PublishedJourneySource } from '../application/ports'
-import type { FirebaseConfig } from './firebase/config'
+import type { FirebaseConfig } from '../../../shared/firebase/config'
 
 /** Coleção com a versão publicada de cada jornada: `published/{journeyId}`, campo `content` (JSON). */
 export const PUBLISHED_COLLECTION = 'published'

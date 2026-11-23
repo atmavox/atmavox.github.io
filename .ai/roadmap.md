@@ -133,12 +133,18 @@ aprovados antes do código.
           grátis no catálogo (Boas-vindas, Retorne ao Seu Centro). Na página inicial, o vídeo abre na
           largura toda da seção. **Pagas** (login → preço → acesso, "Baixar e-book") ficam para o passo 6,
           junto com o acesso: o login precisa sair da jornada para `shared/` (o hub também vai usar)
-   6. [ ] Regras do Firestore: catálogo, acesso, `published` só com acesso; conteúdo pago fora do
-          código do site
-   7. [ ] Modo Andreía: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
-          temas, território, destaque) e liberar acesso à mão
-6. [ ] Pagamento por produto sem custo fixo (decidir: Mercado Pago + Worker gratuito ou só liberação
-       manual, que já funciona desde o passo 5.7)
+   6. [x] Login compartilhado (ADR-022): sessão em `shared/auth`, a jornada sincroniza por cima; no hub,
+          depois do login, "Grátis" e preço com cadeado; filtro "Grátis"; produto pago sem login abre o
+          login com o produto e depois a janela de preço (mock F·2), com o botão de pagar desativado até
+          o Mercado Pago
+   7. [ ] Acesso: regras do Firestore (catálogo, `published` só com acesso, `access` gravado só pelo
+          servidor ou pela admin), conteúdo pago lido com o token, "Sua"/"Minhas", "Baixar e-book";
+          conteúdo pago fora do código do site
+   8. [ ] Mercado Pago (Checkout Pro) + Worker gratuito na Cloudflare (ADR-023): cobrança com o preço do
+          catálogo, webhook com assinatura conferida, acesso gravado pelo servidor; guia das contas
+   9. [ ] Modo Andreía: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
+          temas, território, destaque) e liberar acesso à mão6. [x] Pagamento por produto: decidido Mercado Pago (Checkout Pro) + Worker gratuito (2026-11-22),
+          implementação no passo 5.8
 
 Surgiu no caminho:
 

@@ -9,6 +9,7 @@ import { ProductBanner } from '../../../shared/ui/ProductBanner'
 interface CardProps {
   journey: JourneyProduct
   offer: Offer
+  onPurchase: (journey: JourneyProduct) => void
 }
 
 const metaPill =
@@ -61,7 +62,7 @@ function Tiles({ journey }: { journey: JourneyProduct }) {
 const isSoon = (journey: JourneyProduct) => journey.status === 'soon'
 
 /** Visão expandida no computador (a A5 do mock): banner à esquerda, temas e botão à direita. */
-export function ExpandedJourneyCard({ journey, offer }: CardProps) {
+export function ExpandedJourneyCard({ journey, offer, onPurchase }: CardProps) {
   return (
     <article
       className={`grid grid-cols-[1.05fr_1fr] overflow-hidden rounded-3xl border border-line bg-surface ${isSoon(journey) ? 'opacity-90' : ''}`}
@@ -86,7 +87,7 @@ export function ExpandedJourneyCard({ journey, offer }: CardProps) {
         )}
         <Tiles journey={journey} />
         <div className="mt-auto flex justify-end pt-1.5">
-          <OfferButton action={offer.action} journey={journey} />
+          <OfferButton action={offer.action} journey={journey} onPurchase={onPurchase} />
         </div>
       </div>
     </article>
@@ -94,7 +95,7 @@ export function ExpandedJourneyCard({ journey, offer }: CardProps) {
 }
 
 /** Visão compacta no computador (a A4 do mock): uma linha por jornada. */
-export function CompactJourneyRow({ journey, offer }: CardProps) {
+export function CompactJourneyRow({ journey, offer, onPurchase }: CardProps) {
   return (
     <article
       className={`grid grid-cols-[110px_1.2fr_1.3fr_auto] items-center gap-[18px] border-b border-line py-3.5 ${isSoon(journey) ? 'opacity-90' : ''}`}
@@ -131,14 +132,14 @@ export function CompactJourneyRow({ journey, offer }: CardProps) {
       </div>
       <div className="flex flex-col items-end gap-2">
         <OfferBadge tag={offer.tag} />
-        <OfferButton action={offer.action} journey={journey} />
+        <OfferButton action={offer.action} journey={journey} onPurchase={onPurchase} />
       </div>
     </article>
   )
 }
 
 /** Celular, visão compacta (A4): miniatura, nome, duração, tag e botão. */
-export function PhoneCompactRow({ journey, offer }: CardProps) {
+export function PhoneCompactRow({ journey, offer, onPurchase }: CardProps) {
   return (
     <article
       className={`grid grid-cols-[76px_1fr] items-center gap-3.5 border-b border-line py-3 ${isSoon(journey) ? 'opacity-90' : ''}`}
@@ -155,7 +156,7 @@ export function PhoneCompactRow({ journey, offer }: CardProps) {
           <OfferBadge tag={offer.tag} />
         </div>
         <div className="mt-2">
-          <OfferButton action={offer.action} journey={journey} />
+          <OfferButton action={offer.action} journey={journey} onPurchase={onPurchase} />
         </div>
       </div>
     </article>
@@ -163,7 +164,7 @@ export function PhoneCompactRow({ journey, offer }: CardProps) {
 }
 
 /** Celular, visão expandida (A5): cartão com banner, frase, tag e botão. */
-export function PhoneExpandedCard({ journey, offer }: CardProps) {
+export function PhoneExpandedCard({ journey, offer, onPurchase }: CardProps) {
   return (
     <article
       className={`flex flex-col overflow-hidden rounded-[20px] border border-line bg-surface ${isSoon(journey) ? 'opacity-90' : ''}`}
@@ -185,7 +186,7 @@ export function PhoneExpandedCard({ journey, offer }: CardProps) {
         )}
         <div className="flex items-center justify-between gap-2.5">
           {isSoon(journey) ? <span /> : <OfferBadge tag={offer.tag} />}
-          <OfferButton action={offer.action} journey={journey} />
+          <OfferButton action={offer.action} journey={journey} onPurchase={onPurchase} />
         </div>
       </div>
     </article>

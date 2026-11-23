@@ -1,13 +1,15 @@
-import {
-  AuthFailure,
-  type AdminDirectory,
-  type AuthService,
-  type AuthUser,
-  type CloudBackend,
-  type CloudProgressRepository,
-  type CompressedImage,
-  type JourneyEditorBackend,
-  type VersionSummary,
+import { InMemoryAuth } from '../../../shared/auth/InMemoryAuth'
+import { createAuthSession, type AuthSession } from '../../../shared/auth/session'
+import { createAccount, type Account } from '../application/account'
+import type { JourneyStore } from '../application/JourneyStore'
+import type {
+  AdminDirectory,
+  CloudBackend,
+  CloudProgressRepository,
+  CompressedImage,
+  JourneyEditorBackend,
+  ProgressRepository,
+  VersionSummary,
 } from '../application/ports'
 import type { JourneyProgress } from '../domain/progress'
 
@@ -26,42 +28,6 @@ export class InMemoryCloud implements CloudProgressRepository {
     if (this.isOffline) throw new Error('offline')
     this.saveCount += 1
     this.docs.set(uid, progress)
-  }
-}
-
-/** Login de mentira para testes: aceita qualquer e-mail com a senha "certa". */
-export class InMemoryAuth implements AuthService {
-  private user: AuthUser | null = null
-  private readonly listeners = new Set<(user: AuthUser | null) => void>()
-
-  onChange(listener: (user: AuthUser | null) => void) {
-    this.listeners.add(listener)
-    listener(this.user)
-    return () => this.listeners.delete(listener)
-  }
-
-  private setUser(user: AuthUser | null) {
-    this.user = user
-    this.listeners.forEach((listener) => listener(user))
-  }
-
-  async signInWithGoogle() {
-    this.setUser({ uid: 'google-uid', displayName: 'Maria', email: 'maria@exemplo.com' })
-  }
-
-  async signInWithEmail(email: string, password: string) {
-    if (password !== 'certa') throw new AuthFailure('E-mail ou senha incorretos.')
-    this.setUser({ uid: `uid-${email}`, displayName: null, email })
-  }
-
-  async signUpWithEmail(email: string, password: string) {
-    await this.signInWithEmail(email, password)
-  }
-
-  async sendPasswordReset() {}
-
-  async signOut() {
-    this.setUser(null)
   }
 }
 
@@ -126,6 +92,7 @@ export class InMemoryEditorBackend implements JourneyEditorBackend {
   }
 }
 
+/** Nuvem da jornada + login de mentira (o login fica fora do `CloudBackend`, na sessão do site). */
 export function createInMemoryBackend(): CloudBackend & {
   auth: InMemoryAuth
   cloud: InMemoryCloud
@@ -138,4 +105,44 @@ export function createInMemoryBackend(): CloudBackend & {
     admins: new InMemoryAdmins(),
     editor: new InMemoryEditorBackend(),
   }
+}
+
+interface TestAccountOptions {
+  store: JourneyStore
+  local: ProgressRepository
+  backend?: ReturnType<typeof createInMemoryBackend>
+  /** Havia sessão lembrada no aparelho. */
+  hint?: boolean
+  debounceMs?: number
+  onReconnect?: (listener: () => void) => () => void
+}
+
+/** Sessão de login + conta da jornada ligadas ao backend de mentira, como em `app/` (ADR-022). */
+export function createTestAccount({
+  store,
+  local,
+  backend = createInMemoryBackend(),
+  hint = false,
+  debounceMs,
+  onReconnect,
+}: TestAccountOptions): {
+  account: Account
+  session: AuthSession
+  backend: ReturnType<typeof createInMemoryBackend>
+  hint: () => boolean
+} {
+  let hintValue = hint
+  const session = createAuthSession({
+    loadAuth: async () => backend.auth,
+    hint: { get: () => hintValue, set: (value) => (hintValue = value) },
+  })
+  const account = createAccount({
+    store,
+    local,
+    session,
+    loadBackend: async () => backend,
+    ...(debounceMs === undefined ? {} : { debounceMs }),
+    ...(onReconnect ? { onReconnect } : {}),
+  })
+  return { account, session, backend, hint: () => hintValue }
 }

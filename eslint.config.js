@@ -62,7 +62,8 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ['**/features', '**/features/**', '**/app', '**/app/**'],
+              // `!firebase/**`: o pacote `firebase/app` não é a pasta `app/` da composição.
+              group: ['**/features', '**/features/**', '**/app', '**/app/**', '!firebase/**'],
               message: 'shared/ não conhece as features nem a composição.',
             },
           ],

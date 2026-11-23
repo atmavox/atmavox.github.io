@@ -1,13 +1,12 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { createAccount } from '../../application/account'
 import { createJourneyContent } from '../../application/JourneyContent'
 import { createJourneyEditor } from '../../application/JourneyEditor'
 import { createJourneyStore } from '../../application/JourneyStore'
 import { createMediaCache } from '../../application/MediaCache'
 import type { JourneyContentCache } from '../../application/ports'
 import { chamaInterna21 } from '../../content/chama-interna-21'
-import { createInMemoryBackend } from '../../infrastructure/InMemoryCloudBackend'
+import { createInMemoryBackend, createTestAccount } from '../../infrastructure/InMemoryCloudBackend'
 import { InMemoryProgressRepository } from '../../infrastructure/InMemoryProgressRepository'
 import { JourneyApp } from '../JourneyApp'
 import { JourneyContext } from '../JourneyContext'
@@ -19,11 +18,10 @@ async function renderEditor({ admin = true } = {}) {
   if (admin) backend.admins.uids.add('google-uid')
   const store = createJourneyStore({ repository: new InMemoryProgressRepository() })
   const content = createJourneyContent({ fallback: chamaInterna21 })
-  const account = createAccount({
+  const { account } = createTestAccount({
     store,
     local: new InMemoryProgressRepository(),
-    loadBackend: () => Promise.resolve(backend),
-    hint: { get: () => false, set: () => {} },
+    backend,
   })
   await account.signInWithGoogle()
   await waitFor(() => expect(account.getSnapshot().user).not.toBeNull())

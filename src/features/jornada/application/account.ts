@@ -1,12 +1,7 @@
+import type { AuthSession, LoginActions } from '../../../shared/auth/session'
 import { emptyProgress, mergeProgress } from '../domain/progress'
 import type { JourneyStore } from './JourneyStore'
-import {
-  AuthFailure,
-  type AuthUser,
-  type CloudBackend,
-  type JourneyEditorBackend,
-  type ProgressRepository,
-} from './ports'
+import type { AuthUser, CloudBackend, JourneyEditorBackend, ProgressRepository } from './ports'
 
 /**
  * - idle: sem conta (tudo só no aparelho)
@@ -23,82 +18,75 @@ export interface AccountState {
   isBackendLoading: boolean
   /** A conta tem o papel de admin: vê a jornada inteira, sem cadeados. */
   isAdmin: boolean
-  /**
-   * Já se sabe se há alguém logado. Com sessão lembrada no aparelho, só depois da primeira resposta
-   * do Firebase: até lá a jornada mostra "carregando", e não a tela de login (ADR-020).
-   */
+  /** Já se sabe se há alguém logado (ver `AuthSessionState`). */
   authChecked: boolean
 }
 
-export interface Account {
+export interface Account extends LoginActions {
   getSnapshot(): AccountState
   subscribe(listener: () => void): () => void
-  signInWithGoogle(): Promise<void>
-  signInWithEmail(email: string, password: string): Promise<void>
-  signUpWithEmail(email: string, password: string): Promise<void>
-  sendPasswordReset(email: string): Promise<void>
   /** O que o modo Andreía grava; as regras da nuvem recusam quem não é admin. */
   loadEditorBackend(): Promise<JourneyEditorBackend>
   /** Envia o que estiver pendente, sai da conta e apaga o progresso deste aparelho. */
   signOut(): Promise<void>
 }
 
-/** Lembra, sem guardar dados pessoais, que havia alguém logado: só então o Firebase carrega ao abrir. */
-export interface SessionHint {
-  get(): boolean
-  set(value: boolean): void
-}
-
 interface AccountDeps {
   store: JourneyStore
   local: ProgressRepository
+  /** O login do site (ADR-022); a jornada só reage a quem entra e sai. */
+  session: AuthSession
+  /** A nuvem da jornada (progresso, admins, editor), baixada quando alguém entra. */
   loadBackend: () => Promise<CloudBackend>
-  hint: SessionHint
   debounceMs?: number
   /** Avisa quando a conexão volta (window 'online'). */
   onReconnect?: (listener: () => void) => () => void
 }
 
-const CONNECTION_ERROR = 'Não foi possível conectar. Verifique sua internet e tente de novo.'
-
+/** Sincroniza o progresso da jornada com a conta de quem está logado. */
 export function createAccount({
   store,
   local,
+  session,
   loadBackend,
-  hint,
   debounceMs = 800,
   onReconnect,
 }: AccountDeps): Account {
-  let state: AccountState = {
-    user: null,
-    sync: 'idle',
-    isBackendLoading: false,
-    isAdmin: false,
-    authChecked: !hint.get(),
-  }
+  let own: { sync: SyncStatus; isAdmin: boolean } = { sync: 'idle', isAdmin: false }
+  let currentUid: string | null = null
+  let snapshot: AccountState = compose()
   const listeners = new Set<() => void>()
   let backendPromise: Promise<CloudBackend> | null = null
   let pushTimer: ReturnType<typeof setTimeout> | null = null
   let isApplyingCloud = false
 
-  function set(patch: Partial<AccountState>) {
-    state = { ...state, ...patch }
+  function compose(): AccountState {
+    const s = session.getSnapshot()
+    return {
+      user: s.user,
+      sync: own.sync,
+      isBackendLoading: s.isLoading,
+      isAdmin: own.isAdmin,
+      authChecked: s.authChecked,
+    }
+  }
+
+  function notify() {
+    snapshot = compose()
     listeners.forEach((listener) => listener())
+  }
+
+  function set(patch: Partial<typeof own>) {
+    own = { ...own, ...patch }
+    notify()
   }
 
   function ensureBackend(): Promise<CloudBackend> {
     if (!backendPromise) {
-      set({ isBackendLoading: true })
-      backendPromise = loadBackend()
-        .then((backend) => {
-          backend.auth.onChange((user) => void handleUser(backend, user))
-          return backend
-        })
-        .catch((error: unknown) => {
-          backendPromise = null
-          throw error
-        })
-        .finally(() => set({ isBackendLoading: false }))
+      backendPromise = loadBackend().catch((error: unknown) => {
+        backendPromise = null
+        throw error
+      })
     }
     return backendPromise
   }
@@ -113,21 +101,21 @@ export function createAccount({
     }
   }
 
-  async function handleUser(backend: CloudBackend, user: AuthUser | null) {
+  async function handleUser(user: AuthUser | null) {
     if (!user) {
       cancelPush()
-      set({ user: null, sync: 'idle', isAdmin: false, authChecked: true })
+      set({ sync: 'idle', isAdmin: false })
       return
     }
-    hint.set(true)
-    set({ user, sync: 'connecting', authChecked: true })
-    void checkAdmin(backend, user.uid)
+    set({ sync: 'connecting' })
     try {
+      const backend = await ensureBackend()
+      void checkAdmin(backend, user.uid)
       const remote = await backend.cloud.load(user.uid)
       const merged = remote ? mergeProgress(store.getSnapshot(), remote) : store.getSnapshot()
       applyFromCloud(merged)
       await backend.cloud.save(user.uid, merged)
-      if (state.sync === 'connecting') set({ sync: 'saved' })
+      if (own.sync === 'connecting') set({ sync: 'saved' })
     } catch {
       set({ sync: 'offline' })
     }
@@ -136,7 +124,7 @@ export function createAccount({
   async function checkAdmin(backend: CloudBackend, uid: string) {
     const isAdmin = await backend.admins.isAdmin(uid).catch(() => false)
     // Só vale se a mesma pessoa ainda estiver logada quando a resposta chegar.
-    if (state.user?.uid === uid && isAdmin !== state.isAdmin) set({ isAdmin })
+    if (currentUid === uid && isAdmin !== own.isAdmin) set({ isAdmin })
   }
 
   function cancelPush() {
@@ -146,11 +134,11 @@ export function createAccount({
 
   async function push() {
     cancelPush()
-    const user = state.user
-    if (!user || !backendPromise) return
-    const backend = await backendPromise
+    const user = snapshot.user
+    if (!user) return
     const progress = store.getSnapshot()
     try {
+      const backend = await ensureBackend()
       await backend.cloud.save(user.uid, progress)
       // Só marca "salvo" se nada mudou enquanto o envio acontecia.
       if (!pushTimer && store.getSnapshot() === progress) set({ sync: 'saved' })
@@ -159,51 +147,48 @@ export function createAccount({
     }
   }
 
+  function onSessionChange() {
+    const user = session.getSnapshot().user
+    const uid = user?.uid ?? null
+    if (uid !== currentUid) {
+      currentUid = uid
+      void handleUser(user)
+    }
+    notify()
+  }
+
+  session.subscribe(onSessionChange)
+  onSessionChange()
+
   store.subscribe(() => {
-    if (!state.user || isApplyingCloud) return
+    if (!snapshot.user || isApplyingCloud) return
     set({ sync: 'saving' })
     cancelPush()
     pushTimer = setTimeout(() => void push(), debounceMs)
   })
 
   onReconnect?.(() => {
-    if (state.user && state.sync === 'offline') void push()
+    if (snapshot.user && own.sync === 'offline') void push()
   })
 
-  if (hint.get()) void ensureBackend().catch(() => set({ sync: 'idle', authChecked: true }))
-
-  async function withBackend(action: (backend: CloudBackend) => Promise<void>) {
-    let backend: CloudBackend
-    try {
-      backend = await ensureBackend()
-    } catch {
-      throw new AuthFailure(CONNECTION_ERROR)
-    }
-    await action(backend)
-  }
-
   return {
-    getSnapshot: () => state,
+    getSnapshot: () => snapshot,
     subscribe(listener) {
       listeners.add(listener)
       return () => listeners.delete(listener)
     },
-    signInWithGoogle: () => withBackend((b) => b.auth.signInWithGoogle()),
-    signInWithEmail: (email, password) =>
-      withBackend((b) => b.auth.signInWithEmail(email, password)),
-    signUpWithEmail: (email, password) =>
-      withBackend((b) => b.auth.signUpWithEmail(email, password)),
-    sendPasswordReset: (email) => withBackend((b) => b.auth.sendPasswordReset(email)),
+    signInWithGoogle: () => session.signInWithGoogle(),
+    signInWithEmail: (email, password) => session.signInWithEmail(email, password),
+    signUpWithEmail: (email, password) => session.signUpWithEmail(email, password),
+    sendPasswordReset: (email) => session.sendPasswordReset(email),
     loadEditorBackend: () => ensureBackend().then((backend) => backend.editor),
     async signOut() {
-      if (!backendPromise || !state.user) return
-      if (pushTimer || state.sync === 'offline') await push()
-      const backend = await backendPromise
-      await backend.auth.signOut()
-      hint.set(false)
+      if (!snapshot.user) return
+      if (pushTimer || own.sync === 'offline') await push()
+      await session.signOut()
       applyFromCloud(emptyProgress())
       local.clear()
-      set({ user: null, sync: 'idle', isAdmin: false })
+      set({ sync: 'idle', isAdmin: false })
     },
   }
 }
