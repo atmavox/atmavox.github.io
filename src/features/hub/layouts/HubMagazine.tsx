@@ -1,5 +1,5 @@
 import { ArrowRight, MessageCircle } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
@@ -30,7 +30,7 @@ import {
   specialties,
   type HubAudio,
 } from '../content'
-import { DESKTOP_MENU, type HubSection } from '../navigation'
+import { activeMenuItem, DESKTOP_MENU, isHomeAnchor, type HubSection } from '../navigation'
 
 const wrap = 'mx-auto w-full max-w-6xl px-6 md:px-12'
 const eyebrow = 'text-xs font-semibold tracking-[0.24em] text-accent uppercase'
@@ -49,6 +49,27 @@ export function HubMagazine({
   meditationId: string | null
 }) {
   const [openVideo, setOpenVideo] = useState<HubAudio | null>(null)
+  const activeItem = activeMenuItem(section)
+  // Trechos da página inicial piscam no menu ao serem clicados e devolvem a marca ao "Início".
+  const [flashing, setFlashing] = useState<HubSection | null>(null)
+  const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(
+    () => () => {
+      if (flashTimer.current) clearTimeout(flashTimer.current)
+    },
+    [],
+  )
+
+  function handleMenuClick(item: HubSection, href: string) {
+    if (!isHomeAnchor(item)) return
+    setFlashing(item)
+    if (flashTimer.current) clearTimeout(flashTimer.current)
+    flashTimer.current = setTimeout(() => setFlashing(null), 700)
+    // O mesmo link de novo não muda o endereço: rola até o trecho assim mesmo.
+    if (window.location.hash === href) {
+      document.getElementById(item)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
   // Hubs e página de meditação são páginas próprias; o resto são seções da vitrine.
   const page =
     section === 'jornadas'
@@ -81,9 +102,10 @@ export function HubMagazine({
               <a
                 key={item.id}
                 href={item.href}
-                aria-current={item.id === section ? 'location' : undefined}
-                className={`text-[0.95rem] transition-colors hover:text-accent ${
-                  item.id === section ? 'text-accent' : 'text-ink-muted'
+                aria-current={item.id === activeItem ? 'page' : undefined}
+                onClick={() => handleMenuClick(item.id, item.href)}
+                className={`text-[0.95rem] transition-colors duration-300 hover:text-accent ${
+                  item.id === activeItem || item.id === flashing ? 'text-accent' : 'text-ink-muted'
                 }`}
               >
                 {item.label}

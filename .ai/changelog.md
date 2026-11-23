@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.6.2] · 2026-11-22
+
+### Corrigido
+
+- Menu do computador: Encontros, Sobre e Contato são trechos da página inicial, então "Início" continua
+  marcado e o item clicado só pisca; Jornadas e Meditações, páginas próprias, ficam marcadas. Clicar de
+  novo no trecho em que já se está volta a rolar até ele.
+
 ## [1.6.1] · 2026-11-22
 
 Reúne as etapas D.1 a D.5 (uma minor cada: 1.2.0 a 1.6.0) e as correções pedidas no caminho (áudio de

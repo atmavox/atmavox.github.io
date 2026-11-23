@@ -183,7 +183,20 @@ describe('hub no computador (revista)', () => {
     const menu = screen.getByRole('navigation', { name: 'Seções' })
     expect(within(menu).getByRole('link', { name: 'Jornadas' })).toHaveAttribute(
       'aria-current',
-      'location',
+      'page',
+    )
+  })
+
+  it('Encontros, Sobre e Contato são trechos do início: "Início" continua marcado', () => {
+    setWideViewport(true)
+    render(<HubPage path="/encontros" />)
+    const menu = screen.getByRole('navigation', { name: 'Seções' })
+    expect(within(menu).getByRole('link', { name: 'Início' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    expect(within(menu).getByRole('link', { name: 'Encontros' })).not.toHaveAttribute(
+      'aria-current',
     )
   })
 })

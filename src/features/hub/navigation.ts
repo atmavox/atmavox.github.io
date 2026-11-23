@@ -53,3 +53,15 @@ export function tabOfSection(section: HubSection): HubTab {
   if (section === 'sobre') return 'contato'
   return section
 }
+
+/**
+ * Item marcado no menu do computador: Jornadas e Meditações são páginas próprias e ficam marcadas;
+ * Encontros, Sobre e Contato são trechos da página inicial, então "Início" continua marcado (o item
+ * clicado só pisca).
+ */
+export function activeMenuItem(section: HubSection): HubSection {
+  return section === 'jornadas' || section === 'meditacoes' ? section : 'inicio'
+}
+
+export const isHomeAnchor = (section: HubSection) =>
+  section === 'encontros' || section === 'sobre' || section === 'contato'
