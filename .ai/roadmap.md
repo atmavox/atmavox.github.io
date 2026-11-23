@@ -107,13 +107,27 @@ aprovados antes do código.
        ADR-018)
    - [ ] Conferir no celular depois do deploy: sem barra de endereço, barra do topo Areia/Sépia, cor da
          barra de botões do Android; remover o atalho antigo e instalar de novo
-4. [ ] "Começar jornada" com mais destaque na página inicial
-5. [ ] Hub de jornadas (`#/jornadas`) com banner, nome, frase e temas; jornada só com login (mocks antes;
-       muda o `purpose.md`, com ADR)
-6. [ ] Modo Andreía: criar jornadas (estrutura por dias, dias + semanas ou temas; grátis/paga, preço,
-       validade do acesso, banner, frase, temas)
-7. [ ] Pagamento por jornada sem custo fixo (decidir: Mercado Pago + Worker gratuito ou liberação manual);
-       conteúdo pago sai do código do site e fica só na nuvem
+4. [x] "Começar jornada" com mais destaque: juntou-se ao hub de jornadas e à página inicial nova
+   - [x] Etapa A: mocks da página inicial (vitrine), aprovada a direção 4
+         (`Downloads/atmavox-pagina-inicial.html`)
+   - [x] Etapa B: mocks dos hubs (jornadas expandida A5 + compacta A4, filtros recolhíveis, tag "Pago",
+         login → preço, meditações B com e-book), aprovados (`Downloads/atmavox-hubs.html`)
+   - [x] Etapa C: modelo e decisões: catálogo (ADR-019), login e acesso (ADR-020), vitrine (ADR-021),
+         `purpose.md`, F9 em `features.md`, modelo em `architecture.md`
+5. [ ] Etapa D, um commit por passo:
+   1. [ ] `shared/catalog`: tipos, `parseCatalog`, regra da tag de preço, com testes; catálogo inicial
+          com a jornada de 21 dias
+   2. [ ] Página inicial vitrine (F9), encontros apontando para o TikTok
+   3. [ ] Hub de jornadas (`#/jornadas`): expandida/compacta, filtros, tag
+   4. [ ] Login obrigatório na jornada + janela de login sobre a tela desfocada; rotas
+          `#/jornada/{id}`
+   5. [ ] Hub de meditações (`#/meditacoes`) e página da meditação (play + e-book)
+   6. [ ] Regras do Firestore: catálogo, acesso, `published` só com acesso; conteúdo pago fora do
+          código do site
+   7. [ ] Modo Andreía: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
+          temas, território, destaque) e liberar acesso à mão
+6. [ ] Pagamento por produto sem custo fixo (decidir: Mercado Pago + Worker gratuito ou só liberação
+       manual, que já funciona desde o passo 5.7)
 
 Surgiu no caminho:
 
@@ -122,6 +136,12 @@ Surgiu no caminho:
 - [ ] Alinhar os nomes dos produtos ao briefing antes do hub de jornadas: lá "Saindo do Estado Cinza"
       (jornada em áudio) e "A Chama Interna" (21 dias, futura) são produtos diferentes; o briefing também
       pede não anunciar como disponível o que não está pronto
+- [ ] Receber da Andreía: preço e prazo de acesso de cada produto, depoimentos reais, frases de efeito,
+      e quais meditações terão e-book
+- [x] E-book (2026-11-22): um link para baixar o documento (ex.: Google Drive), guardado só no
+      `published` da meditação; quem tem acesso vê o botão "Baixar e-book" (ADR-020)
+- [x] Histórico do git (2026-11-22): fica como está; o desenvolvedor considerou que ninguém vai procurar
+      o conteúdo lá (ADR-020)
 
 ## Depois
 

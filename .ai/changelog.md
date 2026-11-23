@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+### Alterado
+
+- Propósito do site: a página inicial vira vitrine, nascem os hubs de jornadas e de meditações, e
+  jornadas e meditações podem ser pagas; jornadas passam a pedir login (`purpose.md`).
+- Decisões registradas para o que vem: catálogo de produtos (ADR-019), login e acesso pago liberado por
+  documento (ADR-020) e página inicial como vitrine (ADR-021); especificação F9 em `features.md` e
+  modelo planejado em `architecture.md`.
+
 ## [1.1.0] · 2026-11-22
 
 ### Adicionado

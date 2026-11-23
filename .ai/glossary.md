@@ -38,3 +38,8 @@
 | **Porta**            | Interface da camada de aplicação (`ProgressRepository`, `AuthService`).                |
 | **Composition root** | O único lugar que escolhe as implementações das portas (`createServices`).             |
 | **Evolução da aba**  | A cor da aba vai do cinza ao âmbar conforme o progresso daquela etapa.                 |
+| **Produto**          | Uma jornada ou meditação do catálogo, grátis ou paga (ADR-019).                        |
+| **Catálogo**         | A lista pública de produtos (`catalog/public`), sem o conteúdo deles.                  |
+| **Acesso**           | Documento que libera um produto pago para uma pessoa, com prazo (ADR-020).             |
+| **Território**       | Grupo da marca usado nos filtros: Estado Cinza, Consciência, Presença, Expansão.       |
+| **Vitrine**          | A página inicial: mostra produtos em destaque, sem preço (ADR-021).                    |

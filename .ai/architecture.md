@@ -111,6 +111,54 @@ Regras do Firestore (`firestore.rules`): cada pessoa só lê e escreve `users/{s
 e `media` têm leitura pública e gravação só da admin; `drafts` é só da admin; cada pessoa só lê o
 próprio `admins/{uid}`. O restante é negado.
 
+### Catálogo e acesso (planejado, ADR-019 e ADR-020)
+
+```
+catalog/public                        # content: JSON com Product[]; updatedAt (leitura pública, por REST)
+published/{productId}                 # content: jornada ou meditação; free: boolean (cópia do catálogo)
+users/{uid}/access/{productId}        # grantedAt, expiresAt | null, source: 'manual' | 'payment', ref?
+interest/{productId}/people/{uid}     # "Quero ser avisada" de um produto "Em breve"; createdAt
+```
+
+```ts
+type Territory = 'estado-cinza' | 'consciencia' | 'presenca' | 'expansao'
+type Pricing = { type: 'free' } | { type: 'paid'; priceCents: number; accessMonths: number | null } // null = acesso para sempre
+
+interface ProductBase {
+  id: string // slug imutável: chave do progresso, do acesso e das rotas
+  title: string
+  phrase: string // frase emblemática do cartão
+  bannerMediaId?: string // imagem em media/{id} (ADR-014)
+  territory: Territory
+  status: 'draft' | 'soon' | 'published' // draft não aparece; soon = "Em breve"
+  pricing: Pricing
+  featured: boolean // aparece na página inicial
+  order: number
+}
+interface JourneyProduct extends ProductBase {
+  kind: 'journey'
+  structure: 'days' | 'weeks' | 'themes' // "Por dias", "3 semanas", "Por temas"
+  durationLabel: string // "21 dias", "Jornada em áudio"
+  themes: { label: string; title: string }[] // os quadradinhos: I · Nomeando o Cinza…
+}
+interface MeditationProduct extends ProductBase {
+  kind: 'meditation'
+  media: 'audio' | 'video'
+  durationSec: number
+  group: string // agrupamento no hub: "Manhã", "Noite", "Encontros gravados"…
+  ebook?: { pages: number } // o link de download fica no published, nunca no catálogo
+}
+type Product = JourneyProduct | MeditationProduct
+```
+
+Regras novas: `catalog/public` com leitura pública e gravação só da admin; `published/{id}` com `get`
+só se `resource.data.free == true`, acesso válido ou admin (sem `list`); `access` lido pela própria
+pessoa e gravado só pela admin; `interest/{id}/people/{uid}` gravado pela própria pessoa e lido pela
+admin. Preço em centavos (inteiro) para não ter erro de arredondamento.
+
+Rotas novas: `#/jornadas` e `#/meditacoes` (hubs), `#/jornada/{productId}/…` (a `#/jornada` atual passa
+a abrir `chama-interna-21`) e `#/meditacao/{productId}`.
+
 As participantes leem `published` e `media` por `fetch` na API REST: o SDK do Firebase só carrega para
 quem entra na conta.
 

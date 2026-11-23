@@ -222,6 +222,81 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ app instalável e sem barra do navegador, sem risco de cache velho, zero dependências.
   ➖ não funciona offline; o script de ícones só roda no Windows.
 
+## ADR-019 · Jornadas e meditações como produtos de um catálogo
+
+- **Status:** aceita · 2026-11-22 (mocks aprovados: `Downloads/atmavox-pagina-inicial.html` e
+  `Downloads/atmavox-hubs.html`)
+- **Contexto:** o site deixa de ter uma jornada só. A página inicial vira vitrine, nascem o hub de
+  jornadas e o de meditações, e a Andreía quer criar jornadas e meditações grátis ou pagas, com preço e
+  prazo de acesso. A vitrine precisa saber o que existe sem baixar o conteúdo de nada.
+- **Decisão:** um **catálogo** público separado do conteúdo.
+  - `catalog/public` guarda, como JSON num campo `content` (mesmo padrão do ADR-015), a lista de
+    produtos: só o que a vitrine e os hubs mostram (nome, frase, banner, território, estrutura, temas,
+    duração, preço, prazo, destaque, ordem, status). Lido por REST, sem login e sem o SDK.
+  - O **conteúdo** de cada produto continua em `published/{productId}` (jornada: dias e blocos;
+    meditação: link do áudio ou vídeo e do e-book), com a cópia `free` do catálogo para as regras.
+  - O **id do produto** é um slug imutável (ex.: `chama-interna-21`): é a chave do progresso
+    (`users/{uid}/journeys/{id}`), do acesso e das rotas. Renomear muda só o título.
+  - Tipos e regras puras (formato, `parseCatalog`, qual tag mostrar) ficam em `src/shared/catalog/`,
+    porque o hub e a jornada usam os dois. Modelo completo em `architecture.md` e regras de tela em
+    `features.md` (F9).
+- **Alternativas consideradas:** um documento por produto (uma leitura por cartão na vitrine);
+  catálogo no código (a Andreía não conseguiria criar produtos sem desenvolvedor); manter tudo em
+  `published` (a vitrine baixaria o conteúdo inteiro, inclusive o pago).
+- **Consequências:** ➕ uma leitura para montar a vitrine e os hubs; conteúdo pago nunca passa pela
+  vitrine; mesmo formato para jornadas e meditações. ➖ o catálogo e o `published` precisam ser gravados
+  juntos (em lote) para o `free` não divergir; limite de 1 MB no catálogo (folgado: cada produto tem
+  ~1 kB).
+
+## ADR-020 · Login nas jornadas e acesso pago liberado por documento
+
+- **Status:** aceita · 2026-11-22 · muda o ADR-015 (o `published` deixa de ser leitura pública para
+  tudo) e o `purpose.md` (a jornada era aberta e sem login)
+- **Contexto:** jornadas e meditações podem ser pagas. Num site estático no GitHub Pages, tudo que está
+  no código é público; e no plano gratuito do Firebase não há Cloud Functions para validar compras.
+- **Decisão:**
+  - **Jornadas pedem login**, grátis ou pagas: o progresso e o acesso ficam na conta. Quem já tinha
+    progresso no aparelho entra e o merge de sempre junta tudo. **Meditações grátis** tocam sem login;
+    as pagas pedem login.
+  - **Acesso** = documento `users/{uid}/access/{productId}` com `grantedAt`, `expiresAt` (ou `null` para
+    sempre), `source` (`manual` ou `payment`) e `ref` (o pagamento). A pessoa só lê o próprio; **só a
+    admin grava** (liberação manual no Modo Andreía). Um pagamento automático, se vier (Fase 5, passo
+    7), grava com credencial de servidor, que não passa pelas regras.
+  - **Regras:** `published/{id}` só é lido (`get`, nunca `list`) se `free == true`, se a pessoa tem
+    acesso válido (`expiresAt` nulo ou no futuro) ou se é admin. Quem tem acesso lê por REST com o token
+    do login.
+  - **Conteúdo pago sai do código do site:** a cópia da jornada que hoje vai no código (usada se a nuvem
+    falhar) deixa de existir para produtos pagos; sem nuvem, a tela pede para tentar de novo.
+  - **Fluxo de tela** (mock aprovado): vitrine sem preço; no hub, "Pago" antes do login; "Começar" abre o
+    login sobre a tela desfocada; depois do login, a janela de preço (só se paga e sem acesso).
+  - **Acesso vencido:** o progresso continua guardado; o conteúdo volta a mostrar o preço para renovar.
+- **Alternativas consideradas:** conteúdo pago no código com "cadeado" só na tela (qualquer pessoa lê no
+  código-fonte); liberar por _custom claims_ (exige Cloud Functions, plano pago); senha por jornada
+  (fácil de repassar e sem prazo).
+- **Consequências:** ➕ custo zero; quem não pagou não recebe o conteúdo; a Andreía consegue liberar
+  acesso à mão desde o primeiro dia, antes de qualquer integração de pagamento. ➖ proteção "suave":
+  links de vídeo, áudio e e-book podem ser repassados por quem tem acesso; o repositório é público, então
+  o **histórico do git** continua com a jornada de 21 dias e o `workbook-original.html` (apagar o
+  histórico exigiria reescrever a `main`; aceito pelo desenvolvedor em 2026-11-22). O **e-book** é um
+  link para baixar o documento (ex.: Google Drive), guardado só no `published`; cada leitura de
+  conteúdo pago custa uma leitura extra (o documento de acesso), folgado na cota gratuita.
+
+## ADR-021 · Página inicial como vitrine; textos fixos no código por enquanto
+
+- **Status:** aceita · 2026-11-22 · complementa o ADR-010 (as duas estruturas, abas no celular e revista
+  no computador, continuam)
+- **Contexto:** a página inicial aprovada mostra jornadas em destaque, meditações, encontros, frase de
+  efeito, depoimentos, redes e A Ativadora. Os encontros não têm horário fixo: acontecem como quadro ao
+  vivo no TikTok.
+- **Decisão:** jornadas e meditações da vitrine vêm do catálogo (ADR-019), pelo `featured` e pela
+  `order`. Encontros, frases, depoimento (um, de exemplo, até a Andreía mandar os reais), redes e A
+  Ativadora continuam em `features/hub/content.ts`. Os encontros perdem os horários e apontam para o
+  TikTok. Esses textos vão para o Firestore só quando o Modo Andreía precisar editá-los.
+- **Alternativas consideradas:** tudo no Firestore já agora (mais leituras e telas de edição que ainda
+  ninguém pediu).
+- **Consequências:** ➕ a vitrine muda sozinha quando a Andreía publica um produto; menos trabalho agora.
+  ➖ trocar frase, depoimento ou encontro ainda pede desenvolvedor.
+
 ---
 
 ## Modelo

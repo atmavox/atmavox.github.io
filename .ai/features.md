@@ -281,3 +281,51 @@ escolha de dia/aparelho, limpar imagens que nenhum bloco usa.
 
 **Aceite (conferido em 2026-11-21 com a conta do desenvolvedor):** editar o dia 1, salvar, publicar e ver
 a mudança numa janela anônima; voltar uma versão pelo Histórico.
+
+## F9 · Vitrine, hubs e produtos pagos 📐 (mocks aprovados em 2026-11-22; código a partir da Etapa D)
+
+Mocks: `Downloads/atmavox-pagina-inicial.html` (direção 4) e `Downloads/atmavox-hubs.html`. Decisões:
+ADR-019 (catálogo), ADR-020 (login e acesso), ADR-021 (página inicial).
+
+**Tag de preço** (uma regra só, em `shared/catalog`, com teste), para jornadas e meditações:
+
+| Situação                              | Tag                     | Botão                             |
+| ------------------------------------- | ----------------------- | --------------------------------- |
+| `status: 'soon'`                      | "Em breve"              | "Quero ser avisada" (pede login)  |
+| Vitrine (página inicial), qualquer um | nenhuma                 | "Conhecer"                        |
+| Hub, sem login, paga                  | "Pago"                  | "Começar jornada" → login         |
+| Hub, sem login, grátis                | nenhuma                 | "Começar jornada" → login         |
+| Hub, logada, paga sem acesso          | preço com cadeado       | "Ver e começar" → janela de preço |
+| Hub, logada, grátis                   | "Grátis"                | "Começar"                         |
+| Logada com acesso válido              | "Sua" (filtro "Minhas") | "Continuar"                       |
+| Acesso vencido                        | preço com cadeado       | "Renovar" → janela de preço       |
+
+**Página inicial (vitrine):** topo da revista com "Conhecer as jornadas" e "Ouvir uma meditação";
+jornadas em destaque (sem preço); meditações ("Pausas guiadas para voltar ao centro"); encontros (sem
+horário, "quando acontece, é um quadro ao vivo no TikTok"); frase de efeito com a logo falando atrás;
+"Quem já viveu" (carrossel); "Nas redes sociais"; A Ativadora. Linhas de cartões sem barra de rolagem:
+setas no cabeçalho da seção no computador (só quando sobra cartão), deslizar com pontinhos no celular.
+
+**Hub de jornadas (`#/jornadas`):**
+
+- **Expandida** (padrão, a A5): cartões largos agrupados por território, com banner, duração,
+  estrutura, tag, nome, frase, quadradinhos dos temas e botão.
+- **Compacta** (a A4): uma linha por jornada (miniatura, nome, frase, duração, temas, tag, botão).
+- Chave Expandida/Compacta; a escolha fica no aparelho.
+- **Filtros** abertos por padrão numa coluna à esquerda (busca, territórios com contagem, "Mostrar":
+  Todas, Disponíveis, Em breve e, logada, Grátis e Minhas; duração), recolhíveis por "Ocultar filtros"
+  (a busca sobe para a barra). No celular: busca e filtros que deslizam, recolhíveis pelo botão
+  "Filtros"; compacta é o padrão.
+
+**Começar uma jornada:** sem login, o hub fica desfocado e abre a janela de login (no celular, folha que
+sobe) com a jornada escolhida, Google, e-mail e senha. Depois do login: grátis começa direto; paga sem
+acesso abre a janela de preço (banner, preço, o que inclui, prazo de acesso, formas de pagamento, "Pagar
+e começar", "Voltar para as jornadas").
+
+**Hub de meditações (`#/meditacoes`, variante B):** grade de capas com tipo ("Áudio", "Vídeo", "+ E-book")
+e play; filtros Todas, Áudio, Vídeo, Com e-book (logada: Grátis e Minhas). Grátis tocam sem login; pagas
+seguem o mesmo fluxo das jornadas, com "Pagar e ouvir". Com acesso, a meditação mostra o play e "Baixar
+e-book".
+
+**Modo Andreía (Etapa D):** criar e editar produtos do catálogo (tipo, estrutura, grátis/paga, preço,
+prazo de acesso, banner, frase, temas, território, destaque, ordem, status) e liberar acesso à mão.
