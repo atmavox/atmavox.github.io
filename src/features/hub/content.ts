@@ -38,7 +38,7 @@ export interface HubVideo {
 }
 
 export type SocialId =
-  'instagram' | 'youtube' | 'facebook' | 'whatsapp' | 'tiktok' | 'threads' | 'telegram'
+  'instagram' | 'youtube' | 'facebook' | 'whatsapp' | 'tiktok' | 'threads' | 'telegram' | 'spotify'
 
 export interface SocialLink {
   id: SocialId

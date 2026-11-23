@@ -23,6 +23,7 @@ import { PhraseBand } from '../components/PhraseBand'
 import { Portrait } from '../components/Portrait'
 import { ShowcaseJourneyCard } from '../components/ShowcaseJourneyCard'
 import { SocialLinks } from '../components/SocialLinks'
+import { SocialPosts } from '../components/SocialPosts'
 import { Testimonials } from '../components/Testimonials'
 import {
   about,
@@ -296,15 +297,18 @@ export function HubMagazine({
           <section
             id="contato"
             aria-labelledby="redes-titulo"
-            className={`${wrap} flex scroll-mt-24 flex-wrap items-end justify-between gap-6 py-18`}
+            className={`${wrap} flex scroll-mt-24 flex-col gap-7 py-18`}
           >
-            <div className="flex flex-col gap-2">
-              <p className={eyebrow}>@atmavox</p>
-              <h2 id="redes-titulo" className={sectionTitle}>
-                Nas redes sociais
-              </h2>
+            <div className="flex flex-wrap items-end justify-between gap-6">
+              <div className="flex flex-col gap-2">
+                <p className={eyebrow}>@atmavox</p>
+                <h2 id="redes-titulo" className={sectionTitle}>
+                  Nas redes sociais
+                </h2>
+              </div>
+              <SocialLinks variant="icons" />
             </div>
-            <SocialLinks variant="icons" />
+            <SocialPosts layout="wide" />
           </section>
 
           <section

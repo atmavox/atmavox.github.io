@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  # A cada 6 horas, para a página inicial trazer a última publicação das redes (ADR-028).
+  schedule:
+    - cron: '17 */6 * * *'
 
 permissions:
   contents: read
@@ -26,6 +29,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - name: Buscar as últimas publicações das redes
+        # Uma rede que falhar fica de fora; sem nenhuma, a página inicial mostra só os ícones (ADR-028).
+        # A chave do Instagram é secreta; o vídeo do TikTok e o feed do podcast são Variables.
+        continue-on-error: true
+        run: node scripts/fetch-social.ts
+        env:
+          INSTAGRAM_TOKEN: ${{ secrets.INSTAGRAM_TOKEN }}
+          SOCIAL_TIKTOK_URL: ${{ vars.SOCIAL_TIKTOK_URL }}
+          SOCIAL_SPOTIFY_RSS: ${{ vars.SOCIAL_SPOTIFY_RSS }}
       - run: npm run build
         # Configuração web do Firebase (pública por natureza; a segurança está nas regras do Firestore).
         # Sem estas variáveis o site funciona e o botão "Entrar" simplesmente não aparece.

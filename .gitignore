@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Gerados no deploy pelo scripts/fetch-social.ts (ADR-028)
+public/social.json
+public/social/

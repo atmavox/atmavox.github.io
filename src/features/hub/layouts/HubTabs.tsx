@@ -29,6 +29,7 @@ import { PhraseBand } from '../components/PhraseBand'
 import { Portrait } from '../components/Portrait'
 import { ShowcaseJourneyCard } from '../components/ShowcaseJourneyCard'
 import { SocialLinks } from '../components/SocialLinks'
+import { SocialPosts } from '../components/SocialPosts'
 import { Testimonials } from '../components/Testimonials'
 import { about, contactCta, hero, introAudio, signature, specialties } from '../content'
 import { meditationHref, toHubAudio } from '../meditations'
@@ -100,6 +101,7 @@ function InicioPanel() {
           Nas redes sociais
         </h2>
         <SocialLinks variant="icons" />
+        <SocialPosts layout="narrow" />
       </section>
 
       <section aria-labelledby="sobre-titulo" className="flex flex-col gap-4">

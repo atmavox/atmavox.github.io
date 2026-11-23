@@ -344,7 +344,8 @@ ADR-019 (catálogo), ADR-020 (login e acesso), ADR-021 (página inicial).
 **Página inicial (vitrine):** topo da revista com "Conhecer as jornadas" e "Ouvir uma meditação";
 jornadas em destaque (sem preço); meditações ("Pausas guiadas para voltar ao centro"); encontros (sem
 horário, "um quadro recorrente, ao vivo no TikTok"); frase de efeito com a logo falando atrás;
-"Quem já viveu" (carrossel); "Nas redes sociais"; A Ativadora. Linhas de cartões sem barra de rolagem:
+"Quem já viveu" (carrossel); "Nas redes sociais" (ícones + a última publicação de cada rede: mural
+no computador, cartões quadrados que deslizam no celular; ADR-028); A Ativadora. Linhas de cartões sem barra de rolagem:
 setas no cabeçalho da seção no computador (só quando sobra cartão), deslizar com pontinhos no celular.
 
 **Hub de jornadas (`#/jornadas`):**

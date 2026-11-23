@@ -10,6 +10,16 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.21.0] · 2026-11-23
+
+### Adicionado
+
+- **Última publicação de cada rede** na página inicial (ADR-028, mock `Downloads/atmavox-redes.html`):
+  mural de cartões no computador e cartões quadrados que deslizam no celular, um por rede, com a capa,
+  o começo do texto e "há 10 dias". Gerado no deploy (a cada 6 horas) por `scripts/fetch-social.ts`:
+  YouTube já funciona; TikTok com um vídeo escolhido; Instagram e Spotify quando configurados (guia em
+  `.ai/redes-sociais.md`).
+
 ## [1.20.0] · 2026-11-23
 
 ### Alterado

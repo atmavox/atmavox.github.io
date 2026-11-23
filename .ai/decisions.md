@@ -443,6 +443,25 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ a Andreía cria territórios sozinha; o site segue de pé sem a nuvem. ➖ renomear
   e apagar ainda não existem (ficam para quando ela pedir).
 
+## ADR-028 · Últimas publicações das redes geradas no deploy
+
+- **Status:** aceita · 2026-11-23 (mock `Downloads/atmavox-redes.html`: A no computador, C no celular)
+- **Contexto:** a página inicial deve parecer viva sem a Andreía mexer no site. Sem custo e sem
+  segredo no navegador (GitHub Pages é estático).
+- **Decisão:** `scripts/fetch-social.ts` roda no deploy (a cada push e por `schedule` a cada 6 horas),
+  busca a última publicação de cada rede e grava `public/social.json` + as capas baixadas em
+  `public/social/` (as do Instagram e do TikTok vencem em dias). O site lê o arquivo uma vez por visita.
+  YouTube pelo feed público do canal; podcast pelo RSS (`SOCIAL_SPOTIFY_RSS`); Instagram pela API
+  oficial com `INSTAGRAM_TOKEN` (secret); TikTok por um vídeo escolhido (`SOCIAL_TIKTOK_URL`) e o
+  oEmbed público, porque o TikTok não entrega o último vídeo sem app aprovado. As leituras são funções
+  puras em `src/shared/social/feeds.ts` (o Node 24 roda o TypeScript direto). Rede que falhar fica de
+  fora; sem nenhuma, só os ícones. Guia em `redes-sociais.md`.
+- **Alternativas consideradas:** buscar no navegador (exigiria chave exposta e esbarra em CORS); um
+  Worker na Cloudflare (mais uma peça para manter, sem ganho); widgets prontos das redes (pesados e
+  fora da marca).
+- **Consequências:** ➕ grátis, rápido (arquivo estático) e sem chave no site. ➖ a publicação nova
+  aparece em até 6 horas; a chave do Instagram precisa ser renovada a cada 60 dias.
+
 ---
 
 ## Modelo

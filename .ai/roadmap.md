@@ -209,14 +209,13 @@ Surgiu no caminho:
 - [x] Histórico do git (2026-11-22): fica como está; o desenvolvedor considerou que ninguém vai procurar
       o conteúdo lá (ADR-020)
 
-- [ ] **Última publicação das redes na página inicial** (pedido de 2026-11-22): card em "Nas redes
-      sociais". Sem custo e sem segredo no navegador: um job agendado do GitHub Actions busca a última
-      publicação e gera um JSON estático no deploy. YouTube por RSS (público, sem chave); Instagram pela
-      Graph API (exige conta profissional, app na Meta e token guardado nos segredos do Actions, renovado
-      a cada 60 dias); TikTok não tem "última publicação" sem app aprovado. Precisa de mock antes. - [ ] **Pendência (2026-11-23):** trocar o Facebook pelo **Spotify** como foco dos posts recentes
-      (último episódio). A conta ainda não existe. Se for podcast publicado pelo Spotify for
-      Creators, o feed RSS é público e entra no mesmo job do Actions, sem chave; a API do Spotify
-      exigiria app e segredo nos segredos do Actions.
+- [x] **Última publicação das redes na página inicial** (ADR-028, mock `Downloads/atmavox-redes.html`,
+      1.21.0): gerada no deploy a cada 6 horas; mural no computador, cartões que deslizam no celular.
+      YouTube já funciona. Guia em `redes-sociais.md`.
+  - [ ] **Desenvolvedor:** criar a Variable `SOCIAL_TIKTOK_URL` com o vídeo escolhido pela Andreía
+  - [ ] **Desenvolvedor + Andreía:** ligar o Instagram (conta profissional, app na Meta, secret
+        `INSTAGRAM_TOKEN`) e lembrar de renovar a chave a cada 60 dias (ou automatizar a renovação)
+  - [ ] Spotify: quando o podcast existir, a Variable `SOCIAL_SPOTIFY_RSS` (o Facebook sai do foco)
 
 ## Depois
 

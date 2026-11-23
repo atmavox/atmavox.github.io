@@ -123,6 +123,7 @@ próprio `admins/{uid}`. O restante é negado.
 ```
 catalog/public                        # content: JSON com Product[]; updatedAt (leitura pública, por REST)
 catalog/territories                   # content: JSON com os territórios criados { id, name, tone }[] (ADR-027)
+# Fora do Firestore: public/social.json + public/social/*.jpg, gerados no deploy (ADR-028)
 published/{productId}                 # content: jornada ou meditação; free: boolean (cópia do catálogo)
 users/{uid}/access/{productId}        # grantedAt, expiresAt | null, source: 'manual' | 'payment', ref?
 interest/{productId}/people/{uid}     # "Quero ser avisada" de um produto "Em breve"; createdAt
