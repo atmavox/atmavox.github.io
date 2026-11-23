@@ -300,6 +300,14 @@ Editar a jornada →" e o mesmo atalho no menu da conta. Qualquer outra pessoa q
 - Tudo que vem da nuvem passa por `parseJourney`: bloco desconhecido, id repetido ou link que não seja
   `http(s)` faz o site usar a versão do código.
 
+- **Jornadas novas (ADR-024):** cada jornada tem o próprio editor, `#/jornada/{id}/editar` (a Chama
+  Interna continua em `#/jornada/editar`), aberto por "Editar o conteúdo da jornada →" no Modo Andreía
+  de produtos. Na primeira vez ela encontra o **esqueleto montado pelo produto**: por semana, os N dias
+  da duração ("14 dias" → 2 semanas de 7, com os temas do produto); por tema, um conteúdo vazio por
+  tema (sem dias: "Editar tema", sem apagar nem arrastar; o nome do tema se edita no quadro); por dias,
+  os N dias numa parte só. Também há o campo **Texto da Abertura**. Até publicar, as participantes veem
+  "Esta jornada ainda não está disponível"; a Andreía vê a prévia.
+
 **Ainda não faz (roadmap):** editar Revisões e Encerramento, "ver como participante" com
 escolha de dia/aparelho, limpar imagens que nenhum bloco usa.
 

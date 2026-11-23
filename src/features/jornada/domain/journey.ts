@@ -142,6 +142,8 @@ export interface Journey {
   id: string
   /** Sem ela, `weeks` (a Chama Interna, de antes das estruturas). */
   structure?: JourneyStructure
+  /** Texto da Abertura de uma jornada nova (a Chama Interna usa o texto que vem no código). */
+  opening?: string
   weeks: readonly JourneyWeek[]
   reviews: readonly WeeklyReview[]
   closingQuestions: readonly Question[]

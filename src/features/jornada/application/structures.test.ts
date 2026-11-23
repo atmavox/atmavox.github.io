@@ -5,7 +5,15 @@ import { withSectionIds, type Journey, type JourneyDay } from '../domain/journey
 import { parseJourney } from '../domain/parseJourney'
 import { completeDay, emptyProgress } from '../domain/progress'
 import { DAY_MS } from '../domain/release'
-import { journeyTabs, partOfTab, routeFromPath, tabOfDay } from './navigation'
+import {
+  editorHref,
+  editorJourneyId,
+  journeyIdFromPath,
+  journeyTabs,
+  partOfTab,
+  routeFromPath,
+  tabOfDay,
+} from './navigation'
 import { furthestUnlockedTab, isTabUnlocked } from './tabAccess'
 
 const T0 = Date.UTC(2026, 10, 23, 15) // 23/11, 12h em Brasília
@@ -90,6 +98,17 @@ describe('abas montadas pela estrutura', () => {
       journeyId: 'chama-interna-21',
       tab: 'semana-1',
     })
+  })
+})
+
+describe('editor de cada jornada', () => {
+  it('a Chama Interna usa o endereço antigo; as outras, o próprio id', () => {
+    expect(editorHref('chama-interna-21')).toBe('#/jornada/editar')
+    expect(editorHref('corpo-que-escuta')).toBe('#/jornada/corpo-que-escuta/editar')
+    expect(editorJourneyId('/jornada/editar')).toBe('chama-interna-21')
+    expect(editorJourneyId('/jornada/corpo-que-escuta/editar')).toBe('corpo-que-escuta')
+    expect(editorJourneyId('/jornada/corpo-que-escuta/tema-1')).toBeNull()
+    expect(journeyIdFromPath('/jornada/corpo-que-escuta/editar')).toBe('corpo-que-escuta')
   })
 })
 

@@ -6,7 +6,15 @@ import {
   type EditorState,
   type JourneyEditor,
 } from '../../application/JourneyEditor'
-import { allDays, type JourneyDay, type JourneyWeek } from '../../domain/journey'
+import { DEFAULT_JOURNEY_ID, journeyHref } from '../../application/navigation'
+import {
+  allDays,
+  structureOf,
+  type JourneyDay,
+  type JourneyStructure,
+  type JourneyWeek,
+} from '../../domain/journey'
+import { useCatalog } from '../../../../shared/catalog/CatalogContext'
 import { canRemoveDay } from '../../domain/journeyEditing'
 import { ConfirmDialog } from './ConfirmDialog'
 import { EditorIcon } from './EditorIcon'
@@ -24,15 +32,34 @@ interface OverviewProps {
 const btn =
   'inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-sm text-ink transition-colors hover:border-admin-ink'
 
-/** O tema da semana salva ao sair do campo (gravar a cada letra encheria a nuvem de escritas). */
-function WeekHeading({ week, editor }: { week: JourneyWeek; editor: JourneyEditor }) {
+/** O tema da semana (ou o nome do tema) salva ao sair do campo: gravar a cada letra encheria a nuvem. */
+function WeekHeading({
+  week,
+  editor,
+  structure,
+  position,
+}: {
+  week: JourneyWeek
+  editor: JourneyEditor
+  structure: JourneyStructure
+  position: number
+}) {
   const [theme, setTheme] = useState(week.theme)
+  if (structure === 'days') {
+    return (
+      <h2 className="mb-2.5 flex items-center gap-2.5 text-[13px] font-semibold tracking-[0.2em] text-accent uppercase">
+        <span className="shrink-0">Dias</span>
+        <span aria-hidden="true" className="h-px flex-1 bg-line" />
+      </h2>
+    )
+  }
+  const prefix = structure === 'themes' ? `Tema ${position}` : `Semana ${week.roman}`
   return (
     <h2 className="mb-2.5 flex items-center gap-2.5 text-[13px] font-semibold tracking-[0.2em] text-accent uppercase">
-      <span className="shrink-0">Semana {week.roman} ·</span>
+      <span className="shrink-0">{prefix} ·</span>
       <InlineText
         singleLine
-        label={`Tema da Semana ${week.roman}`}
+        label={structure === 'themes' ? `Nome do ${prefix}` : `Tema da ${prefix}`}
         value={theme}
         onChange={setTheme}
         onBlur={() => {
@@ -48,8 +75,35 @@ function WeekHeading({ week, editor }: { week: JourneyWeek; editor: JourneyEdito
   )
 }
 
+/** Texto da Abertura de uma jornada nova; salva ao sair do campo. */
+function OpeningField({ editor, value }: { editor: JourneyEditor; value: string }) {
+  const [text, setText] = useState(value)
+  return (
+    <section className="mt-4.5 rounded-[18px] border border-line bg-surface p-4">
+      <h2 className="mb-2 text-[13px] font-semibold tracking-[0.2em] text-accent uppercase">
+        Texto da Abertura
+      </h2>
+      <InlineText
+        label="Texto da Abertura"
+        placeholder="O que a participante lê antes de começar a jornada…"
+        value={text}
+        onChange={setText}
+        onBlur={() => {
+          if (text !== value) void editor.setOpening(text)
+        }}
+        className="text-ink-muted"
+      />
+    </section>
+  )
+}
+
 /** Quadro de todos os dias: cartões por semana, arrastar para reordenar, "Publicar" só aqui. */
 export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }: OverviewProps) {
+  const structure = structureOf(state.working)
+  const isThemes = structure === 'themes'
+  const unit = isThemes ? 'tema' : 'dia'
+  const product = useCatalog().find(state.working.id)
+  const isChama = state.working.id === DEFAULT_JOURNEY_ID
   const [dragging, setDragging] = useState<number | null>(null)
   const [over, setOver] = useState<number | null>(null)
   const [removing, setRemoving] = useState<JourneyDay | null>(null)
@@ -81,14 +135,18 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
     <div className="pt-6 pb-24">
       <div className="mb-4.5 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-[32px] text-ink">A Chama Interna</h1>
+          <h1 className="font-display text-[32px] text-ink">
+            {product?.title ?? 'A Chama Interna'}
+          </h1>
           <p className="mt-1.5 mb-2.5 text-ink-muted">
-            Clique num dia para editar. Arraste os cartões para mudar a ordem.
+            {isThemes
+              ? 'Clique num tema para editar o conteúdo dele.'
+              : 'Clique num dia para editar. Arraste os cartões para mudar a ordem.'}
           </p>
           <div className="flex items-center gap-2.5 text-sm text-ink-muted">
             <div
               role="progressbar"
-              aria-label="Dias salvos"
+              aria-label={isThemes ? 'Temas salvos' : 'Dias salvos'}
               aria-valuemin={0}
               aria-valuemax={total}
               aria-valuenow={total - drafts}
@@ -100,13 +158,13 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
               />
             </div>
             <span>
-              {total - drafts} de {total} dias salvos
+              {total - drafts} de {total} {isThemes ? 'temas' : 'dias'} salvos
             </span>
           </div>
         </div>
         <div className="flex flex-col items-end gap-1.5">
           <div className="flex flex-wrap justify-end gap-2">
-            <a href="#/jornada" className={btn}>
+            <a href={journeyHref(state.working.id)} className={btn}>
               <EditorIcon name="eye" /> Ver como participante
             </a>
             <button
@@ -122,9 +180,17 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
         </div>
       </div>
 
-      {state.working.weeks.map((week) => (
-        <section key={week.number} className="mt-4.5" aria-label={`Semana ${week.roman}`}>
-          <WeekHeading key={week.theme} week={week} editor={editor} />
+      {!isChama && <OpeningField editor={editor} value={state.working.opening ?? ''} />}
+
+      {state.working.weeks.map((week, weekIndex) => (
+        <section key={week.number} className="mt-4.5">
+          <WeekHeading
+            key={week.theme}
+            week={week}
+            editor={editor}
+            structure={structure}
+            position={weekIndex + 1}
+          />
           <ol className="grid grid-cols-2 gap-2.5 lg:grid-cols-7">
             {week.days.map((day) => {
               const status = dayStatus(state, day.number)
@@ -132,7 +198,8 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
               return (
                 <li
                   key={day.number}
-                  draggable
+                  // Por tema, cada tema tem um conteúdo só: nada de arrastar nem apagar.
+                  draggable={!isThemes}
                   onDragStart={() => setDragging(day.number)}
                   onDragEnd={() => {
                     setDragging(null)
@@ -156,8 +223,8 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
                   }`}
                 >
                   <span className="flex items-center justify-between font-display text-[28px] leading-none text-accent">
-                    {String(position).padStart(2, '0')}
-                    <span className="flex items-center gap-1">
+                    {String(isThemes ? weekIndex + 1 : position).padStart(2, '0')}
+                    <span className={`flex items-center gap-1 ${isThemes ? 'hidden' : ''}`}>
                       <button
                         type="button"
                         aria-label={`Apagar dia ${position}: ${day.title}`}
@@ -182,20 +249,22 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
                       </button>
                     </span>
                   </span>
-                  <span className="flex-1 text-sm leading-snug text-ink">{day.title}</span>
+                  <span className="flex-1 text-sm leading-snug text-ink">
+                    {isThemes ? week.theme || day.title : day.title}
+                  </span>
                   <StatusTag status={status} className="self-start" />
                   <button
                     type="button"
                     onClick={() => onOpenDay(day.number)}
-                    aria-label={`Editar dia ${position}: ${day.title}`}
+                    aria-label={`Editar ${unit} ${isThemes ? weekIndex + 1 : position}: ${isThemes ? week.theme : day.title}`}
                     className={`${btn} justify-center px-2.5 py-1.5 text-[13px]`}
                   >
-                    Editar dia
+                    {isThemes ? 'Editar tema' : 'Editar dia'}
                   </button>
                 </li>
               )
             })}
-            {week.number === lastWeek && (
+            {!isThemes && week.number === lastWeek && (
               <li>
                 <button
                   type="button"

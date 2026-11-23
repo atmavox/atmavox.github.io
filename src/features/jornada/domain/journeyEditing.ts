@@ -185,6 +185,13 @@ export function setWeekTheme(journey: Journey, weekNumber: number, theme: string
   }
 }
 
+export function setOpening(journey: Journey, opening: string): Journey {
+  if (opening.trim() !== '') return { ...journey, opening }
+  const rest = { ...journey }
+  delete rest.opening
+  return rest
+}
+
 export function sameDay(a: JourneyDay | undefined, b: JourneyDay | undefined): boolean {
   return JSON.stringify(a) === JSON.stringify(b)
 }

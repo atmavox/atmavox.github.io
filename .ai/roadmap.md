@@ -158,8 +158,10 @@ aprovados antes do código.
       1. [x] dias liberados pelo calendário, um por 00h de Brasília (ADR-024), na Chama Interna também
       2. [x] caderno montado pela estrutura (abas por semana, por tema ou "Dias"; "por tema" libera o
              próximo tema ao concluir o anterior; Revisões só em "por semana")
-      3. [ ] editor de dias para jornada nova, com os N dias vazios prontos
+      3. [x] editor de dias para jornada nova, com os N dias vazios prontos
       4. [ ] "Publicada" só com dias publicados (Modo Andreía de produtos)
+      - [ ] Ideia: temas adicionados ao produto depois do primeiro rascunho não entram sozinhos na
+            jornada (o esqueleto só vale até o primeiro "Salvar"); criar um "+ Novo tema" no editor.
       - Antes: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
         temas, território, destaque) e liberar acesso à mão
 6. [x] Pagamento por produto: decidido Mercado Pago (Checkout Pro) + Worker gratuito (2026-11-22),

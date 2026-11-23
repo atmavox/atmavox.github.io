@@ -21,6 +21,40 @@ const sourceReturning = (json: string | null): PublishedJourneySource => ({
   load: () => Promise.resolve(json),
 })
 
+describe('JourneyContent de uma jornada nova (só o esqueleto)', () => {
+  const skeleton: Journey = { ...chamaInterna21, id: 'ritual', reviews: [], closingQuestions: [] }
+
+  it('fica "carregando" até a busca voltar e "indisponível" se nada foi publicado', async () => {
+    const content = createJourneyContent({
+      fallback: skeleton,
+      isPlaceholder: true,
+      source: sourceReturning(null),
+    })
+    expect(content.getAvailability()).toBe('loading')
+    const listener = vi.fn()
+    content.subscribe(listener)
+    await content.refresh()
+    expect(content.getAvailability()).toBe('unavailable')
+    expect(listener).toHaveBeenCalled()
+  })
+
+  it('fica disponível quando há versão publicada', async () => {
+    const published = JSON.stringify({ ...skeleton, weeks: skeleton.weeks.slice(0, 1) })
+    const content = createJourneyContent({
+      fallback: skeleton,
+      isPlaceholder: true,
+      source: sourceReturning(published),
+    })
+    await content.refresh()
+    expect(content.getAvailability()).toBe('available')
+    expect(content.getSnapshot().weeks).toHaveLength(1)
+  })
+
+  it('a Chama Interna (conteúdo no código) já começa disponível', () => {
+    expect(createJourneyContent({ fallback: chamaInterna21 }).getAvailability()).toBe('available')
+  })
+})
+
 describe('JourneyContent', () => {
   it('começa com a versão do site quando não há nada guardado', () => {
     const content = createJourneyContent({ fallback: chamaInterna21 })

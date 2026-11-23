@@ -198,6 +198,9 @@ export function parseJourney(raw: unknown): Journey | null {
   const journey: Journey = {
     id,
     ...(structure && structure !== 'weeks' ? { structure } : {}),
+    ...(typeof raw.opening === 'string' && raw.opening.trim() !== ''
+      ? { opening: raw.opening }
+      : {}),
     weeks,
     reviews,
     closingQuestions,

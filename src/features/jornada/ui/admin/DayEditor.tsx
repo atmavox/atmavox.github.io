@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { dayStatus, type EditorState, type JourneyEditor } from '../../application/JourneyEditor'
-import { allDays, type DaySection, type JourneyDay } from '../../domain/journey'
+import { allDays, structureOf, type DaySection, type JourneyDay } from '../../domain/journey'
 import {
   canRemoveDay,
   createSection,
@@ -70,6 +70,15 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
   const index = days.findIndex((d) => d.number === day.number)
   const position = index + 1
   const week = state.working.weeks.find((w) => w.days.some((d) => d.number === day.number))
+  const structure = structureOf(state.working)
+  // Por tema não há dias: a mesma tela edita o conteúdo do tema (o nome dele fica no quadro geral).
+  const isTheme = structure === 'themes'
+  const unit = isTheme ? 'tema' : 'dia'
+  const where = isTheme
+    ? `Tema ${position} · ${week?.theme ?? ''}`
+    : structure === 'days'
+      ? `Dia ${position}`
+      : `${week ? `Semana ${week.roman} · ${week.theme} · ` : ''}Dia ${position}`
   const previous = days[index - 1]
   const next = days[index + 1]
   const update = (changed: JourneyDay) => editor.editDay(changed)
@@ -85,7 +94,7 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
     <div className="mx-auto max-w-195 pt-0 pb-24">
       <div className="sticky top-13 z-30 mb-4 flex flex-wrap items-center gap-2.5 border-b border-line bg-bg py-2.5">
         <button type="button" onClick={onBack} className={ghost}>
-          <EditorIcon name="back" /> Todos os dias
+          <EditorIcon name="back" /> {isTheme ? 'Todos os temas' : 'Todos os dias'}
         </button>
         <span className="flex-1" />
         <StatusTag status={status} long />
@@ -106,7 +115,8 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
           onClick={() => void editor.saveDay(day.number)}
           className={primary}
         >
-          <EditorIcon name="check" /> {state.isBusy ? 'Salvando…' : 'Salvar dia'}
+          <EditorIcon name="check" />{' '}
+          {state.isBusy ? 'Salvando…' : isTheme ? 'Salvar tema' : 'Salvar dia'}
         </button>
         {isDraft && problems.length > 0 && (
           <ul aria-label="O que falta para salvar" className="w-full text-[13px] text-draft">
@@ -118,16 +128,14 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
       </div>
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-[11px] font-semibold tracking-[0.2em] text-accent uppercase">
-          {week ? `Semana ${week.roman} · ${week.theme} · ` : ''}Dia {position}
-        </p>
+        <p className="text-[11px] font-semibold tracking-[0.2em] text-accent uppercase">{where}</p>
         <div className="flex items-center gap-2">
           <button
             type="button"
             className={ghost}
             disabled={!previous}
             onClick={() => previous && onOpenDay(previous.number)}
-            aria-label="Dia anterior"
+            aria-label={isTheme ? 'Tema anterior' : 'Dia anterior'}
           >
             <EditorIcon name="back" />
           </button>
@@ -139,19 +147,21 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
             className={ghost}
             disabled={!next}
             onClick={() => next && onOpenDay(next.number)}
-            aria-label="Próximo dia"
+            aria-label={isTheme ? 'Próximo tema' : 'Próximo dia'}
           >
             <EditorIcon name="next" />
           </button>
-          <button
-            type="button"
-            className={`${ghost} hover:border-wine hover:text-wine`}
-            disabled={!removable || state.isBusy}
-            title={removable ? undefined : 'Cada semana precisa de pelo menos um dia'}
-            onClick={() => setIsConfirmingRemove(true)}
-          >
-            <EditorIcon name="trash" size={16} /> Apagar dia
-          </button>
+          {!isTheme && (
+            <button
+              type="button"
+              className={`${ghost} hover:border-wine hover:text-wine`}
+              disabled={!removable || state.isBusy}
+              title={removable ? undefined : 'Cada semana precisa de pelo menos um dia'}
+              onClick={() => setIsConfirmingRemove(true)}
+            >
+              <EditorIcon name="trash" size={16} /> Apagar dia
+            </button>
+          )}
         </div>
       </div>
 
@@ -179,17 +189,21 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
             <span aria-hidden="true" className="font-display text-[34px] text-accent">
               {String(position).padStart(2, '0')}
             </span>
-            <InlineText
-              label="Título do dia"
-              placeholder="Título do dia"
-              value={day.title}
-              onChange={(title) => update({ ...day, title })}
-              className="font-display text-[26px] leading-tight text-ink"
-            />
+            {isTheme ? (
+              <h1 className="font-display text-[26px] leading-tight text-ink">{week?.theme}</h1>
+            ) : (
+              <InlineText
+                label="Título do dia"
+                placeholder="Título do dia"
+                value={day.title}
+                onChange={(title) => update({ ...day, title })}
+                className="font-display text-[26px] leading-tight text-ink"
+              />
+            )}
           </div>
           <InlineText
-            label="Subtítulo do dia"
-            placeholder="Subtítulo do dia"
+            label={`Subtítulo do ${unit}`}
+            placeholder={`Subtítulo do ${unit}`}
             value={day.subtitle}
             onChange={(subtitle) => update({ ...day, subtitle })}
             className="mt-1.5 text-ink-muted"
@@ -224,7 +238,7 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
 
         <div className="p-2" aria-hidden="true">
           <span className="inline-flex rounded-full bg-accent px-4 py-2 text-sm font-semibold text-bg">
-            Concluir dia
+            {isTheme ? 'Concluir tema' : 'Concluir dia'}
           </span>
         </div>
       </article>

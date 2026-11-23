@@ -1,7 +1,7 @@
 import { BRAND_TAB_TITLE } from '../../../../shared/brand/links'
 import { useCallback, useContext, useEffect, useState, useSyncExternalStore } from 'react'
 import type { JourneyEditor } from '../../application/JourneyEditor'
-import { allDays } from '../../domain/journey'
+import { allDays, structureOf } from '../../domain/journey'
 import { findDay, nextDayNumber } from '../../domain/journeyEditing'
 import { JourneyContext } from '../JourneyContext'
 import { useJourney } from '../useJourney'
@@ -17,8 +17,8 @@ function Notice({ title, text }: { title: string; text: string }) {
     <div className="flex flex-col items-center gap-3 py-20 text-center">
       <h1 className="font-display text-3xl text-ink">{title}</h1>
       <p className="max-w-md text-ink-muted">{text}</p>
-      <a href="#/jornada" className="text-admin-ink hover:underline">
-        Voltar para a jornada
+      <a href="#/jornadas" className="text-admin-ink hover:underline">
+        Voltar para as jornadas
       </a>
     </div>
   )
@@ -98,8 +98,11 @@ function Editor({ editor }: { editor: JourneyEditor }) {
             void editor.publish()
           }}
         >
-          Os {allDays(state.saved).length} dias estão salvos. Ao publicar, todas as participantes
-          passam a ver esta versão. Dá para voltar à anterior pelo Histórico.
+          {structureOf(state.saved) === 'themes'
+            ? `Os ${allDays(state.saved).length} temas estão salvos.`
+            : `Os ${allDays(state.saved).length} dias estão salvos.`}{' '}
+          Ao publicar, todas as participantes passam a ver esta versão. Dá para voltar à anterior
+          pelo Histórico.
         </ConfirmDialog>
       )}
       <Toast message={state.message} seq={state.messageSeq} />

@@ -288,6 +288,17 @@ export function ProductsApp({
     </p>
   )
 
+  // Os dias (ou temas) de uma jornada se editam no editor da jornada, já montado pela estrutura.
+  const contentLink =
+    form && form.kind === 'journey' && !isNew ? (
+      <a
+        href={form.id === 'chama-interna-21' ? '#/jornada/editar' : `#/jornada/${form.id}/editar`}
+        className="text-sm font-semibold text-admin-ink hover:underline"
+      >
+        Editar o conteúdo da jornada →
+      </a>
+    ) : null
+
   const header = (
     <div className="flex items-center justify-between gap-3">
       <h1 className={`font-display text-ink ${isWide ? 'text-[2rem]' : 'text-[1.6rem]'}`}>
@@ -322,7 +333,8 @@ export function ProductsApp({
                 bannerState={bannerState}
               />
               {noticeLine}
-              <div className="flex justify-end gap-2.5">
+              <div className="flex flex-wrap items-center justify-end gap-2.5">
+                {contentLink && <span className="mr-auto">{contentLink}</span>}
                 <button type="button" onClick={() => setForm(null)} className={ghostButton}>
                   Descartar
                 </button>
@@ -386,6 +398,7 @@ export function ProductsApp({
       <h1 className="font-display text-[1.6rem] text-ink">
         {form.title || (isNew ? 'Novo produto' : 'Produto')}
       </h1>
+      {contentLink}
       <p className="text-sm text-ink-faint">
         Passo {step + 1} de {steps.length} · {current.label}
       </p>

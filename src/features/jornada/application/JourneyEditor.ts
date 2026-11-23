@@ -12,6 +12,7 @@ import {
   removeDay as removeDayFrom,
   replaceDay,
   sameDay,
+  setOpening as setOpeningIn,
   setWeekTheme as setWeekThemeIn,
 } from '../domain/journeyEditing'
 import { parseJourney } from '../domain/parseJourney'
@@ -51,6 +52,8 @@ export interface JourneyEditor {
   /** Tira o dia da jornada (vai para o rascunho salvo; sai do ar ao publicar). */
   removeDay(dayNumber: number): Promise<void>
   setWeekTheme(weekNumber: number, theme: string): Promise<void>
+  /** Texto da Abertura de uma jornada nova. */
+  setOpening(text: string): Promise<void>
   publish(): Promise<void>
   restoreVersion(versionId: string): Promise<void>
   /** Aviso curto vindo da tela (ex.: "Bloco removido"). */
@@ -222,7 +225,10 @@ export function createJourneyEditor({
       structural((journey) => moveDayIn(journey, dayNumber, delta), 'Ordem dos dias salva.'),
 
     setWeekTheme: (weekNumber, theme) =>
-      structural((journey) => setWeekThemeIn(journey, weekNumber, theme), 'Tema da semana salvo.'),
+      structural((journey) => setWeekThemeIn(journey, weekNumber, theme), 'Tema salvo.'),
+
+    setOpening: (text) =>
+      structural((journey) => setOpeningIn(journey, text), 'Texto da Abertura salvo.'),
 
     async publish() {
       if (publishBlocker(state) !== null) return

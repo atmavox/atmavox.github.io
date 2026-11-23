@@ -13,7 +13,7 @@ export function CoverPage() {
   const { journey } = useJourney()
   const product = useCatalog().find(journey.id)
   // O texto da Abertura da Chama Interna é da Andreía e fica no código; jornada nova mostra o
-  // título e a frase do produto (o texto próprio dela chega com o editor de jornadas novas).
+  // título e a frase do produto e o texto da Abertura escrito no editor.
   const isChama = journey.id === DEFAULT_JOURNEY_ID || !product
   return (
     <div className="flex flex-col items-center gap-8 py-8 text-center">
@@ -35,6 +35,10 @@ export function CoverPage() {
         aria-hidden="true"
         className="h-px w-16 bg-linear-to-r from-transparent via-accent to-transparent"
       />
+
+      {!isChama && journey.opening && (
+        <RichText text={journey.opening} className="max-w-xl leading-loose text-ink-muted" />
+      )}
 
       {isChama && (
         <>

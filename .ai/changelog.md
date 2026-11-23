@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.16.0] · 2026-11-23
+
+### Adicionado
+
+- Modo Andreía: editor para cada jornada (`#/jornada/{id}/editar`), aberto pelo produto. Jornada nova
+  começa com o esqueleto da estrutura (dias vazios por semana ou em "Dias", um conteúdo por tema),
+  com campo de Texto da Abertura. Até publicar, as participantes veem "ainda não está disponível".
+
 ## [1.15.0] · 2026-11-23
 
 ### Adicionado

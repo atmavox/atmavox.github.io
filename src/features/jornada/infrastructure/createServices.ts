@@ -5,6 +5,7 @@ import { createJourneyStore } from '../application/JourneyStore'
 import { createMediaCache } from '../application/MediaCache'
 import type { JourneyServices } from '../application/services'
 import { chamaInterna21 } from '../content/chama-interna-21'
+import type { Journey } from '../domain/journey'
 import type { AuthSession } from '../../../shared/auth/session'
 import { readFirebaseConfig } from '../../../shared/firebase/config'
 import { createFirestoreRestJourneySource } from './FirestoreRestJourneySource'
@@ -12,15 +13,23 @@ import { createFirestoreRestMediaSource } from './FirestoreRestMediaSource'
 import { createLocalJourneyContentCache } from './LocalJourneyContentCache'
 import { LocalProgressRepository } from './LocalProgressRepository'
 
-/** Composition root da jornada: o único lugar que escolhe as implementações das portas. */
-export function createServices(session: AuthSession | null): JourneyServices {
-  const fallback = chamaInterna21
+/**
+ * Composition root da jornada: o único lugar que escolhe as implementações das portas. Uma jornada
+ * por vez: a Chama Interna (com o conteúdo do código) ou uma jornada nova (com o esqueleto montado
+ * pela estrutura do produto, que só a Andreía vê até ela publicar).
+ */
+export function createServices(
+  session: AuthSession | null,
+  newJourney: Journey | null = null,
+): JourneyServices {
+  const fallback = newJourney ?? chamaInterna21
   const local = new LocalProgressRepository(fallback.id)
   const store = createJourneyStore({ repository: local })
   const firebaseConfig = readFirebaseConfig(import.meta.env)
 
   const content = createJourneyContent({
     fallback,
+    isPlaceholder: newJourney !== null,
     cache: createLocalJourneyContentCache(),
     ...(firebaseConfig
       ? {

@@ -4,7 +4,7 @@ import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import {
-  EDITOR_HREF,
+  editorHref,
   journeyTabs,
   partOfTab,
   tabHref,
@@ -52,7 +52,10 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
         <div className="flex items-center gap-3 bg-admin px-4 py-1.5 text-sm text-on-admin md:px-8">
           <span className="rounded-full bg-on-admin/16 px-2.5 py-0.5 text-xs">Modo Andreía</span>
           <span className="hidden truncate sm:inline">você vê a jornada inteira, sem cadeados</span>
-          <a href={EDITOR_HREF} className="ml-auto font-semibold whitespace-nowrap hover:underline">
+          <a
+            href={editorHref(journey.id)}
+            className="ml-auto font-semibold whitespace-nowrap hover:underline"
+          >
             Editar a jornada →
           </a>
         </div>

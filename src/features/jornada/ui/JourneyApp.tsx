@@ -1,7 +1,7 @@
 import { Lock } from 'lucide-react'
-import { lazy, Suspense, useEffect, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useSyncExternalStore, type ReactNode } from 'react'
 import {
-  EDITOR_PATH,
+  editorJourneyId,
   journeyTabs,
   partOfTab,
   routeFromPath,
@@ -80,7 +80,9 @@ interface JourneyAppProps {
 }
 
 export function JourneyApp({ path, loginBackground }: JourneyAppProps) {
-  if (path !== EDITOR_PATH) return <ParticipantApp path={path} loginBackground={loginBackground} />
+  if (editorJourneyId(path) === null) {
+    return <ParticipantApp path={path} loginBackground={loginBackground} />
+  }
   return (
     <Suspense fallback={<p className="py-20 text-center text-ink-muted">Carregando…</p>}>
       <EditorApp />
@@ -129,6 +131,7 @@ function PaidJourney({ title }: { title: string }) {
 function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
   const { journeyId, tab } = routeFromPath(path)
   const { journey, content, isAdmin } = useJourney()
+  const availability = useSyncExternalStore(content.subscribe, content.getAvailability)
   const { account, state } = useAccount()
   const access = useAccess()
   const now = useNow()
@@ -145,7 +148,17 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
     window.scrollTo({ top: 0 })
   }, [tab])
 
-  if (journeyId !== journey.id) return <UnavailableJourney />
+  // A Andreía vê a jornada nova antes de publicar ("Ver como participante").
+  if (journeyId !== journey.id || (availability === 'unavailable' && !isAdmin)) {
+    return <UnavailableJourney />
+  }
+  if (availability === 'loading' && !isAdmin) {
+    return (
+      <p aria-busy="true" className="py-20 text-center text-ink-muted">
+        Carregando…
+      </p>
+    )
+  }
   const activeTab = journeyTabs(journey).some((t) => t.id === tab) ? tab : 'abertura'
   // Jornada pede login (ADR-020). Sem Firebase configurado (testes, desenvolvimento) não há como entrar.
   if (account && state && !state.user) {

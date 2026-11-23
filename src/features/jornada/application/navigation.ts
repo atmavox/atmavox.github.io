@@ -23,9 +23,32 @@ export const JOURNEY_BASE_PATH = '/jornada'
 /** A jornada que existia antes das rotas por id: os links antigos (`#/jornada/semana-1`) abrem ela. */
 export const DEFAULT_JOURNEY_ID = 'chama-interna-21'
 
-/** Modo Andreía (editor da jornada). */
+/** Modo Andreía (editor da jornada): `#/jornada/{id}/editar`; o antigo `#/jornada/editar` é a Chama. */
 export const EDITOR_PATH = `${JOURNEY_BASE_PATH}/editar`
 export const EDITOR_HREF = `#${EDITOR_PATH}`
+
+export function editorHref(journeyId: string): string {
+  return journeyId === DEFAULT_JOURNEY_ID
+    ? EDITOR_HREF
+    : `#${JOURNEY_BASE_PATH}/${journeyId}/editar`
+}
+
+/** Endereço da jornada para a participante (a Abertura). */
+export function journeyHref(journeyId: string): string {
+  return `#${JOURNEY_BASE_PATH}/${journeyId}`
+}
+
+/** A jornada que o caminho abre no editor, ou null se não é o editor. */
+export function editorJourneyId(path: string): string | null {
+  if (path === EDITOR_PATH) return DEFAULT_JOURNEY_ID
+  const match = new RegExp(`^${JOURNEY_BASE_PATH}/([a-z0-9-]+)/editar$`).exec(path)
+  return match?.[1] ?? null
+}
+
+/** A jornada que o caminho abre (participante ou editor). */
+export function journeyIdFromPath(path: string): string {
+  return editorJourneyId(path) ?? routeFromPath(path).journeyId
+}
 
 /** A aba de uma parte (semana, tema ou o bloco de dias). */
 export function partTabId(journey: Journey, part: JourneyWeek): JourneyTabId {
