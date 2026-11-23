@@ -2,7 +2,13 @@ import { Lock } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
-import { EDITOR_HREF, JOURNEY_TABS, tabHref, type JourneyTabId } from '../application/navigation'
+import {
+  EDITOR_HREF,
+  JOURNEY_TABS,
+  tabHref,
+  weekNumberOfTab,
+  type JourneyTabId,
+} from '../application/navigation'
 import { isTabUnlocked } from '../application/tabAccess'
 import { tabProgress } from '../application/tabProgress'
 import { overallProgress } from '../domain/measures'
@@ -86,7 +92,11 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
                 <li key={tab.id} className="relative shrink-0 snap-center md:min-w-0">
                   <span
                     aria-disabled="true"
-                    title="Complete a etapa anterior para abrir"
+                    title={
+                      weekNumberOfTab(tab.id)
+                        ? 'Abre com o primeiro dia da semana'
+                        : 'Complete a etapa anterior para abrir'
+                    }
                     className="flex flex-col gap-1.5 border-b-2 border-transparent px-3 pt-3 pb-2.5 text-xs font-medium tracking-wider whitespace-nowrap text-ink-faint uppercase opacity-70 md:px-2 md:text-[0.8rem]"
                   >
                     <span className="flex items-center justify-center gap-1.5 md:truncate">

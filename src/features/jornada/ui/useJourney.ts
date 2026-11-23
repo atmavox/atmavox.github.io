@@ -1,6 +1,7 @@
 import { useContext, useSyncExternalStore } from 'react'
 import type { AccessOptions } from '../domain/access'
 import { JourneyContext } from './JourneyContext'
+import { useReleaseClock } from './releaseClock'
 
 const noSubscription = () => () => {}
 const notAdmin = () => false
@@ -15,7 +16,8 @@ export function useJourney() {
     account ? account.subscribe : noSubscription,
     account ? () => account.getSnapshot().isAdmin : notAdmin,
   )
-  /** A admin vê tudo, sem cadeados (ADR-013). */
-  const access: AccessOptions = { bypass: isAdmin }
+  const now = useReleaseClock()
+  /** A admin vê tudo, sem cadeados (ADR-013); os dias abrem pelo calendário (ADR-024). */
+  const access: AccessOptions = { bypass: isAdmin, now }
   return { journey, content, store, progress, access, isAdmin }
 }

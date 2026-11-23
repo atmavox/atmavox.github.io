@@ -82,7 +82,7 @@ describe('JourneyApp', () => {
     expect(screen.getByRole('button', { name: 'Feito ✦' })).toBeEnabled()
   })
 
-  it('concluir todas as etapas libera "Concluir dia", que abre o dia seguinte e fica salvo', () => {
+  it('concluir todas as etapas libera "Concluir dia", que fica salvo; o dia seguinte abre à meia-noite', () => {
     const { repository, unmount } = renderJourney('/jornada/semana-1', started())
     openDay1()
     expect(
@@ -104,7 +104,8 @@ describe('JourneyApp', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Concluir dia ✦' }))
 
     expect(repository.saved.completedDays).toEqual([1])
-    expect(screen.getByRole('button', { name: /Dia 2: Os sintomas/ })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /Dia 2: Os sintomas/ })).toBeDisabled()
+    expect(screen.getAllByText('Abre amanhã, à meia-noite').length).toBeGreaterThan(0)
     unmount()
 
     renderJourney('/jornada/semana-1', repository)
@@ -116,7 +117,7 @@ describe('JourneyApp', () => {
     ).toHaveValue('Peço permissão demais')
   })
 
-  it('o dia seguinte fica fechado até o anterior ser concluído', () => {
+  it('o dia seguinte fica fechado até a meia-noite', () => {
     renderJourney('/jornada/semana-1', started())
     expect(screen.getByRole('button', { name: /Dia 2: Os sintomas/ })).toBeDisabled()
     expect(screen.getByText('Dia 2 fechado')).toBeInTheDocument()

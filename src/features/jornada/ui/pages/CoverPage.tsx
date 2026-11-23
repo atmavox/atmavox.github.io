@@ -3,7 +3,7 @@ import { RichText } from '../../../../shared/ui/RichText'
 import { JOURNEY_TABS, tabHref } from '../../application/navigation'
 import { furthestUnlockedTab } from '../../application/tabAccess'
 import { coverCopy } from '../../content/copy'
-import { hasStarted, nextDayToDo, START_STEP } from '../../domain/access'
+import { hasStarted, nextDayToDo } from '../../domain/access'
 import { DAYS_PER_WEEK } from '../../domain/journey'
 import { DayTracker } from '../components/DayTracker'
 import { useJourney } from '../useJourney'
@@ -68,7 +68,7 @@ function StartOrContinue() {
         type="button"
         className={buttonClass}
         onClick={() => {
-          store.markStepDone(START_STEP)
+          store.startJourney()
           window.location.hash = tabHref(journey.id, 'semana-1')
         }}
       >

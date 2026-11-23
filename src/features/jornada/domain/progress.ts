@@ -22,6 +22,8 @@ export interface JourneyProgress {
   emotions: Record<string, Emotion[]>
   moods: Record<string, Mood>
   victories: Victory[]
+  /** Quando a pessoa começou a jornada: daí em diante abre um dia por meia-noite (`release.ts`). */
+  startedAt: number | null
   updatedAt: number
 }
 
@@ -34,6 +36,7 @@ export function emptyProgress(): JourneyProgress {
     emotions: {},
     moods: {},
     victories: [],
+    startedAt: null,
     updatedAt: 0,
   }
 }
@@ -55,6 +58,12 @@ export function completeDay(progress: JourneyProgress, day: number, now: number)
   if (!isValidDay(day) || progress.completedDays.includes(day)) return progress
   const completedDays = [...progress.completedDays, day].sort((a, b) => a - b)
   return { ...progress, completedDays, updatedAt: now }
+}
+
+/** Guarda o início da jornada (só a primeira vez: começar de novo não atrasa a liberação). */
+export function setStartedAt(progress: JourneyProgress, startedAt: number): JourneyProgress {
+  if (progress.startedAt !== null) return progress
+  return { ...progress, startedAt }
 }
 
 /** Marca uma etapa como "Feito". Também definitivo, como concluir um dia. */
@@ -201,6 +210,10 @@ export function parseProgress(raw: unknown): JourneyProgress {
     emotions,
     moods,
     victories,
+    startedAt:
+      typeof raw.startedAt === 'number' && Number.isFinite(raw.startedAt) && raw.startedAt > 0
+        ? raw.startedAt
+        : null,
     updatedAt: typeof raw.updatedAt === 'number' ? raw.updatedAt : 0,
   }
 }
@@ -229,6 +242,13 @@ function mergeRecords<T>(
   return merged
 }
 
+/** O início mais antigo vence: quem começou num aparelho não perde dias liberados ao entrar em outro. */
+function earliest(a: number | null, b: number | null): number | null {
+  if (a === null) return b
+  if (b === null) return a
+  return Math.min(a, b)
+}
+
 /**
  * Dias, etapas e vitórias: união (nunca perde). Textos, emoções e humor: vence o lado que tem conteúdo; se os
  * dois têm, vence o progresso salvo mais recentemente. Valores vazios não existem nos registros
@@ -252,6 +272,7 @@ export function mergeProgress(local: JourneyProgress, remote: JourneyProgress): 
     emotions: mergeRecords(local.emotions, remote.emotions, localIsNewer),
     moods: mergeRecords(local.moods, remote.moods, localIsNewer),
     victories: [...victoriesById.values()].sort((a, b) => b.createdAt - a.createdAt),
+    startedAt: earliest(local.startedAt, remote.startedAt),
     updatedAt: Math.max(local.updatedAt, remote.updatedAt),
   }
 }

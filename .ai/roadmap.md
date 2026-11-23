@@ -152,8 +152,14 @@ aprovados antes do código.
             perfil (`#/perfil`): abas, trilha de progresso, tipo de acesso
    9. [~] Modo Andreía de produtos (mock aprovado): [x] lista + editor + prévia (computador) e passo a
       passo com "Revisar" (celular), catálogo no Firestore; [x] tela de Acessos (liberar à mão por
-      e-mail, revogar); [x] imagem do banner; [ ] dias de uma jornada nova (hoje o editor de dias só
-      conhece a de 21 dias: uma jornada nova deve ficar "Em breve" até isso existir)
+      e-mail, revogar); [x] imagem do banner; [~] dias de uma jornada nova (hoje o editor de dias só
+      conhece a de 21 dias: uma jornada nova deve ficar "Em breve" até isso existir). A estrutura define
+      quando cada parte abre (2026-11-23):
+      1. [x] dias liberados pelo calendário, um por 00h de Brasília (ADR-024), na Chama Interna também
+      2. [ ] caderno montado pela estrutura (abas por semana, por tema ou "Dias"; "por tema" libera o
+             próximo tema ao concluir o anterior; Revisões só em "por semana")
+      3. [ ] editor de dias para jornada nova, com os N dias vazios prontos
+      4. [ ] "Publicada" só com dias publicados (Modo Andreía de produtos)
       - Antes: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
         temas, território, destaque) e liberar acesso à mão
 6. [x] Pagamento por produto: decidido Mercado Pago (Checkout Pro) + Worker gratuito (2026-11-22),

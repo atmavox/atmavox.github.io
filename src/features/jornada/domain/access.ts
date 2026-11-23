@@ -1,6 +1,6 @@
-// Regra de avanço da jornada: a participante só avança quando a etapa anterior está completa.
-// Vale para as etapas de cada dia, os dias, as semanas e as abas (a ordem das abas fica em
-// application/tabAccess.ts). Progresso feito antes desta regra é respeitado ("legado").
+// Regra de avanço da jornada. Os dias abrem pelo calendário, um por meia-noite desde o início (ADR-024,
+// `release.ts`); dentro do dia, as etapas e as revisões seguem em sequência (só avança quem completa a
+// anterior). A ordem das abas fica em application/tabAccess.ts. Progresso de antes das regras é respeitado.
 import {
   allDays,
   isStepSection,
@@ -9,7 +9,8 @@ import {
   type JourneyDay,
   type Question,
 } from './journey'
-import type { JourneyProgress } from './progress'
+import { markStepDone, setStartedAt, type JourneyProgress } from './progress'
+import { DAY_MS, releaseAt, releasedDayCount } from './release'
 
 /** "Começar a jornada", no fim da Abertura. */
 export const START_STEP = 'abertura'
@@ -19,6 +20,8 @@ export const VICTORIES_STEP = 'vitorias'
 /** Quem pode ver tudo sem bloqueio (a Andreía, no modo admin). */
 export interface AccessOptions {
   bypass?: boolean
+  /** Agora (para a liberação dos dias); sem ele, vale o instante do início (só o primeiro dia). */
+  now?: number
 }
 
 // ---------- etapas de um dia ----------
@@ -87,6 +90,21 @@ export function hasStarted(progress: JourneyProgress): boolean {
   )
 }
 
+/** "Começar a jornada": marca a Abertura e guarda o início, de onde conta a liberação dos dias. */
+export function startJourney(progress: JourneyProgress, now: number): JourneyProgress {
+  return setStartedAt(markStepDone(progress, START_STEP, now), now)
+}
+
+/**
+ * Quem começou antes da liberação por calendário não tem início guardado. Fica com um início `N`
+ * dias atrás (N = dias já concluídos): continua com tudo o que tinha aberto (os concluídos e o
+ * seguinte), e o próximo dia abre na meia-noite seguinte.
+ */
+export function anchorLegacyStart(progress: JourneyProgress, now: number): JourneyProgress {
+  if (progress.startedAt !== null || !hasStarted(progress)) return progress
+  return setStartedAt(progress, now - progress.completedDays.length * DAY_MS)
+}
+
 function dayHasOwnProgress(progress: JourneyProgress, dayNumber: number): boolean {
   const key = String(dayNumber)
   return (
@@ -105,14 +123,26 @@ export function isDayUnlocked(
   journey: Journey,
   progress: JourneyProgress,
   dayNumber: number,
-  { bypass = false }: AccessOptions = {},
+  { bypass = false, now }: AccessOptions = {},
 ): boolean {
   if (bypass || dayHasOwnProgress(progress, dayNumber)) return true
-  const days = allDays(journey)
-  const position = days.findIndex((day) => day.number === dayNumber)
-  if (position === -1) return false
-  const previous = days[position - 1]
-  return previous ? progress.completedDays.includes(previous.number) : hasStarted(progress)
+  const position = allDays(journey).findIndex((day) => day.number === dayNumber)
+  if (position === -1 || !hasStarted(progress)) return false
+  const { startedAt } = progress
+  // Sem início guardado (ainda não ancorado), só o primeiro dia; o store ancora ao carregar.
+  if (startedAt === null) return position === 0
+  return position < releasedDayCount(startedAt, now ?? startedAt)
+}
+
+/** Quando o dia abre pelo calendário, ou null se a jornada ainda não começou (ou o dia não existe). */
+export function dayOpensAt(
+  journey: Journey,
+  progress: JourneyProgress,
+  dayNumber: number,
+): number | null {
+  const position = allDays(journey).findIndex((day) => day.number === dayNumber)
+  if (position === -1 || progress.startedAt === null) return null
+  return releaseAt(progress.startedAt, position)
 }
 
 /** O primeiro dia ainda não concluído (o "dia de hoje" da jornada), ou null se terminou. */

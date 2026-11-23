@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { emptyProgress } from '../domain/progress'
 import { emptyVictoryDraft } from '../domain/victories'
 import { InMemoryProgressRepository } from '../infrastructure/InMemoryProgressRepository'
 import { createJourneyStore } from './JourneyStore'
@@ -16,6 +17,23 @@ function setup() {
 }
 
 describe('JourneyStore', () => {
+  it('"Começar a jornada" guarda o início, de onde conta a liberação dos dias', () => {
+    const { repository, store } = setup()
+    store.startJourney()
+    expect(repository.saved.startedAt).toBeGreaterThanOrEqual(100)
+    expect(repository.saved.completedSteps).toEqual(['abertura'])
+  })
+
+  it('ao carregar, quem começou antes da regra ganha um início que mantém os dias abertos', () => {
+    const DAY = 24 * 60 * 60 * 1000
+    const repository = new InMemoryProgressRepository({
+      ...emptyProgress(),
+      completedDays: [1, 2],
+    })
+    createJourneyStore({ repository, now: () => 10 * DAY })
+    expect(repository.saved.startedAt).toBe(8 * DAY)
+  })
+
   it('salva na hora cada mudança e avisa quem está ouvindo', () => {
     const { repository, store } = setup()
     const listener = vi.fn()

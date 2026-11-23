@@ -1,3 +1,4 @@
+import { anchorLegacyStart, startJourney } from '../domain/access'
 import type { Emotion, Mood } from '../domain/journey'
 import {
   addVictory,
@@ -23,6 +24,8 @@ export interface JourneyStore {
   /** Concluir é definitivo. Quem chama confere antes se pode (`canCompleteDay`). */
   completeDay(day: number): void
   markStepDone(stepId: string): void
+  /** "Começar a jornada": daí em diante abre um dia por meia-noite. */
+  startJourney(): void
   setEntry(fieldId: string, text: string): void
   toggleEmotion(day: number, emotion: Emotion): void
   setMood(day: number, mood: Mood | null): void
@@ -45,6 +48,12 @@ export function createJourneyStore({
   createId = () => crypto.randomUUID(),
 }: JourneyStoreDeps): JourneyStore {
   let progress = repository.load()
+  // Quem começou antes da liberação por calendário ganha um início que mantém o que já tinha aberto.
+  const anchored = anchorLegacyStart(progress, now())
+  if (anchored !== progress) {
+    progress = anchored
+    repository.save(progress)
+  }
   const listeners = new Set<() => void>()
 
   // Salva na hora: nenhuma reflexão pode depender de um "salvar" manual.
@@ -63,6 +72,7 @@ export function createJourneyStore({
     },
     completeDay: (day) => commit(completeDay(progress, day, now())),
     markStepDone: (stepId) => commit(markStepDone(progress, stepId, now())),
+    startJourney: () => commit(startJourney(progress, now())),
     setEntry: (fieldId, text) => commit(setEntry(progress, fieldId, text, now())),
     toggleEmotion: (day, emotion) => commit(toggleEmotion(progress, day, emotion, now())),
     setMood: (day, mood) => commit(setMood(progress, day, mood, now())),
@@ -72,6 +82,6 @@ export function createJourneyStore({
       return errors
     },
     removeVictory: (id) => commit(removeVictory(progress, id, now())),
-    replace: commit,
+    replace: (next) => commit(anchorLegacyStart(next, now())),
   }
 }

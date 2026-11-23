@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.14.0] · 2026-11-23
+
+### Alterado
+
+- Jornada: os dias abrem pelo calendário (ADR-024), um novo a cada 00h de Brasília a partir de "Começar
+  a jornada", concluído ou não o anterior; dias que passaram ficam abertos. Dia fechado mostra quando
+  abre, e a tela vira o dia sozinha. Quem já estava no meio continua com o que tinha aberto.
+
 ## [1.13.1] · 2026-11-23
 
 ### Corrigido

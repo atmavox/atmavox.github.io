@@ -349,6 +349,31 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   segredos para cuidar; o texto exato assinado pelo webhook vem dos SDKs oficiais e precisa ser
   conferido com o simulador do painel antes de abrir as vendas.
 
+## ADR-024 · Dias liberados pelo calendário, um por meia-noite de Brasília
+
+- **Status:** aceita · 2026-11-23 (pedido do desenvolvedor e da Andreía); altera a parte "dias" do
+  ADR-013
+- **Contexto:** a estrutura escolhida no produto define quando cada parte da jornada abre. Em
+  "por dias" e "por semana", a pessoa vive a jornada no ritmo do calendário, um dia de cada vez, e não
+  "maratona" concluindo vários dias seguidos.
+- **Decisão:**
+  - O progresso guarda `startedAt` ("Começar a jornada"). O primeiro dia abre na hora; depois, **um dia
+    novo a cada 00h de Brasília** (UTC-3 fixo), concluído ou não o anterior. Dias que passaram ficam
+    abertos (quem volta depois de 3 dias encontra 3 dias novos).
+  - As abas de semana abrem junto com o primeiro dia delas. Dentro do dia, as etapas continuam em
+    sequência; Revisões, Vitórias e Encerramento continuam abrindo por conclusão.
+  - A Chama Interna passa para a regra nova. Quem já tinha começado ganha, ao carregar, um início
+    `N` dias atrás (N = dias concluídos): mantém o que já tinha aberto e o próximo dia abre na
+    meia-noite seguinte. Ao mesclar aparelho e nuvem, vale o início mais antigo.
+  - A tela troca de dia sozinha à meia-noite (um relógio único, `ui/releaseClock.ts`) e mostra nos dias
+    fechados quando eles abrem ("Abre amanhã, à meia-noite" / "Abre em dd/mm").
+  - "Por tema" (concluir um tema libera o próximo) entra no passo 2, com o caderno montado pela estrutura.
+- **Alternativas consideradas:** hora de um servidor (exigiria serviço pago ou mais uma rota no Worker
+  a cada abertura); liberar uma semana inteira por vez (descartado pelo desenvolvedor); um dia novo só
+  depois de concluir o anterior (nada se acumula; descartado).
+- **Consequências:** ➕ ritmo diário de verdade, regra pura e testada, sem custo. ➖ a hora vem do
+  relógio do aparelho: quem adiantar o relógio abre antes (aceito, como a proteção leve do ADR-020).
+
 ---
 
 ## Modelo

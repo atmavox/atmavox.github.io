@@ -1,6 +1,7 @@
 import {
   areReviewsComplete,
   hasStarted,
+  isDayUnlocked,
   isWeekComplete,
   VICTORIES_STEP,
   type AccessOptions,
@@ -48,10 +49,19 @@ export function isTabUnlocked(
   tab: JourneyTabId,
   journey: Journey,
   progress: JourneyProgress,
-  { bypass = false }: AccessOptions = {},
+  options: AccessOptions = {},
 ): boolean {
   const index = JOURNEY_TABS.findIndex((t) => t.id === tab)
-  if (bypass || index <= 0) return true
+  if (options.bypass || index <= 0) return true
+  // Semana: abre junto com o primeiro dia dela, pelo calendário (ADR-024).
+  const week = weekNumberOfTab(tab)
+  if (week) {
+    const firstDay = journey.weeks.find((w) => w.number === week)?.days[0]
+    return (
+      (firstDay !== undefined && isDayUnlocked(journey, progress, firstDay.number, options)) ||
+      tabHasOwnProgress(tab, journey, progress)
+    )
+  }
   const previous = JOURNEY_TABS[index - 1]
   return (
     (previous !== undefined && isTabComplete(previous.id, journey, progress)) ||

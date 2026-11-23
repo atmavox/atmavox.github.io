@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { chamaInterna21 } from '../content/chama-interna-21'
-import { START_STEP, VICTORIES_STEP } from '../domain/access'
+import { START_STEP, startJourney, VICTORIES_STEP } from '../domain/access'
+import { DAY_MS } from '../domain/release'
 import { emptyProgress, markStepDone, type JourneyProgress } from '../domain/progress'
 import { furthestUnlockedTab, isTabUnlocked } from './tabAccess'
 
@@ -18,10 +19,12 @@ describe('abas em sequência', () => {
     expect(furthestUnlockedTab(chamaInterna21, emptyProgress())).toBe('abertura')
   })
 
-  it('"Começar a jornada" abre a Semana I; a Semana II só com os 7 dias concluídos', () => {
-    expect(isTabUnlocked('semana-1', chamaInterna21, started)).toBe(true)
-    expect(isTabUnlocked('semana-2', chamaInterna21, withDays(started, 6))).toBe(false)
-    expect(isTabUnlocked('semana-2', chamaInterna21, withDays(started, 7))).toBe(true)
+  it('"Começar a jornada" abre a Semana I; a Semana II abre junto com o dia 8, pelo calendário', () => {
+    const T0 = Date.UTC(2026, 10, 23, 15) // 12h em Brasília
+    const s = startJourney(emptyProgress(), T0)
+    expect(isTabUnlocked('semana-1', chamaInterna21, s, { now: T0 })).toBe(true)
+    expect(isTabUnlocked('semana-2', chamaInterna21, s, { now: T0 + 6 * DAY_MS })).toBe(false)
+    expect(isTabUnlocked('semana-2', chamaInterna21, s, { now: T0 + 7 * DAY_MS })).toBe(true)
   })
 
   it('Revisões abrem depois da Semana III; Vitórias, depois das 11 perguntas feitas', () => {

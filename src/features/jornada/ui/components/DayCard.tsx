@@ -2,6 +2,7 @@ import { Check, Lock } from 'lucide-react'
 import { useId, useState } from 'react'
 import {
   canCompleteDay,
+  dayOpensAt,
   dayStepCount,
   isDayUnlocked,
   isStepDone,
@@ -9,6 +10,7 @@ import {
   isStepUnlocked,
 } from '../../domain/access'
 import type { DaySection, JourneyDay } from '../../domain/journey'
+import { lockedDayHint } from '../releaseLabel'
 import { useJourney } from '../useJourney'
 import { DaySectionView } from './DaySectionView'
 
@@ -118,7 +120,9 @@ export function DayCard({ day }: { day: JourneyDay }) {
               </span>
               <span className="sr-only">.</span>{' '}
               <span className="block text-sm text-ink-muted">
-                {isUnlocked ? day.subtitle : 'Conclua o dia anterior para abrir'}
+                {isUnlocked
+                  ? day.subtitle
+                  : lockedDayHint(dayOpensAt(journey, progress, day.number), access.now ?? 0)}
               </span>
             </span>
             {isUnlocked && (

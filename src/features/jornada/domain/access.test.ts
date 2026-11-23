@@ -9,10 +9,14 @@ import {
   isDayUnlocked,
   isReviewQuestionUnlocked,
   isStepSatisfied,
+  anchorLegacyStart,
+  dayOpensAt,
   isStepUnlocked,
   nextDayToDo,
   START_STEP,
+  startJourney,
 } from './access'
+import { DAY_MS } from './release'
 import { allDays, withSectionIds, type Journey } from './journey'
 import {
   completeDay,
@@ -25,6 +29,9 @@ import {
 
 const day1 = allDays(chamaInterna21)[0]!
 const started = () => markStepDone(emptyProgress(), START_STEP, 1)
+/** 23/11/2026, 12h em Brasília. */
+const T0 = Date.UTC(2026, 10, 23, 15)
+const begun = () => startJourney(emptyProgress(), T0)
 
 /** Marca como feitas, em ordem, todas as etapas de um dia (respondendo o que precisa de resposta). */
 function finishSteps(progress: JourneyProgress, dayNumber: number): JourneyProgress {
@@ -82,21 +89,44 @@ describe('dias e semanas', () => {
     expect(isDayUnlocked(chamaInterna21, started(), 1)).toBe(true)
   })
 
-  it('o próximo dia abre na hora em que o anterior é concluído', () => {
-    const p = completeDay(finishSteps(started(), 1), 1, 3)
-    expect(isDayUnlocked(chamaInterna21, started(), 2)).toBe(false)
-    expect(isDayUnlocked(chamaInterna21, p, 2)).toBe(true)
-    expect(isDayUnlocked(chamaInterna21, p, 3)).toBe(false)
+  it('um dia novo abre a cada meia-noite de Brasília, mesmo concluindo o anterior antes', () => {
+    const p = completeDay(finishSteps(begun(), 1), 1, T0)
+    expect(isDayUnlocked(chamaInterna21, p, 2, { now: T0 })).toBe(false)
+    expect(isDayUnlocked(chamaInterna21, p, 2, { now: Date.UTC(2026, 10, 24, 2, 59) })).toBe(false)
+    expect(isDayUnlocked(chamaInterna21, p, 2, { now: Date.UTC(2026, 10, 24, 3, 0) })).toBe(true)
+    expect(isDayUnlocked(chamaInterna21, p, 3, { now: Date.UTC(2026, 10, 24, 3, 0) })).toBe(false)
     expect(nextDayToDo(chamaInterna21, p)).toBe(2)
   })
 
-  it('respeita quem já tinha dias marcados antes da regra (fora de ordem também)', () => {
-    const legacy = { ...emptyProgress(), completedDays: [1, 2, 5] }
+  it('dias que passaram ficam abertos: três dias depois, quatro dias abertos', () => {
+    const now = T0 + 3 * DAY_MS
+    expect(isDayUnlocked(chamaInterna21, begun(), 4, { now })).toBe(true)
+    expect(isDayUnlocked(chamaInterna21, begun(), 5, { now })).toBe(false)
+    expect(dayOpensAt(chamaInterna21, begun(), 5)).toBe(Date.UTC(2026, 10, 27, 3))
+  })
+
+  it('começar de novo não atrasa a liberação', () => {
+    expect(startJourney(begun(), T0 + DAY_MS).startedAt).toBe(T0)
+  })
+
+  it('quem começou antes da regra continua com o que tinha aberto; o próximo abre na meia-noite', () => {
+    const legacy = { ...emptyProgress(), completedDays: [1, 2, 3] }
     expect(hasStarted(legacy)).toBe(true)
-    expect(isDayUnlocked(chamaInterna21, legacy, 5)).toBe(true)
-    expect(isDayUnlocked(chamaInterna21, legacy, 3)).toBe(true)
-    expect(isDayUnlocked(chamaInterna21, legacy, 4)).toBe(false)
-    expect(canCompleteDay(legacy, allDays(chamaInterna21)[4]!)).toBe(true)
+    const p = anchorLegacyStart(legacy, T0)
+    expect(isDayUnlocked(chamaInterna21, p, 4, { now: T0 })).toBe(true)
+    expect(isDayUnlocked(chamaInterna21, p, 5, { now: T0 })).toBe(false)
+    expect(isDayUnlocked(chamaInterna21, p, 5, { now: T0 + DAY_MS })).toBe(true)
+  })
+
+  it('dias com progresso próprio ficam abertos (fora de ordem também)', () => {
+    const legacy = anchorLegacyStart({ ...emptyProgress(), completedDays: [1, 2, 9] }, T0)
+    expect(isDayUnlocked(chamaInterna21, legacy, 9, { now: T0 })).toBe(true)
+    expect(canCompleteDay(legacy, allDays(chamaInterna21)[8]!)).toBe(true)
+  })
+
+  it('quem já tem início guardado ou nem começou não é ancorado', () => {
+    expect(anchorLegacyStart(begun(), T0 + DAY_MS).startedAt).toBe(T0)
+    expect(anchorLegacyStart(emptyProgress(), T0).startedAt).toBeNull()
   })
 
   it('concluir é definitivo: concluir de novo não muda nada', () => {
@@ -143,9 +173,9 @@ describe('blocos e ordem editáveis (modo Andreía)', () => {
       ...chamaInterna21,
       weeks: [{ number: 1, roman: 'I', theme: 'Teste', days: [d1!, d3!, d2!] }],
     }
-    const p = completeDay(started(), 1, 2)
-    expect(isDayUnlocked(reordered, p, 3)).toBe(true)
-    expect(isDayUnlocked(reordered, p, 2)).toBe(false)
+    const now = T0 + DAY_MS
+    expect(isDayUnlocked(reordered, begun(), 3, { now })).toBe(true)
+    expect(isDayUnlocked(reordered, begun(), 2, { now })).toBe(false)
   })
 })
 
