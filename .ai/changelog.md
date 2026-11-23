@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.13.1] · 2026-11-23
+
+### Corrigido
+
+- Hubs: com a conta da Andreía, aparece a faixa azul do Modo Andreía (Editar a jornada, Produtos, Acessos)
+  e o menu da bolinha ganha os mesmos atalhos.
+- Jornada: botão "← Jornadas" no cabeçalho para voltar ao hub de jornadas.
+
 ## [1.13.0] · 2026-11-23
 
 ### Adicionado

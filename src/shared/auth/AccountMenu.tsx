@@ -2,6 +2,7 @@ import { LogIn } from 'lucide-react'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useAuthSession } from './AuthContext'
 import { LoginDialog } from './LoginDialog'
+import { useIsAdmin } from './useIsAdmin'
 
 /**
  * Conta no cabeçalho dos hubs (jornadas e meditações): "Entrar" ou a inicial de quem entrou, com o
@@ -15,6 +16,7 @@ export function AccountMenu() {
   const menuId = useId()
   const wrapperRef = useRef<HTMLDivElement>(null)
   const closeDialog = useCallback(() => setIsDialogOpen(false), [])
+  const isAdmin = useIsAdmin()
 
   useEffect(() => {
     if (!isMenuOpen) return
@@ -82,6 +84,19 @@ export function AccountMenu() {
           <a href="#/perfil" onClick={() => setIsMenuOpen(false)} className={menuLink}>
             Meu perfil
           </a>
+          {isAdmin && (
+            <>
+              <a href="#/jornada/editar" onClick={() => setIsMenuOpen(false)} className={menuLink}>
+                Editar a jornada
+              </a>
+              <a href="#/admin/produtos" onClick={() => setIsMenuOpen(false)} className={menuLink}>
+                Produtos e preços
+              </a>
+              <a href="#/admin/acessos" onClick={() => setIsMenuOpen(false)} className={menuLink}>
+                Acessos
+              </a>
+            </>
+          )}
           {isConfirmingExit ? (
             <div className="mt-2 flex flex-col gap-3 border-t border-line px-1 pt-3">
               <p className="text-sm text-ink-muted">

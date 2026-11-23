@@ -2,6 +2,8 @@ import { ArrowRight, MessageCircle } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { AccountMenu } from '../../../shared/auth/AccountMenu'
+import { useIsAdmin } from '../../../shared/auth/useIsAdmin'
+import { AdminStrip } from '../../../shared/ui/AdminStrip'
 import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
@@ -71,6 +73,7 @@ export function HubMagazine({
   // Ao pausar, o vídeo sai devagar (esmaece e recolhe) em vez de sumir de uma vez.
   const { shown: shownVideo, leaving: videoLeaving } = useLingering(openVideo)
   const activeItem = activeMenuItem(section)
+  const isAdmin = useIsAdmin()
   // Trechos da página inicial piscam no menu ao serem clicados e devolvem a marca ao "Início".
   const [flashing, setFlashing] = useState<HubSection | null>(null)
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -117,6 +120,7 @@ export function HubMagazine({
   return (
     <div className="min-h-dvh">
       <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur">
+        {page && isAdmin && <AdminStrip />}
         {page ? (
           // Hubs: uma área própria (mock aprovado, opção 3): Início, Jornadas e Meditações em abas, e a
           // conta à direita. A vitrine fica só para olhar, sem login.

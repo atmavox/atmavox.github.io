@@ -9,6 +9,8 @@ import {
 import { useEffect, type ComponentType } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { AccountMenu } from '../../../shared/auth/AccountMenu'
+import { useIsAdmin } from '../../../shared/auth/useIsAdmin'
+import { AdminStrip } from '../../../shared/ui/AdminStrip'
 import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
@@ -178,6 +180,7 @@ export function HubTabs({
   payment?: PaymentReturn | null
   isProfile?: boolean
 }) {
+  const isAdmin = useIsAdmin()
   const isHubTab =
     activeTab === 'jornadas' || activeTab === 'meditacoes' || payment !== null || isProfile
 
@@ -188,6 +191,7 @@ export function HubTabs({
   return (
     <div className="min-h-dvh overflow-x-clip pb-28">
       <header className="sticky top-0 z-20 bg-bg/95 backdrop-blur">
+        {isHubTab && isAdmin && <AdminStrip />}
         <div className="flex items-center justify-between px-5 pt-3 pb-2">
           <span className="flex items-center gap-2 font-display text-[0.95rem] tracking-[0.18em] text-gold uppercase">
             <BrandMark className="w-[22px]" />

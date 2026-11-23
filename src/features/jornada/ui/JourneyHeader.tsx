@@ -45,6 +45,13 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
         </div>
       )}
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 pt-2.5 md:px-8">
+        {/* Caminho claro de volta para o hub de jornadas (pedido do cliente). */}
+        <a
+          href="#/jornadas"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-line px-3 py-1 text-sm text-ink-muted hover:border-accent hover:text-accent"
+        >
+          <span aria-hidden="true">←</span> Jornadas
+        </a>
         <a
           href="#/"
           className="font-display tracking-[0.15em] text-gold uppercase"
