@@ -91,7 +91,7 @@ export function hubAreaItem(section: HubSection): HubTab | null {
 }
 
 /** "/perfil": a página de perfil, aberta pela bolinha da conta nos hubs (mock aprovado). */
-export const isProfilePath = (path: string) => path === '/perfil' || path === '/perfil/'
+export const isProfilePath = (path: string) => /^\/perfil(\/ativacoes)?\/?$/.test(path)
 
 /** "/ativacao": a ativação individual, numa janela sobre o Contato (ADR-029). */
 export const isActivationPath = (path: string) => /^\/ativacao(\/|$)/.test(path)
@@ -111,4 +111,9 @@ export function orderReturnFromPath(path: string): OrderReturn | null {
     orderId: match[1]!,
     status: (match[2] as OrderReturn['status'] | undefined) ?? 'aprovado',
   }
+}
+
+/** "/ativacao/confirmar/A7KX2Q": o link que a Andreía manda para confirmar o horário. */
+export function confirmOrderFromPath(path: string): string | null {
+  return /^\/ativacao\/confirmar\/(A[A-Z0-9]{5})\/?$/.exec(path)?.[1] ?? null
 }

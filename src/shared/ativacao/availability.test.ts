@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   addDays,
+  bookSlot,
+  releaseBooking,
   EMPTY_AVAILABILITY,
   isDate,
   localDate,
@@ -150,5 +152,27 @@ describe('leitura e validação', () => {
     expect(validateWindow(outra, [reiki, barras], agenda).time).toBe(
       'Esse período encosta em outro horário livre do dia.',
     )
+  })
+})
+
+describe('reservas de pedidos', () => {
+  it('reservar tira o horário; soltar devolve; reservar de novo troca a anterior', () => {
+    const reservada = bookSlot(
+      agenda,
+      { date: '2026-12-02', start: '18:00', end: '18:50' },
+      'A7KX2Q',
+    )
+    expect(slotsFor(reservada, reiki, '2026-12-02', '2026-12-02')[0]?.starts).toEqual([
+      '17:00',
+      '19:00',
+    ])
+    const trocada = bookSlot(
+      reservada,
+      { date: '2026-12-02', start: '19:00', end: '19:50' },
+      'A7KX2Q',
+    )
+    expect(trocada.booked).toHaveLength(1)
+    expect(releaseBooking(trocada, 'A7KX2Q').booked).toEqual([])
+    expect(parseAvailability(JSON.parse(JSON.stringify(trocada))).booked[0]?.orderId).toBe('A7KX2Q')
   })
 })

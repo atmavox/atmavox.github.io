@@ -25,6 +25,7 @@ import type { AtivacoesBackend } from '../../infrastructure/ativacoesBackend'
 import { adminButton, ghostButton } from '../styles'
 import { Overlay } from './Overlay'
 import { Switch, TherapyFields } from './TherapyFields'
+import { LoadingNote } from '../../../../shared/ui/LoadingNote'
 
 const SAVE_ERROR = 'Não deu para salvar. Confira a internet e tente de novo.'
 
@@ -82,7 +83,7 @@ export function TherapiesPanel({
     disabled: isSaving,
   })
 
-  if (!list) return <p className="p-8 text-ink-muted">Carregando as terapias…</p>
+  if (!list) return <LoadingNote text="Carregando as terapias…" />
 
   function openForm(therapy: Therapy | null, startErrors: TherapyErrors = {}) {
     setNotice(null)

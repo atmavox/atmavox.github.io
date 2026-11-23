@@ -7,6 +7,7 @@ import {
   type Availability,
 } from '../../../shared/ativacao/availability'
 import { parseSavedAnamnesis, type SavedAnamnesis } from '../../../shared/ativacao/answers'
+import { DEFAULT_MESSAGES, parseMessages, type Messages } from '../../../shared/ativacao/messages'
 import {
   orderFromFields,
   orderPathOf,
@@ -41,6 +42,8 @@ export interface AtivacoesBackend {
   /** As respostas da anamnese de uma pessoa (`users/{uid}/anamnesis/current`). */
   loadPersonAnamnesis(uid: string): Promise<SavedAnamnesis | null>
   updateOrder(uid: string, orderId: string, change: OrderChange): Promise<void>
+  loadMessages(): Promise<Messages>
+  saveMessages(messages: Messages): Promise<void>
 }
 
 export type OrderChange = Parameters<typeof orderUpdateFields>[0]
@@ -48,6 +51,7 @@ export type OrderChange = Parameters<typeof orderUpdateFields>[0]
 const THERAPIES = 'catalog/therapies'
 const ANAMNESIS = 'catalog/anamnesis'
 const AVAILABILITY = 'catalog/availability'
+const MESSAGES = 'catalog/messages'
 
 export function createAtivacoesBackend(
   config: RestConfig,
@@ -116,6 +120,8 @@ export function createAtivacoesBackend(
       const raw = await readContent(`users/${uid}/anamnesis/current`)
       return raw === undefined ? null : parseSavedAnamnesis(raw)
     },
+    loadMessages: async () => parseMessages(await readContent(MESSAGES)),
+    saveMessages: (messages) => writeContent(MESSAGES, messages),
     async updateOrder(uid, orderId, change) {
       await patchDocument(
         config,
@@ -136,18 +142,21 @@ export function createInMemoryAtivacoesBackend(
     availability?: Availability
     orders?: SessionOrder[]
     people?: Record<string, SavedAnamnesis>
+    messages?: Messages
   } = {},
 ): AtivacoesBackend & {
   therapies: Therapy[] | null
   anamnesis: AnamnesisForm | null
   availability: Availability
   orders: SessionOrder[]
+  messages: Messages
 } {
   const state = {
     therapies: initial.therapies ?? (null as Therapy[] | null),
     anamnesis: initial.anamnesis ?? (null as AnamnesisForm | null),
     availability: initial.availability ?? EMPTY_AVAILABILITY,
     orders: [...(initial.orders ?? [])],
+    messages: initial.messages ?? DEFAULT_MESSAGES,
   }
   const people = initial.people ?? {}
   // Como no Firestore: o que volta é uma cópia lida do JSON, nunca o mesmo objeto.
@@ -166,6 +175,10 @@ export function createInMemoryAtivacoesBackend(
       state.availability = copy(availability)
     },
     listOrders: async () => copy(state.orders),
+    loadMessages: async () => copy(state.messages),
+    saveMessages: async (messages: Messages) => {
+      state.messages = copy(messages)
+    },
     loadPersonAnamnesis: async (uid: string) => (people[uid] ? copy(people[uid]) : null),
     updateOrder: async (uid: string, orderId: string, change: OrderChange) => {
       state.orders = state.orders.map((o) =>

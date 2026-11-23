@@ -24,6 +24,8 @@ export interface Booking {
   date: string
   start: string
   end: string
+  /** O pedido que reservou (para soltar se a pessoa não confirmar). */
+  orderId?: string
 }
 
 export interface Availability {
@@ -153,7 +155,8 @@ function parseBooking(raw: unknown): Booking | null {
   if (!isDate(date) || !isTime(start) || !isTime(end) || toMinutes(end) <= toMinutes(start)) {
     return null
   }
-  return { date, start, end }
+  const orderId = text(r.orderId)
+  return orderId ? { date, start, end, orderId } : { date, start, end }
 }
 
 /** O `content` de `catalog/availability`; o que estiver quebrado fica de fora. */
@@ -253,6 +256,23 @@ export function upsertWindow(availability: Availability, window: AvailabilityWin
 
 export function removeWindow(availability: Availability, id: string): Availability {
   return { ...availability, windows: availability.windows.filter((w) => w.id !== id) }
+}
+
+/** Reserva o horário de um pedido (troca a reserva anterior do mesmo pedido, se houver). */
+export function bookSlot(
+  availability: Availability,
+  slot: { date: string; start: string; end: string },
+  orderId: string,
+): Availability {
+  return {
+    ...availability,
+    booked: [...availability.booked.filter((b) => b.orderId !== orderId), { ...slot, orderId }],
+  }
+}
+
+/** Solta a reserva de um pedido (a pessoa não confirmou a tempo, ou o pedido foi cancelado). */
+export function releaseBooking(availability: Availability, orderId: string): Availability {
+  return { ...availability, booked: availability.booked.filter((b) => b.orderId !== orderId) }
 }
 
 /** Tira só um dia de uma faixa que repete (as outras semanas continuam). */

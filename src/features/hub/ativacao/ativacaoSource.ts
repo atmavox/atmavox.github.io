@@ -7,7 +7,9 @@ import {
   type AnamnesisForm,
 } from '../../../shared/ativacao/anamnesis'
 import { parseSavedAnamnesis, type SavedAnamnesis } from '../../../shared/ativacao/answers'
+import { DEFAULT_MESSAGES, parseMessages, type Messages } from '../../../shared/ativacao/messages'
 import {
+  HOLD_MS,
   newOrderFields,
   newOrderId,
   orderFromFields,
@@ -22,6 +24,7 @@ import {
 } from '../../../shared/ativacao/availability'
 import { DEFAULT_THERAPIES, parseTherapies, type Therapy } from '../../../shared/ativacao/therapy'
 import {
+  documentId,
   documentsUrl,
   fieldsOf,
   getJson,
@@ -46,6 +49,11 @@ export interface AtivacaoSource {
   getOrder(uid: string, orderId: string): Promise<SessionOrder | null>
   /** Paga → Solicitada: a pessoa avisou a Andreía no WhatsApp. */
   markRequested(uid: string, orderId: string): Promise<void>
+  /** Os pedidos da pessoa (perfil, aba Ativações). */
+  listMyOrders(uid: string): Promise<SessionOrder[]>
+  /** Confirma o horário que a Andreía aprovou (o pedido vira Agendada). */
+  confirmProposal(uid: string, order: SessionOrder): Promise<void>
+  loadMessages(): Promise<Messages>
 }
 
 export function createRestAtivacaoSource(
@@ -111,6 +119,40 @@ export function createRestAtivacaoSource(
       const fields = fieldsOf(body)
       return fields ? orderFromFields(orderId, uid, fields) : null
     },
+    loadMessages: async () => parseMessages(await content('catalog/messages', null)),
+    async listMyOrders(uid) {
+      const body = await getJson(
+        documentsUrl(config, `users/${uid}/sessions`, '&pageSize=100'),
+        await token(),
+        fetchFn,
+      )
+      const documents =
+        typeof body === 'object' &&
+        body !== null &&
+        Array.isArray((body as { documents?: unknown }).documents)
+          ? (body as { documents: unknown[] }).documents
+          : []
+      return documents.flatMap((document) => {
+        const id = documentId(document)
+        const fields = fieldsOf(document)
+        const order = id && fields ? orderFromFields(id, uid, fields) : null
+        return order ? [order] : []
+      })
+    },
+    async confirmProposal(uid, order) {
+      if (!order.proposed) throw new Error('Sem horário aprovado.')
+      await patchDocument(
+        config,
+        `users/${uid}/sessions/${order.id}`,
+        orderUpdateFields({
+          status: 'sched',
+          scheduled: order.proposed,
+          scheduledAt: Date.now(),
+        }) as Record<string, RestValue>,
+        await token(),
+        fetchFn,
+      )
+    },
     async markRequested(uid, orderId) {
       await patchDocument(
         config,
@@ -131,6 +173,7 @@ export function createInMemoryAtivacaoSource(
     availability?: Availability
     mine?: Record<string, SavedAnamnesis>
     orders?: SessionOrder[]
+    messages?: Messages
   } = {},
 ): AtivacaoSource & { mine: Record<string, SavedAnamnesis>; orders: SessionOrder[] } {
   const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
@@ -156,6 +199,17 @@ export function createInMemoryAtivacaoSource(
     getOrder: async (uid, id) => {
       const order = find(uid, id)
       return order ? copy(order) : null
+    },
+    loadMessages: async () => copy(initial.messages ?? DEFAULT_MESSAGES),
+    listMyOrders: async (uid) => copy(orders.filter((o) => o.uid === uid)),
+    async confirmProposal(uid, current) {
+      const order = find(uid, current.id)
+      if (!order?.proposed || !order.proposedAt || Date.now() >= order.proposedAt + HOLD_MS) {
+        throw new Error('Reserva vencida.')
+      }
+      order.status = 'sched'
+      order.scheduled = order.proposed
+      order.scheduledAt = Date.now()
     },
     async markRequested(uid, id) {
       const order = find(uid, id)

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AdminHeader } from '../../shared/ui/AdminHeader'
+import { LoadingNote } from '../../shared/ui/LoadingNote'
 import { useAuthSession } from '../../shared/auth/AuthContext'
 import { LoginDialog } from '../../shared/auth/LoginDialog'
 import { useCatalog } from '../../shared/catalog/CatalogContext'
@@ -97,7 +98,7 @@ export function ProdutosEntry({
   if (!backend && !injected) {
     body = message('O Modo Andreía precisa do Firebase configurado.')
   } else if (!state?.authChecked) {
-    body = message('Carregando…')
+    body = <LoadingNote className="py-20 text-center text-ink-muted" />
   } else if (!uid || !session) {
     body = message(
       'Entre com a conta da Andreía para editar os produtos.',
@@ -115,7 +116,7 @@ export function ProdutosEntry({
       </>,
     )
   } else if (admin?.uid !== uid) {
-    body = message('Carregando…')
+    body = <LoadingNote className="py-20 text-center text-ink-muted" />
   } else if (!admin.isAdmin) {
     body = message(
       'Esta área é só da Andreía.',
@@ -140,7 +141,14 @@ export function ProdutosEntry({
   return (
     <div className="min-h-dvh bg-bg">
       <AdminHeader active={area} />
-      {body}
+      {/* A luz que desce (mock aprovado, A): um brilho âmbar difuso no topo da página, como no hub. */}
+      <div className="relative">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[300px] bg-[radial-gradient(60%_100%_at_30%_0%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_70%)]"
+        />
+        <div className="relative">{body}</div>
+      </div>
     </div>
   )
 }

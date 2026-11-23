@@ -1,6 +1,5 @@
 // Pedidos da ativação individual (ADR-029), em `users/{uid}/sessions/{id}`. Usado pelo site (a pessoa
 // cria; a Andreía acompanha) e pelo Worker do pagamento (marca como paga). Funções puras.
-import { longDate, timeLabel } from './availability'
 
 export const ORDER_STATUSES = ['wait', 'paid', 'req', 'sched', 'done', 'cancel'] as const
 export type OrderStatus = (typeof ORDER_STATUSES)[number]
@@ -46,8 +45,44 @@ export interface SessionOrder extends OrderDetails {
   doneAt: number | null
   cancelledAt: number | null
   paymentRef: string | null
-  /** O horário aprovado pela Andreía. */
-  scheduled: { date: string; start: string; end: string } | null
+  /** O horário confirmado (aprovado pela Andreía e confirmado pela pessoa). */
+  scheduled: Slot | null
+  /** O horário que a Andreía aprovou e espera a pessoa confirmar (reservado por 24 h). */
+  proposed: Slot | null
+  proposedAt: number | null
+}
+
+export interface Slot {
+  date: string
+  start: string
+  end: string
+}
+
+/** Quanto tempo o horário aprovado fica reservado esperando a pessoa confirmar. */
+export const HOLD_MS = 24 * 60 * 60 * 1000
+
+/** Sempre a mesma ordem de chaves: a regra do Firestore compara o texto de `proposed` e `scheduled`. */
+export const slotJson = (slot: Slot) =>
+  JSON.stringify({ date: slot.date, start: slot.start, end: slot.end })
+
+/** Há um horário aprovado esperando a confirmação da pessoa, ainda no prazo. */
+export function proposalOpen(order: SessionOrder, now: number): boolean {
+  return (
+    !!order.proposed &&
+    order.proposedAt !== null &&
+    (order.status === 'paid' || order.status === 'req') &&
+    now < order.proposedAt + HOLD_MS
+  )
+}
+
+/** A reserva venceu sem a pessoa confirmar: o horário volta para a agenda. */
+export function proposalExpired(order: SessionOrder, now: number): boolean {
+  return (
+    !!order.proposed &&
+    order.proposedAt !== null &&
+    (order.status === 'paid' || order.status === 'req') &&
+    now >= order.proposedAt + HOLD_MS
+  )
 }
 
 const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
@@ -82,19 +117,6 @@ export function statusTimes(order: SessionOrder): Partial<Record<OrderStatus, nu
   }
 }
 
-/** A mensagem que a pessoa manda à Andreía depois de pagar (a tela Mensagens poderá mudar o texto). */
-export function paidMessage(
-  order: Pick<SessionOrder, 'id' | 'therapyName' | 'name' | 'preference'>,
-) {
-  return [
-    'Olá, Andreía! Acabei de pagar uma ativação pelo site.',
-    `Pedido: ${order.id}`,
-    `Terapia: ${order.therapyName}`,
-    `Nome: ${order.name}`,
-    `Data que prefiro: ${longDate(order.preference.date).toLowerCase()}, às ${timeLabel(order.preference.start)}`,
-  ].join('\n')
-}
-
 /* ---------- campos do documento (REST do Firestore) ---------- */
 
 type RestField = Record<string, unknown>
@@ -126,6 +148,8 @@ export function orderUpdateFields(
       | 'cancelledAt'
       | 'paymentRef'
       | 'scheduled'
+      | 'proposed'
+      | 'proposedAt'
     >
   >,
 ): RestFields {
@@ -143,7 +167,12 @@ export function orderUpdateFields(
     if (typeof value === 'number') fields[key] = int(value)
   }
   if (change.paymentRef) fields.paymentRef = str(change.paymentRef)
-  if (change.scheduled) fields.scheduled = str(JSON.stringify(change.scheduled))
+  if (change.scheduled) fields.scheduled = str(slotJson(change.scheduled))
+  // `proposed: null` limpa a proposta (reserva vencida ou trocada).
+  if (change.proposed) fields.proposed = str(slotJson(change.proposed))
+  else if (change.proposed === null) fields.proposed = { nullValue: null }
+  if (typeof change.proposedAt === 'number') fields.proposedAt = int(change.proposedAt)
+  else if (change.proposedAt === null) fields.proposedAt = { nullValue: null }
   return fields
 }
 
@@ -161,6 +190,20 @@ function readInt(fields: Record<string, unknown>, name: string): number | null {
   if (typeof f.integerValue === 'string' && /^-?\d+$/.test(f.integerValue))
     return Number(f.integerValue)
   return typeof f.doubleValue === 'number' ? f.doubleValue : null
+}
+
+function readSlot(fields: Record<string, unknown>, name: string): Slot | null {
+  try {
+    const raw: unknown = JSON.parse(readString(fields, name) ?? 'null')
+    return isObject(raw) &&
+      typeof raw.date === 'string' &&
+      typeof raw.start === 'string' &&
+      typeof raw.end === 'string'
+      ? { date: raw.date, start: raw.start, end: raw.end }
+      : null
+  } catch {
+    return null
+  }
 }
 
 export function parseOrderDetails(raw: unknown): OrderDetails | null {
@@ -204,20 +247,6 @@ export function orderFromFields(
     details = null
   }
   if (!status || createdAt === null || !details) return null
-  let scheduled: SessionOrder['scheduled'] = null
-  try {
-    const raw: unknown = JSON.parse(readString(fields, 'scheduled') ?? 'null')
-    if (
-      isObject(raw) &&
-      typeof raw.date === 'string' &&
-      typeof raw.start === 'string' &&
-      typeof raw.end === 'string'
-    ) {
-      scheduled = { date: raw.date, start: raw.start, end: raw.end }
-    }
-  } catch {
-    scheduled = null
-  }
   return {
     ...details,
     id,
@@ -231,7 +260,9 @@ export function orderFromFields(
     doneAt: readInt(fields, 'doneAt'),
     cancelledAt: readInt(fields, 'cancelledAt'),
     paymentRef: readString(fields, 'paymentRef') ?? null,
-    scheduled,
+    scheduled: readSlot(fields, 'scheduled'),
+    proposed: readSlot(fields, 'proposed'),
+    proposedAt: readInt(fields, 'proposedAt'),
   }
 }
 

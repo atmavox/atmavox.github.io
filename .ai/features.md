@@ -409,7 +409,7 @@ no código, sempre pode.
 - Criar grava na hora e já escolhe; o produto muda só no "Salvar". Nome repetido não passa.
 - No hub, um território criado entra depois dos 4 da marca e só aparece no filtro quando tem jornada.
 
-## F10 · Ativação individual paga 🔨 (passos 1 a 4 de 5: falta aprovar o horário, Mensagens e o perfil)
+## F10 · Ativação individual paga ✅ (código pronto; falta configurar Mercado Pago e publicar as regras)
 
 Mocks aprovados (2026-11-23): `Downloads/atmavox-ativacao-pessoa-v3.html` (pessoa) e
 `Downloads/atmavox-ativacao-andreia-v3.html` (Modo Andreía). Decisão: ADR-029.
@@ -454,7 +454,7 @@ embaixo da tela e um botão redondo que volta ao site.
   opções, obrigatória, subir/descer, tirar do formulário). Nome e telefone são fixos (só o texto
   muda). Pergunta já salva que sai do formulário fica **guardada** (as respostas usam o id dela) e pode
   voltar. Barra fixa com "Alterações não salvas", Descartar e Salvar. Começa pelo modelo aprovado.
-- **Pedidos** ✅ (passo 4; aprovar o horário no passo 5): quadro por status no computador, lista por dia no celular; o pedido abre numa
+- **Pedidos** ✅ (aprovar o horário: reserva de 24 h, link de confirmação, reserva vencida volta para a agenda): quadro por status no computador, lista por dia no celular; o pedido abre numa
   janela (dados fixos à esquerda, só a anamnese rola) ou numa folha. "Aprovar" e "Sugerir outro
   horário" abrem o WhatsApp com a mensagem pronta.
 - **Agenda** ✅: grade da semana das 7h às 22h (arrastar marca uma faixa livre, de meia em meia hora;
@@ -464,7 +464,7 @@ embaixo da tela e um botão redondo que volta ao site.
   (só este dia ou toda semana) e até quando, com os horários de início que a pessoa vai ver (duração +
   10 min de intervalo). Clicar numa faixa: mudar, tirar só este dia ou tirar todas as semanas. Faixas
   do mesmo dia não podem se encostar; nenhuma terapia escolhida que não caiba no período.
-- **Mensagens** (passo 5): os textos prontos do WhatsApp com campos ({nome}, {data}, {link}…) e prévia.
+- **Mensagens** ✅: os textos prontos do WhatsApp com campos ({nome}, {data}, {link}…) e prévia.
 
 **Critérios de aceite do passo 1:** terapias e anamnese salvam em `catalog/therapies` e
 `catalog/anamnesis`; terapia sem preço não fica ativa; nome e telefone não saem nem mudam de tipo;

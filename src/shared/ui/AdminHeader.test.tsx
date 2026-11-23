@@ -16,7 +16,7 @@ describe('cabeçalhos do Modo Andreía', () => {
   it('nas telas de edição, as três áreas, voltar ao hub e ver o site', () => {
     render(<AdminHeader active="ativacoes" />)
     const areas = screen.getByRole('navigation', { name: 'Áreas do Modo Andreía' })
-    expect(areas).toHaveTextContent('ProdutosAcessosAtivações')
+    expect(areas).toHaveTextContent('ProdutosAtivaçõesAcessos')
     expect(screen.getByRole('link', { name: 'Ativações' })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: 'Voltar ao hub' })).toHaveAttribute(
       'href',

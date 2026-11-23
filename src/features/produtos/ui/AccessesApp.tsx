@@ -5,6 +5,7 @@ import { expiresAtFor, isEmail, termLabel, type TermChoice } from '../domain/acc
 import type { AccessAdmin, GrantedAccess, Person } from '../infrastructure/accessAdmin'
 import { Field, Section } from './fields'
 import { inputClass } from './styles'
+import { LoadingNote } from '../../../shared/ui/LoadingNote'
 
 const adminButton =
   'inline-flex min-h-[42px] items-center justify-center rounded-full bg-admin px-5 text-sm font-semibold whitespace-nowrap text-on-admin hover:opacity-90 disabled:opacity-60'
@@ -223,7 +224,7 @@ export function AccessesApp({
 
       <Section title="Liberados">
         {rows === null ? (
-          <p className="text-ink-muted">Carregando…</p>
+          <LoadingNote className="text-ink-muted" />
         ) : rows.length === 0 ? (
           <p className="text-ink-muted">Nenhum acesso liberado ainda.</p>
         ) : (

@@ -10,6 +10,34 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.26.0] · 2026-11-23
+
+### Adicionado
+
+- **Aprovar o horário** (Modo Andreía · Pedidos): o que a pessoa prefere, se ainda estiver livre, ou outro
+  da agenda; o horário fica **reservado por 24 h** (aparece como "Reservado" na agenda) e a mensagem
+  "Horário aprovado" sai pronta para o WhatsApp com o link de confirmação. Reserva vencida sem
+  confirmação volta para a agenda sozinha ao abrir os Pedidos. "Lembrar no WhatsApp" para os agendados;
+  cancelar solta a reserva.
+- **Confirmar o horário** (`#/ativacao/confirmar/{pedido}`): "A Andreía aprovou o seu horário" e
+  "Confirmar este horário"; o pedido vira Agendada.
+- **Mensagens** (Modo Andreía): os quatro textos do WhatsApp (pagou, horário aprovado, outro horário,
+  lembrete) com campos que se preenchem sozinhos e a prévia; em `catalog/messages`.
+- **Perfil · Ativações** (`#/perfil/ativacoes`): um cartão por pedido, que abre as etapas com data e
+  hora e os detalhes; "Ver minha anamnese" e a próxima ação (pagar, avisar, confirmar, conversar).
+
+### Alterado
+
+- Cabeçalho do Modo Andreía: "Modo Andreía" virou uma tag pequena com "área da admin" ao lado; no
+  computador, as áreas ficam no meio, na ordem Produtos, Ativações, Acessos; "Voltar ao hub" e "Ver o
+  site" com o mesmo realce do "Começar a editar"; as faixas azuis (site, jornada e edição) têm sempre
+  a mesma altura.
+- Telas do Modo Andreía com a "luz que desce" (brilho âmbar difuso no topo, como no hub) e o submenu da
+  ativação no estilo do menu do site, alinhado ao conteúdo (mock `atmavox-modo-andreia-estilo.html`, A).
+- Agenda da semana no estilo do site (mock, A): cada dia é um cartão claro com o número em Playfair,
+  faixas livres com a fita dourada ao lado (da C), reservado em vinho e a linha da hora atual em âmbar.
+- "Carregando…" só aparece se a espera passar de meio segundo (sem piscar ao trocar de aba).
+
 ## [1.25.0] · 2026-11-23
 
 ### Adicionado

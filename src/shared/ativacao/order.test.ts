@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  HOLD_MS,
   isExpired,
+  proposalExpired,
+  proposalOpen,
   newOrderFields,
   newOrderId,
   ORDER_ID,
@@ -8,7 +11,6 @@ import {
   orderFromFields,
   orderPathOf,
   orderUpdateFields,
-  paidMessage,
   statusTimes,
   visibleOrders,
   type OrderDetails,
@@ -41,6 +43,8 @@ function order(change: Partial<SessionOrder> = {}): SessionOrder {
     cancelledAt: null,
     paymentRef: null,
     scheduled: null,
+    proposed: null,
+    proposedAt: null,
     ...change,
   }
 }
@@ -104,16 +108,29 @@ describe('pedido', () => {
     ).toEqual({ uid: 'u1', id: 'A7KX2Q' })
     expect(orderPathOf('projects/p/databases/(default)/documents/users/u1/access/x')).toBeNull()
   })
+})
 
-  it('mensagem pronta para avisar a Andreía', () => {
-    expect(paidMessage(order())).toBe(
-      [
-        'Olá, Andreía! Acabei de pagar uma ativação pelo site.',
-        'Pedido: A7KX2Q',
-        'Terapia: Reiki a distância',
-        'Nome: Mariana Souza',
-        'Data que prefiro: quinta, 3 de dezembro, às 19h',
-      ].join('\n'),
-    )
+describe('horário aprovado esperando a confirmação', () => {
+  const proposed = { date: '2026-12-03', start: '19:00', end: '19:50' }
+  it('vale por 24 horas; depois, a reserva vence', () => {
+    const o = order({ status: 'req', proposed, proposedAt: 1000 })
+    expect(proposalOpen(o, 1000 + HOLD_MS - 1)).toBe(true)
+    expect(proposalExpired(o, 1000 + HOLD_MS - 1)).toBe(false)
+    expect(proposalExpired(o, 1000 + HOLD_MS)).toBe(true)
+    expect(proposalOpen(order({ status: 'sched', proposed, proposedAt: 1000 }), 1001)).toBe(false)
+  })
+
+  it('proposta e horário confirmado têm o mesmo texto (a regra do Firestore compara)', () => {
+    const fields = orderUpdateFields({ proposed, scheduled: proposed })
+    expect(fields.proposed).toEqual(fields.scheduled)
+    expect(orderUpdateFields({ proposed: null, proposedAt: null })).toEqual({
+      proposed: { nullValue: null },
+      proposedAt: { nullValue: null },
+    })
+    const lido = orderFromFields('A7KX2Q', 'u1', {
+      ...newOrderFields(details, 1000),
+      ...orderUpdateFields({ proposed, proposedAt: 5 }),
+    })
+    expect(lido).toMatchObject({ proposed, proposedAt: 5 })
   })
 })

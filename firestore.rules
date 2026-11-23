@@ -83,7 +83,15 @@ service cloud.firestore {
           && request.auth.uid == uid
           && resource.data.status == 'paid'
           && request.resource.data.status == 'req'
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'requestedAt']));
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'requestedAt']))
+        // Confirmar o horário que a Andreía aprovou: o mesmo horário, dentro das 24 h da reserva.
+        || (request.auth != null
+          && request.auth.uid == uid
+          && resource.data.status in ['paid', 'req']
+          && request.resource.data.status == 'sched'
+          && request.resource.data.scheduled == resource.data.proposed
+          && request.time.toMillis() < resource.data.proposedAt + 86400000
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'scheduled', 'scheduledAt']));
       allow delete: if isAdmin();
     }
 

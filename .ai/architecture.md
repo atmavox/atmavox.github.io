@@ -71,6 +71,8 @@ ui  →  application  →  domain  ←  content
 | `#/jornada`, `#/jornada/semana-1`…                  | Links antigos: abrem `chama-interna-21`     |
 | `#/jornada/editar`                                  | Modo Andreía (só admin)                     |
 | `#/ativacao`                                        | Ativação individual: janela sobre o Contato |
+| `#/ativacao/confirmar/{pedido}`                     | Confirmar o horário aprovado                |
+| `#/perfil/ativacoes`                                | Perfil, aba Ativações                       |
 | `#/admin/ativacoes`, `…/terapias`, `…/anamnese`     | Modo Andreía da ativação (ADR-029)          |
 
 O hash evita o 404 do GitHub Pages ao recarregar uma página interna e permite compartilhar o link de uma aba.
@@ -128,7 +130,8 @@ catalog/public                        # content: JSON com Product[]; updatedAt (
 catalog/territories                   # content: JSON com os territórios criados { id, name, tone }[] (ADR-027)
 catalog/therapies                     # content: JSON com Therapy[] da ativação individual (ADR-029)
 catalog/anamnesis                     # content: JSON com o formulário da anamnese { sections, consent, archived }
-catalog/availability                  # content: JSON com a agenda { windows (faixas livres), booked (aprovados) }
+catalog/availability                  # content: JSON com a agenda { windows (faixas livres), booked (reservas por pedido) }
+catalog/messages                      # content: JSON com os textos do WhatsApp { paid, approved, other, reminder }
 # Fora do Firestore: public/social.json + public/social/*.jpg, gerados no deploy (ADR-028)
 published/{productId}                 # content: jornada ou meditação; free: boolean (cópia do catálogo)
 users/{uid}/access/{productId}        # grantedAt, expiresAt | null, source: 'manual' | 'payment', ref?

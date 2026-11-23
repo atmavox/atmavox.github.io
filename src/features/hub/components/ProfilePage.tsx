@@ -1,5 +1,5 @@
 import { ArrowRight } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { lazy, Suspense, useState, type ReactNode } from 'react'
 import { useAuthSession } from '../../../shared/auth/AuthContext'
 import { LoginDialog } from '../../../shared/auth/LoginDialog'
 import { useAccess } from '../../../shared/catalog/AccessContext'
@@ -17,11 +17,15 @@ import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import { formatDuration, mediaLabel, meditationHref } from '../meditations'
 import { useCatalog } from '../../../shared/catalog/CatalogContext'
 
-type Tab = 'geral' | 'jornadas' | 'meditacoes' | 'conta'
+// A aba Ativações só é baixada por quem abre (ADR-029).
+const ActivationsTab = lazy(() => import('../ativacao/ActivationsTab'))
+
+type Tab = 'geral' | 'jornadas' | 'meditacoes' | 'ativacoes' | 'conta'
 const TABS: readonly { id: Tab; label: string }[] = [
   { id: 'geral', label: 'Visão geral' },
   { id: 'jornadas', label: 'Jornadas' },
   { id: 'meditacoes', label: 'Meditações' },
+  { id: 'ativacoes', label: 'Ativações' },
   { id: 'conta', label: 'Conta' },
 ]
 
@@ -181,7 +185,10 @@ export function ProfilePage({
   const { session, state } = useAuthSession()
   const access = useAccess()
   const now = useNow()
-  const [tab, setTab] = useState<Tab>('geral')
+  // "#/perfil/ativacoes" (para onde a janela da ativação leva ao fechar) abre direto na aba.
+  const [tab, setTab] = useState<Tab>(() =>
+    window.location.hash.startsWith('#/perfil/ativacoes') ? 'ativacoes' : 'geral',
+  )
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isConfirmingExit, setIsConfirmingExit] = useState(false)
   const { journeys: allJourneys, meditations: allMeditations } = useCatalog()
@@ -338,6 +345,11 @@ export function ProfilePage({
         ))}
       </ul>
     ),
+    ativacoes: (
+      <Suspense fallback={<p className="text-ink-muted">Carregando…</p>}>
+        <ActivationsTab isWide={isWide} />
+      </Suspense>
+    ),
     conta: (
       <section className="flex flex-col gap-3 rounded-[22px] border border-line bg-surface p-5">
         <p className="text-ink">{user.email ?? user.displayName}</p>
@@ -400,7 +412,7 @@ export function ProfilePage({
       <div
         role="tablist"
         aria-label="Perfil"
-        className={`flex border-b border-line ${isWide ? 'gap-7' : 'gap-5 text-[0.92rem]'}`}
+        className={`flex overflow-x-auto border-b border-line [scrollbar-width:none] ${isWide ? 'gap-7' : 'gap-5 text-[0.92rem]'}`}
       >
         {TABS.map((t) => (
           <button

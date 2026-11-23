@@ -10,16 +10,26 @@ import {
   type SavedAnamnesis,
 } from '../../../../shared/ativacao/answers'
 import {
+  bookSlot,
   dayOfMonth,
+  EMPTY_AVAILABILITY,
+  fromMinutes,
   longDate,
   monthName,
+  releaseBooking,
   timeLabel,
   weekdayShort,
+  type Availability,
 } from '../../../../shared/ativacao/availability'
+import { DEFAULT_MESSAGES, fillMessage, type Messages } from '../../../../shared/ativacao/messages'
 import {
+  HOLD_MS,
+  proposalExpired,
+  proposalOpen,
   STATUS_FLOW,
   STATUS_LABELS,
   visibleOrders,
+  type Slot,
   type OrderStatus,
   type SessionOrder,
 } from '../../../../shared/ativacao/order'
@@ -31,6 +41,8 @@ import { TherapyBadge } from '../../../../shared/ui/TherapyIcon'
 import { UiIcon } from '../../../../shared/ui/UiIcon'
 import type { AtivacoesBackend, OrderChange } from '../../infrastructure/ativacoesBackend'
 import { adminButton, ghostButton } from '../styles'
+import { LoadingNote } from '../../../../shared/ui/LoadingNote'
+import { ApprovePanel } from './ApprovePanel'
 import { Overlay } from './Overlay'
 
 const STATUS_CLASS: Record<OrderStatus, string> = {
@@ -90,7 +102,8 @@ function AnamnesisAnswers({
   extra: { label: string; answer: string }[]
 }) {
   const [all, setAll] = useState(false)
-  if (saved === undefined) return <p className="text-sm text-ink-faint">Carregando a anamnese…</p>
+  if (saved === undefined)
+    return <LoadingNote text="Carregando a anamnese…" className="text-sm text-ink-faint" />
   const questions = [...form.sections.flatMap((s) => s.questions), ...form.archived]
   const byId = new Map(questions.map((q) => [q.id, q]))
   const answered = Object.entries(saved?.answers ?? {}).filter(
@@ -174,6 +187,10 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   const [confirmCancel, setConfirmCancel] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [availability, setAvailability] = useState<Availability>(EMPTY_AVAILABILITY)
+  const [messages, setMessages] = useState<Messages>(DEFAULT_MESSAGES)
+  const [isApproving, setIsApproving] = useState(false)
+  const [pageNotice, setPageNotice] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -181,19 +198,45 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
       backend.listOrders().catch(() => null),
       backend.loadTherapies().catch(() => null),
       backend.loadAnamnesis().catch(() => null),
-    ]).then(([list, ts, f]) => {
+      backend.loadAvailability().catch(() => EMPTY_AVAILABILITY),
+      backend.loadMessages().catch(() => DEFAULT_MESSAGES),
+    ]).then(async ([list, ts, f, av, msgs]) => {
       if (cancelled) return
-      if (list === null) setNotice('Não deu para carregar os pedidos. Confira a internet.')
-      setOrders(list ?? [])
+      if (list === null) setPageNotice('Não deu para carregar os pedidos. Confira a internet.')
       if (ts?.length) setTherapies(ts)
       if (f) setForm(f)
+      setMessages(msgs)
+      // Reserva vencida sem a pessoa confirmar: o horário volta para a agenda (mock aprovado).
+      const expired = (list ?? []).filter((o) => proposalExpired(o, Date.now()))
+      let nextList = list ?? []
+      let nextAv = av
+      if (expired.length) {
+        try {
+          for (const o of expired) {
+            await backend.updateOrder(o.uid, o.id, { proposed: null, proposedAt: null })
+            nextAv = releaseBooking(nextAv, o.id)
+          }
+          await backend.saveAvailability(nextAv)
+          nextList = nextList.map((o) =>
+            expired.includes(o) ? { ...o, proposed: null, proposedAt: null } : o,
+          )
+          setPageNotice(
+            `A reserva de ${expired.map((o) => o.name.split(' ')[0]).join(', ')} venceu sem confirmação: o horário voltou para a agenda.`,
+          )
+        } catch {
+          // Sem rede: tenta de novo na próxima vez que a tela abrir.
+        }
+      }
+      if (cancelled) return
+      setAvailability(nextAv)
+      setOrders(nextList)
     })
     return () => {
       cancelled = true
     }
   }, [backend])
 
-  if (!orders) return <p className="p-8 text-ink-muted">Carregando os pedidos…</p>
+  if (!orders) return <LoadingNote text="Carregando os pedidos…" />
 
   const list = visibleOrders(orders, now)
   const therapyOf = (id: string) => therapies.find((t) => t.id === id)
@@ -201,6 +244,7 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   function openOrder(order: SessionOrder) {
     setOpen(order)
     setConfirmCancel(false)
+    setIsApproving(false)
     setNotice(null)
     setSaved(undefined)
     void backend
@@ -222,6 +266,35 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     } finally {
       setIsSaving(false)
       setConfirmCancel(false)
+    }
+  }
+
+  async function approve(order: SessionOrder, slot: Slot) {
+    setIsSaving(true)
+    const nextAv = bookSlot(availability, slot, order.id)
+    try {
+      await backend.saveAvailability(nextAv)
+      setAvailability(nextAv)
+      const proposedAt = Date.now()
+      await backend.updateOrder(order.uid, order.id, { proposed: slot, proposedAt })
+      const next = { ...order, proposed: slot, proposedAt }
+      setOrders((all) => all!.map((o) => (o.uid === order.uid && o.id === order.id ? next : o)))
+      setOpen(next)
+      setIsApproving(false)
+      setNotice('Horário reservado ✓ Agora envie a confirmação pelo WhatsApp.')
+    } catch {
+      setNotice('Não deu para salvar. Confira a internet e tente de novo.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  async function cancelOrder(order: SessionOrder) {
+    await change(order, { status: 'cancel', cancelledAt: Date.now() }, 'Pedido cancelado ✓')
+    if (availability.booked.some((b) => b.orderId === order.id)) {
+      const nextAv = releaseBooking(availability, order.id)
+      await backend.saveAvailability(nextAv).catch(() => {})
+      setAvailability(nextAv)
     }
   }
 
@@ -259,6 +332,22 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     const talk = digits
       ? buildWhatsAppLink(digits, `Oi, ${firstName}! Aqui é a Andreía, da Atmavox.`)
       : null
+    const values = (slot: Slot | null) => ({
+      nome: open.name,
+      apelido: firstName,
+      terapia: open.therapyName,
+      data: slot ? longDate(slot.date).toLowerCase() : '',
+      hora: slot ? timeLabel(slot.start) : '',
+      pedido: open.id,
+      link: `${window.location.origin}${window.location.pathname}#/ativacao/confirmar/${open.id}`,
+    })
+    const isPreferred =
+      open.proposed?.date === open.preference.date && open.proposed.start === open.preference.start
+    const approvedText = fillMessage(
+      isPreferred ? messages.approved : messages.other,
+      values(open.proposed),
+    )
+    const reminderText = fillMessage(messages.reminder, values(open.scheduled))
     const extra = (t?.questions ?? [])
       .filter((q) => open.extra[q.id])
       .map((q) => ({
@@ -306,10 +395,63 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
             Conversar no WhatsApp
           </a>
         )}
-        {(open.status === 'paid' || open.status === 'req') && (
-          <p className="rounded-xl bg-admin/8 px-3 py-2 text-[13px] text-ink-muted">
-            Combine o horário pelo WhatsApp. O botão "Aprovar horário" chega no próximo passo.
-          </p>
+        {(open.status === 'paid' || open.status === 'req') &&
+          (isApproving ? (
+            <ApprovePanel
+              order={open}
+              availability={availability}
+              isSaving={isSaving}
+              onApprove={(slot) => void approve(open, slot)}
+              onCancel={() => setIsApproving(false)}
+            />
+          ) : proposalOpen(open, now) && open.proposed ? (
+            <div className="flex flex-col gap-2 rounded-xl bg-admin/8 px-3 py-2.5 text-[13px] text-ink-muted">
+              <span>
+                Horário aprovado:{' '}
+                <b className="text-ink">
+                  {longDate(open.proposed.date)}, às {timeLabel(open.proposed.start)}
+                </b>
+                . Esperando {firstName} confirmar (até{' '}
+                {timeLabel(fromMinutes(new Date(open.proposedAt! + HOLD_MS).getHours() * 60))} de{' '}
+                {new Date(open.proposedAt! + HOLD_MS).toLocaleDateString('pt-BR', {
+                  day: 'numeric',
+                  month: 'long',
+                })}
+                ).
+              </span>
+              {digits && (
+                <a
+                  href={buildWhatsAppLink(digits, approvedText)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={adminButton}
+                >
+                  Enviar a confirmação no WhatsApp
+                </a>
+              )}
+              <button
+                type="button"
+                onClick={() => setIsApproving(true)}
+                className="self-start text-admin-ink hover:underline"
+              >
+                Trocar o horário
+              </button>
+            </div>
+          ) : (
+            <button type="button" onClick={() => setIsApproving(true)} className={ghostButton}>
+              <UiIcon name="check" size={16} />
+              Aprovar horário
+            </button>
+          ))}
+        {open.status === 'sched' && digits && open.scheduled && (
+          <a
+            href={buildWhatsAppLink(digits, reminderText)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={ghostButton}
+          >
+            Lembrar no WhatsApp
+          </a>
         )}
         {open.status === 'sched' && (
           <button
@@ -338,13 +480,7 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
             <button
               type="button"
               disabled={isSaving}
-              onClick={() =>
-                void change(
-                  open,
-                  { status: 'cancel', cancelledAt: Date.now() },
-                  'Pedido cancelado ✓',
-                )
-              }
+              onClick={() => void cancelOrder(open)}
               className="rounded-full bg-wine px-3.5 py-1.5 font-semibold text-on-admin hover:opacity-90"
             >
               Cancelar pedido
@@ -441,6 +577,11 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
       </label>
     </div>
   )
+  const pageNoticeLine = pageNotice && (
+    <p role="status" className="rounded-xl bg-admin/8 px-4 py-2.5 text-sm text-ink-muted">
+      {pageNotice}
+    </p>
+  )
   const empty = !list.length && (
     <p className="rounded-[18px] border border-dashed border-line p-8 text-center text-ink-muted">
       Ainda não há pedidos. Eles aparecem aqui quando alguém escolhe a terapia e vai pagar.
@@ -452,6 +593,7 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     return (
       <div className="mx-auto flex w-full max-w-[1280px] animate-[page-in_400ms_ease-out] flex-col gap-4 px-7 py-6">
         {header}
+        {pageNoticeLine}
         {empty || (
           <div
             className="grid gap-3 overflow-x-auto pb-2"
@@ -491,6 +633,7 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   return (
     <div className="flex animate-[page-in_400ms_ease-out] flex-col gap-4 p-4">
       {header}
+      {pageNoticeLine}
       {empty}
       {days.map((date) => (
         <section key={date} aria-label={longDate(date)} className="flex flex-col gap-2">

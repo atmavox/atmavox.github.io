@@ -6,6 +6,7 @@ import { HubTabs } from './layouts/HubTabs'
 import {
   hubSectionFromPath,
   meditationIdFromPath,
+  confirmOrderFromPath,
   isActivationPath,
   orderReturnFromPath,
   isProfilePath,
@@ -54,7 +55,10 @@ export function HubPage({ path }: { path: string }) {
       {layout}
       {isActivation && (
         <Suspense fallback={null}>
-          <AtivacaoFlow orderReturn={orderReturnFromPath(path)} />
+          <AtivacaoFlow
+            orderReturn={orderReturnFromPath(path)}
+            confirmOrderId={confirmOrderFromPath(path)}
+          />
         </Suspense>
       )}
     </>

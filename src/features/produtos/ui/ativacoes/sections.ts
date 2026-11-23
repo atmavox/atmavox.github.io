@@ -1,6 +1,12 @@
-export type AtivacoesSection = 'pedidos' | 'agenda' | 'terapias' | 'anamnese'
+export type AtivacoesSection = 'pedidos' | 'agenda' | 'terapias' | 'anamnese' | 'mensagens'
 
-const SECTIONS: readonly AtivacoesSection[] = ['pedidos', 'agenda', 'terapias', 'anamnese']
+const SECTIONS: readonly AtivacoesSection[] = [
+  'pedidos',
+  'agenda',
+  'terapias',
+  'anamnese',
+  'mensagens',
+]
 
 /** `#/admin/ativacoes/{seção}`; sem seção, abre os pedidos. */
 export function sectionFromPath(path: string): AtivacoesSection {

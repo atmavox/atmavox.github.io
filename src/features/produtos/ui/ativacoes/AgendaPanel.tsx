@@ -30,11 +30,12 @@ import { adminButton, ghostButton } from '../styles'
 import { Overlay } from './Overlay'
 import { Switch } from './TherapyFields'
 import { TherapyChecks, ToneDot, WindowForm } from './WindowForm'
+import { LoadingNote } from '../../../../shared/ui/LoadingNote'
 
-/** A grade mostra das 7h às 22h; cada hora tem 44 px e o arrastar anda de meia em meia hora. */
+/** A grade mostra das 7h às 22h; cada hora tem 48 px e o arrastar anda de meia em meia hora. */
 const FIRST_HOUR = 7
 const LAST_HOUR = 22
-const HOUR_PX = 44
+const HOUR_PX = 48
 const SNAP = 30
 
 let windowCounter = 0
@@ -64,7 +65,9 @@ interface Quick {
 
 /** Agenda da Andreía (mock aprovado): grade da semana com arrastar + mês no computador; dia no celular. */
 export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; isWide: boolean }) {
-  const today = localDate(useNow())
+  const nowMs = useNow()
+  const today = localDate(nowMs)
+  const nowMinutes = new Date(nowMs).getHours() * 60 + new Date(nowMs).getMinutes()
   const [availability, setAvailability] = useState<Availability | null>(null)
   const [therapies, setTherapies] = useState<readonly Therapy[]>(DEFAULT_THERAPIES)
   const [view, setView] = useState<'semana' | 'mes'>('semana')
@@ -92,7 +95,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     }
   }, [backend])
 
-  if (!availability) return <p className="p-8 text-ink-muted">Carregando a agenda…</p>
+  if (!availability) return <LoadingNote text="Carregando a agenda…" />
 
   const monday = startOfWeek(day)
   const week = weekOf(day)
@@ -228,8 +231,12 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   const legend = (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-ink-muted">
       <span className="flex items-center gap-1.5">
-        <span className="inline-block size-3 rounded border border-dashed border-admin-ink bg-admin-ink/15" />
+        <span className="inline-block h-3 w-3.5 rounded-[2px_4px_4px_2px] border border-l-[3px] border-line border-l-gold bg-field" />
         Livre
+      </span>
+      <span className="flex items-center gap-1.5">
+        <span className="inline-block size-3 rounded-sm bg-wine" />
+        Reservado
       </span>
       {therapies.map((t) => (
         <span key={t.id} className="flex items-center gap-1.5">
@@ -248,7 +255,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
       onClick={() => openExisting(window, date)}
       aria-label={`Livre ${longDate(date)}, ${timeLabel(window.start)} às ${timeLabel(window.end)}`}
       style={style}
-      className="flex flex-col items-start gap-0.5 overflow-hidden rounded-lg border border-dashed border-admin-ink/60 bg-admin-ink/14 px-2 py-1 text-left text-[11px] leading-tight text-admin-ink transition-colors hover:bg-admin-ink/22"
+      className="flex flex-col items-start gap-0.5 overflow-hidden rounded-[4px_12px_12px_4px] border border-l-4 border-line border-l-gold bg-field px-2.5 py-1.5 text-left text-[11px] leading-tight text-ink transition-colors hover:border-gold/60 hover:border-l-gold"
     >
       <b className="font-semibold">
         {timeLabel(window.start)}–{timeLabel(window.end)}
@@ -260,6 +267,41 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
           return t ? <ToneDot key={id} tone={t.tone} /> : null
         })}
       </span>
+    </button>
+  )
+
+  /** A faixa livre na grade (mock aprovado: grade da A, faixa da C): papel claro com a fita dourada. */
+  const gridBlock = (window: AvailabilityWindow, date: string, top: number, height: number) => (
+    <button
+      key={window.id}
+      type="button"
+      data-window
+      onClick={() => openExisting(window, date)}
+      aria-label={`Livre ${longDate(date)}, ${timeLabel(window.start)} às ${timeLabel(window.end)}`}
+      style={{ top: top + 1, height: height - 2 }}
+      className="absolute inset-x-1.5 z-[1] flex flex-col items-start gap-0.5 overflow-hidden rounded-[4px_10px_10px_4px] border border-l-4 border-line border-l-gold bg-field px-2 py-1.5 text-left text-[11.5px] leading-tight text-ink transition-colors hover:border-gold/60 hover:border-l-gold"
+    >
+      <span className="text-[10.5px] font-semibold tracking-[0.16em] text-gold uppercase">
+        Livre
+      </span>
+      <b className="font-medium">
+        {timeLabel(window.start)} – {timeLabel(window.end)}
+        {window.weekly ? ' · toda semana' : ''}
+      </b>
+      {height > 70 && (
+        <span className="mt-0.5 flex flex-wrap items-center gap-1">
+          {window.therapyIds.map((id) => {
+            const t = therapyOf(id)
+            return t ? (
+              <span
+                key={id}
+                className="inline-block size-2.5 rounded-full"
+                style={{ background: `var(--tone-${t.tone})` }}
+              />
+            ) : null
+          })}
+        </span>
+      )}
     </button>
   )
 
@@ -378,30 +420,42 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
         {noticeLine}
 
         {view === 'semana' ? (
-          <div className="relative overflow-hidden rounded-[18px] border border-line bg-surface">
-            <div className="grid grid-cols-[52px_repeat(7,minmax(0,1fr))] border-b border-line text-xs">
+          // A semana no estilo do site (mock aprovado, A): cada dia é um cartão claro, com o nome do
+          // dia pequeno e o número em Playfair; linhas bem leves; a linha de agora em âmbar.
+          <div className="relative rounded-[22px] bg-surface-2 px-1 pt-1 pb-2.5">
+            <div className="grid grid-cols-[56px_repeat(7,minmax(0,1fr))]">
               <span />
-              {week.map((date) => (
-                <span
-                  key={date}
-                  className={`py-2 text-center ${date === today ? 'font-semibold text-admin-ink' : 'text-ink-faint'}`}
-                >
-                  <b className="mr-1 text-sm text-ink">{dayOfMonth(date)}</b>
-                  {weekdayShort(date)}
-                </span>
-              ))}
+              {week.map((date) => {
+                const isToday = date === today
+                return (
+                  <span key={date} className="flex flex-col items-center pt-2.5 pb-2">
+                    <span
+                      className={`text-[11px] font-semibold tracking-[0.2em] uppercase ${isToday ? 'text-accent' : 'text-ink-faint'}`}
+                    >
+                      {weekdayShort(date)}
+                    </span>
+                    <span
+                      className={`font-display text-[1.65rem] leading-tight ${isToday ? 'text-accent' : 'text-ink'}`}
+                    >
+                      {dayOfMonth(date)}
+                    </span>
+                  </span>
+                )
+              })}
             </div>
-            <div className="grid grid-cols-[52px_repeat(7,minmax(0,1fr))]">
-              <div>
-                {Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) => (
-                  <div
-                    key={i}
-                    style={{ height: HOUR_PX }}
-                    className="border-t border-line pt-0.5 pr-1.5 text-right text-[11px] text-ink-faint"
-                  >
-                    {FIRST_HOUR + i}h
-                  </div>
-                ))}
+            <div className="grid grid-cols-[56px_repeat(7,minmax(0,1fr))]">
+              <div className="relative">
+                {Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) =>
+                  i === 0 ? null : (
+                    <span
+                      key={i}
+                      className="absolute right-2 -translate-y-1/2 text-[11px] text-ink-faint"
+                      style={{ top: i * HOUR_PX }}
+                    >
+                      {FIRST_HOUR + i}h
+                    </span>
+                  ),
+                )}
               </div>
               {week.map((date) => (
                 <div
@@ -410,24 +464,44 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
                   onPointerDown={(e) => onColumnDown(e, date)}
                   onPointerMove={onColumnMove}
                   onPointerUp={onColumnUp}
-                  className="relative cursor-cell touch-none border-l border-line select-none"
+                  className="relative mx-[3px] cursor-cell touch-none rounded-2xl bg-surface select-none"
                   style={{
                     height: (LAST_HOUR - FIRST_HOUR) * HOUR_PX,
-                    backgroundImage: `repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px ${HOUR_PX}px)`,
+                    backgroundImage: `repeating-linear-gradient(to bottom, transparent 0 ${HOUR_PX - 1}px, color-mix(in oklab, var(--text) 7%, transparent) ${HOUR_PX - 1}px ${HOUR_PX}px)`,
                   }}
                 >
                   {occurrencesOn(availability, date).map(({ window }) => {
                     const top = ((toMinutes(window.start) - FIRST_HOUR * 60) / 60) * HOUR_PX
                     const height =
                       ((toMinutes(window.end) - toMinutes(window.start)) / 60) * HOUR_PX
-                    return windowBlock(window, date, {
-                      position: 'absolute',
-                      left: 3,
-                      right: 3,
-                      top: top + 2,
-                      height: height - 4,
-                    })
+                    return gridBlock(window, date, top, height)
                   })}
+                  {availability.booked
+                    .filter((b) => b.date === date)
+                    .map((b) => (
+                      <div
+                        key={`${b.orderId ?? ''}-${b.start}`}
+                        className="pointer-events-none absolute right-1.5 left-4 z-[2] overflow-hidden rounded-[4px_10px_10px_4px] bg-wine px-2 py-1 text-[11px] leading-tight text-[var(--banner-mark)]"
+                        style={{
+                          top: ((toMinutes(b.start) - FIRST_HOUR * 60) / 60) * HOUR_PX + 1,
+                          height: ((toMinutes(b.end) - toMinutes(b.start)) / 60) * HOUR_PX - 2,
+                        }}
+                      >
+                        <b className="font-semibold">Reservado</b>
+                        {b.orderId ? ` · ${b.orderId}` : ''}
+                      </div>
+                    ))}
+                  {date === today &&
+                    nowMinutes > FIRST_HOUR * 60 &&
+                    nowMinutes < LAST_HOUR * 60 && (
+                      <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-x-0 z-[3] h-0.5 bg-accent"
+                        style={{ top: ((nowMinutes - FIRST_HOUR * 60) / 60) * HOUR_PX }}
+                      >
+                        <span className="absolute -top-1 -left-[5px] size-2.5 rounded-full bg-accent" />
+                      </div>
+                    )}
                   {drag?.date === date && (
                     <div
                       className="pointer-events-none absolute inset-x-[3px] rounded-lg border-2 border-dashed border-admin-ink bg-admin-ink/14 px-1.5 py-1 text-[11px] font-semibold text-admin-ink"
@@ -613,14 +687,14 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
               aria-label={longDate(date)}
               onClick={() => setDay(date)}
               className={`relative flex flex-col items-center rounded-xl py-2 transition-colors ${
-                date === day ? 'bg-admin text-on-admin' : 'bg-field text-ink'
+                date === day ? 'bg-accent text-bg' : 'bg-surface text-ink'
               }`}
             >
               <small className="text-[11px] opacity-80">{weekdayShort(date)}</small>
               <b>{dayOfMonth(date)}</b>
               {hasFree && (
                 <span
-                  className={`absolute bottom-1 size-1 rounded-full ${date === day ? 'bg-on-admin' : 'bg-admin-ink'}`}
+                  className={`absolute bottom-1 size-1 rounded-full ${date === day ? 'bg-bg' : 'bg-accent'}`}
                 />
               )}
             </button>

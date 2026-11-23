@@ -3,17 +3,18 @@ import { UiIcon, type UiIconName } from '../../../../shared/ui/UiIcon'
 import type { AtivacoesBackend } from '../../infrastructure/ativacoesBackend'
 import { AgendaPanel } from './AgendaPanel'
 import { AnamnesisPanel } from './AnamnesisPanel'
+import { MessagesPanel } from './MessagesPanel'
 import { OrdersPanel } from './OrdersPanel'
 import { TherapiesPanel } from './TherapiesPanel'
 
 import type { AtivacoesSection } from './sections'
 
-// Mensagens entra no próximo passo (roadmap, ativação individual).
 const SECTIONS: readonly { id: AtivacoesSection; label: string; icon: UiIconName }[] = [
   { id: 'pedidos', label: 'Pedidos', icon: 'inbox' },
   { id: 'agenda', label: 'Agenda', icon: 'calendar' },
   { id: 'terapias', label: 'Terapias', icon: 'leaf' },
   { id: 'anamnese', label: 'Anamnese', icon: 'file' },
+  { id: 'mensagens', label: 'Mensagens', icon: 'chat' },
 ]
 
 /**
@@ -34,6 +35,8 @@ export function AtivacoesApp({
       <OrdersPanel backend={backend} isWide={isWide} />
     ) : section === 'agenda' ? (
       <AgendaPanel backend={backend} isWide={isWide} />
+    ) : section === 'mensagens' ? (
+      <MessagesPanel backend={backend} isWide={isWide} />
     ) : section === 'anamnese' ? (
       <AnamnesisPanel backend={backend} isWide={isWide} />
     ) : (
@@ -45,22 +48,23 @@ export function AtivacoesApp({
       <>
         <nav
           aria-label="Ativação individual"
-          className="sticky top-13 z-30 flex gap-1.5 border-b border-line bg-bg px-6 py-2.5"
+          // Como o menu do site: texto e sublinhado âmbar no item aberto, alinhado ao conteúdo.
+          className="sticky top-13 z-30 h-12 border-b border-line bg-bg/90 backdrop-blur"
         >
-          {SECTIONS.map((s) => (
-            <a
-              key={s.id}
-              href={`#/admin/ativacoes/${s.id}`}
-              aria-current={section === s.id ? 'page' : undefined}
-              className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
-                section === s.id
-                  ? 'bg-admin-ink/14 font-semibold text-admin-ink'
-                  : 'text-ink-muted hover:text-admin-ink'
-              }`}
-            >
-              {s.label}
-            </a>
-          ))}
+          <div className="mx-auto flex h-full max-w-6xl gap-7 px-7">
+            {SECTIONS.map((s) => (
+              <a
+                key={s.id}
+                href={`#/admin/ativacoes/${s.id}`}
+                aria-current={section === s.id ? 'page' : undefined}
+                className={`flex items-center border-b-2 pt-0.5 text-[0.95rem] transition-colors duration-300 hover:text-accent ${
+                  section === s.id ? 'border-accent text-ink' : 'border-transparent text-ink-muted'
+                }`}
+              >
+                {s.label}
+              </a>
+            ))}
+          </div>
         </nav>
         {panel}
       </>

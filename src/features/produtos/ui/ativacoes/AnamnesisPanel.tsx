@@ -27,6 +27,7 @@ import type { AtivacoesBackend } from '../../infrastructure/ativacoesBackend'
 import { Field } from '../fields'
 import { adminButton, ghostButton, inputClass } from '../styles'
 import { Switch } from './TherapyFields'
+import { LoadingNote } from '../../../../shared/ui/LoadingNote'
 
 let idCounter = 0
 const newId = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${++idCounter}`
@@ -224,7 +225,7 @@ export function AnamnesisPanel({
     [saved, isFromModel],
   )
 
-  if (!form || !saved) return <p className="p-8 text-ink-muted">Carregando a anamnese…</p>
+  if (!form || !saved) return <LoadingNote text="Carregando a anamnese…" />
 
   const isDirty = isFromModel || JSON.stringify(form) !== JSON.stringify(saved)
   const change = (next: AnamnesisForm) => {

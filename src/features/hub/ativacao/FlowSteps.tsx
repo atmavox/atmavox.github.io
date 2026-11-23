@@ -54,10 +54,14 @@ export function StepBar({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-between gap-3 text-[13px] text-ink-faint">
-        <span>
-          Passo {current + 1} de {FLOW_STEPS.length} ·{' '}
-          <b className="font-semibold text-ink">{FLOW_STEPS[current]}</b>
-        </span>
+        {current >= FLOW_STEPS.length ? (
+          <b className="font-semibold text-ink">Etapas concluídas</b>
+        ) : (
+          <span>
+            Passo {current + 1} de {FLOW_STEPS.length} ·{' '}
+            <b className="font-semibold text-ink">{FLOW_STEPS[current]}</b>
+          </span>
+        )}
         {detail && <span>{detail}</span>}
       </div>
       <div aria-hidden="true" className="flex gap-1">

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { paidMessage, type SessionOrder } from '../../../shared/ativacao/order'
+import { longDate, timeLabel } from '../../../shared/ativacao/availability'
+import { DEFAULT_MESSAGES, fillMessage, type Messages } from '../../../shared/ativacao/messages'
+import type { SessionOrder } from '../../../shared/ativacao/order'
 import { WHATSAPP_PHONE } from '../../../shared/brand/links'
 import { buildWhatsAppLink } from '../../../shared/lib/whatsapp'
 import { UiIcon } from '../../../shared/ui/UiIcon'
@@ -35,6 +37,20 @@ export function PaidStep({
 }) {
   const [order, setOrder] = useState<SessionOrder | null | undefined>(undefined)
   const [tries, setTries] = useState(0)
+  const [messages, setMessages] = useState<Messages>(DEFAULT_MESSAGES)
+
+  useEffect(() => {
+    let cancelled = false
+    void source
+      .loadMessages()
+      .catch(() => DEFAULT_MESSAGES)
+      .then((loaded) => {
+        if (!cancelled) setMessages(loaded)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [source])
 
   useEffect(() => {
     let cancelled = false
@@ -58,7 +74,17 @@ export function PaidStep({
   }, [isWaiting, tries])
 
   const isPaid = order && ['paid', 'req', 'sched', 'done'].includes(order.status)
-  const message = order ? paidMessage(order) : ''
+  const message = order
+    ? fillMessage(messages.paid, {
+        nome: order.name,
+        apelido: order.name.split(' ')[0] ?? '',
+        terapia: order.therapyName,
+        data: longDate(order.preference.date).toLowerCase(),
+        hora: timeLabel(order.preference.start),
+        pedido: order.id,
+        link: '',
+      })
+    : ''
   const link = buildWhatsAppLink(WHATSAPP_PHONE, message)
 
   function notify() {
@@ -129,7 +155,7 @@ export function PaidStep({
   const footer = isPaid ? (
     <div className="flex items-center justify-between gap-3">
       {isWide && (
-        <a href="#/perfil" className="text-sm text-ink-faint hover:text-ink">
+        <a href="#/perfil/ativacoes" className="text-sm text-ink-faint hover:text-ink">
           Ver minhas ativações
         </a>
       )}
@@ -160,7 +186,7 @@ export function PaidStep({
       )}
     </div>
   ) : (
-    <a href="#/perfil" className={primary}>
+    <a href="#/perfil/ativacoes" className={primary}>
       Ver minhas ativações
     </a>
   )

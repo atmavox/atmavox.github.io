@@ -13,7 +13,7 @@ variables → Actions** (abas **Variables** e **Secrets**).
 - [ ] Redes sociais: Instagram (`INSTAGRAM_TOKEN`, renovar a cada 60 dias)
 - [ ] Redes sociais: Spotify (`SOCIAL_SPOTIFY_RSS`, quando o podcast existir)
 - [ ] Pagamentos: conta de serviço do Firebase + Mercado Pago + Worker + webhook + botão + compra de teste
-- [ ] Publicar as regras novas do Firestore (anamnese e pedidos da ativação individual, 1.24.0 e 1.25.0): seção 4
+- [ ] Publicar as regras novas do Firestore (anamnese, pedidos e confirmação do horário da ativação individual, 1.24.0 a 1.26.0): seção 4
 - [ ] Robô do WhatsApp (depois dos pagamentos): app na Meta + número em "coexistence" + token + webhook
 
 ---
@@ -222,6 +222,10 @@ As regras ficam no repositório (`firestore.rules`) mas só valem depois de publ
 3. **Publicar**.
 
 Mudanças pendentes:
+
+- (1.26.0) Em `users/{uid}/sessions/{pedido}`, a pessoa também pode confirmar o horário que a Andreía
+  aprovou (o mesmo horário, dentro das 24 h da reserva). Sem publicar, o botão "Confirmar este
+  horário" do link não funciona.
 
 - (1.25.0) `users/{uid}/sessions/{pedido}`: os pedidos da ativação individual. A pessoa cria e só passa
   de "Paga" para "Solicitada"; a Andreía lê e muda todos; o Worker marca como paga. Sem publicar, o

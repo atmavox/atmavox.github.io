@@ -16,6 +16,8 @@ import { tabProgress } from '../application/tabProgress'
 import { overallProgress } from '../domain/measures'
 import { AccountButton } from './account/AccountButton'
 import { useJourney } from './useJourney'
+import { ArrowUpRight } from 'lucide-react'
+import { AdminTag } from '../../../shared/ui/AdminTag'
 
 /** A cor da aba vai do cinza ao âmbar conforme a etapa avança: "sair do cinza". */
 function stageColor(ratio: number): string {
@@ -49,14 +51,14 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
     <header className="sticky top-0 z-10 border-b border-line bg-bg/95 backdrop-blur">
       {isAdmin && (
         // A faixa azul do Modo Andreía: ela sabe que está vendo tudo aberto, e volta a editar num toque.
-        <div className="flex items-center gap-3 bg-admin px-4 py-1.5 text-sm text-on-admin md:px-8">
-          <span className="rounded-full bg-on-admin/16 px-2.5 py-0.5 text-xs">Modo Andreía</span>
-          <span className="hidden truncate sm:inline">você vê a jornada inteira, sem cadeados</span>
+        <div className="flex h-13 items-center gap-3 overflow-hidden bg-admin px-4 text-sm text-on-admin md:px-8">
+          <AdminTag note="você vê a jornada inteira, sem cadeados" />
           <a
             href={editorHref(journey.id)}
-            className="ml-auto font-semibold whitespace-nowrap hover:underline"
+            className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[0.95rem] whitespace-nowrap transition-colors hover:bg-on-admin/12"
           >
-            Editar a jornada →
+            Editar a jornada
+            <ArrowUpRight aria-hidden size={16} />
           </a>
         </div>
       )}

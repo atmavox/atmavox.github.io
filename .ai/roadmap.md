@@ -217,10 +217,10 @@ Surgiu no caminho:
         `INSTAGRAM_TOKEN`) e lembrar de renovar a chave a cada 60 dias (ou automatizar a renovação)
   - [ ] Spotify: quando o podcast existir, a Variable `SOCIAL_SPOTIFY_RSS` (o Facebook sai do foco)
 
-- [~] **Ativação individual paga** (F10, ADR-029; conversa com a Andreía em 2026-11-23): login
-  obrigatório → anamnese (editável no Modo Andreía) → terapia (preços editáveis) → data de
-  preferência (agenda da Andreía) → pagamento → mensagem pronta no WhatsApp → histórico e status no
-  perfil. 0. [x] Mocks aprovados (pessoa v3 e Modo Andreía v3)
+- [x] **Ativação individual paga** (F10, ADR-029; conversa com a Andreía em 2026-11-23): login
+      obrigatório → anamnese (editável no Modo Andreía) → terapia (preços editáveis) → data de
+      preferência (agenda da Andreía) → pagamento → mensagem pronta no WhatsApp → histórico e status no
+      perfil. 0. [x] Mocks aprovados (pessoa v3 e Modo Andreía v3)
   1. [x] Terapias + anamnese no Modo Andreía (`#/admin/ativacoes`, `catalog/therapies` e
          `catalog/anamnesis`) (1.22.0)
   2. [x] Agenda no Modo Andreía (`catalog/availability`): grade da semana com arrastar + balão, "+"
@@ -237,7 +237,11 @@ Surgiu no caminho:
          anamnese, conversar, realizada, cancelar)
      - [ ] **Desenvolvedor:** publicar as regras do Firestore e, quando o Mercado Pago estiver
            configurado, publicar o Worker de novo (`npx wrangler@4 deploy` na pasta `worker/`)
-  5. [ ] Aprovação pelo site com link de confirmação + Mensagens + aba Ativações no perfil
+  5. [x] Aprovação pelo site (horário reservado por 24 h, link de confirmação, reserva vencida volta
+         para a agenda), tela Mensagens (textos editáveis do WhatsApp) e aba Ativações no perfil (1.26.0)
+  - [x] Estilo do Modo Andreía e da agenda no jeito do site (mock `atmavox-modo-andreia-estilo.html`:
+        página A, agenda A com a faixa da C)
+  - [ ] Menu do Modo Andreía no celular: mock `Downloads/atmavox-modo-andreia-celular.html`, aguardando escolha
   - [ ] A Andreía confere os textos das terapias e da anamnese, põe os preços e ativa
   - Decidido: sem item novo no menu (a aba Contato explica e leva à ativação); status Aguardando
     pagamento → Paga → Solicitada → Agendada → Realizada (+ Cancelada); a data escolhida é só

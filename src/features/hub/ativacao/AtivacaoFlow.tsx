@@ -32,12 +32,14 @@ import {
   createRestAtivacaoSource,
   type AtivacaoSource,
 } from './ativacaoSource'
+import { ConfirmStep } from './ConfirmStep'
 import { DateStep, type Preference } from './DateStep'
 import { FlowShell } from './FlowShell'
 import { StepBar, StepList } from './FlowSteps'
 import { PaidStep } from './PaidStep'
 import { SummaryStep } from './SummaryStep'
 import { TherapyStep } from './TherapyStep'
+import { LoadingNote } from '../../../shared/ui/LoadingNote'
 
 /** Etapas dentro da janela, depois do login (o índice é o mesmo de FLOW_STEPS). */
 type Step = 1 | 2 | 3 | 4
@@ -71,19 +73,23 @@ const ghost =
 export function AtivacaoFlow({
   source: injected,
   orderReturn = null,
+  confirmOrderId = null,
   workerUrl = paymentsUrl(import.meta.env),
   redirect = (url) => window.location.assign(url),
 }: {
   source?: AtivacaoSource
   /** A volta do Mercado Pago (`#/ativacao/pedido/{código}/{resultado}`). */
   orderReturn?: OrderReturn | null
+  /** O link de confirmação do horário (`#/ativacao/confirmar/{código}`). */
+  confirmOrderId?: string | null
   /** Endereço do Worker de pagamentos; sem ele, "Pagamento em breve". */
   workerUrl?: string | null
   redirect?: (url: string) => void
 }) {
   const { session, state } = useAuthSession()
   const isWide = useMediaQuery(WIDE_LAYOUT_QUERY)
-  const today = localDate(useNow())
+  const now = useNow()
+  const today = localDate(now)
   const user = state?.user ?? null
 
   const source = useMemo<AtivacaoSource>(() => {
@@ -141,7 +147,7 @@ export function AtivacaoFlow({
     }
   }, [uid, displayName, source])
 
-  const close = () => goTo(user ? '#/perfil' : '#/')
+  const close = () => goTo(user ? '#/perfil/ativacoes' : '#/')
 
   if (!state?.authChecked) return null
 
@@ -175,6 +181,19 @@ export function AtivacaoFlow({
     })
     if (result.kind === 'redirect') redirect(result.url)
     else setNotice('Não deu para abrir o pagamento agora. Tente de novo em instantes.')
+  }
+
+  if (confirmOrderId) {
+    return (
+      <ConfirmStep
+        uid={user.uid}
+        orderId={confirmOrderId}
+        source={source}
+        isWide={isWide}
+        now={now}
+        onClose={close}
+      />
+    )
   }
 
   if (orderReturn) {
@@ -307,7 +326,7 @@ export function AtivacaoFlow({
 
   /* ---------- corpo de cada etapa ---------- */
 
-  let body: React.ReactNode = <p className="p-6 text-ink-muted">Carregando…</p>
+  let body: React.ReactNode = <LoadingNote className="p-6 text-ink-muted" />
   if (loaded && answers && form && current) {
     if (step === 1) {
       body = (

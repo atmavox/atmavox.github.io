@@ -183,6 +183,8 @@ const waitingOrder: SessionOrder = {
   cancelledAt: null,
   paymentRef: null,
   scheduled: null,
+  proposed: null,
+  proposedAt: null,
 }
 
 function fakeFirestore() {

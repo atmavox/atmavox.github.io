@@ -38,10 +38,10 @@ describe('Modo Andreía · agenda no computador', () => {
     const backend = createInMemoryAtivacoesBackend({ therapies: priced })
     render(<AtivacoesApp backend={backend} section="agenda" />)
     const column = await screen.findByTestId('dia-2026-12-02')
-    // Sem medidas no teste, o topo da coluna é 0: 440 px = 17h e 572 px = 20h (44 px por hora).
-    fireEvent.pointerDown(column, { clientY: 440, pointerId: 1 })
-    fireEvent.pointerMove(column, { clientY: 572, pointerId: 1 })
-    fireEvent.pointerUp(column, { clientY: 572, pointerId: 1 })
+    // Sem medidas no teste, o topo da coluna é 0: 480 px = 17h e 624 px = 20h (48 px por hora).
+    fireEvent.pointerDown(column, { clientY: 480, pointerId: 1 })
+    fireEvent.pointerMove(column, { clientY: 624, pointerId: 1 })
+    fireEvent.pointerUp(column, { clientY: 624, pointerId: 1 })
 
     const popover = screen.getByRole('dialog', { name: 'Novo horário livre' })
     expect(within(popover).getByText(/17h às 20h/)).toBeInTheDocument()

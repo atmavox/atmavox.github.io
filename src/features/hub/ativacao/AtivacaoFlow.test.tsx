@@ -8,6 +8,7 @@ import { InMemoryAuth } from '../../../shared/auth/InMemoryAuth'
 import { createAuthSession } from '../../../shared/auth/session'
 import { setWideViewport } from '../../../test/viewport'
 import { createInMemoryAtivacaoSource } from './ativacaoSource'
+import ActivationsTab from './ActivationsTab'
 import { AtivacaoFlow } from './AtivacaoFlow'
 
 // Hoje é quinta, 3 de dezembro de 2026; a Andreía abriu a sexta, 4, das 18h às 20h.
@@ -165,7 +166,7 @@ describe('ativação individual', () => {
       </AuthContext.Provider>,
     )
     fireEvent.click(await screen.findByRole('button', { name: 'Fechar e ir para o meu perfil' }))
-    expect(window.location.hash).toBe('#/perfil')
+    expect(window.location.hash).toBe('#/perfil/ativacoes')
   })
 
   it('respostas de antes voltam preenchidas', async () => {
@@ -283,5 +284,80 @@ describe('pagamento da ativação', () => {
     )
     expect(await screen.findByText('O pagamento não foi aprovado')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument()
+  })
+})
+
+describe('confirmar o horário e acompanhar no perfil', () => {
+  async function orderWithProposal(source: ReturnType<typeof setup>['source'], proposedAt: number) {
+    const id = await source.createOrder('google-uid', {
+      therapyId: 'reiki-a-distancia',
+      therapyName: 'Reiki a distância',
+      durationMin: 50,
+      priceCents: 12000,
+      preference: { date: '2026-12-04', start: '18:00' },
+      extra: {},
+      name: 'Maria',
+      phone: '41998765432',
+    })
+    Object.assign(source.orders[0]!, {
+      status: 'req',
+      proposed: { date: '2026-12-04', start: '19:00', end: '19:50' },
+      proposedAt,
+    })
+    return id
+  }
+
+  it('pelo link, a pessoa confirma e o pedido vira Agendada', async () => {
+    const { session, source } = setup()
+    await session.signInWithGoogle()
+    const id = await orderWithProposal(source, Date.now())
+    render(
+      <AuthContext.Provider value={session}>
+        <AtivacaoFlow source={source} confirmOrderId={id} />
+      </AuthContext.Provider>,
+    )
+    expect(await screen.findByText('A Andreía aprovou o seu horário')).toBeInTheDocument()
+    expect(screen.getByText('Sexta, 4 de dezembro, às 19h')).toBeInTheDocument()
+    expect(screen.getByText(/Reservado para você até amanhã/)).toBeInTheDocument()
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Confirmar este horário' }))
+    })
+    expect(await screen.findByText('Horário confirmado')).toBeInTheDocument()
+    expect(source.orders[0]).toMatchObject({
+      status: 'sched',
+      scheduled: { date: '2026-12-04', start: '19:00', end: '19:50' },
+    })
+  })
+
+  it('reserva vencida: não dá para confirmar', async () => {
+    const { session, source } = setup()
+    await session.signInWithGoogle()
+    const id = await orderWithProposal(source, Date.now() - 25 * 3600000)
+    render(
+      <AuthContext.Provider value={session}>
+        <AtivacaoFlow source={source} confirmOrderId={id} />
+      </AuthContext.Provider>,
+    )
+    expect(await screen.findByText(/A reserva venceu/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Confirmar este horário' })).toBeDisabled()
+  })
+
+  it('no perfil, o pedido com horário aprovado leva a confirmar', async () => {
+    setWideViewport(true)
+    const { session, source } = setup()
+    await session.signInWithGoogle()
+    const id = await orderWithProposal(source, Date.now())
+    render(
+      <AuthContext.Provider value={session}>
+        <ActivationsTab isWide source={source} />
+      </AuthContext.Provider>,
+    )
+    expect(await screen.findByText(/A Andreía aprovou um horário/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Confirmar horário' })).toHaveAttribute(
+      'href',
+      `#/ativacao/confirmar/${id}`,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Ver minha anamnese' }))
+    expect(screen.getByRole('dialog', { name: 'Minha anamnese' })).toBeInTheDocument()
   })
 })
