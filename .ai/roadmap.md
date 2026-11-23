@@ -146,12 +146,12 @@ aprovados antes do código.
       - [ ] **Pendência do desenvolvedor (com a Andreía):** configurar as contas e publicar o Worker
             (`pagamentos.md`, passos 1 a 5) e fazer a compra de teste (passo 6) antes de abrir as vendas.
             Até lá o botão mostra "Pagamento em breve" e nada quebra
-      - [ ] **Pendência do desenvolvedor:** publicar as regras novas do Firestore no console
-            (`firebase-setup.md`, seção 8); sem elas, o acesso pago não funciona (o resto segue normal)
+      - [x] **Pendência do desenvolvedor (feito em 2026-11-23):** publicar as regras novas do Firestore no console
+            (`firebase-setup.md`, seções 8 e 9); sem elas, o acesso pago e a tela Acessos não funcionam (o resto segue normal)
             8b. [x] Login nos hubs com abas Início · Jornadas · Meditações (mock aprovado, opção 3) e página de
             perfil (`#/perfil`): abas, trilha de progresso, tipo de acesso
    9. [~] Modo Andreía de produtos (mock aprovado): [x] lista + editor + prévia (computador) e passo a
-      passo com "Revisar" (celular), catálogo no Firestore; [ ] tela de Acessos (liberar à mão por
+      passo com "Revisar" (celular), catálogo no Firestore; [x] tela de Acessos (liberar à mão por
       e-mail, revogar); [ ] imagem do banner; [ ] dias de uma jornada nova (hoje o editor de dias só
       conhece a de 21 dias: uma jornada nova deve ficar "Em breve" até isso existir)
       - Antes: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,

@@ -1,4 +1,5 @@
 import { createLocalSessionHint } from '../shared/auth/LocalSessionHint'
+import { syncProfileOnLogin } from '../shared/auth/profileDoc'
 import { createAuthSession, type AuthSession } from '../shared/auth/session'
 import { createAccessStore, type AccessStore } from '../shared/catalog/accessStore'
 import { createRestAccessLoader } from '../shared/catalog/restAccessLoader'
@@ -58,5 +59,6 @@ export function createAppServices(): AppServices {
       import('../shared/auth/loadFirebaseAuth').then((module) => module.loadFirebaseAuth(config)),
   })
   const access = createAccessStore({ session, load: createRestAccessLoader(config) })
+  syncProfileOnLogin(session, config)
   return { session, access, catalog }
 }

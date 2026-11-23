@@ -106,12 +106,14 @@ O arquivo `firestore.rules` ganhou o catálogo (`catalog/`), os acessos (`users/
 3. Confira: a jornada de 21 dias continua abrindo para quem entra (ela é grátis; o documento antigo,
    sem o campo `free`, conta como grátis).
 
-Liberar um acesso à mão, até o Modo Andreía de produtos existir (passo 9 da Etapa D):
+Liberar um acesso à mão: pelo **Modo Andreía → Acessos** (`#/admin/acessos`), pelo e-mail da pessoa.
+A pessoa precisa ter entrado no site pelo menos uma vez (é quando o e-mail dela fica em `users/{uid}`).
 
-1. Firestore → **Iniciar coleção** dentro de `users/{uid da pessoa}` (o uid aparece em Authentication →
-   Usuários) → coleção `access`, documento com o id do produto (ex.: `chama-interna-21`).
-2. Campos: `grantedAt` (number, `Date.now()` em milissegundos), `expiresAt` (number com o vencimento,
-   ou `null` para sempre) e `source` (string `manual`).
+## 9. Regras de novo: perfil e acessos do Modo Andreía (2026-11-23)
+
+As regras ganharam `users/{uid}` (e-mail e nome gravados pela própria pessoa ao entrar) e a leitura de
+todos os acessos pela admin. Publique o `firestore.rules` inteiro de novo (como na seção 8). Se a tela
+Acessos mostrar "Não foi possível carregar os acessos", confira se as regras novas foram publicadas.
 
 ## Limites do plano gratuito
 

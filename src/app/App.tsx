@@ -44,7 +44,7 @@ function Routes() {
   if (path === '/admin' || path.startsWith('/admin/')) {
     return (
       <Suspense fallback={<div className="min-h-dvh bg-bg" aria-busy="true" />}>
-        <ProdutosEntry />
+        <ProdutosEntry path={path} />
       </Suspense>
     )
   }

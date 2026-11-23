@@ -8,6 +8,12 @@ import {
   createProductsBackend,
   type ProductsBackend,
 } from './infrastructure/productsBackend'
+import {
+  createAccessAdmin,
+  createInMemoryAccessAdmin,
+  type AccessAdmin,
+} from './infrastructure/accessAdmin'
+import { AccessesApp } from './ui/AccessesApp'
 import { ProductsApp } from './ui/ProductsApp'
 
 /** Faixa azul do Modo Andreía (protótipo aprovado), com as áreas dela. */
@@ -28,6 +34,13 @@ function AdminBar({ active }: { active: 'produtos' | 'acessos' }) {
         >
           Produtos
         </a>
+        <a
+          href="#/admin/acessos"
+          aria-current={active === 'acessos' ? 'page' : undefined}
+          className={link(active === 'acessos')}
+        >
+          Acessos
+        </a>
       </nav>
       <a href="#/" className="ml-auto text-on-admin/90 hover:text-on-admin">
         Ver o site ↗
@@ -40,9 +53,18 @@ function AdminBar({ active }: { active: 'produtos' | 'acessos' }) {
  * Porta de entrada do Modo Andreía de produtos (`#/admin/produtos`), carregada sob demanda: só a admin
  * baixa este código. Sem login, pede para entrar; quem não é admin vê um aviso.
  */
-export function ProdutosEntry({ backend: injected }: { backend?: ProductsBackend }) {
+export function ProdutosEntry({
+  path = '/admin/produtos',
+  backend: injected,
+  accessAdmin: injectedAccess,
+}: {
+  path?: string
+  backend?: ProductsBackend
+  accessAdmin?: AccessAdmin
+}) {
+  const area = path.startsWith('/admin/acessos') ? 'acessos' : 'produtos'
   const { session, state } = useAuthSession()
-  const { store } = useCatalog()
+  const { store, products } = useCatalog()
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [admin, setAdmin] = useState<{ uid: string; isAdmin: boolean } | null>(null)
   const uid = state?.user?.uid ?? null
@@ -53,6 +75,13 @@ export function ProdutosEntry({ backend: injected }: { backend?: ProductsBackend
     if (!config || !session) return null
     return createProductsBackend(config, () => session.getIdToken())
   }, [injected, session])
+
+  const accessAdmin = useMemo<AccessAdmin | null>(() => {
+    if (injectedAccess) return injectedAccess
+    const config = readFirebaseConfig(import.meta.env)
+    if (!config || !session) return null
+    return createAccessAdmin(config, () => session.getIdToken())
+  }, [injectedAccess, session])
 
   useEffect(() => {
     if (!uid || !backend) return
@@ -107,12 +136,17 @@ export function ProdutosEntry({ backend: injected }: { backend?: ProductsBackend
       </a>,
     )
   } else {
-    body = <ProductsApp backend={backend ?? createInMemoryProductsBackend()} catalog={store} />
+    body =
+      area === 'acessos' ? (
+        <AccessesApp admin={accessAdmin ?? createInMemoryAccessAdmin()} products={products} />
+      ) : (
+        <ProductsApp backend={backend ?? createInMemoryProductsBackend()} catalog={store} />
+      )
   }
 
   return (
     <div className="min-h-dvh bg-bg">
-      <AdminBar active="produtos" />
+      <AdminBar active={area} />
       {body}
     </div>
   )

@@ -10,6 +10,16 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.12.0] · 2026-11-23
+
+### Adicionado
+
+- Modo Andreía · Acessos (`#/admin/acessos`, mock aprovado): liberar um produto à mão pelo e-mail da
+  pessoa, com o prazo do produto, para sempre ou até uma data; lista dos liberados (à mão ou por
+  pagamento) com "Revogar" (pede confirmação) e "Renovar" nos vencidos.
+- Ao entrar, a pessoa grava o próprio e-mail e nome em `users/{uid}` (só ela e a admin leem): é como a
+  Andreía acha alguém. Regras novas no `firestore.rules` (publicar de novo, `firebase-setup.md` seção 9).
+
 ## [1.11.0] · 2026-11-23
 
 ### Adicionado
