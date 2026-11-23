@@ -3,12 +3,14 @@ import { UiIcon, type UiIconName } from '../../../../shared/ui/UiIcon'
 import type { AtivacoesBackend } from '../../infrastructure/ativacoesBackend'
 import { AgendaPanel } from './AgendaPanel'
 import { AnamnesisPanel } from './AnamnesisPanel'
+import { OrdersPanel } from './OrdersPanel'
 import { TherapiesPanel } from './TherapiesPanel'
 
 import type { AtivacoesSection } from './sections'
 
-// Pedidos e Mensagens entram nos próximos passos (roadmap, ativação individual).
+// Mensagens entra no próximo passo (roadmap, ativação individual).
 const SECTIONS: readonly { id: AtivacoesSection; label: string; icon: UiIconName }[] = [
+  { id: 'pedidos', label: 'Pedidos', icon: 'inbox' },
   { id: 'agenda', label: 'Agenda', icon: 'calendar' },
   { id: 'terapias', label: 'Terapias', icon: 'leaf' },
   { id: 'anamnese', label: 'Anamnese', icon: 'file' },
@@ -28,7 +30,9 @@ export function AtivacoesApp({
 }) {
   const isWide = useMediaQuery('(min-width: 900px)')
   const panel =
-    section === 'agenda' ? (
+    section === 'pedidos' ? (
+      <OrdersPanel backend={backend} isWide={isWide} />
+    ) : section === 'agenda' ? (
       <AgendaPanel backend={backend} isWide={isWide} />
     ) : section === 'anamnese' ? (
       <AnamnesisPanel backend={backend} isWide={isWide} />

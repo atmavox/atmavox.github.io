@@ -110,7 +110,7 @@ export function DateStep({
   const months = [firstMonth, nextMonth(firstMonth), nextMonth(nextMonth(firstMonth))]
   const starts = days.find((d) => d.date === day)?.starts ?? []
   const askOther = whatsAppMessage(
-    `Olá, Andreía! Quero agendar ${therapy.name}, mas nenhum horário do site serve para mim. Podemos combinar outro?`,
+    `Quero agendar ${therapy.name}, mas nenhum horário do site serve para mim. Podemos combinar outro?`,
   )
 
   const otherLink = (

@@ -1,8 +1,9 @@
-export type AtivacoesSection = 'agenda' | 'terapias' | 'anamnese'
+export type AtivacoesSection = 'pedidos' | 'agenda' | 'terapias' | 'anamnese'
 
-/** `#/admin/ativacoes/{agenda|terapias|anamnese}`; sem seção, abre a agenda. */
+const SECTIONS: readonly AtivacoesSection[] = ['pedidos', 'agenda', 'terapias', 'anamnese']
+
+/** `#/admin/ativacoes/{seção}`; sem seção, abre os pedidos. */
 export function sectionFromPath(path: string): AtivacoesSection {
-  if (path.startsWith('/admin/ativacoes/terapias')) return 'terapias'
-  if (path.startsWith('/admin/ativacoes/anamnese')) return 'anamnese'
-  return 'agenda'
+  const segment = path.replace(/^\/admin\/ativacoes\/?/, '').split('/')[0]
+  return SECTIONS.find((s) => s === segment) ?? 'pedidos'
 }

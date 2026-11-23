@@ -10,6 +10,25 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.25.0] · 2026-11-23
+
+### Adicionado
+
+- **Pedidos da ativação individual** (F10, ADR-029): no resumo, "Pagar" cria o pedido (Aguardando
+  pagamento) e segue para o Mercado Pago; o Worker cobra pelo preço das terapias do catálogo e marca o
+  pedido como Pago no aviso do pagamento (estorno cancela). A volta abre "Pagamento confirmado" com o
+  número do pedido, a mensagem pronta e "Avisar a Andreía no WhatsApp" (o pedido vira Solicitada);
+  pagamento recusado oferece tentar de novo. Sem o Worker configurado, segue "Pagamento em breve".
+- Modo Andreía · Ativações · **Pedidos**: quadro por status no computador e lista por dia no celular
+  (vencidos sem pagamento somem); o pedido abre numa janela com os dados parados à esquerda e a anamnese
+  rolando à direita ("Ver todas as respostas"), conversar no WhatsApp da pessoa, marcar como realizada
+  e cancelar.
+- Regras do Firestore para `users/{uid}/sessions` (precisam ser publicadas no console).
+
+### Corrigido
+
+- Mensagens do WhatsApp da ativação não repetem mais "Olá, Andreía!".
+
 ## [1.24.0] · 2026-11-23
 
 ### Adicionado

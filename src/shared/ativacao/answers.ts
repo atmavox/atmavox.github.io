@@ -46,6 +46,12 @@ export function isPhone(value: string): boolean {
   return d.length === 10 || d.length === 11
 }
 
+/** Para o link do WhatsApp: "(41) 9 9876-5432" → "5541998765432" (`null` se não for telefone). */
+export function whatsAppDigits(value: string): string | null {
+  if (!isPhone(value)) return null
+  return `55${digits(value).replace(/^55(?=\d{10,11}$)/, '')}`
+}
+
 /** "41998765432" → "(41) 9 9876-5432"; o que não der para formatar fica como está. */
 export function formatPhone(value: string): string {
   const d = digits(value).replace(/^55(?=\d{10,11}$)/, '')

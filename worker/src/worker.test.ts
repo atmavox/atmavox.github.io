@@ -1,5 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from 'vitest'
+import type { SessionOrder } from '../../src/shared/ativacao/order'
+import { DEFAULT_THERAPIES, type Therapy } from '../../src/shared/ativacao/therapy'
 import type { Product } from '../../src/shared/catalog/product'
 import { createApp, type AppDeps } from './app'
 import { base64UrlEncode, hmacSha256Hex } from './crypto'
@@ -159,16 +161,46 @@ const paidJourney: Product = {
   themes: [],
 }
 const freeJourney: Product = { ...paidJourney, id: 'livre', pricing: { type: 'free' } }
+const reiki: Therapy = { ...DEFAULT_THERAPIES[0]!, priceCents: 12000, active: true }
+const waitingOrder: SessionOrder = {
+  id: 'A7KX2Q',
+  uid: 'uid-ana',
+  status: 'wait',
+  createdAt: NOW,
+  therapyId: reiki.id,
+  therapyName: reiki.name,
+  durationMin: 50,
+  priceCents: 1,
+  preference: { date: '2026-12-03', start: '19:00' },
+  extra: {},
+  name: 'Ana',
+  phone: '41998765432',
+  chargedCents: null,
+  paidAt: null,
+  requestedAt: null,
+  scheduledAt: null,
+  doneAt: null,
+  cancelledAt: null,
+  paymentRef: null,
+  scheduled: null,
+}
 
 function fakeFirestore() {
   const access = new Map<string, StoredAccess>()
+  const orders = new Map<string, SessionOrder>()
   const client: FirestoreClient = {
+    readTherapies: async () => [reiki, { ...reiki, id: 'sem-preco', priceCents: 0, active: false }],
+    readOrder: async (uid, id) => orders.get(`${uid}/${id}`) ?? null,
+    updateOrder: async (uid, id, change) => {
+      const current = orders.get(`${uid}/${id}`)
+      if (current) orders.set(`${uid}/${id}`, { ...current, ...change })
+    },
     readCatalog: async () => [paidJourney, freeJourney],
     readAccess: async (uid, id) => access.get(`${uid}/${id}`) ?? null,
     writeAccess: async (uid, id, value) => void access.set(`${uid}/${id}`, value),
     deleteAccess: async (uid, id) => void access.delete(`${uid}/${id}`),
   }
-  return { client, access }
+  return { client, access, orders }
 }
 
 function setup(payment: Partial<Payment> = {}, signed = true) {
@@ -307,5 +339,72 @@ describe('rota /retorno', () => {
       new Request('https://pag.example/retorno?status=<script>&produto=../../x'),
     )
     expect(odd.headers.get('Location')).toBe('https://atmavox.github.io/#/pagamento/pendente')
+  })
+})
+
+describe('ativação individual', () => {
+  const orderCheckout = (orderId: string) =>
+    new Request('https://pag.example/checkout', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer bom', Origin: 'https://atmavox.github.io' },
+      body: JSON.stringify({ orderId }),
+    })
+
+  it('cobra o pedido pelo preço das terapias, não pelo que veio do navegador', async () => {
+    const { handle, store, createPreference } = setup()
+    store.orders.set('uid-ana/A7KX2Q', waitingOrder)
+    const response = await handle(orderCheckout('A7KX2Q'))
+    expect(response.status).toBe(200)
+    expect(createPreference).toHaveBeenCalledWith(
+      expect.objectContaining({ productId: 'ativacao:A7KX2Q', priceCents: 12000, uid: 'uid-ana' }),
+    )
+    expect(store.orders.get('uid-ana/A7KX2Q')?.chargedCents).toBe(12000)
+  })
+
+  it('recusa pedido de outra pessoa, já pago ou de terapia sem preço', async () => {
+    const { handle, store } = setup()
+    expect((await handle(orderCheckout('A7KX2Q'))).status).toBe(400)
+    store.orders.set('uid-ana/APAGO1', { ...waitingOrder, id: 'APAGO1', status: 'paid' })
+    expect((await handle(orderCheckout('APAGO1'))).status).toBe(409)
+    store.orders.set('uid-ana/ASEMP1', { ...waitingOrder, id: 'ASEMP1', therapyId: 'sem-preco' })
+    expect((await handle(orderCheckout('ASEMP1'))).status).toBe(400)
+    expect((await handle(orderCheckout('../x'))).status).toBe(400)
+  })
+
+  it('pagamento aprovado marca como paga, uma vez só e com o valor certo', async () => {
+    const ok = setup({ externalReference: 'uid-ana|ativacao:A7KX2Q', amount: 120 })
+    ok.store.orders.set('uid-ana/A7KX2Q', { ...waitingOrder, chargedCents: 12000 })
+    await ok.handle(webhookRequest())
+    expect(ok.store.orders.get('uid-ana/A7KX2Q')).toMatchObject({
+      status: 'paid',
+      paidAt: NOW,
+      paymentRef: '999',
+    })
+    expect(ok.store.access.size).toBe(0)
+
+    const low = setup({ externalReference: 'uid-ana|ativacao:A7KX2Q', amount: 1 })
+    low.store.orders.set('uid-ana/A7KX2Q', { ...waitingOrder, chargedCents: 12000 })
+    await low.handle(webhookRequest())
+    expect(low.store.orders.get('uid-ana/A7KX2Q')?.status).toBe('wait')
+  })
+
+  it('estorno cancela o pedido daquele pagamento', async () => {
+    const { handle, store } = setup({
+      status: 'refunded',
+      externalReference: 'uid-ana|ativacao:A7KX2Q',
+    })
+    store.orders.set('uid-ana/A7KX2Q', { ...waitingOrder, status: 'req', paymentRef: '999' })
+    await handle(webhookRequest())
+    expect(store.orders.get('uid-ana/A7KX2Q')).toMatchObject({ status: 'cancel', cancelledAt: NOW })
+  })
+
+  it('volta para a tela do pedido no site', async () => {
+    const { handle } = setup()
+    const back = await handle(
+      new Request('https://pag.example/retorno?status=aprovado&produto=ativacao%3AA7KX2Q'),
+    )
+    expect(back.headers.get('Location')).toBe(
+      'https://atmavox.github.io/#/ativacao/pedido/A7KX2Q/aprovado',
+    )
   })
 })

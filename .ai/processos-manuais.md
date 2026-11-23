@@ -13,7 +13,7 @@ variables → Actions** (abas **Variables** e **Secrets**).
 - [ ] Redes sociais: Instagram (`INSTAGRAM_TOKEN`, renovar a cada 60 dias)
 - [ ] Redes sociais: Spotify (`SOCIAL_SPOTIFY_RSS`, quando o podcast existir)
 - [ ] Pagamentos: conta de serviço do Firebase + Mercado Pago + Worker + webhook + botão + compra de teste
-- [ ] Publicar as regras novas do Firestore (anamnese da ativação individual, 1.24.0): seção 4
+- [ ] Publicar as regras novas do Firestore (anamnese e pedidos da ativação individual, 1.24.0 e 1.25.0): seção 4
 - [ ] Robô do WhatsApp (depois dos pagamentos): app na Meta + número em "coexistence" + token + webhook
 
 ---
@@ -221,7 +221,12 @@ As regras ficam no repositório (`firestore.rules`) mas só valem depois de publ
 2. Apagar o conteúdo e colar o `firestore.rules` inteiro da `main`.
 3. **Publicar**.
 
-Mudança pendente (1.24.0): `users/{uid}/anamnesis/{doc}`, onde cada pessoa guarda as respostas da
-anamnese da ativação individual (só ela grava; ela e a Andreía leem). Sem publicar, o fluxo funciona,
-mas as respostas não ficam na conta: a pessoa vê o aviso "Não deu para guardar suas respostas na conta
-agora" e precisa responder de novo da próxima vez.
+Mudanças pendentes:
+
+- (1.25.0) `users/{uid}/sessions/{pedido}`: os pedidos da ativação individual. A pessoa cria e só passa
+  de "Paga" para "Solicitada"; a Andreía lê e muda todos; o Worker marca como paga. Sem publicar, o
+  botão "Pagar" não consegue criar o pedido e a tela Pedidos fica vazia.
+- (1.24.0) `users/{uid}/anamnesis/{doc}`, onde cada pessoa guarda as respostas da
+  anamnese da ativação individual (só ela grava; ela e a Andreía leem). Sem publicar, o fluxo funciona,
+  mas as respostas não ficam na conta: a pessoa vê o aviso "Não deu para guardar suas respostas na conta
+  agora" e precisa responder de novo da próxima vez.

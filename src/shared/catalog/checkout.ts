@@ -16,11 +16,14 @@ export function paymentsUrl(env: Partial<Record<string, string | undefined>>): s
 export async function requestCheckout({
   workerUrl,
   productId,
+  orderId,
   idToken,
   fetchFn = (input, init) => fetch(input, init),
 }: {
   workerUrl: string
-  productId: string
+  /** Jornada ou meditação; ou, na ativação individual, o código do pedido (`orderId`). */
+  productId?: string
+  orderId?: string
   idToken: string | null
   fetchFn?: (input: string, init?: RequestInit) => Promise<Response>
 }): Promise<CheckoutResult> {
@@ -29,7 +32,7 @@ export async function requestCheckout({
     const response = await fetchFn(`${workerUrl}/checkout`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productId }),
+      body: JSON.stringify(orderId ? { orderId } : { productId }),
     })
     if (response.status === 401) return { kind: 'login' }
     if (response.status === 409) return { kind: 'already-owned' }

@@ -231,8 +231,12 @@ Surgiu no caminho:
      - [ ] **Desenvolvedor:** publicar as regras do Firestore (`processos-manuais.md`, seção 4)
      - [x] Cabeçalho do Modo Andreía: no site, só "Começar a editar"; nas telas de edição, Produtos,
            Acessos e Ativações na fonte do menu do site, "Voltar ao hub" com a seta à direita
-  4. [ ] Pedidos e status (regras novas do Firestore, Worker cobrando terapias; o pagamento real
-         depende do Mercado Pago, ainda pendente) + tela Pedidos no Modo Andreía
+  4. [x] Pedidos e status (1.25.0): pedido criado no resumo (`users/{uid}/sessions/{código}`), Worker
+         cobra pelo preço das terapias e marca como paga, volta com "Pagamento confirmado" e o aviso no
+         WhatsApp (Paga → Solicitada), tela Pedidos no Modo Andreía (quadro / lista por dia, pedido com a
+         anamnese, conversar, realizada, cancelar)
+     - [ ] **Desenvolvedor:** publicar as regras do Firestore e, quando o Mercado Pago estiver
+           configurado, publicar o Worker de novo (`npx wrangler@4 deploy` na pasta `worker/`)
   5. [ ] Aprovação pelo site com link de confirmação + Mensagens + aba Ativações no perfil
   - [ ] A Andreía confere os textos das terapias e da anamnese, põe os preços e ativa
   - Decidido: sem item novo no menu (a aba Contato explica e leva à ativação); status Aguardando

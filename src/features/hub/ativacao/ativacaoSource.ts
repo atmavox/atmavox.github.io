@@ -8,6 +8,14 @@ import {
 } from '../../../shared/ativacao/anamnesis'
 import { parseSavedAnamnesis, type SavedAnamnesis } from '../../../shared/ativacao/answers'
 import {
+  newOrderFields,
+  newOrderId,
+  orderFromFields,
+  orderUpdateFields,
+  type OrderDetails,
+  type SessionOrder,
+} from '../../../shared/ativacao/order'
+import {
   EMPTY_AVAILABILITY,
   parseAvailability,
   type Availability,
@@ -18,6 +26,7 @@ import {
   fieldsOf,
   getJson,
   patchDocument,
+  type RestValue,
   restInteger,
   restString,
   stringField,
@@ -32,6 +41,11 @@ export interface AtivacaoSource {
   loadAvailability(): Promise<Availability>
   loadMyAnamnesis(uid: string): Promise<SavedAnamnesis | null>
   saveMyAnamnesis(uid: string, saved: SavedAnamnesis): Promise<void>
+  /** Cria o pedido como "Aguardando pagamento" e devolve o código. */
+  createOrder(uid: string, details: OrderDetails): Promise<string>
+  getOrder(uid: string, orderId: string): Promise<SessionOrder | null>
+  /** Paga → Solicitada: a pessoa avisou a Andreía no WhatsApp. */
+  markRequested(uid: string, orderId: string): Promise<void>
 }
 
 export function createRestAtivacaoSource(
@@ -77,6 +91,35 @@ export function createRestAtivacaoSource(
         fetchFn,
       )
     },
+    async createOrder(uid, details) {
+      const id = newOrderId()
+      await patchDocument(
+        config,
+        `users/${uid}/sessions/${id}`,
+        newOrderFields(details, Date.now()) as Record<string, RestValue>,
+        await token(),
+        fetchFn,
+      )
+      return id
+    },
+    async getOrder(uid, orderId) {
+      const body = await getJson(
+        documentsUrl(config, `users/${uid}/sessions/${orderId}`),
+        await token(),
+        fetchFn,
+      )
+      const fields = fieldsOf(body)
+      return fields ? orderFromFields(orderId, uid, fields) : null
+    },
+    async markRequested(uid, orderId) {
+      await patchDocument(
+        config,
+        `users/${uid}/sessions/${orderId}`,
+        orderUpdateFields({ status: 'req', requestedAt: Date.now() }) as Record<string, RestValue>,
+        await token(),
+        fetchFn,
+      )
+    },
   }
 }
 
@@ -87,18 +130,38 @@ export function createInMemoryAtivacaoSource(
     anamnesis?: AnamnesisForm
     availability?: Availability
     mine?: Record<string, SavedAnamnesis>
+    orders?: SessionOrder[]
   } = {},
-): AtivacaoSource & { mine: Record<string, SavedAnamnesis> } {
+): AtivacaoSource & { mine: Record<string, SavedAnamnesis>; orders: SessionOrder[] } {
   const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
   const mine: Record<string, SavedAnamnesis> = { ...(initial.mine ?? {}) }
+  const orders: SessionOrder[] = [...(initial.orders ?? [])]
+  const find = (uid: string, id: string) => orders.find((o) => o.uid === uid && o.id === id)
   return {
     mine,
+    orders,
     loadTherapies: async () => copy(initial.therapies ?? [...DEFAULT_THERAPIES]),
     loadAnamnesis: async () => copy(initial.anamnesis ?? DEFAULT_ANAMNESIS),
     loadAvailability: async () => copy(initial.availability ?? EMPTY_AVAILABILITY),
     loadMyAnamnesis: async (uid) => (mine[uid] ? copy(mine[uid]) : null),
     saveMyAnamnesis: async (uid, saved) => {
       mine[uid] = copy(saved)
+    },
+    async createOrder(uid, details) {
+      const fields = newOrderFields(details, Date.now())
+      const order = orderFromFields(newOrderId(), uid, fields)!
+      orders.push(order)
+      return order.id
+    },
+    getOrder: async (uid, id) => {
+      const order = find(uid, id)
+      return order ? copy(order) : null
+    },
+    async markRequested(uid, id) {
+      const order = find(uid, id)
+      if (!order || order.status !== 'paid') throw new Error('Só um pedido pago vira Solicitada.')
+      order.status = 'req'
+      order.requestedAt = Date.now()
     },
   }
 }

@@ -43,6 +43,12 @@ const PATHS = {
     </>
   ),
   next: <path d="m9 6 6 6-6 6" />,
+  inbox: (
+    <>
+      <path d="M4 13l2.5-7.5h11L20 13v6H4z" />
+      <path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20" />
+    </>
+  ),
   file: (
     <>
       <path d="M7 3.5h7l4 4V20.5H6V3.5z" />

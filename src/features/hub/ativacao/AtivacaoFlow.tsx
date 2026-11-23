@@ -1,5 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { useEffect, useMemo, useState } from 'react'
 import type { AnamnesisForm } from '../../../shared/ativacao/anamnesis'
 import {
   answeredCount,
@@ -19,13 +18,14 @@ import type { Therapy } from '../../../shared/ativacao/therapy'
 import { useAuthSession } from '../../../shared/auth/AuthContext'
 import { LoginDialog } from '../../../shared/auth/LoginDialog'
 import { whatsAppMessage } from '../../../shared/brand/links'
+import { paymentsUrl, requestCheckout } from '../../../shared/catalog/checkout'
 import { formatPrice } from '../../../shared/catalog/offer'
 import { readFirebaseConfig } from '../../../shared/firebase/config'
 import { useMediaQuery } from '../../../shared/lib/useMediaQuery'
 import { useNow } from '../../../shared/lib/useNow'
 import { UiIcon } from '../../../shared/ui/UiIcon'
 import { SocialIcon } from '../components/SocialIcon'
-import { WIDE_LAYOUT_QUERY } from '../navigation'
+import { WIDE_LAYOUT_QUERY, type OrderReturn } from '../navigation'
 import { AnswerField } from './AnswerField'
 import {
   createInMemoryAtivacaoSource,
@@ -33,7 +33,9 @@ import {
   type AtivacaoSource,
 } from './ativacaoSource'
 import { DateStep, type Preference } from './DateStep'
-import { StepBar, StepDots, StepList } from './FlowSteps'
+import { FlowShell } from './FlowShell'
+import { StepBar, StepList } from './FlowSteps'
+import { PaidStep } from './PaidStep'
 import { SummaryStep } from './SummaryStep'
 import { TherapyStep } from './TherapyStep'
 
@@ -66,13 +68,23 @@ const ghost =
  * A ativação individual (mock aprovado, `atmavox-ativacao-pessoa-v3.html`): do login ao resumo, tudo
  * numa janela sobre o hub desfocado. Fechar antes de entrar volta ao início; depois, ao perfil.
  */
-export function AtivacaoFlow({ source: injected }: { source?: AtivacaoSource }) {
+export function AtivacaoFlow({
+  source: injected,
+  orderReturn = null,
+  workerUrl = paymentsUrl(import.meta.env),
+  redirect = (url) => window.location.assign(url),
+}: {
+  source?: AtivacaoSource
+  /** A volta do Mercado Pago (`#/ativacao/pedido/{código}/{resultado}`). */
+  orderReturn?: OrderReturn | null
+  /** Endereço do Worker de pagamentos; sem ele, "Pagamento em breve". */
+  workerUrl?: string | null
+  redirect?: (url: string) => void
+}) {
   const { session, state } = useAuthSession()
   const isWide = useMediaQuery(WIDE_LAYOUT_QUERY)
   const today = localDate(useNow())
   const user = state?.user ?? null
-  const titleId = useId()
-  const bodyRef = useRef<HTMLDivElement>(null)
 
   const source = useMemo<AtivacaoSource>(() => {
     if (injected) return injected
@@ -92,6 +104,7 @@ export function AtivacaoFlow({ source: injected }: { source?: AtivacaoSource }) 
   const [preference, setPreference] = useState<Preference | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [isPaying, setIsPaying] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -130,19 +143,6 @@ export function AtivacaoFlow({ source: injected }: { source?: AtivacaoSource }) 
 
   const close = () => goTo(user ? '#/perfil' : '#/')
 
-  useEffect(() => {
-    if (!user) return
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') goTo('#/perfil')
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [user])
-
-  useEffect(() => {
-    bodyRef.current?.scrollTo?.({ top: 0 })
-  }, [step, section])
-
   if (!state?.authChecked) return null
 
   if (!user || !session) {
@@ -162,6 +162,30 @@ export function AtivacaoFlow({ source: injected }: { source?: AtivacaoSource }) 
           </div>
         }
         header={<StepBar current={0} />}
+      />
+    )
+  }
+
+  async function checkout(orderId: string) {
+    if (!workerUrl || !session) return
+    const result = await requestCheckout({
+      workerUrl,
+      orderId,
+      idToken: await session.getIdToken(),
+    })
+    if (result.kind === 'redirect') redirect(result.url)
+    else setNotice('Não deu para abrir o pagamento agora. Tente de novo em instantes.')
+  }
+
+  if (orderReturn) {
+    return (
+      <PaidStep
+        uid={user.uid}
+        orderReturn={orderReturn}
+        source={source}
+        isWide={isWide}
+        onClose={close}
+        onRetry={(id) => void checkout(id)}
       />
     )
   }
@@ -249,6 +273,30 @@ export function AtivacaoFlow({ source: injected }: { source?: AtivacaoSource }) 
       return
     }
     setStep((step - 1) as Step)
+  }
+
+  /** Cria o pedido ("Aguardando pagamento") e segue para o Mercado Pago. */
+  async function pay() {
+    if (!uid || !therapy || !preference || !answers) return
+    setIsPaying(true)
+    setNotice(null)
+    try {
+      const orderId = await source.createOrder(uid, {
+        therapyId: therapy.id,
+        therapyName: therapy.name,
+        durationMin: therapy.durationMin,
+        priceCents: therapy.priceCents,
+        preference,
+        extra,
+        name: String(answers.nome ?? displayName ?? ''),
+        phone: String(answers.telefone ?? ''),
+      })
+      await checkout(orderId)
+    } catch {
+      setNotice('Não deu para criar o pedido agora. Confira a internet e tente de novo.')
+    } finally {
+      setIsPaying(false)
+    }
   }
 
   function edit(target: 1 | 2 | 3) {
@@ -359,7 +407,7 @@ export function AtivacaoFlow({ source: injected }: { source?: AtivacaoSource }) 
   const combine =
     therapy && preference
       ? whatsAppMessage(
-          `Olá, Andreía! Quero agendar ${therapy.name}. Data que prefiro: ${longDate(preference.date).toLowerCase()}, às ${timeLabel(preference.start)}.`,
+          `Quero agendar ${therapy.name}. Data que prefiro: ${longDate(preference.date).toLowerCase()}, às ${timeLabel(preference.start)}.`,
         )
       : null
 
@@ -380,24 +428,38 @@ export function AtivacaoFlow({ source: injected }: { source?: AtivacaoSource }) 
               </b>
             </span>
           )}
-          <button type="button" disabled className={`${primary} ${isWide ? '' : 'flex-1'}`}>
-            Pagamento em breve
-          </button>
-        </div>
-        <p className="text-[13px] text-ink-faint">
-          O pagamento pelo site abre em breve.{' '}
-          {combine && (
-            <a
-              href={combine}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-medium text-accent hover:underline"
+          {workerUrl ? (
+            <button
+              type="button"
+              onClick={() => void pay()}
+              disabled={isPaying}
+              className={`${primary} ${isWide ? '' : 'flex-1'}`}
             >
-              <SocialIcon id="whatsapp" size={14} />
-              Por enquanto, combine com a Andreía
-            </a>
+              <UiIcon name="lock" size={16} />
+              {isPaying ? 'Abrindo o pagamento…' : `Pagar ${formatPrice(therapy.priceCents)}`}
+            </button>
+          ) : (
+            <button type="button" disabled className={`${primary} ${isWide ? '' : 'flex-1'}`}>
+              Pagamento em breve
+            </button>
           )}
-        </p>
+        </div>
+        {!workerUrl && (
+          <p className="text-[13px] text-ink-faint">
+            O pagamento pelo site abre em breve.{' '}
+            {combine && (
+              <a
+                href={combine}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-medium text-accent hover:underline"
+              >
+                <SocialIcon id="whatsapp" size={14} />
+                Por enquanto, combine com a Andreía
+              </a>
+            )}
+          </p>
+        )}
       </div>
     ) : (
       <div className="flex items-center justify-between gap-3">
@@ -424,90 +486,21 @@ export function AtivacaoFlow({ source: injected }: { source?: AtivacaoSource }) 
 
   /* ---------- a janela ---------- */
 
-  const sectionInfo =
-    step === 1 && current
-      ? {
-          fraction: (section + 1) / sections.length,
-          detail: `${section + 1} de ${sections.length}`,
-        }
-      : null
-
-  return createPortal(
-    <div className="fixed inset-0 z-40 grid animate-[fade-in_250ms_ease-out] place-items-center bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.4))] backdrop-blur-[5px] sm:p-6">
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        className={`flex flex-col overflow-hidden border-line bg-surface shadow-[0_30px_80px_rgb(20_14_10/0.35)] ${
-          isWide
-            ? 'h-[min(760px,92dvh)] w-full max-w-[820px] animate-[dialog-in_320ms_ease-out] rounded-3xl border'
-            : 'fixed inset-0 animate-[sheet-up_360ms_cubic-bezier(.2,.8,.2,1)]'
-        }`}
-      >
-        <div className="flex flex-col gap-4 border-b border-line px-6 pt-4.5 pb-4">
-          <div className="flex items-center justify-between gap-3">
-            <h2
-              id={titleId}
-              className="text-xs font-semibold tracking-[0.24em] text-accent uppercase"
-            >
-              Ativação individual
-            </h2>
-            <button
-              type="button"
-              onClick={close}
-              aria-label="Fechar e ir para o meu perfil"
-              title="Fechar e ir para o meu perfil"
-              className="grid size-9 place-items-center rounded-full bg-field text-ink-muted hover:text-ink"
-            >
-              <UiIcon name="close" size={17} />
-            </button>
-          </div>
-          {isWide ? (
-            <>
-              <StepDots current={step} />
-              {sectionInfo && current && (
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between text-[13px] text-ink-faint">
-                    <span>
-                      <b className="font-semibold text-ink">{current.title}</b> · etapa{' '}
-                      {sectionInfo.detail}
-                    </span>
-                  </div>
-                  <div aria-hidden="true" className="flex gap-1">
-                    {sections.map((s, i) => (
-                      <span
-                        key={s.id}
-                        className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i <= section ? 'bg-accent' : 'bg-line'}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <StepBar current={step} {...(sectionInfo ?? {})} />
-          )}
-        </div>
-        <div
-          ref={bodyRef}
-          key={`${step}-${section}`}
-          className="flex-1 animate-[page-in_350ms_ease-out] overflow-y-auto px-6 py-5"
-        >
-          {notice && (
-            <p
-              role="status"
-              className="mb-4 rounded-xl bg-field px-3.5 py-2.5 text-sm text-ink-muted"
-            >
-              {notice}
-            </p>
-          )}
-          {body}
-        </div>
-        <div className="border-t border-line px-6 py-3.5 pb-[calc(0.875rem+env(safe-area-inset-bottom))]">
-          {footer}
-        </div>
-      </div>
-    </div>,
-    document.body,
+  return (
+    <FlowShell
+      isWide={isWide}
+      current={step}
+      section={
+        step === 1 && current
+          ? { title: current.title, index: section, ids: sections.map((s) => s.id) }
+          : null
+      }
+      bodyKey={`${step}-${section}`}
+      notice={notice}
+      footer={footer}
+      onClose={close}
+    >
+      {body}
+    </FlowShell>
   )
 }

@@ -1,5 +1,11 @@
 // Firestore pela API REST com a conta de serviço: o Worker grava o acesso de quem pagou. A conta de
 // serviço não passa pelas regras (ADR-020), por isso a chave fica só nos segredos do Worker.
+import {
+  orderFromFields,
+  orderUpdateFields,
+  type SessionOrder,
+} from '../../src/shared/ativacao/order'
+import { parseTherapies, type Therapy } from '../../src/shared/ativacao/therapy'
 import { parseCatalog } from '../../src/shared/catalog/parseCatalog'
 import type { Product } from '../../src/shared/catalog/product'
 import { seedCatalog } from '../../src/shared/catalog/seedCatalog'
@@ -70,6 +76,14 @@ export interface FirestoreClient {
   readAccess(uid: string, productId: string): Promise<StoredAccess | null>
   writeAccess(uid: string, productId: string, access: StoredAccess): Promise<void>
   deleteAccess(uid: string, productId: string): Promise<void>
+  /** As terapias da ativação individual (`catalog/therapies`, ADR-029). */
+  readTherapies(): Promise<Therapy[]>
+  readOrder(uid: string, orderId: string): Promise<SessionOrder | null>
+  updateOrder(
+    uid: string,
+    orderId: string,
+    change: Parameters<typeof orderUpdateFields>[0],
+  ): Promise<void>
 }
 
 type Fields = Record<string, Record<string, unknown>>
@@ -143,6 +157,30 @@ export function createFirestoreClient(
         ...(access.ref ? { ref: { stringValue: access.ref } } : {}),
       }
       const response = await request(docUrl(`users/${uid}/access/${productId}`), {
+        method: 'PATCH',
+        body: JSON.stringify({ fields }),
+      })
+      if (!response.ok) throw new Error(`Firestore ${response.status}`)
+    },
+    async readTherapies() {
+      const content = (await getFields('catalog/therapies'))?.content?.stringValue
+      if (typeof content !== 'string') return []
+      try {
+        return parseTherapies(JSON.parse(content))
+      } catch {
+        return []
+      }
+    },
+    async readOrder(uid, orderId) {
+      const fields = await getFields(`users/${uid}/sessions/${orderId}`)
+      return fields ? orderFromFields(orderId, uid, fields) : null
+    },
+    async updateOrder(uid, orderId, change) {
+      const fields = orderUpdateFields(change)
+      const mask = Object.keys(fields)
+        .map((name) => `updateMask.fieldPaths=${encodeURIComponent(name)}`)
+        .join('&')
+      const response = await request(`${docUrl(`users/${uid}/sessions/${orderId}`)}?${mask}`, {
         method: 'PATCH',
         body: JSON.stringify({ fields }),
       })

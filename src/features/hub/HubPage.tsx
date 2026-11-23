@@ -7,6 +7,7 @@ import {
   hubSectionFromPath,
   meditationIdFromPath,
   isActivationPath,
+  orderReturnFromPath,
   isProfilePath,
   paymentReturnFromPath,
   tabOfSection,
@@ -53,7 +54,7 @@ export function HubPage({ path }: { path: string }) {
       {layout}
       {isActivation && (
         <Suspense fallback={null}>
-          <AtivacaoFlow />
+          <AtivacaoFlow orderReturn={orderReturnFromPath(path)} />
         </Suspense>
       )}
     </>

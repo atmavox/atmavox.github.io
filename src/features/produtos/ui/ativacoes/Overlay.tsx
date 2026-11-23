@@ -12,7 +12,10 @@ export function Overlay({
   onClose,
   footer,
   children,
+  wide = false,
 }: {
+  /** Janela mais larga no computador (o pedido, com a anamnese ao lado). */
+  wide?: boolean
   title: string
   isWide: boolean
   onClose: () => void
@@ -31,7 +34,7 @@ export function Overlay({
   }, [onClose])
 
   const box = isWide
-    ? 'max-h-[90dvh] w-full max-w-[560px] animate-[dialog-in_320ms_ease-out] rounded-3xl'
+    ? `max-h-[90dvh] w-full ${wide ? 'max-w-[860px]' : 'max-w-[560px]'} animate-[dialog-in_320ms_ease-out] rounded-3xl`
     : 'absolute inset-x-0 bottom-0 max-h-[92dvh] animate-[sheet-up_360ms_cubic-bezier(.2,.8,.2,1)] rounded-t-[26px]'
 
   return createPortal(

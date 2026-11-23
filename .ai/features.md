@@ -409,7 +409,7 @@ no código, sempre pode.
 - Criar grava na hora e já escolhe; o produto muda só no "Salvar". Nome repetido não passa.
 - No hub, um território criado entra depois dos 4 da marca e só aparece no filtro quando tem jornada.
 
-## F10 · Ativação individual paga 🔨 (passos 1 a 3 de 5: Modo Andreía e fluxo da pessoa até o resumo)
+## F10 · Ativação individual paga 🔨 (passos 1 a 4 de 5: falta aprovar o horário, Mensagens e o perfil)
 
 Mocks aprovados (2026-11-23): `Downloads/atmavox-ativacao-pessoa-v3.html` (pessoa) e
 `Downloads/atmavox-ativacao-andreia-v3.html` (Modo Andreía). Decisão: ADR-029.
@@ -454,7 +454,7 @@ embaixo da tela e um botão redondo que volta ao site.
   opções, obrigatória, subir/descer, tirar do formulário). Nome e telefone são fixos (só o texto
   muda). Pergunta já salva que sai do formulário fica **guardada** (as respostas usam o id dela) e pode
   voltar. Barra fixa com "Alterações não salvas", Descartar e Salvar. Começa pelo modelo aprovado.
-- **Pedidos** (passo 4): quadro por status no computador, lista por dia no celular; o pedido abre numa
+- **Pedidos** ✅ (passo 4; aprovar o horário no passo 5): quadro por status no computador, lista por dia no celular; o pedido abre numa
   janela (dados fixos à esquerda, só a anamnese rola) ou numa folha. "Aprovar" e "Sugerir outro
   horário" abrem o WhatsApp com a mensagem pronta.
 - **Agenda** ✅: grade da semana das 7h às 22h (arrastar marca uma faixa livre, de meia em meia hora;

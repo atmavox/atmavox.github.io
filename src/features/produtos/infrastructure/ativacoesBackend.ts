@@ -6,6 +6,13 @@ import {
   parseAvailability,
   type Availability,
 } from '../../../shared/ativacao/availability'
+import { parseSavedAnamnesis, type SavedAnamnesis } from '../../../shared/ativacao/answers'
+import {
+  orderFromFields,
+  orderPathOf,
+  orderUpdateFields,
+  type SessionOrder,
+} from '../../../shared/ativacao/order'
 import { parseTherapies, type Therapy } from '../../../shared/ativacao/therapy'
 import {
   documentsUrl,
@@ -16,6 +23,7 @@ import {
   restString,
   stringField,
   type FetchFn,
+  type RestValue,
   type RestConfig,
 } from '../../../shared/firebase/firestoreRest'
 
@@ -28,7 +36,14 @@ export interface AtivacoesBackend {
   /** A agenda da Andreía; sem documento, vazia. */
   loadAvailability(): Promise<Availability>
   saveAvailability(availability: Availability): Promise<void>
+  /** Todos os pedidos (consulta em grupo de `sessions`, só a admin). */
+  listOrders(): Promise<SessionOrder[]>
+  /** As respostas da anamnese de uma pessoa (`users/{uid}/anamnesis/current`). */
+  loadPersonAnamnesis(uid: string): Promise<SavedAnamnesis | null>
+  updateOrder(uid: string, orderId: string, change: OrderChange): Promise<void>
 }
+
+export type OrderChange = Parameters<typeof orderUpdateFields>[0]
 
 const THERAPIES = 'catalog/therapies'
 const ANAMNESIS = 'catalog/anamnesis'
@@ -78,22 +93,63 @@ export function createAtivacoesBackend(
     saveAnamnesis: (form) => writeContent(ANAMNESIS, form),
     loadAvailability: async () => parseAvailability(await readContent(AVAILABILITY)),
     saveAvailability: (availability) => writeContent(AVAILABILITY, availability),
+    async listOrders() {
+      const base = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(config.projectId)}/databases/(default)/documents`
+      const doFetch = fetchFn ?? ((input: string, init?: RequestInit) => fetch(input, init))
+      const response = await doFetch(`${base}:runQuery?key=${encodeURIComponent(config.apiKey)}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${await token()}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          structuredQuery: { from: [{ collectionId: 'sessions', allDescendants: true }] },
+        }),
+      })
+      if (!response.ok) throw new Error(`Firestore respondeu ${response.status}`)
+      const rows = (await response.json()) as { document?: { name?: unknown } }[]
+      return (Array.isArray(rows) ? rows : []).flatMap((row) => {
+        const path = orderPathOf(row.document?.name)
+        const fields = fieldsOf(row.document)
+        const order = path && fields ? orderFromFields(path.id, path.uid, fields) : null
+        return order ? [order] : []
+      })
+    },
+    async loadPersonAnamnesis(uid) {
+      const raw = await readContent(`users/${uid}/anamnesis/current`)
+      return raw === undefined ? null : parseSavedAnamnesis(raw)
+    },
+    async updateOrder(uid, orderId, change) {
+      await patchDocument(
+        config,
+        `users/${uid}/sessions/${orderId}`,
+        orderUpdateFields(change) as Record<string, RestValue>,
+        await token(),
+        fetchFn,
+      )
+    },
   }
 }
 
 /** Para os testes e para quem abre sem Firebase: guarda na memória. */
 export function createInMemoryAtivacoesBackend(
-  initial: { therapies?: Therapy[]; anamnesis?: AnamnesisForm; availability?: Availability } = {},
+  initial: {
+    therapies?: Therapy[]
+    anamnesis?: AnamnesisForm
+    availability?: Availability
+    orders?: SessionOrder[]
+    people?: Record<string, SavedAnamnesis>
+  } = {},
 ): AtivacoesBackend & {
   therapies: Therapy[] | null
   anamnesis: AnamnesisForm | null
   availability: Availability
+  orders: SessionOrder[]
 } {
   const state = {
     therapies: initial.therapies ?? (null as Therapy[] | null),
     anamnesis: initial.anamnesis ?? (null as AnamnesisForm | null),
     availability: initial.availability ?? EMPTY_AVAILABILITY,
+    orders: [...(initial.orders ?? [])],
   }
+  const people = initial.people ?? {}
   // Como no Firestore: o que volta é uma cópia lida do JSON, nunca o mesmo objeto.
   const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
   return Object.assign(state, {
@@ -108,6 +164,13 @@ export function createInMemoryAtivacoesBackend(
     loadAvailability: async () => copy(state.availability),
     saveAvailability: async (availability: Availability) => {
       state.availability = copy(availability)
+    },
+    listOrders: async () => copy(state.orders),
+    loadPersonAnamnesis: async (uid: string) => (people[uid] ? copy(people[uid]) : null),
+    updateOrder: async (uid: string, orderId: string, change: OrderChange) => {
+      state.orders = state.orders.map((o) =>
+        o.uid === uid && o.id === orderId ? { ...o, ...change } : o,
+      )
     },
   })
 }

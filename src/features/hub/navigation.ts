@@ -94,4 +94,21 @@ export function hubAreaItem(section: HubSection): HubTab | null {
 export const isProfilePath = (path: string) => path === '/perfil' || path === '/perfil/'
 
 /** "/ativacao": a ativação individual, numa janela sobre o Contato (ADR-029). */
-export const isActivationPath = (path: string) => path === '/ativacao' || path === '/ativacao/'
+export const isActivationPath = (path: string) => /^\/ativacao(\/|$)/.test(path)
+
+export interface OrderReturn {
+  orderId: string
+  status: 'aprovado' | 'pendente' | 'recusado'
+}
+
+/** "/ativacao/pedido/A7KX2Q/aprovado": a volta do Mercado Pago de um pedido da ativação. */
+export function orderReturnFromPath(path: string): OrderReturn | null {
+  const match = /^\/ativacao\/pedido\/(A[A-Z0-9]{5})(?:\/(aprovado|pendente|recusado))?\/?$/.exec(
+    path,
+  )
+  if (!match) return null
+  return {
+    orderId: match[1]!,
+    status: (match[2] as OrderReturn['status'] | undefined) ?? 'aprovado',
+  }
+}

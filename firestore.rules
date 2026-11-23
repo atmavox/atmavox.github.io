@@ -68,6 +68,30 @@ service cloud.firestore {
         && request.resource.size() < 100 * 1024;
     }
 
+    // Pedidos da ativação individual (ADR-029). A pessoa cria como "Aguardando pagamento" e só pode
+    // avisar que mandou a mensagem (Paga → Solicitada). Pagamento: servidor (credencial de serviço).
+    // O resto (aprovar, realizar, cancelar): a Andreía.
+    match /users/{uid}/sessions/{orderId} {
+      allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.status == 'wait'
+        && request.resource.data.keys().hasOnly(['status', 'content', 'createdAt'])
+        && request.resource.size() < 50 * 1024;
+      allow update: if isAdmin()
+        || (request.auth != null
+          && request.auth.uid == uid
+          && resource.data.status == 'paid'
+          && request.resource.data.status == 'req'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'requestedAt']));
+      allow delete: if isAdmin();
+    }
+
+    // A admin lista os pedidos de todo mundo (consulta em grupo, tela Pedidos do Modo Andreía).
+    match /{path=**}/sessions/{orderId} {
+      allow read: if isAdmin();
+    }
+
     // A admin lista os acessos de todo mundo (consulta em grupo, tela Acessos do Modo Andreía).
     match /{path=**}/access/{productId} {
       allow read: if isAdmin();

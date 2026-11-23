@@ -1,5 +1,6 @@
 // As três rotas do Worker de pagamentos (ADR-023). Tudo que fala com fora vem por `deps`, para os
 // testes rodarem sem rede.
+import { ORDER_ID } from '../../src/shared/ativacao/order'
 import { accessExpiresAt, hasValidAccess } from '../../src/shared/catalog/offer'
 import type { Product } from '../../src/shared/catalog/product'
 import type { FirestoreClient } from './firestore'
@@ -23,6 +24,8 @@ export interface AppDeps {
 }
 
 const RETURN_STATUSES = ['aprovado', 'pendente', 'recusado'] as const
+/** Na referência do pagamento, o "produto" de um pedido da ativação é `ativacao:{pedido}`. */
+const SESSION_PREFIX = 'ativacao:'
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/
 const DEV_ORIGIN = 'http://localhost:5173'
 
@@ -60,11 +63,16 @@ export function createApp(deps: AppDeps) {
     if (!uid) return json({ error: 'login' }, 401, cors)
 
     let productId: unknown
+    let orderId: unknown
     try {
-      productId = ((await request.json()) as { productId?: unknown }).productId
+      ;({ productId, orderId } = (await request.json()) as {
+        productId?: unknown
+        orderId?: unknown
+      })
     } catch {
       return json({ error: 'pedido' }, 400, cors)
     }
+    if (orderId !== undefined) return checkoutSession(request, uid, orderId, cors)
     // O preço vem do catálogo, aqui no servidor: o navegador só diz qual produto quer.
     const product = paidProduct(await deps.firestore.readCatalog(), productId)
     if (!product || product.pricing.type !== 'paid') return json({ error: 'produto' }, 400, cors)
@@ -85,6 +93,69 @@ export function createApp(deps: AppDeps) {
       workerUrl: new URL(request.url).origin,
     })
     return json({ url }, 200, cors)
+  }
+
+  /**
+   * Ativação individual (ADR-029): o pedido já existe (a pessoa criou como "Aguardando pagamento").
+   * O preço vem das terapias do catálogo, aqui no servidor, e fica gravado no pedido para conferir o
+   * aviso do pagamento.
+   */
+  async function checkoutSession(
+    request: Request,
+    uid: string,
+    orderId: unknown,
+    cors: Record<string, string>,
+  ): Promise<Response> {
+    if (typeof orderId !== 'string' || !ORDER_ID.test(orderId)) {
+      return json({ error: 'pedido' }, 400, cors)
+    }
+    const order = await deps.firestore.readOrder(uid, orderId)
+    if (!order) return json({ error: 'pedido' }, 400, cors)
+    if (order.status !== 'wait') return json({ error: 'ja-pago' }, 409, cors)
+    const therapy = (await deps.firestore.readTherapies()).find(
+      (t) => t.id === order.therapyId && t.active && t.priceCents > 0,
+    )
+    if (!therapy) return json({ error: 'produto' }, 400, cors)
+    await deps.firestore.updateOrder(uid, orderId, { chargedCents: therapy.priceCents })
+    const url = await deps.createPreference({
+      productId: `${SESSION_PREFIX}${orderId}`,
+      title: `Ativação individual · ${therapy.name}`,
+      priceCents: therapy.priceCents,
+      uid,
+      workerUrl: new URL(request.url).origin,
+    })
+    return json({ url }, 200, cors)
+  }
+
+  /** Aviso de pagamento de um pedido da ativação individual. */
+  async function sessionPayment(payment: Payment, uid: string, orderId: string) {
+    const order = await deps.firestore.readOrder(uid, orderId)
+    if (!order) return json({ ok: true, ignorado: true })
+    const now = deps.now()
+    if (payment.status === 'approved') {
+      if (order.paymentRef === payment.id) return json({ ok: true, repetido: true })
+      if (order.status !== 'wait' || order.chargedCents === null) {
+        return json({ ok: true, ignorado: true })
+      }
+      const paidEnough =
+        payment.currency === 'BRL' && payment.amount * 100 >= order.chargedCents - 0.5
+      if (!paidEnough) {
+        log(`pagamento ${payment.id} do pedido ${orderId} abaixo do valor`)
+        return json({ ok: true, ignorado: true })
+      }
+      await deps.firestore.updateOrder(uid, orderId, {
+        status: 'paid',
+        paidAt: now,
+        paymentRef: payment.id,
+      })
+      return json({ ok: true, pago: true })
+    }
+    if (['refunded', 'charged_back', 'cancelled'].includes(payment.status)) {
+      if (order.paymentRef !== payment.id) return json({ ok: true, ignorado: true })
+      await deps.firestore.updateOrder(uid, orderId, { status: 'cancel', cancelledAt: now })
+      return json({ ok: true, cancelado: true })
+    }
+    return json({ ok: true, status: payment.status })
   }
 
   async function webhook(request: Request): Promise<Response> {
@@ -115,6 +186,9 @@ export function createApp(deps: AppDeps) {
     const payment = await deps.getPayment(dataId)
     const ref = parseExternalReference(payment?.externalReference)
     if (!payment || !ref) return json({ ok: true, ignorado: true })
+    if (ref.productId.startsWith(SESSION_PREFIX)) {
+      return sessionPayment(payment, ref.uid, ref.productId.slice(SESSION_PREFIX.length))
+    }
     const product = paidProduct(await deps.firestore.readCatalog(), ref.productId)
     if (!product || product.pricing.type !== 'paid') return json({ ok: true, ignorado: true })
 
@@ -159,6 +233,12 @@ export function createApp(deps: AppDeps) {
     const status = url.searchParams.get('status')
     const productId = url.searchParams.get('produto') ?? ''
     const safeStatus = RETURN_STATUSES.find((s) => s === status) ?? 'pendente'
+    const orderId = productId.startsWith(SESSION_PREFIX)
+      ? productId.slice(SESSION_PREFIX.length)
+      : null
+    if (orderId && ORDER_ID.test(orderId)) {
+      return Response.redirect(`${deps.siteUrl}/#/ativacao/pedido/${orderId}/${safeStatus}`, 302)
+    }
     const path = SLUG.test(productId)
       ? `#/pagamento/${safeStatus}/${productId}`
       : `#/pagamento/${safeStatus}`

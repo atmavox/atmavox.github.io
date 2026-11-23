@@ -133,6 +133,8 @@ catalog/availability                  # content: JSON com a agenda { windows (fa
 published/{productId}                 # content: jornada ou meditação; free: boolean (cópia do catálogo)
 users/{uid}/access/{productId}        # grantedAt, expiresAt | null, source: 'manual' | 'payment', ref?
 users/{uid}/anamnesis/current         # content: JSON { answers, consent, updatedAt } da ativação (ADR-029)
+users/{uid}/sessions/{código}         # pedido da ativação: status, content (escolhas), createdAt, chargedCents,
+                                      # paidAt, requestedAt, scheduledAt, doneAt, cancelledAt, paymentRef, scheduled
 interest/{productId}/people/{uid}     # "Quero ser avisada" de um produto "Em breve"; createdAt
 ```
 
