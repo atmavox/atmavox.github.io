@@ -33,7 +33,11 @@ export function usePurchaseFlow(): {
       <LoginDialog
         account={session}
         variant="gate"
-        chosen={{ title: product.title, tone: TONE_BY_TERRITORY[product.territory] }}
+        chosen={{
+          title: product.title,
+          tone: TONE_BY_TERRITORY[product.territory],
+          mediaId: product.bannerMediaId,
+        }}
         onClose={close}
         onSignedIn={() => setStep({ kind: 'price', product })}
       />

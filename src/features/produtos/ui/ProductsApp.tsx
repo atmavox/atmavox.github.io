@@ -7,6 +7,7 @@ import type { CatalogStore } from '../../../shared/catalog/catalogStore'
 import { useMediaQuery } from '../../../shared/lib/useMediaQuery'
 import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
+import { rememberBannerImage } from '../../../shared/ui/useBannerImage'
 import { saveProduct } from '../application/saveProduct'
 import {
   emptyForm,
@@ -65,6 +66,7 @@ function ProductRow({
       >
         <ProductBanner
           tone={TONE_BY_TERRITORY[product.territory]}
+          mediaId={product.bannerMediaId}
           className="aspect-square rounded-xl"
         />
         <span className="min-w-0">
@@ -166,6 +168,22 @@ export function ProductsApp({
   const [notice, setNotice] = useState<string | null>(null)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [step, setStep] = useState(0)
+  const [bannerState, setBannerState] = useState<'idle' | 'sending' | 'error'>('idle')
+
+  async function pickBanner(file: File) {
+    setBannerState('sending')
+    try {
+      // A redução de imagem só carrega quando a Andreía escolhe uma foto.
+      const { compressImageInBrowser } = await import('../../../shared/media/compressImage')
+      const image = await compressImageInBrowser(file)
+      const id = await backend.saveImage(image)
+      rememberBannerImage(id, image.dataUrl)
+      setForm((f) => (f ? { ...f, bannerMediaId: id } : f))
+      setBannerState('idle')
+    } catch {
+      setBannerState('error')
+    }
+  }
 
   useEffect(() => catalog?.subscribe(() => setProducts(catalog.getSnapshot())), [catalog])
 
@@ -300,6 +318,8 @@ export function ProductsApp({
                     : ['conteudo', 'preco', 'situacao']
                 }
                 isNew={isNew}
+                onPickBanner={(file) => void pickBanner(file)}
+                bannerState={bannerState}
               />
               {noticeLine}
               <div className="flex justify-end gap-2.5">
@@ -386,6 +406,8 @@ export function ProductsApp({
           onChange={patch}
           parts={[current.id]}
           isNew={isNew}
+          onPickBanner={(file) => void pickBanner(file)}
+          bannerState={bannerState}
         />
       )}
       {noticeLine}

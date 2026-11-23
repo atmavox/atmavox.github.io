@@ -62,7 +62,9 @@ export function createServices(session: AuthSession | null): JourneyServices {
           workingCopy: createLocalJourneyContentCache(localStorage, 'atmavox:editor'),
           // Só a admin usa: o código de redução de imagem carrega sob demanda.
           compressImage: (file) =>
-            import('./compressImage').then((module) => module.compressImageInBrowser(file)),
+            import('../../../shared/media/compressImage').then((module) =>
+              module.compressImageInBrowser(file),
+            ),
         })
     : null
 

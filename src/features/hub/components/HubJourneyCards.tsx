@@ -69,6 +69,7 @@ export function ExpandedJourneyCard({ journey, offer, onPurchase }: CardProps) {
     >
       <ProductBanner
         tone={TONE_BY_TERRITORY[journey.territory]}
+        mediaId={journey.bannerMediaId}
         muted={isSoon(journey)}
         className="h-full min-h-[250px]"
       >
@@ -102,6 +103,7 @@ export function CompactJourneyRow({ journey, offer, onPurchase }: CardProps) {
     >
       <ProductBanner
         tone={TONE_BY_TERRITORY[journey.territory]}
+        mediaId={journey.bannerMediaId}
         muted={isSoon(journey)}
         className="aspect-[4/3] rounded-xl"
       />
@@ -146,6 +148,7 @@ export function PhoneCompactRow({ journey, offer, onPurchase }: CardProps) {
     >
       <ProductBanner
         tone={TONE_BY_TERRITORY[journey.territory]}
+        mediaId={journey.bannerMediaId}
         muted={isSoon(journey)}
         className="aspect-square rounded-xl"
       />
@@ -171,6 +174,7 @@ export function PhoneExpandedCard({ journey, offer, onPurchase }: CardProps) {
     >
       <ProductBanner
         tone={TONE_BY_TERRITORY[journey.territory]}
+        mediaId={journey.bannerMediaId}
         muted={isSoon(journey)}
         className="aspect-video"
       >

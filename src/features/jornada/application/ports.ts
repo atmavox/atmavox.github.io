@@ -31,16 +31,9 @@ export interface JourneyContentCache {
   save(journeyId: string, json: string): void
 }
 
-/** Imagem já reduzida no navegador, pronta para gravar (ADR-014). */
-export interface CompressedImage {
-  /** `data:image/webp;base64,…` (ou jpeg, no Safari). */
-  dataUrl: string
-  width: number
-  height: number
-}
+import type { CompressedImage } from '../../../shared/media/compressImage'
 
-/** Reduz a foto escolhida pela Andreía; rejeita se o arquivo não for uma imagem legível. */
-export type ImageCompressor = (file: Blob) => Promise<CompressedImage>
+export type { CompressedImage, ImageCompressor } from '../../../shared/media/compressImage'
 
 /** Onde as participantes leem as imagens dos blocos (`media/{id}`), devolvidas como data URL. */
 export interface MediaSource {

@@ -152,7 +152,7 @@ aprovados antes do código.
             perfil (`#/perfil`): abas, trilha de progresso, tipo de acesso
    9. [~] Modo Andreía de produtos (mock aprovado): [x] lista + editor + prévia (computador) e passo a
       passo com "Revisar" (celular), catálogo no Firestore; [x] tela de Acessos (liberar à mão por
-      e-mail, revogar); [ ] imagem do banner; [ ] dias de uma jornada nova (hoje o editor de dias só
+      e-mail, revogar); [x] imagem do banner; [ ] dias de uma jornada nova (hoje o editor de dias só
       conhece a de 21 dias: uma jornada nova deve ficar "Em breve" até isso existir)
       - Antes: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
         temas, território, destaque) e liberar acesso à mão
@@ -177,7 +177,10 @@ Surgiu no caminho:
       sociais". Sem custo e sem segredo no navegador: um job agendado do GitHub Actions busca a última
       publicação e gera um JSON estático no deploy. YouTube por RSS (público, sem chave); Instagram pela
       Graph API (exige conta profissional, app na Meta e token guardado nos segredos do Actions, renovado
-      a cada 60 dias); TikTok não tem "última publicação" sem app aprovado. Precisa de mock antes.
+      a cada 60 dias); TikTok não tem "última publicação" sem app aprovado. Precisa de mock antes. - [ ] **Pendência (2026-11-23):** trocar o Facebook pelo **Spotify** como foco dos posts recentes
+      (último episódio). A conta ainda não existe. Se for podcast publicado pelo Spotify for
+      Creators, o feed RSS é público e entra no mesmo job do Actions, sem chave; a API do Spotify
+      exigiria app e segredo nos segredos do Actions.
 
 ## Depois
 

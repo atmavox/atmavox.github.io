@@ -75,6 +75,7 @@ export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'n
       ) : (
         <ProductBanner
           tone={TONE_BY_TERRITORY[meditation.territory]}
+          mediaId={meditation.bannerMediaId}
           className="aspect-video rounded-3xl"
         />
       )}

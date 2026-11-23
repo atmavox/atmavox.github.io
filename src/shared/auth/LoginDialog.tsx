@@ -47,7 +47,7 @@ interface LoginDialogProps {
    * por cima do hub desfocado, mostrando a jornada escolhida. "hub": o "Entrar" do cabeçalho dos hubs.
    */
   variant?: Variant
-  chosen?: { title: string; tone: BannerTone }
+  chosen?: { title: string; tone: BannerTone; mediaId?: string | undefined }
   /** Entrou. Sem ele, fecha a janela; no portão, a própria tela troca e não há o que fechar. */
   onSignedIn?: () => void
 }
@@ -173,7 +173,11 @@ export function LoginDialog({
                 </p>
                 {chosen && (
                   <div className="mb-4 flex items-center gap-3 rounded-2xl border border-line bg-bg p-2.5">
-                    <ProductBanner tone={chosen.tone} className="size-16 shrink-0 rounded-[10px]" />
+                    <ProductBanner
+                      tone={chosen.tone}
+                      mediaId={chosen.mediaId}
+                      className="size-16 shrink-0 rounded-[10px]"
+                    />
                     <div>
                       <span className="text-sm text-ink-faint">Você escolheu</span>
                       <b className="block font-display text-lg font-medium text-ink">

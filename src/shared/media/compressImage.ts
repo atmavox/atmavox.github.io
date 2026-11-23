@@ -1,4 +1,13 @@
-import type { CompressedImage, ImageCompressor } from '../application/ports'
+/** Imagem já reduzida no navegador, pronta para gravar (ADR-014). */
+export interface CompressedImage {
+  /** `data:image/webp;base64,…` (ou jpeg, no Safari). */
+  dataUrl: string
+  width: number
+  height: number
+}
+
+/** Reduz a foto escolhida; rejeita se o arquivo não for uma imagem legível. */
+export type ImageCompressor = (file: Blob) => Promise<CompressedImage>
 
 /** Maior lado da imagem: nítido no celular e no computador, sem desperdício. */
 export const MAX_SIDE = 1200

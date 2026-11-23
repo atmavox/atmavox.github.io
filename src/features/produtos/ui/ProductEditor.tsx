@@ -1,5 +1,7 @@
 import { X } from 'lucide-react'
 import { TERRITORIES, TERRITORY_LABELS, type Territory } from '../../../shared/catalog/product'
+import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
+import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import type { AccessTerm, FormErrors, ProductForm } from '../domain/productForm'
 import { Field, Section, Segmented } from './fields'
 import { inputClass } from './styles'
@@ -13,6 +15,9 @@ interface ProductEditorProps {
   /** Partes a mostrar (no celular, uma por passo; no computador, todas). */
   parts: readonly EditorPart[]
   isNew: boolean
+  /** Escolheu uma foto para o banner: o app reduz e envia (ADR-014). */
+  onPickBanner?: (file: File) => void
+  bannerState?: 'idle' | 'sending' | 'error'
 }
 
 const ACCESS_OPTIONS: readonly { id: AccessTerm; label: string }[] = [
@@ -24,7 +29,15 @@ const ACCESS_OPTIONS: readonly { id: AccessTerm; label: string }[] = [
 ]
 
 /** Os blocos do editor de produto (mock aprovado): Básico, Estrutura ou Mídia, Preço e acesso, Situação. */
-export function ProductEditor({ form, errors, onChange, parts, isNew }: ProductEditorProps) {
+export function ProductEditor({
+  form,
+  errors,
+  onChange,
+  parts,
+  isNew,
+  onPickBanner,
+  bannerState = 'idle',
+}: ProductEditorProps) {
   const isJourney = form.kind === 'journey'
   const has = (part: EditorPart) => parts.includes(part)
 
@@ -74,6 +87,53 @@ export function ProductEditor({ form, errors, onChange, parts, isNew }: ProductE
                 />
               )}
             </Field>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm text-ink-muted">Banner</span>
+              <div className="flex items-center gap-3">
+                <ProductBanner
+                  tone={TONE_BY_TERRITORY[form.territory]}
+                  mediaId={form.bannerMediaId || undefined}
+                  className="h-16 w-28 shrink-0 rounded-xl"
+                />
+                <label className="cursor-pointer text-sm font-semibold text-admin-ink hover:underline">
+                  {bannerState === 'sending'
+                    ? 'Enviando…'
+                    : form.bannerMediaId
+                      ? 'Trocar imagem'
+                      : 'Escolher imagem'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    disabled={bannerState === 'sending' || !onPickBanner}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) onPickBanner?.(file)
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
+                {form.bannerMediaId && bannerState !== 'sending' && (
+                  <button
+                    type="button"
+                    onClick={() => onChange({ bannerMediaId: '' })}
+                    className="text-sm text-ink-faint hover:text-accent"
+                  >
+                    Usar o fundo da marca
+                  </button>
+                )}
+              </div>
+              {bannerState === 'error' ? (
+                <p className="text-sm text-accent">
+                  Não foi possível enviar a imagem. Tente outra foto ou verifique sua internet.
+                </p>
+              ) : (
+                <p className="text-xs text-ink-faint">
+                  A foto é reduzida no seu aparelho antes de enviar. Sem foto, vale o fundo da
+                  marca.
+                </p>
+              )}
+            </div>{' '}
             <Field label="Território" hint="Agrupa e filtra no hub.">
               {(props) => (
                 <select

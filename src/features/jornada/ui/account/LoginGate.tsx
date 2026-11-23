@@ -21,7 +21,11 @@ interface LoginGateProps {
 export function LoginGate({ account, journeyId, background }: LoginGateProps) {
   const product = useCatalog().find(journeyId)
   const chosen = product
-    ? { title: product.title, tone: TONE_BY_TERRITORY[product.territory] }
+    ? {
+        title: product.title,
+        tone: TONE_BY_TERRITORY[product.territory],
+        mediaId: product.bannerMediaId,
+      }
     : undefined
 
   return (

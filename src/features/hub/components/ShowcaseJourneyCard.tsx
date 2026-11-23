@@ -27,6 +27,7 @@ export function ShowcaseJourneyCard({ journey, size }: ShowcaseJourneyCardProps)
     >
       <ProductBanner
         tone={TONE_BY_TERRITORY[journey.territory]}
+        mediaId={journey.bannerMediaId}
         muted={isSoon}
         className="aspect-video"
       >

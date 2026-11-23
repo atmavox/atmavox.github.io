@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.13.0] · 2026-11-23
+
+### Adicionado
+
+- Imagem do banner dos produtos: no editor, "Escolher imagem" reduz a foto no aparelho (WebP) e guarda
+  em `media/`; ela aparece em todo cartão do produto (vitrine, hubs, perfil, janelas de login e preço),
+  com o fundo da marca enquanto carrega ou quando não há foto.
+
 ## [1.12.1] · 2026-11-23
 
 ### Corrigido

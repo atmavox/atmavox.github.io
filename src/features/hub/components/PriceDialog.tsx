@@ -118,6 +118,7 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
         </button>
         <ProductBanner
           tone={TONE_BY_TERRITORY[product.territory]}
+          mediaId={product.bannerMediaId}
           className="aspect-video rounded-[18px]"
         >
           <span className="absolute bottom-3 left-3.5 flex gap-1.5">

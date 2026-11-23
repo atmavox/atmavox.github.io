@@ -77,6 +77,7 @@ export function MeditationsHub({ layout }: { layout: 'wide' | 'narrow' }) {
             <MeditationCover
               item={toHubAudio(m)}
               tone={coverToneAt(index)}
+              mediaId={m.bannerMediaId}
               href={meditationHref(m.id)}
               hasEbook={m.ebook !== undefined}
               tag={<OfferBadge tag={tag} />}

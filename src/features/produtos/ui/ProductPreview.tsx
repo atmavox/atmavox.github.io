@@ -19,7 +19,11 @@ export function ProductPreview({ product }: { product: Product }) {
   return (
     <div className="flex flex-col gap-3">
       <article className="overflow-hidden rounded-[18px] border border-line bg-surface">
-        <ProductBanner tone={TONE_BY_TERRITORY[product.territory]} className="h-40" />
+        <ProductBanner
+          tone={TONE_BY_TERRITORY[product.territory]}
+          mediaId={product.bannerMediaId}
+          className="h-40"
+        />
         <div className="flex flex-col gap-2 px-4 pt-3.5 pb-4">
           <div className="flex flex-wrap gap-1.5">
             <span className={pill}>

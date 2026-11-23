@@ -8,6 +8,8 @@ import type { HubAudio } from '../content'
 interface MeditationCoverProps {
   item: HubAudio
   tone: BannerTone
+  /** Imagem escolhida pela Andreía, se houver. */
+  mediaId?: string | undefined
   /** Página da meditação: o título vira link (e o play do vídeo também). */
   href?: string
   hasEbook?: boolean
@@ -21,6 +23,7 @@ interface MeditationCoverProps {
 export function MeditationCover({
   item,
   tone,
+  mediaId,
   href,
   hasEbook = false,
   tag,
@@ -36,7 +39,7 @@ export function MeditationCover({
 
   return (
     <article className={`flex flex-col gap-2.5 ${size === 'row' ? 'w-[160px]' : 'w-full'}`}>
-      <ProductBanner tone={tone} className="aspect-square rounded-[18px]">
+      <ProductBanner tone={tone} mediaId={mediaId} className="aspect-square rounded-[18px]">
         <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full border border-line bg-bg/85 px-2 py-0.5 text-[0.68rem] text-ink-muted">
           {isVideo ? <Video aria-hidden size={12} /> : <Headphones aria-hidden size={12} />}
           {isVideo ? 'Vídeo' : 'Áudio'}

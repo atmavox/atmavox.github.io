@@ -319,7 +319,11 @@ export function ProfilePage({
             key={m.id}
             className="grid grid-cols-[64px_1fr_auto] items-center gap-3.5 border-b border-line py-3"
           >
-            <ProductBanner tone={coverToneAt(index)} className="aspect-square rounded-xl" />
+            <ProductBanner
+              tone={coverToneAt(index)}
+              mediaId={m.bannerMediaId}
+              className="aspect-square rounded-xl"
+            />
             <div className="min-w-0">
               <a href={meditationHref(m.id)} className="font-medium text-ink hover:text-accent">
                 {m.title}
