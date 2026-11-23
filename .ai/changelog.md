@@ -10,6 +10,13 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.17.1] · 2026-11-23
+
+### Corrigido
+
+- Jornada: "← Jornadas" na mesma linha das etapas, no canto esquerdo da página.
+- Modo Andreía de produtos e acessos: "Voltar ao hub" ao lado de "Ver o site".
+
 ## [1.17.0] · 2026-11-23
 
 ### Adicionado

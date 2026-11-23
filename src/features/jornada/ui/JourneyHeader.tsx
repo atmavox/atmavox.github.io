@@ -61,13 +61,6 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
         </div>
       )}
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 pt-2.5 md:px-8">
-        {/* Caminho claro de volta para o hub de jornadas (pedido do cliente). */}
-        <a
-          href="#/jornadas"
-          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-line px-3 py-1 text-sm text-ink-muted hover:border-accent hover:text-accent"
-        >
-          <span aria-hidden="true">←</span> Jornadas
-        </a>
         <a
           href="#/"
           className="font-display tracking-[0.15em] text-gold uppercase"
@@ -88,79 +81,84 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
         </div>
       </div>
 
-      <nav
-        aria-label="Etapas da jornada"
-        className="mx-auto max-w-6xl md:px-8"
-        style={{ paddingTop: '5px' }}
-      >
-        <ul
-          className="relative flex snap-x overflow-x-auto px-2 [scrollbar-width:none] md:grid md:grid-cols-(--tab-count) md:overflow-visible md:px-0"
-          style={{ '--tab-count': `repeat(${tabs.length}, minmax(0, 1fr))` } as CSSProperties}
+      {/* Na linha das etapas, bem no canto esquerdo: o caminho de volta para o hub de jornadas. */}
+      <div className="flex items-center gap-1 pl-3 md:pl-4" style={{ paddingTop: '5px' }}>
+        <a
+          href="#/jornadas"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-line px-3 py-1 text-sm text-ink-muted hover:border-accent hover:text-accent"
         >
-          {tabs.map((tab) => {
-            const isActive = tab.id === activeTab
-            const stage = tabProgress(tab.id, journey, progress)
-            if (!isTabUnlocked(tab.id, journey, progress, access)) {
-              return (
-                <li key={tab.id} className="relative shrink-0 snap-center md:min-w-0">
-                  <span
-                    aria-disabled="true"
-                    title={
-                      partOfTab(journey, tab.id) && structureOf(journey) !== 'themes'
-                        ? 'Abre com o primeiro dia dela, à meia-noite'
-                        : 'Complete a etapa anterior para abrir'
-                    }
-                    className="flex flex-col gap-1.5 border-b-2 border-transparent px-3 pt-3 pb-2.5 text-xs font-medium tracking-wider whitespace-nowrap text-ink-faint uppercase opacity-70 md:px-2 md:text-[0.8rem]"
-                  >
-                    <span className="flex items-center justify-center gap-1.5 md:truncate">
-                      <Lock aria-hidden size={12} />
-                      {tab.label}
-                      <span className="sr-only">, fechada</span>
+          <span aria-hidden="true">←</span> Jornadas
+        </a>
+        <nav aria-label="Etapas da jornada" className="mx-auto max-w-6xl min-w-0 flex-1 md:px-8">
+          <ul
+            className="relative flex snap-x overflow-x-auto px-2 [scrollbar-width:none] md:grid md:grid-cols-(--tab-count) md:overflow-visible md:px-0"
+            style={{ '--tab-count': `repeat(${tabs.length}, minmax(0, 1fr))` } as CSSProperties}
+          >
+            {tabs.map((tab) => {
+              const isActive = tab.id === activeTab
+              const stage = tabProgress(tab.id, journey, progress)
+              if (!isTabUnlocked(tab.id, journey, progress, access)) {
+                return (
+                  <li key={tab.id} className="relative shrink-0 snap-center md:min-w-0">
+                    <span
+                      aria-disabled="true"
+                      title={
+                        partOfTab(journey, tab.id) && structureOf(journey) !== 'themes'
+                          ? 'Abre com o primeiro dia dela, à meia-noite'
+                          : 'Complete a etapa anterior para abrir'
+                      }
+                      className="flex flex-col gap-1.5 border-b-2 border-transparent px-3 pt-3 pb-2.5 text-xs font-medium tracking-wider whitespace-nowrap text-ink-faint uppercase opacity-70 md:px-2 md:text-[0.8rem]"
+                    >
+                      <span className="flex items-center justify-center gap-1.5 md:truncate">
+                        <Lock aria-hidden size={12} />
+                        {tab.label}
+                        <span className="sr-only">, fechada</span>
+                      </span>
+                      <span aria-hidden="true" className="h-1 rounded-full bg-line md:h-1.5" />
                     </span>
-                    <span aria-hidden="true" className="h-1 rounded-full bg-line md:h-1.5" />
-                  </span>
+                  </li>
+                )
+              }
+              return (
+                // `relative`: os textos só para leitor de tela (sr-only, absolutos) ficam presos à aba e
+                // não alargam a página no celular.
+                <li key={tab.id} className="relative shrink-0 snap-center md:min-w-0">
+                  <a
+                    ref={isActive ? activeRef : undefined}
+                    href={tabHref(journey.id, tab.id)}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={`flex flex-col gap-1.5 border-b-2 px-3 pt-3 pb-2.5 text-xs font-medium tracking-wider whitespace-nowrap uppercase transition-colors md:px-2 md:text-[0.8rem] ${
+                      isActive ? 'border-accent text-ink' : 'border-transparent hover:text-ink'
+                    }`}
+                    style={isActive ? undefined : { color: stageColor(stage.ratio) }}
+                  >
+                    <span className="text-center md:truncate">
+                      {tab.label}
+                      {stage.isComplete && (
+                        <>
+                          <span aria-hidden="true"> ✦</span>
+                          <span className="sr-only">, completa</span>
+                        </>
+                      )}
+                    </span>{' '}
+                    <span className="flex w-full items-center gap-2">
+                      <span aria-hidden="true" className="h-1 flex-1 rounded-full bg-line md:h-1.5">
+                        <span
+                          className="block h-full rounded-full bg-accent transition-[width] duration-500"
+                          style={{ width: `${Math.round(stage.ratio * 100)}%` }}
+                        />
+                      </span>
+                      <span className="text-[0.7rem] tracking-normal normal-case tabular-nums md:text-xs">
+                        <span className="sr-only">progresso:</span> {stage.caption}
+                      </span>
+                    </span>
+                  </a>
                 </li>
               )
-            }
-            return (
-              // `relative`: os textos só para leitor de tela (sr-only, absolutos) ficam presos à aba e
-              // não alargam a página no celular.
-              <li key={tab.id} className="relative shrink-0 snap-center md:min-w-0">
-                <a
-                  ref={isActive ? activeRef : undefined}
-                  href={tabHref(journey.id, tab.id)}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`flex flex-col gap-1.5 border-b-2 px-3 pt-3 pb-2.5 text-xs font-medium tracking-wider whitespace-nowrap uppercase transition-colors md:px-2 md:text-[0.8rem] ${
-                    isActive ? 'border-accent text-ink' : 'border-transparent hover:text-ink'
-                  }`}
-                  style={isActive ? undefined : { color: stageColor(stage.ratio) }}
-                >
-                  <span className="text-center md:truncate">
-                    {tab.label}
-                    {stage.isComplete && (
-                      <>
-                        <span aria-hidden="true"> ✦</span>
-                        <span className="sr-only">, completa</span>
-                      </>
-                    )}
-                  </span>{' '}
-                  <span className="flex w-full items-center gap-2">
-                    <span aria-hidden="true" className="h-1 flex-1 rounded-full bg-line md:h-1.5">
-                      <span
-                        className="block h-full rounded-full bg-accent transition-[width] duration-500"
-                        style={{ width: `${Math.round(stage.ratio * 100)}%` }}
-                      />
-                    </span>
-                    <span className="text-[0.7rem] tracking-normal normal-case tabular-nums md:text-xs">
-                      <span className="sr-only">progresso:</span> {stage.caption}
-                    </span>
-                  </span>
-                </a>
-              </li>
-            )
-          })}
-        </ul>
-      </nav>
+            })}
+          </ul>
+        </nav>
+      </div>
 
       <div
         role="progressbar"

@@ -42,9 +42,14 @@ function AdminBar({ active }: { active: 'produtos' | 'acessos' }) {
           Acessos
         </a>
       </nav>
-      <a href="#/" className="ml-auto text-on-admin/90 hover:text-on-admin">
-        Ver o site ↗
-      </a>
+      <span className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1">
+        <a href="#/jornadas" className="text-on-admin/90 hover:text-on-admin">
+          Voltar ao hub
+        </a>
+        <a href="#/" className="text-on-admin/90 hover:text-on-admin">
+          Ver o site ↗
+        </a>
+      </span>
     </header>
   )
 }
