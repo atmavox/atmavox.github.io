@@ -383,6 +383,7 @@ export function ProductEditor({
             ]}
             onChange={(status) => onChange({ status })}
           />
+          {errors.status && <p className="text-sm text-accent">{errors.status}</p>}
           <label className="flex items-center gap-2.5 text-ink-muted">
             <input
               type="checkbox"
@@ -395,6 +396,8 @@ export function ProductEditor({
           <p className="text-xs text-ink-faint">
             Rascunho não aparece no site. Em breve aparece com "Quero ser avisada". Publicada pode
             ser começada (e comprada, se for paga).
+            {form.kind === 'journey' &&
+              ' Uma jornada só fica Publicada depois que o conteúdo dela for publicado no editor.'}
           </p>
         </Section>
       )}

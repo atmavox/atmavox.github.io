@@ -2,7 +2,43 @@ import { describe, expect, it } from 'vitest'
 import { seedCatalog } from '../../../shared/catalog/seedCatalog'
 import { emptyForm, formFromProduct } from '../domain/productForm'
 import { createInMemoryProductsBackend } from '../infrastructure/productsBackend'
-import { saveProduct } from './saveProduct'
+import { saveProduct, UNPUBLISHED_JOURNEY } from './saveProduct'
+
+describe('jornada só fica Publicada com conteúdo publicado', () => {
+  const newJourney = {
+    ...emptyForm('journey', 9),
+    title: 'Raízes',
+    durationLabel: '14 dias',
+    structure: 'weeks' as const,
+  }
+
+  it('sem conteúdo publicado no editor, recusa "Publicada" e não grava nada', async () => {
+    const backend = createInMemoryProductsBackend()
+    const result = await saveProduct({ ...newJourney, status: 'published' }, seedCatalog, backend)
+    expect(result).toEqual({ kind: 'invalid', errors: { status: UNPUBLISHED_JOURNEY } })
+    expect(backend.catalog).toBeNull()
+  })
+
+  it('em Rascunho ou Em breve, salva normalmente', async () => {
+    const backend = createInMemoryProductsBackend()
+    const result = await saveProduct({ ...newJourney, status: 'soon' }, seedCatalog, backend)
+    expect(result.kind).toBe('saved')
+  })
+
+  it('depois de publicar o conteúdo, aceita "Publicada"', async () => {
+    const backend = createInMemoryProductsBackend()
+    backend.publishedJourneys.add('raizes')
+    const result = await saveProduct({ ...newJourney, status: 'published' }, seedCatalog, backend)
+    expect(result.kind).toBe('saved')
+  })
+
+  it('a Chama Interna, com o conteúdo no código, sempre pode ficar Publicada', async () => {
+    const backend = createInMemoryProductsBackend()
+    const chama = seedCatalog.find((p) => p.id === 'chama-interna-21')!
+    const result = await saveProduct(formFromProduct(chama), seedCatalog, backend)
+    expect(result.kind).toBe('saved')
+  })
+})
 
 describe('salvar um produto', () => {
   it('com erro no formulário, não grava nada', async () => {

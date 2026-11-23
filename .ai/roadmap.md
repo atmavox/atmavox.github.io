@@ -152,14 +152,20 @@ aprovados antes do código.
             perfil (`#/perfil`): abas, trilha de progresso, tipo de acesso
    9. [~] Modo Andreía de produtos (mock aprovado): [x] lista + editor + prévia (computador) e passo a
       passo com "Revisar" (celular), catálogo no Firestore; [x] tela de Acessos (liberar à mão por
-      e-mail, revogar); [x] imagem do banner; [~] dias de uma jornada nova (hoje o editor de dias só
+      e-mail, revogar); [x] imagem do banner; [x] dias de uma jornada nova (hoje o editor de dias só
       conhece a de 21 dias: uma jornada nova deve ficar "Em breve" até isso existir). A estrutura define
       quando cada parte abre (2026-11-23):
       1. [x] dias liberados pelo calendário, um por 00h de Brasília (ADR-024), na Chama Interna também
       2. [x] caderno montado pela estrutura (abas por semana, por tema ou "Dias"; "por tema" libera o
              próximo tema ao concluir o anterior; Revisões só em "por semana")
       3. [x] editor de dias para jornada nova, com os N dias vazios prontos
-      4. [ ] "Publicada" só com dias publicados (Modo Andreía de produtos)
+      4. [x] "Publicada" só com dias publicados (Modo Andreía de produtos)
+      - [ ] **Pendência (2026-11-23): envio de áudio das meditações.** Hoje o editor pede o link de um
+            arquivo já hospedado. Opções: Cloudflare R2 pelo Worker do pagamento (recomendado: grátis até
+            10 GB, sem custo de download, áudio pago só entregue a quem tem acesso; exige cartão na
+            Cloudflare), Worker gravando no GitHub (sem cartão, mas o arquivo fica público no repositório) ou
+            manter o link. Firebase Storage exige plano pago; Firestore tem limite de 1 MB. Decidir com a
+            Andreía junto com o Mercado Pago.
       - [ ] Ideia: temas adicionados ao produto depois do primeiro rascunho não entram sozinhos na
             jornada (o esqueleto só vale até o primeiro "Salvar"); criar um "+ Novo tema" no editor.
       - Antes: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,

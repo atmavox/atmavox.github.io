@@ -9,6 +9,12 @@ import {
 } from '../domain/productForm'
 import type { ProductsBackend } from '../infrastructure/productsBackend'
 
+/** Jornadas com o conteúdo no código do site: sempre têm o que mostrar. */
+const BUILT_IN_JOURNEYS: readonly string[] = ['chama-interna-21']
+
+export const UNPUBLISHED_JOURNEY =
+  'Para marcar como Publicada, publique antes o conteúdo da jornada (em "Editar o conteúdo da jornada"). Até lá, deixe em Rascunho ou Em breve.'
+
 export type SaveResult =
   | { kind: 'saved'; catalog: Product[]; product: Product }
   | { kind: 'invalid'; errors: FormErrors }
@@ -29,6 +35,19 @@ export async function saveProduct(
   )
   if (Object.keys(errors).length > 0) return { kind: 'invalid', errors }
   const product = productFromForm(form)
+  if (product.kind === 'journey' && product.status === 'published') {
+    let hasContent: boolean
+    try {
+      hasContent =
+        BUILT_IN_JOURNEYS.includes(product.id) || (await backend.hasPublishedJourney(product.id))
+    } catch {
+      return {
+        kind: 'error',
+        message: 'Não foi possível conferir a jornada. Verifique sua internet.',
+      }
+    }
+    if (!hasContent) return { kind: 'invalid', errors: { status: UNPUBLISHED_JOURNEY } }
+  }
   let next: Product[]
   try {
     next = upsertProduct(catalog, product)

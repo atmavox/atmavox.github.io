@@ -220,7 +220,7 @@ export function ProductsApp({
     if (result.kind === 'invalid') {
       setErrors(result.errors)
       setIsPreviewOpen(false)
-      setNotice('Faltam alguns campos. Confira as mensagens em vermelho.')
+      setNotice(result.errors.status ?? 'Faltam alguns campos. Confira as mensagens em vermelho.')
       return
     }
     if (result.kind === 'error') {

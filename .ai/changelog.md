@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.17.0] · 2026-11-23
+
+### Adicionado
+
+- Modo Andreía de produtos: uma jornada só pode ser salva como "Publicada" depois que o conteúdo dela
+  for publicado no editor (a Chama Interna, com o conteúdo no código, sempre pode). Até lá, Rascunho ou
+  Em breve.
+
 ## [1.16.0] · 2026-11-23
 
 ### Adicionado

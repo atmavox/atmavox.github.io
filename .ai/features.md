@@ -366,3 +366,6 @@ cada jornada e a etiqueta do tipo de acesso ("Grátis", "Para sempre", "Até dd/
 
 **Modo Andreía (Etapa D):** criar e editar produtos do catálogo (tipo, estrutura, grátis/paga, preço,
 prazo de acesso, banner, frase, temas, território, destaque, ordem, status) e liberar acesso à mão.
+Uma jornada só pode ficar **Publicada** depois que o conteúdo dela for publicado no editor
+(`published/{id}` com `content`); antes disso, Rascunho ou Em breve. A Chama Interna, com o conteúdo
+no código, sempre pode.

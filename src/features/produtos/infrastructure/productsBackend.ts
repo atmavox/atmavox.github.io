@@ -23,6 +23,8 @@ export interface ProductsBackend {
   /** `free` espelha o catálogo: as regras só entregam conteúdo pago a quem tem acesso (ADR-020). */
   setFree(productId: string, free: boolean): Promise<void>
   loadMeditationContent(productId: string): Promise<MeditationContent | null>
+  /** A jornada já foi publicada no editor (`published/{id}` tem `content`)? */
+  hasPublishedJourney(productId: string): Promise<boolean>
   saveMeditationContent(productId: string, content: MeditationContent, free: boolean): Promise<void>
   /** Guarda a imagem do banner em `media/{id}` (ADR-014) e devolve o id. */
   saveImage(image: CompressedImage): Promise<string>
@@ -93,6 +95,15 @@ export function createProductsBackend(
       const json = fields ? stringField(fields, 'content') : undefined
       return json ? parseMeditationContentJson(json) : null
     },
+    async hasPublishedJourney(productId) {
+      const body = await getJson(
+        documentsUrl(config, `published/${productId}`, '&mask.fieldPaths=content'),
+        await token(),
+        fetchFn,
+      )
+      const fields = fieldsOf(body)
+      return !!(fields && stringField(fields, 'content'))
+    },
     async saveMeditationContent(productId, content, free) {
       await patchDocument(
         config,
@@ -136,12 +147,14 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
   free: Map<string, boolean>
   contents: Map<string, MeditationContent>
   images: Map<string, CompressedImage>
+  publishedJourneys: Set<string>
 } {
   const state = {
     catalog: null as Product[] | null,
     free: new Map<string, boolean>(),
     contents: new Map<string, MeditationContent>(),
     images: new Map<string, CompressedImage>(),
+    publishedJourneys: new Set<string>(),
   }
   return Object.assign(state, {
     isAdmin: async () => admin,
@@ -152,6 +165,7 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
       state.free.set(id, free)
     },
     loadMeditationContent: async (id: string) => state.contents.get(id) ?? null,
+    hasPublishedJourney: async (id: string) => state.publishedJourneys.has(id),
     saveMeditationContent: async (id: string, content: MeditationContent, free: boolean) => {
       state.contents.set(id, content)
       state.free.set(id, free)
