@@ -140,8 +140,9 @@ describe('Modo Andreía · anamnese', () => {
 })
 
 describe('rota', () => {
-  it('abre a anamnese pelo endereço; o resto abre as terapias', () => {
+  it('abre cada seção pelo endereço; sem seção, a agenda', () => {
     expect(sectionFromPath('/admin/ativacoes/anamnese')).toBe('anamnese')
-    expect(sectionFromPath('/admin/ativacoes')).toBe('terapias')
+    expect(sectionFromPath('/admin/ativacoes/terapias')).toBe('terapias')
+    expect(sectionFromPath('/admin/ativacoes')).toBe('agenda')
   })
 })

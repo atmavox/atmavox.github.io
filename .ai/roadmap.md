@@ -223,7 +223,9 @@ Surgiu no caminho:
   perfil. 0. [x] Mocks aprovados (pessoa v3 e Modo Andreía v3)
   1. [x] Terapias + anamnese no Modo Andreía (`#/admin/ativacoes`, `catalog/therapies` e
          `catalog/anamnesis`) (1.22.0)
-  2. [ ] Agenda no Modo Andreía (`catalog/availability`, grade da semana + mês, formulário completo)
+  2. [x] Agenda no Modo Andreía (`catalog/availability`): grade da semana com arrastar + balão, "+"
+         para o formulário completo, vista do mês, dia no celular; repetir toda semana, tirar só um dia
+         (1.23.0)
   3. [ ] Fluxo da pessoa na janela sobre o hub (Contato → login → anamnese → terapia → data → resumo)
   4. [ ] Pedidos e status (regras novas do Firestore, Worker cobrando terapias; o pagamento real
          depende do Mercado Pago, ainda pendente) + tela Pedidos no Modo Andreía

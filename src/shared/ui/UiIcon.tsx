@@ -36,6 +36,13 @@ const PATHS = {
       <path d="m5 19 8-8" />
     </>
   ),
+  calendar: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15" rx="2.5" />
+      <path d="M3.5 10h17M8 3v4M16 3v4" />
+    </>
+  ),
+  next: <path d="m9 6 6 6-6 6" />,
   file: (
     <>
       <path d="M7 3.5h7l4 4V20.5H6V3.5z" />

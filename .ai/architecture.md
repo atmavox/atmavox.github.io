@@ -30,7 +30,7 @@ src/
       ui/                 JourneyApp, JourneyHeader, pages/ (uma por aba), components/ (dia, blocos…),
                           account/ (login), admin/ (Modo Andreía, carregado sob demanda)
   shared/
-    ativacao/             ativação individual (ADR-029): therapy.ts e anamnesis.ts (tipos, leitura, edição pura)
+    ativacao/             ativação individual (ADR-029): therapy.ts, anamnesis.ts e availability.ts (tipos, leitura, edição pura)
     auth/                 login do site (ADR-022): sessão, janela de login, Firebase Auth sob demanda
     firebase/             config e app do Firebase, divididos entre o login e a nuvem da jornada
     brand/                links da marca (redes, áudio, WhatsApp) e assinatura
@@ -127,6 +127,7 @@ catalog/public                        # content: JSON com Product[]; updatedAt (
 catalog/territories                   # content: JSON com os territórios criados { id, name, tone }[] (ADR-027)
 catalog/therapies                     # content: JSON com Therapy[] da ativação individual (ADR-029)
 catalog/anamnesis                     # content: JSON com o formulário da anamnese { sections, consent, archived }
+catalog/availability                  # content: JSON com a agenda { windows (faixas livres), booked (aprovados) }
 # Fora do Firestore: public/social.json + public/social/*.jpg, gerados no deploy (ADR-028)
 published/{productId}                 # content: jornada ou meditação; free: boolean (cópia do catálogo)
 users/{uid}/access/{productId}        # grantedAt, expiresAt | null, source: 'manual' | 'payment', ref?

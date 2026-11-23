@@ -409,7 +409,7 @@ no código, sempre pode.
 - Criar grava na hora e já escolhe; o produto muda só no "Salvar". Nome repetido não passa.
 - No hub, um território criado entra depois dos 4 da marca e só aparece no filtro quando tem jornada.
 
-## F10 · Ativação individual paga 🔨 (passo 1 de 5: terapias e anamnese no Modo Andreía)
+## F10 · Ativação individual paga 🔨 (passos 1 e 2 de 5: terapias, anamnese e agenda no Modo Andreía)
 
 Mocks aprovados (2026-11-23): `Downloads/atmavox-ativacao-pessoa-v3.html` (pessoa) e
 `Downloads/atmavox-ativacao-andreia-v3.html` (Modo Andreía). Decisão: ADR-029.
@@ -437,7 +437,7 @@ a pessoa confirma pelo link (reservado por 24 h).
 **Perfil · Ativações:** um cartão por pedido (ícone, terapia, pedido e data, status, próxima ação);
 clicar abre embaixo as etapas na vertical e os detalhes. "Ver minha anamnese" em cada cartão.
 
-**Modo Andreía (`#/admin/ativacoes/…`):** abas Terapias e Anamnese (passo 1); Pedidos, Agenda e
+**Modo Andreía (`#/admin/ativacoes/…`):** abas Agenda, Terapias e Anamnese (passos 1 e 2); Pedidos e
 Mensagens nos passos seguintes. No computador, abas logo abaixo da faixa azul; no celular, abas
 embaixo da tela e um botão redondo que volta ao site.
 
@@ -453,8 +453,13 @@ embaixo da tela e um botão redondo que volta ao site.
 - **Pedidos** (passo 4): quadro por status no computador, lista por dia no celular; o pedido abre numa
   janela (dados fixos à esquerda, só a anamnese rola) ou numa folha. "Aprovar" e "Sugerir outro
   horário" abrem o WhatsApp com a mensagem pronta.
-- **Agenda** (passo 2): grade da semana (arrastar cria horário livre; o "+" abre o formulário
-  completo) e vista do mês; no celular, o dia com toque no horário vazio.
+- **Agenda** ✅: grade da semana das 7h às 22h (arrastar marca uma faixa livre, de meia em meia hora;
+  um clique marca uma hora; o balão escolhe as terapias e "repetir toda semana"; o "+" abre o
+  formulário completo); vista do mês com as faixas de cada dia (clicar abre a semana); no celular, a
+  faixa da semana e o dia com "toque para marcar livre". Formulário: dia, das/até, terapias, repetir
+  (só este dia ou toda semana) e até quando, com os horários de início que a pessoa vai ver (duração +
+  10 min de intervalo). Clicar numa faixa: mudar, tirar só este dia ou tirar todas as semanas. Faixas
+  do mesmo dia não podem se encostar; nenhuma terapia escolhida que não caiba no período.
 - **Mensagens** (passo 5): os textos prontos do WhatsApp com campos ({nome}, {data}, {link}…) e prévia.
 
 **Critérios de aceite do passo 1:** terapias e anamnese salvam em `catalog/therapies` e

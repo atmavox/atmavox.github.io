@@ -1,13 +1,15 @@
 import { useMediaQuery } from '../../../../shared/lib/useMediaQuery'
 import { UiIcon, type UiIconName } from '../../../../shared/ui/UiIcon'
 import type { AtivacoesBackend } from '../../infrastructure/ativacoesBackend'
+import { AgendaPanel } from './AgendaPanel'
 import { AnamnesisPanel } from './AnamnesisPanel'
 import { TherapiesPanel } from './TherapiesPanel'
 
 import type { AtivacoesSection } from './sections'
 
-// Pedidos, Agenda e Mensagens entram nos próximos passos (roadmap, ativação individual).
+// Pedidos e Mensagens entram nos próximos passos (roadmap, ativação individual).
 const SECTIONS: readonly { id: AtivacoesSection; label: string; icon: UiIconName }[] = [
+  { id: 'agenda', label: 'Agenda', icon: 'calendar' },
   { id: 'terapias', label: 'Terapias', icon: 'leaf' },
   { id: 'anamnese', label: 'Anamnese', icon: 'file' },
 ]
@@ -26,7 +28,9 @@ export function AtivacoesApp({
 }) {
   const isWide = useMediaQuery('(min-width: 900px)')
   const panel =
-    section === 'anamnese' ? (
+    section === 'agenda' ? (
+      <AgendaPanel backend={backend} isWide={isWide} />
+    ) : section === 'anamnese' ? (
       <AnamnesisPanel backend={backend} isWide={isWide} />
     ) : (
       <TherapiesPanel backend={backend} isWide={isWide} />

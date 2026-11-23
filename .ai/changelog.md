@@ -10,6 +10,16 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.23.0] · 2026-11-23
+
+### Adicionado
+
+- Modo Andreía · Ativações · **Agenda** (`#/admin/ativacoes`, F10, ADR-029): no computador, a grade da
+  semana (arrastar marca um horário livre e abre o balão com as terapias e "repetir toda semana"; o
+  "+" abre o formulário completo) e a vista do mês; no celular, o dia com "toque para marcar livre".
+  Formulário com dia, horário, terapias, repetição e até quando, mostrando os horários de início que a
+  pessoa vai ver. Tirar só um dia de um horário que repete. Grava em `catalog/availability`.
+
 ## [1.22.0] · 2026-11-23
 
 ### Adicionado
