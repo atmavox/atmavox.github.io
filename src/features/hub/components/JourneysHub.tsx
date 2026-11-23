@@ -274,9 +274,15 @@ export function JourneysHub({ layout }: { layout: Layout }) {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-[radial-gradient(120%_80%_at_20%_0%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_60%)]">
-        <div className="pointer-events-none absolute top-1/2 right-20 w-[130px] -translate-y-1/2 opacity-20">
-          <BrandMark speaking className="w-full" />
+      <section className="relative bg-[radial-gradient(120%_80%_at_20%_0%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_60%)]">
+        {/* O símbolo falando, grande e cortado pelo cabeçalho e pela borda direita da página. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[480px] overflow-hidden"
+        >
+          <div className="absolute -top-40 -right-44 w-[440px] opacity-[0.14] lg:w-[520px]">
+            <BrandMark speaking className="w-full" />
+          </div>
         </div>
         <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-3.5 px-6 pt-9 pb-[18px] md:px-12">
           <p className="text-xs font-semibold tracking-[0.24em] text-accent uppercase">Jornadas</p>
@@ -286,7 +292,7 @@ export function JourneysHub({ layout }: { layout: Layout }) {
         </div>
       </section>
 
-      <div className="mx-auto w-full max-w-6xl px-6 md:px-12">
+      <div className="relative mx-auto w-full max-w-6xl px-6 md:px-12">
         <div className="flex items-center gap-3.5 pb-[18px]">
           {filtersToggle}
           {!filtersOpen && searchBox('w-[340px]')}

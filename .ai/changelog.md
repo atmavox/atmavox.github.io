@@ -10,6 +10,13 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.26.2] · 2026-11-23
+
+### Alterado
+
+- Hub de jornadas (computador): o símbolo que pulsa no topo ficou bem maior, subindo até o cabeçalho e
+  cortado pela borda direita da página.
+
 ## [1.26.1] · 2026-11-23
 
 ### Alterado
