@@ -59,18 +59,19 @@ ui  →  application  →  domain  ←  content
 
 ## Rotas (hash)
 
-| Rota                                                | Tela                                      |
-| --------------------------------------------------- | ----------------------------------------- |
-| `#/`                                                | Hub (início)                              |
-| `#/ouvir`, `#/encontros`, `#/jornadas`, `#/contato` | Hub: aba no celular, âncora no computador |
-| `#/jornada/{id}`                                    | Abertura da jornada (pede login, ADR-020) |
-| `#/jornada/{id}/semana-1`…`3`                       | Semanas                                   |
-| `#/jornada/{id}/revisoes`                           | Revisões semanais                         |
-| `#/jornada/{id}/vitorias`                           | Registro de vitórias                      |
-| `#/jornada/{id}/encerramento`                       | Encerramento                              |
-| `#/jornada`, `#/jornada/semana-1`…                  | Links antigos: abrem `chama-interna-21`   |
-| `#/jornada/editar`                                  | Modo Andreía (só admin)                   |
-| `#/admin/ativacoes/terapias`, `…/anamnese`          | Modo Andreía da ativação (ADR-029)        |
+| Rota                                                | Tela                                        |
+| --------------------------------------------------- | ------------------------------------------- |
+| `#/`                                                | Hub (início)                                |
+| `#/ouvir`, `#/encontros`, `#/jornadas`, `#/contato` | Hub: aba no celular, âncora no computador   |
+| `#/jornada/{id}`                                    | Abertura da jornada (pede login, ADR-020)   |
+| `#/jornada/{id}/semana-1`…`3`                       | Semanas                                     |
+| `#/jornada/{id}/revisoes`                           | Revisões semanais                           |
+| `#/jornada/{id}/vitorias`                           | Registro de vitórias                        |
+| `#/jornada/{id}/encerramento`                       | Encerramento                                |
+| `#/jornada`, `#/jornada/semana-1`…                  | Links antigos: abrem `chama-interna-21`     |
+| `#/jornada/editar`                                  | Modo Andreía (só admin)                     |
+| `#/ativacao`                                        | Ativação individual: janela sobre o Contato |
+| `#/admin/ativacoes`, `…/terapias`, `…/anamnese`     | Modo Andreía da ativação (ADR-029)          |
 
 O hash evita o 404 do GitHub Pages ao recarregar uma página interna e permite compartilhar o link de uma aba.
 
@@ -131,6 +132,7 @@ catalog/availability                  # content: JSON com a agenda { windows (fa
 # Fora do Firestore: public/social.json + public/social/*.jpg, gerados no deploy (ADR-028)
 published/{productId}                 # content: jornada ou meditação; free: boolean (cópia do catálogo)
 users/{uid}/access/{productId}        # grantedAt, expiresAt | null, source: 'manual' | 'payment', ref?
+users/{uid}/anamnesis/current         # content: JSON { answers, consent, updatedAt } da ativação (ADR-029)
 interest/{productId}/people/{uid}     # "Quero ser avisada" de um produto "Em breve"; createdAt
 ```
 

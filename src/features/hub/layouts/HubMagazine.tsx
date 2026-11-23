@@ -1,4 +1,4 @@
-import { ArrowRight, MessageCircle } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { AccountMenu } from '../../../shared/auth/AccountMenu'
@@ -11,6 +11,7 @@ import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { BrandMark } from '../../../shared/ui/BrandMark'
 import { LeaveTransition } from '../../../shared/ui/LeaveTransition'
 import { useLingering } from '../../../shared/ui/useLingering'
+import { ActivationCards } from '../components/ActivationCards'
 import { AudioItem } from '../components/AudioItem'
 import { CardRow } from '../components/CardRow'
 import { EncountersBand } from '../components/EncountersBand'
@@ -27,9 +28,7 @@ import { SocialPosts } from '../components/SocialPosts'
 import { Testimonials } from '../components/Testimonials'
 import {
   about,
-  contactCta,
   hero,
-  individualSession,
   introAudio,
   journeysIntro,
   meditationsIntro,
@@ -333,25 +332,9 @@ export function HubMagazine({
                   </li>
                 ))}
               </ul>
-              <div className="mt-1.5 flex flex-wrap gap-3">
-                <a
-                  href={contactCta.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={primaryButton}
-                >
-                  <MessageCircle aria-hidden size={18} />
-                  {contactCta.label}
-                </a>
-                <a
-                  href={individualSession.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={ghostButton}
-                >
-                  {individualSession.label}
-                </a>
-              </div>
+            </div>
+            <div className="md:col-span-2">
+              <ActivationCards layout="wide" />
             </div>
           </section>
         </main>

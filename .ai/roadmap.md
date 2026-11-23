@@ -226,7 +226,11 @@ Surgiu no caminho:
   2. [x] Agenda no Modo Andreía (`catalog/availability`): grade da semana com arrastar + balão, "+"
          para o formulário completo, vista do mês, dia no celular; repetir toda semana, tirar só um dia
          (1.23.0)
-  3. [ ] Fluxo da pessoa na janela sobre o hub (Contato → login → anamnese → terapia → data → resumo)
+  3. [x] Fluxo da pessoa na janela sobre o hub (Contato → login → anamnese → terapia → data → resumo),
+         respostas na conta (`users/{uid}/anamnesis/current`) (1.24.0)
+     - [ ] **Desenvolvedor:** publicar as regras do Firestore (`processos-manuais.md`, seção 4)
+     - [x] Cabeçalho do Modo Andreía: no site, só "Começar a editar"; nas telas de edição, Produtos,
+           Acessos e Ativações na fonte do menu do site, "Voltar ao hub" com a seta à direita
   4. [ ] Pedidos e status (regras novas do Firestore, Worker cobrando terapias; o pagamento real
          depende do Mercado Pago, ainda pendente) + tela Pedidos no Modo Andreía
   5. [ ] Aprovação pelo site com link de confirmação + Mensagens + aba Ativações no perfil

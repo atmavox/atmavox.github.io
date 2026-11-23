@@ -10,6 +10,25 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.24.0] · 2026-11-23
+
+### Adicionado
+
+- **Ativação individual para a pessoa** (`#/ativacao`, F10, ADR-029): a aba Contato ganha os cartões
+  "Um encontro só seu" (com as terapias e "Quero agendar") e "Ficou com alguma dúvida?" (WhatsApp). O
+  fluxo abre numa janela sobre o hub: login com as etapas ao lado, anamnese por etapas (respostas de
+  antes voltam preenchidas; o nome da conta já vem), terapia (banner e lista com filtro no computador,
+  cartões no celular, pergunta extra obrigatória), data de preferência (só os horários livres daquela
+  terapia; no celular o mês desliza) e resumo com "Editar" em cada bloco. O pagamento aparece como
+  "em breve", com um link para combinar com a Andreía pelo WhatsApp.
+- Regra do Firestore para `users/{uid}/anamnesis/{doc}` (precisa ser publicada no console).
+
+### Alterado
+
+- Cabeçalho do Modo Andreía: no site, a faixa azul só leva a "Começar a editar"; nas telas de edição,
+  Produtos, Acessos e Ativações na fonte do menu do site e "Voltar ao hub" com a seta à direita.
+- O antigo botão "Ativação individual" (só WhatsApp) saiu: o caminho agora é "Quero agendar".
+
 ## [1.23.0] · 2026-11-23
 
 ### Adicionado

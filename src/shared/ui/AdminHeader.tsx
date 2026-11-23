@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 export type AdminArea = 'produtos' | 'acessos' | 'ativacoes'
@@ -24,10 +24,8 @@ export function AdminHeader({
     <a
       href={`#/admin/${id}`}
       aria-current={active === id ? 'page' : undefined}
-      className={`rounded-full px-3 py-1.5 transition-colors ${
-        active === id
-          ? 'bg-on-admin/18 font-medium text-on-admin'
-          : 'text-on-admin/80 hover:text-on-admin'
+      className={`rounded-full px-3 py-1 text-[0.95rem] transition-colors duration-300 ${
+        active === id ? 'bg-on-admin/18 text-on-admin' : 'text-on-admin/80 hover:text-on-admin'
       }`}
     >
       {label}
@@ -50,8 +48,8 @@ export function AdminHeader({
       )}
       <span className="ml-auto flex shrink-0 items-center gap-3 sm:gap-4">
         <a href="#/jornadas" className={exit} aria-label="Voltar ao hub">
-          <ArrowLeft aria-hidden size={15} />
           <span className="hidden sm:inline">Voltar ao hub</span>
+          <ArrowUpRight aria-hidden size={15} />
         </a>
         <a href="#/" className={exit} aria-label="Ver o site">
           <span className="hidden sm:inline">Ver o site</span>

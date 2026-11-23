@@ -13,6 +13,7 @@ variables → Actions** (abas **Variables** e **Secrets**).
 - [ ] Redes sociais: Instagram (`INSTAGRAM_TOKEN`, renovar a cada 60 dias)
 - [ ] Redes sociais: Spotify (`SOCIAL_SPOTIFY_RSS`, quando o podcast existir)
 - [ ] Pagamentos: conta de serviço do Firebase + Mercado Pago + Worker + webhook + botão + compra de teste
+- [ ] Publicar as regras novas do Firestore (anamnese da ativação individual, 1.24.0): seção 4
 - [ ] Robô do WhatsApp (depois dos pagamentos): app na Meta + número em "coexistence" + token + webhook
 
 ---
@@ -209,3 +210,18 @@ os campos por `{{1}}`, `{{2}}`… A aprovação costuma sair em minutos.
    segundos, e a conversa aparece também no app da Andreía.
 2. Aprovar o horário no Modo Andreía: a pessoa recebe a mensagem com o botão **Confirmar**.
 3. Nos logs (`npx wrangler@4 tail`), nenhum aviso pode aparecer como "assinatura inválida".
+
+---
+
+## 4. Regras do Firestore (sempre que `firestore.rules` mudar)
+
+As regras ficam no repositório (`firestore.rules`) mas só valem depois de publicadas no console:
+
+1. Firebase Console → **Firestore Database** → **Regras**.
+2. Apagar o conteúdo e colar o `firestore.rules` inteiro da `main`.
+3. **Publicar**.
+
+Mudança pendente (1.24.0): `users/{uid}/anamnesis/{doc}`, onde cada pessoa guarda as respostas da
+anamnese da ativação individual (só ela grava; ela e a Andreía leem). Sem publicar, o fluxo funciona,
+mas as respostas não ficam na conta: a pessoa vê o aviso "Não deu para guardar suas respostas na conta
+agora" e precisa responder de novo da próxima vez.

@@ -409,12 +409,12 @@ no código, sempre pode.
 - Criar grava na hora e já escolhe; o produto muda só no "Salvar". Nome repetido não passa.
 - No hub, um território criado entra depois dos 4 da marca e só aparece no filtro quando tem jornada.
 
-## F10 · Ativação individual paga 🔨 (passos 1 e 2 de 5: terapias, anamnese e agenda no Modo Andreía)
+## F10 · Ativação individual paga 🔨 (passos 1 a 3 de 5: Modo Andreía e fluxo da pessoa até o resumo)
 
 Mocks aprovados (2026-11-23): `Downloads/atmavox-ativacao-pessoa-v3.html` (pessoa) e
 `Downloads/atmavox-ativacao-andreia-v3.html` (Modo Andreía). Decisão: ADR-029.
 
-**Fluxo da pessoa** (passos 3 a 5): a aba **Contato** explica a ativação (sem item novo no menu) e leva
+**Fluxo da pessoa** ✅ até o resumo (o pagamento e o aviso vêm nos passos 4 e 5): a aba **Contato** explica a ativação (sem item novo no menu) e leva
 a `#/ativacao`. Do login ao "Pagamento confirmado", tudo acontece numa **janela sobre o hub
 desfocado**; fechar antes do login volta ao início, depois do login leva ao perfil, aba **Ativações**.
 
@@ -425,9 +425,13 @@ desfocado**; fechar antes do login volta ao início, depois do login leva ao per
    A pergunta extra da terapia escolhida aparece no cartão.
 4. Data de preferência: calendário do mês com os horários livres daquela terapia (swipe no celular).
    "A Andreía confere a agenda e aprova o horário com você pelo WhatsApp."
-5. Resumo com "Editar" em cada bloco e o total; pagar pelo Mercado Pago. O pedido nasce aqui.
-6. Pagamento confirmado: check grande, número do pedido, prévia da mensagem e "Avisar a Andreía no
-   WhatsApp" (mensagem pronta, editável em Mensagens).
+5. Resumo com "Editar" em cada bloco e o total; pagar pelo Mercado Pago. O pedido nasce aqui. Até o
+   pagamento existir, o botão mostra "Pagamento em breve" e um link leva ao WhatsApp da Andreía com a
+   terapia e a data que a pessoa prefere.
+
+Respostas da anamnese: gravadas na conta ao terminar a anamnese (`users/{uid}/anamnesis/current`,
+só as perguntas que existem no formulário). Terapias, anamnese e agenda são lidas sem login. 6. Pagamento confirmado: check grande, número do pedido, prévia da mensagem e "Avisar a Andreía no
+WhatsApp" (mensagem pronta, editável em Mensagens).
 
 **Status do pedido:** Aguardando pagamento → Paga → Solicitada (avisou no WhatsApp, esperando a
 Andreía) → Agendada (horário aprovado e confirmado) → Realizada; e Cancelada. Sem pagamento em 2 dias,

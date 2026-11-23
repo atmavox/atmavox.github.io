@@ -115,11 +115,6 @@ export function notifyMeHref(productTitle: string): string {
   return whatsAppMessage(`Quero ser avisada quando ${productTitle} abrir.`)
 }
 
-export const individualSession = {
-  label: 'Ativação individual',
-  href: whatsAppMessage('Quero saber mais sobre a sessão individual de 45 minutos.'),
-} as const
-
 /** Práticas da Andreía (aparecem em "A Ativadora"). */
 export const specialties: readonly string[] = [
   'Barras de Access',

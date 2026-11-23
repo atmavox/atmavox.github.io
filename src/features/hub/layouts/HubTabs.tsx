@@ -16,6 +16,7 @@ import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { BrandMark } from '../../../shared/ui/BrandMark'
 import { AboutAndreia } from '../components/AboutAndreia'
+import { ActivationCards } from '../components/ActivationCards'
 import { AudioItem } from '../components/AudioItem'
 import { CardRow } from '../components/CardRow'
 import { EncountersBand } from '../components/EncountersBand'
@@ -140,14 +141,7 @@ function ContatoPanel() {
   return (
     <>
       <AboutAndreia headingLevel={1} />
-      <a
-        href={contactCta.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="grid min-h-13 place-items-center rounded-full bg-accent font-semibold text-bg hover:opacity-90"
-      >
-        {contactCta.label}
-      </a>
+      <ActivationCards layout="narrow" />
       <SocialLinks variant="list" />
       <p className="text-center font-display text-sm text-ink-faint italic">{signature}</p>
       <p className="text-center text-xs text-ink-faint">Atmavox v{SITE.version}</p>
