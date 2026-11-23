@@ -10,6 +10,13 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.12.1] · 2026-11-23
+
+### Corrigido
+
+- Encontros na página inicial: "Um quadro recorrente, ao vivo no TikTok." no lugar de "Sem programação
+  fixa…".
+
 ## [1.12.0] · 2026-11-23
 
 ### Adicionado

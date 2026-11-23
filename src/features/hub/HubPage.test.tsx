@@ -64,7 +64,7 @@ describe('hub no celular (abas)', () => {
       'href',
       'https://www.tiktok.com/@atmavox',
     )
-    expect(screen.getByText(/Sem programação fixa/)).toBeInTheDocument()
+    expect(screen.getByText('Um quadro recorrente, ao vivo no TikTok.')).toBeInTheDocument()
   })
 
   it('a vitrine não mostra preço e não inventa depoimento', () => {

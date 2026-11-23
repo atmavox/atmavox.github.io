@@ -97,9 +97,9 @@ export const encounters: readonly Encounter[] = [
   },
 ]
 
-/** Os encontros não têm horário fixo: quando acontecem, são um quadro ao vivo no TikTok (ADR-021). */
+/** Os encontros são um quadro recorrente, ao vivo no TikTok (ADR-021); o horário não aparece no site. */
 export const encountersInfo = {
-  note: 'Sem programação fixa: quando acontece, é um quadro ao vivo no TikTok.',
+  note: 'Um quadro recorrente, ao vivo no TikTok.',
   cta: 'Seguir no TikTok',
   href: brandLinks.tiktok,
 } as const

@@ -26,8 +26,8 @@ o que é grátis não pede cadastro; a conta só aparece quando a pessoa decide 
 1. **Página inicial** (`/`): a vitrine da bio do Instagram (aprovada em 2026-11-22, F1). Leva a cada parte
    do universo Atmavox:
    - jornadas em destaque e meditações, **sem preço** na vitrine;
-   - **encontros ao vivo** (Zerando o Dia, Pausa Sagrada): sem programação fixa, acontecem como quadro ao
-     vivo no **TikTok**, e o site leva para lá;
+   - **encontros ao vivo** (Zerando o Dia, Pausa Sagrada): um quadro recorrente, ao vivo no
+     **TikTok**, e o site leva para lá;
    - frase de efeito da marca, depoimentos, redes sociais, A Ativadora e **sessão individual** (45 min,
      contato pelo WhatsApp).
 2. **Hub de jornadas** (`#/jornadas`): todas as jornadas, com busca, filtros por território e as visões
