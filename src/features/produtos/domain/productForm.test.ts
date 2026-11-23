@@ -11,6 +11,7 @@ import {
   validateForm,
   youtubeIdOf,
 } from './productForm'
+import { addPart, listItem, setDayCount } from './structureForm'
 
 describe('formulário de produto', () => {
   it('cria o id a partir do nome, sem acento nem símbolo', () => {
@@ -42,20 +43,79 @@ describe('formulário de produto', () => {
       ...emptyForm('journey', 9),
       paid: true,
       price: 'x',
-      themes: [{ label: 'I', title: '' }],
+      layout: 'themes' as const,
+      themes: [listItem('')],
     }
     const errors = validateForm(form, [])
     expect(errors.title).toBe('Dê um nome ao produto.')
     expect(errors.price).toContain('97,00')
-    expect(errors.durationLabel).toContain('21 dias')
-    expect(errors.themes).toBeDefined()
+    expect(errors.themes).toContain('Cada tema precisa de um nome')
+    expect(validateForm({ ...form, themes: [] }, []).themes).toBe('Adicione pelo menos um tema.')
+  })
+
+  it('partes sem nome não passam', () => {
+    const form = addPart({
+      ...emptyForm('journey', 9),
+      title: 'Florescer',
+      split: 'parts' as const,
+    })
+    expect(validateForm(form, []).parts).toBe('Cada parte precisa de um nome.')
+  })
+
+  it('jornada em partes vira produto com faixas, duração gerada e os 3 dias do banner', () => {
+    const base = addPart({
+      ...emptyForm('journey', 9),
+      title: 'Florescer',
+      split: 'parts' as const,
+    })
+    const form = {
+      ...base,
+      parts: base.parts.map((p, i) => ({ ...p, title: ['Descobrindo', 'Desabrochando'][i] ?? '' })),
+      dayTitles: base.dayTitles.map((d, i) => ({
+        ...d,
+        title: ['', 'Chegada', 'Corpo', '', 'Voz', 'Sobra'][i] ?? '',
+      })),
+    }
+    expect(validateForm(form, [])).toEqual({})
+    expect(productFromForm(form)).toMatchObject({
+      structure: 'parts',
+      durationLabel: '21 dias',
+      dayCount: 21,
+      themes: [
+        { label: '1', title: 'Descobrindo', lastDay: 10 },
+        { label: '2', title: 'Desabrochando' },
+      ],
+      previewDays: ['Chegada', 'Corpo', 'Voz'],
+    })
+  })
+
+  it('por temas: sem duração em dias; a duração conta os temas', () => {
+    const form = {
+      ...emptyForm('journey', 9),
+      title: 'Corpo',
+      layout: 'themes' as const,
+      themes: [listItem('Respiração'), listItem('Voz')],
+    }
+    const product = productFromForm(form)
+    expect(product).toMatchObject({ structure: 'themes', durationLabel: '2 temas' })
+    expect(product).not.toHaveProperty('dayCount')
+    expect(product).not.toHaveProperty('previewDays')
+  })
+
+  it('estrutura travada mantém os cartões do banner que já estavam', () => {
+    const form = {
+      ...emptyForm('journey', 9),
+      title: 'Ritual',
+      structureLocked: true,
+      previewDays: ['Já no catálogo'],
+    }
+    expect(productFromForm(form)).toMatchObject({ previewDays: ['Já no catálogo'] })
   })
 
   it('não deixa criar um produto com o id de outro', () => {
     const form = {
       ...emptyForm('journey', 9),
       title: 'A Chama Interna 21',
-      durationLabel: '21 dias',
     }
     expect(validateForm(form, ['a-chama-interna-21']).title).toContain('Já existe')
   })
@@ -108,11 +168,9 @@ describe('formulário de produto', () => {
     const next = upsertProduct(seedCatalog, renamed)
     expect(next).toHaveLength(seedCatalog.length)
     expect(next.find((p) => p.id === chama.id)?.title).toBe('A Chama Interna (nova)')
-    const created = productFromForm({
-      ...emptyForm('journey', 9),
-      title: 'Raízes',
-      durationLabel: '14 dias',
-    })
+    const created = productFromForm(
+      setDayCount({ ...emptyForm('journey', 9), title: 'Raízes' }, 14),
+    )
     expect(upsertProduct(seedCatalog, created)).toHaveLength(seedCatalog.length + 1)
   })
 })

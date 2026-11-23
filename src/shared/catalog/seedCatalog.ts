@@ -16,6 +16,7 @@ export const seedCatalog: readonly Product[] = [
     order: 1,
     structure: 'weeks',
     durationLabel: '21 dias',
+    dayCount: 21,
     themes: [
       { label: 'I', title: 'Nomeando o Cinza' },
       { label: 'II', title: 'Desbloqueio Emocional' },
@@ -34,6 +35,7 @@ export const seedCatalog: readonly Product[] = [
     order: 2,
     structure: 'days',
     durationLabel: '7 dias',
+    dayCount: 7,
     themes: [],
   },
   {

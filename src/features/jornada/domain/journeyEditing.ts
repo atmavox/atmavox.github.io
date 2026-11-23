@@ -1,7 +1,10 @@
 // Operações puras do editor (modo Andreía). Regra de ouro: ids existentes nunca mudam, porque as
 // respostas das pessoas são salvas por eles; blocos e dias novos ganham ids novos.
+import { DAYS_PER_WEEK } from '../../../shared/catalog/journeyLayout'
 import {
   allDays,
+  structureOf,
+  toRoman,
   type DaySection,
   type FieldId,
   type Journey,
@@ -128,10 +131,28 @@ export function nextDayNumber(journey: Journey): number {
   return Math.max(0, ...used) + 1
 }
 
-/** Cada semana precisa de pelo menos um dia (uma semana vazia contaria como "completa" sem nada). */
+const weekOf = (journey: Journey, dayNumber: number) =>
+  journey.weeks.find((w) => w.days.some((day) => day.number === dayNumber))
+
+/** O único dia da última semana (ou parte), havendo outras: apagá-lo apaga a semana junto. */
+const isAloneInLastWeek = (journey: Journey, dayNumber: number) => {
+  const week = weekOf(journey, dayNumber)
+  return (
+    week !== undefined &&
+    week.days.length === 1 &&
+    week === journey.weeks.at(-1) &&
+    journey.weeks.length > 1 &&
+    structureOf(journey) !== 'themes'
+  )
+}
+
+/**
+ * Cada semana precisa de pelo menos um dia (uma semana vazia contaria como "completa" sem nada). A
+ * exceção é o dia sozinho na última semana (ex.: o dia 22 que abriu a Semana IV): a semana sai junto.
+ */
 export function canRemoveDay(journey: Journey, dayNumber: number): boolean {
-  const week = journey.weeks.find((w) => w.days.some((day) => day.number === dayNumber))
-  return week !== undefined && week.days.length > 1
+  const week = weekOf(journey, dayNumber)
+  return week !== undefined && (week.days.length > 1 || isAloneInLastWeek(journey, dayNumber))
 }
 
 /**
@@ -140,9 +161,10 @@ export function canRemoveDay(journey: Journey, dayNumber: number): boolean {
  */
 export function removeDay(journey: Journey, dayNumber: number): Journey {
   if (!canRemoveDay(journey, dayNumber)) return journey
+  const weeks = isAloneInLastWeek(journey, dayNumber) ? journey.weeks.slice(0, -1) : journey.weeks
   return {
     ...journey,
-    weeks: journey.weeks.map((week) => ({
+    weeks: weeks.map((week) => ({
       ...week,
       days: week.days.filter((day) => day.number !== dayNumber),
     })),
@@ -150,6 +172,10 @@ export function removeDay(journey: Journey, dayNumber: number): Journey {
   }
 }
 
+/**
+ * Dia novo no fim da semana (ou parte) escolhida. Por semana, uma semana tem no máximo 7 dias: se a
+ * última já está cheia, o dia abre uma semana nova (o dia 22 de uma jornada de 21 vira a Semana IV).
+ */
 export function addDay(journey: Journey, weekNumber: number, suffix: string): Journey {
   const number = nextDayNumber(journey)
   const day: JourneyDay = {
@@ -158,6 +184,15 @@ export function addDay(journey: Journey, weekNumber: number, suffix: string): Jo
     subtitle: '',
     isReview: false,
     sections: [createSection('ritual', number, suffix), createSection('closing', number, suffix)],
+  }
+  const target = journey.weeks.find((week) => week.number === weekNumber)
+  const isLast = target === journey.weeks.at(-1)
+  if (structureOf(journey) === 'weeks' && target && isLast && target.days.length >= DAYS_PER_WEEK) {
+    const next = Math.max(...journey.weeks.map((week) => week.number)) + 1
+    return {
+      ...journey,
+      weeks: [...journey.weeks, { number: next, roman: toRoman(next), theme: '', days: [day] }],
+    }
   }
   return {
     ...journey,

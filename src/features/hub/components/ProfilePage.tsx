@@ -65,9 +65,9 @@ export function AccessPill({
 }
 
 function continueHref(journey: JourneyProduct, trail: Trail): string {
-  if (journey.structure === 'weeks' && trail.nextStep) {
-    return `#/jornada/${journey.id}/semana-${trail.nextStep}`
-  }
+  const tab = { weeks: 'semana', parts: 'parte', themes: 'tema', days: null }[journey.structure]
+  if (tab && trail.nextStep) return `#/jornada/${journey.id}/${tab}-${trail.nextStep}`
+  if (journey.structure === 'days' && trail.nextDay) return `#/jornada/${journey.id}/dias`
   return `#/jornada/${journey.id}`
 }
 

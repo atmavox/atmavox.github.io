@@ -1,4 +1,5 @@
 import { ArrowRight, Clock } from 'lucide-react'
+import { cardTiles } from '../../../shared/catalog/journeyLayout'
 import { productOffer } from '../../../shared/catalog/offer'
 import type { JourneyProduct } from '../../../shared/catalog/product'
 import { notifyMeHref } from '../content'
@@ -20,6 +21,7 @@ export function ShowcaseJourneyCard({ journey, size }: ShowcaseJourneyCardProps)
   // Na vitrine a regra não depende de login nem de acesso; o horário não importa.
   const { action } = productOffer(journey, { place: 'showcase', logged: false, now: 0 })
   const isSoon = action === 'notify'
+  const tiles = cardTiles(journey)
 
   return (
     <article
@@ -46,9 +48,9 @@ export function ShowcaseJourneyCard({ journey, size }: ShowcaseJourneyCardProps)
         {journey.phrase && (
           <p className="text-[0.95rem] leading-normal text-ink-muted">{journey.phrase}</p>
         )}
-        {journey.themes.length > 0 && (
+        {tiles.length > 0 && (
           <ul aria-label="Temas" className="flex flex-wrap gap-1.5">
-            {journey.themes.map((theme) => (
+            {tiles.map((theme) => (
               <li
                 key={theme.label}
                 className="rounded-lg bg-gold/12 px-2.5 py-1 text-xs text-ink-muted"

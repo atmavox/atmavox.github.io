@@ -94,6 +94,12 @@ const PATHS = {
   back: <path d="M15 18l-6-6 6-6" />,
   next: <path d="M9 6l6 6-6 6" />,
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  pen: (
+    <>
+      <path d="M4 20h4L19 9l-4-4L4 16v4z" />
+      <path d="M13.5 6.5l4 4" />
+    </>
+  ),
 } satisfies Record<string, ReactNode>
 
 export type EditorIconName = keyof typeof PATHS

@@ -66,6 +66,32 @@ describe('parseCatalog', () => {
     expect(parsed).not.toHaveProperty('bannerMediaId')
   })
 
+  it('lê jornada em partes, com dias e os títulos do banner', () => {
+    const parts = {
+      ...journey,
+      id: 'florescer',
+      structure: 'parts',
+      durationLabel: '21 dias',
+      dayCount: 21,
+      themes: [
+        { label: '1', title: 'Descobrindo você mesma', lastDay: 10 },
+        { label: '2', title: 'Desabrochando' },
+      ],
+      previewDays: ['Chegada', '', 'Corpo', 'Voz', 'Sobra'],
+    }
+    expect(parseCatalog([parts])?.[0]).toEqual({
+      ...parts,
+      previewDays: ['Chegada', 'Corpo', 'Voz'],
+    })
+  })
+
+  it('semana sem nome passa; dias fora do limite são ignorados', () => {
+    const [parsed] =
+      parseCatalog([{ ...journey, themes: [{ label: 'I', title: '' }], dayCount: 500 }]) ?? []
+    expect(parsed).toMatchObject({ themes: [{ label: 'I', title: '' }] })
+    expect(parsed).not.toHaveProperty('dayCount')
+  })
+
   it('o que não é lista devolve null', () => {
     expect(parseCatalog({ products: [] })).toBeNull()
     expect(parseCatalog(undefined)).toBeNull()

@@ -1,11 +1,18 @@
 // Onde o Modo Andreía de produtos grava: o catálogo (`catalog/public`), o `free` de cada conteúdo e os
 // links das meditações (`published/{id}`). Tudo por REST com o token da admin; as regras recusam os
 // outros (firestore.rules).
+import {
+  DAY_TITLES_FIELD,
+  parseDayTitles,
+  serializeDayTitles,
+} from '../../../shared/catalog/dayTitles'
 import type { Product } from '../../../shared/catalog/product'
 import {
+  deleteDocument,
   documentsUrl,
   fieldsOf,
   getJson,
+  numberField,
   patchDocument,
   restBoolean,
   restInteger,
@@ -25,6 +32,17 @@ export interface ProductsBackend {
   loadMeditationContent(productId: string): Promise<MeditationContent | null>
   /** A jornada já foi publicada no editor (`published/{id}` tem `content`)? */
   hasPublishedJourney(productId: string): Promise<boolean>
+  /**
+   * O rascunho da jornada (`drafts/{id}`, ADR-025): os títulos dos dias dados no produto e se o editor
+   * já salvou algo (aí a estrutura trava).
+   */
+  loadJourneyDraftInfo(
+    productId: string,
+  ): Promise<{ dayTitles: string[] | null; hasContent: boolean }>
+  /** Grava só o campo `dayTitles` do rascunho (o conteúdo, se houver, fica como está). */
+  saveDayTitles(productId: string, titles: readonly string[]): Promise<void>
+  /** Apaga o rascunho da jornada (`drafts/{id}`), ao apagar um produto que nunca foi publicado. */
+  deleteJourneyDraft(productId: string): Promise<void>
   saveMeditationContent(productId: string, content: MeditationContent, free: boolean): Promise<void>
   /** Guarda a imagem do banner em `media/{id}` (ADR-014) e devolve o id. */
   saveImage(image: CompressedImage): Promise<string>
@@ -104,6 +122,35 @@ export function createProductsBackend(
       const fields = fieldsOf(body)
       return !!(fields && stringField(fields, 'content'))
     },
+    async loadJourneyDraftInfo(productId) {
+      const body = await getJson(
+        documentsUrl(
+          config,
+          `drafts/${productId}`,
+          `&mask.fieldPaths=${DAY_TITLES_FIELD}&mask.fieldPaths=updatedAt`,
+        ),
+        await token(),
+        fetchFn,
+      )
+      const fields = fieldsOf(body)
+      return {
+        dayTitles: fields ? parseDayTitles(stringField(fields, DAY_TITLES_FIELD)) : null,
+        // O editor grava `content` e `updatedAt` juntos; os títulos sozinhos não têm `updatedAt`.
+        hasContent: fields !== null && numberField(fields, 'updatedAt') !== undefined,
+      }
+    },
+    async saveDayTitles(productId, titles) {
+      await patchDocument(
+        config,
+        `drafts/${productId}`,
+        { [DAY_TITLES_FIELD]: restString(serializeDayTitles(titles)) },
+        await token(),
+        fetchFn,
+      )
+    },
+    async deleteJourneyDraft(productId) {
+      await deleteDocument(config, `drafts/${productId}`, await token(), fetchFn)
+    },
     async saveMeditationContent(productId, content, free) {
       await patchDocument(
         config,
@@ -148,6 +195,9 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
   contents: Map<string, MeditationContent>
   images: Map<string, CompressedImage>
   publishedJourneys: Set<string>
+  dayTitles: Map<string, string[]>
+  /** Jornadas com rascunho salvo no editor. */
+  draftJourneys: Set<string>
 } {
   const state = {
     catalog: null as Product[] | null,
@@ -155,6 +205,8 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
     contents: new Map<string, MeditationContent>(),
     images: new Map<string, CompressedImage>(),
     publishedJourneys: new Set<string>(),
+    dayTitles: new Map<string, string[]>(),
+    draftJourneys: new Set<string>(),
   }
   return Object.assign(state, {
     isAdmin: async () => admin,
@@ -166,6 +218,20 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
     },
     loadMeditationContent: async (id: string) => state.contents.get(id) ?? null,
     hasPublishedJourney: async (id: string) => state.publishedJourneys.has(id),
+    loadJourneyDraftInfo: async (id: string) => ({
+      dayTitles: state.dayTitles.get(id) ?? null,
+      hasContent: state.draftJourneys.has(id),
+    }),
+    deleteJourneyDraft: async (id: string) => {
+      state.dayTitles.delete(id)
+      state.draftJourneys.delete(id)
+    },
+    saveDayTitles: async (id: string, titles: readonly string[]) => {
+      state.dayTitles.set(
+        id,
+        titles.map((t) => t.trim()),
+      )
+    },
     saveMeditationContent: async (id: string, content: MeditationContent, free: boolean) => {
       state.contents.set(id, content)
       state.free.set(id, free)

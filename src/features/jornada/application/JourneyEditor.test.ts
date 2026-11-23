@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { chamaInterna21 } from '../content/chama-interna-21'
 import { allDays } from '../domain/journey'
 import { findDay } from '../domain/journeyEditing'
+import { createJourneySkeleton } from '../domain/journeySkeleton'
 import { InMemoryEditorBackend } from '../infrastructure/InMemoryCloudBackend'
 import { createJourneyContent } from './JourneyContent'
 import { createJourneyEditor, dayStatus, draftDayCount, publishBlocker } from './JourneyEditor'
@@ -161,5 +162,38 @@ describe('JourneyEditor', () => {
     const state = editor.getSnapshot()
     expect(state.message).toMatch(/Não foi possível falar com a nuvem/)
     expect(dayStatus(state, 1)).toBe('draft')
+  })
+})
+
+describe('JourneyEditor de uma jornada nova', () => {
+  const skeleton = createJourneySkeleton({
+    id: 'florescer',
+    structure: 'days',
+    groups: [{ label: '', title: '', firstDay: 1, lastDay: 3 }],
+  })
+
+  async function setupNew(backend: InMemoryEditorBackend) {
+    const editor = createJourneyEditor({
+      content: createJourneyContent({ fallback: skeleton }),
+      loadBackend: () => Promise.resolve(backend),
+      workingCopy: memoryCache(),
+    })
+    await editor.load()
+    return editor
+  }
+
+  it('sem rascunho, os títulos dados no produto entram nos dias', async () => {
+    const backend = new InMemoryEditorBackend()
+    backend.dayTitles.set('florescer', ['Chegada', '', 'Voz'])
+    const titles = allDays((await setupNew(backend)).getSnapshot().saved).map((d) => d.title)
+    expect(titles).toEqual(['Chegada', 'Dia 2', 'Voz'])
+  })
+
+  it('com rascunho, vale o rascunho (os títulos do produto não entram mais)', async () => {
+    const backend = new InMemoryEditorBackend()
+    backend.drafts.set('florescer', JSON.stringify(skeleton))
+    backend.dayTitles.set('florescer', ['Chegada'])
+    const first = allDays((await setupNew(backend)).getSnapshot().saved)[0]
+    expect(first?.title).toBe('Dia 1')
   })
 })

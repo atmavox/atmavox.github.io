@@ -39,6 +39,70 @@ describe('Modo Andreía de produtos no computador', () => {
     setWideViewport(false)
   })
 
+  it('jornada nova em partes, com títulos dos dias: catálogo com 3 cartões e títulos no rascunho', async () => {
+    setWideViewport(true)
+    const { backend, catalog } = setup()
+    render(<ProductsApp backend={backend} catalog={catalog} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Novo produto' }))
+    fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Florescer' } })
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Em partes' }))
+    fireEvent.click(screen.getByRole('button', { name: '+ Parte' }))
+    fireEvent.change(screen.getByLabelText('Nome: Parte 1'), { target: { value: 'Descobrindo' } })
+    fireEvent.change(screen.getByLabelText('Nome: Parte 2'), { target: { value: 'Desabrochando' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Parte 1 termina um dia antes' }))
+    // As setas trocam os nomes de lugar; as faixas de dias ficam.
+    fireEvent.click(screen.getByRole('button', { name: 'Mover Parte 2 para cima' }))
+
+    fireEvent.click(screen.getByRole('button', { name: /Títulos dos dias/ }))
+    fireEvent.change(screen.getByLabelText('Nome: Dia 2'), { target: { value: 'Chegada' } })
+    fireEvent.change(screen.getByLabelText('Nome: Dia 12'), { target: { value: 'Raiz' } })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Salvo ✓'))
+    expect(catalog.getSnapshot().find((p) => p.id === 'florescer')).toMatchObject({
+      structure: 'parts',
+      dayCount: 21,
+      themes: [
+        { label: '1', title: 'Desabrochando', lastDay: 9 },
+        { label: '2', title: 'Descobrindo' },
+      ],
+      previewDays: ['Chegada', 'Raiz'],
+    })
+    expect(backend.dayTitles.get('florescer')?.slice(0, 2)).toEqual(['', 'Chegada'])
+    setWideViewport(false)
+  })
+
+  it('jornada com conteúdo salvo no editor: a estrutura fica travada', async () => {
+    setWideViewport(true)
+    const { backend, catalog } = setup()
+    backend.draftJourneys.add('ritual-matinal')
+    render(<ProductsApp backend={backend} catalog={catalog} />)
+    fireEvent.click(screen.getByRole('button', { name: /Ritual Matinal/ }))
+    expect(await screen.findByText('Esta jornada já tem conteúdo salvo.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Um dia a mais' })).toBeDisabled()
+    setWideViewport(false)
+  })
+
+  it('apaga um produto que não está publicado (e a Chama, publicada, não tem o botão)', async () => {
+    setWideViewport(true)
+    const { backend, catalog } = setup()
+    backend.dayTitles.set('ritual-matinal', ['Chegada'])
+    render(<ProductsApp backend={backend} catalog={catalog} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /A Chama Interna/ }))
+    await screen.findByRole('radiogroup', { name: 'Grátis ou paga' })
+    expect(screen.queryByRole('button', { name: 'Apagar produto' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: /Ritual Matinal/ }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Apagar produto' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Apagar' }))
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('foi apagado'))
+    expect(catalog.getSnapshot().some((p) => p.id === 'ritual-matinal')).toBe(false)
+    expect(backend.dayTitles.has('ritual-matinal')).toBe(false)
+    setWideViewport(false)
+  })
+
   it('formulário com erro não salva e aponta o campo', async () => {
     setWideViewport(true)
     const { backend, catalog } = setup()

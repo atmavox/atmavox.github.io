@@ -56,6 +56,18 @@ const days: Journey = {
   closingQuestions: [],
 }
 
+/** "Florescer": 5 dias em 2 partes de tamanhos diferentes. */
+const parts: Journey = {
+  id: 'florescer',
+  structure: 'parts',
+  weeks: [
+    { number: 1, roman: 'I', theme: 'Descobrindo', days: [1, 2, 3].map((n) => unit(n, `D${n}`)) },
+    { number: 2, roman: 'II', theme: 'Desabrochando', days: [4, 5].map((n) => unit(n, `D${n}`)) },
+  ],
+  reviews: [],
+  closingQuestions: [],
+}
+
 const labels = (journey: Journey) => journeyTabs(journey).map((t) => t.label)
 
 describe('abas montadas pela estrutura', () => {
@@ -86,6 +98,15 @@ describe('abas montadas pela estrutura', () => {
   it('por dias: uma aba "Dias" só', () => {
     expect(labels(days)).toEqual(['Abertura', 'Dias', 'Vitórias', 'Encerramento'])
     expect(tabOfDay(days, 5)).toBe('dias')
+  })
+
+  it('em partes: uma aba por parte, sem Revisões', () => {
+    expect(labels(parts)).toEqual(['Abertura', 'Parte 1', 'Parte 2', 'Vitórias', 'Encerramento'])
+    expect(tabOfDay(parts, 4)).toBe('parte-2')
+    expect(routeFromPath('/jornada/florescer/parte-2')).toEqual({
+      journeyId: 'florescer',
+      tab: 'parte-2',
+    })
   })
 
   it('os links das abas novas e os antigos da Chama Interna continuam valendo', () => {
@@ -137,6 +158,13 @@ describe('liberação por estrutura', () => {
     expect(isTabUnlocked('dias', days, p, { now: T0 })).toBe(true)
     expect(isDayUnlocked(days, p, 2, { now: T0 })).toBe(false)
     expect(isDayUnlocked(days, p, 2, { now: T0 + DAY_MS })).toBe(true)
+  })
+
+  it('em partes: a parte seguinte abre com o primeiro dia dela, pelo calendário', () => {
+    const p = startJourney(emptyProgress(), T0)
+    expect(isTabUnlocked('parte-1', parts, p, { now: T0 })).toBe(true)
+    expect(isTabUnlocked('parte-2', parts, p, { now: T0 + 2 * DAY_MS })).toBe(false)
+    expect(isTabUnlocked('parte-2', parts, p, { now: T0 + 3 * DAY_MS })).toBe(true)
   })
 
   it('a estrutura é lida do conteúdo publicado; sem ela, vale "por semana"', () => {

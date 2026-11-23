@@ -118,7 +118,8 @@ export function HubMagazine({
   }, [section, page, meditationId])
 
   return (
-    <div className="min-h-dvh">
+    // Coluna da altura da tela: em páginas curtas (perfil, pagamento) o rodapé fica colado embaixo.
+    <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur">
         {page && isAdmin && <AdminStrip />}
         {page ? (
@@ -352,7 +353,7 @@ export function HubMagazine({
         </main>
       )}
 
-      <footer className="border-t border-line pb-4">
+      <footer className="mt-auto border-t border-line pb-4">
         <div
           className={`${wrap} flex flex-col gap-2 py-8 md:flex-row md:items-center md:justify-between`}
         >

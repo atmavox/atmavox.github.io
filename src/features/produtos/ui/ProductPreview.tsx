@@ -1,4 +1,5 @@
 import { Clock } from 'lucide-react'
+import { cardTiles } from '../../../shared/catalog/journeyLayout'
 import { formatPrice } from '../../../shared/catalog/offer'
 import type { Product } from '../../../shared/catalog/product'
 import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
@@ -43,9 +44,9 @@ export function ProductPreview({ product }: { product: Product }) {
           {product.phrase && (
             <span className="font-display text-ink-muted italic">{product.phrase}</span>
           )}
-          {product.kind === 'journey' && product.themes.length > 0 && (
+          {product.kind === 'journey' && cardTiles(product).length > 0 && (
             <ul className="grid grid-cols-3 gap-2">
-              {product.themes.map((theme) => (
+              {cardTiles(product).map((theme) => (
                 <li
                   key={`${theme.label}-${theme.title}`}
                   className="flex aspect-square flex-col justify-between rounded-[10px] border border-line bg-[color-mix(in_oklab,var(--gold)_10%,var(--surface))] p-2 text-[0.7rem] text-ink-muted"

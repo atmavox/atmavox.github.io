@@ -8,7 +8,13 @@ import { useMediaQuery } from '../../../shared/lib/useMediaQuery'
 import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import { rememberBannerImage } from '../../../shared/ui/useBannerImage'
-import { saveProduct } from '../application/saveProduct'
+import { UiIcon } from '../../../shared/ui/UiIcon'
+import {
+  canDeleteProduct,
+  deleteProduct,
+  loadJourneySeed,
+  saveProduct,
+} from '../application/saveProduct'
 import {
   emptyForm,
   formFromProduct,
@@ -192,15 +198,18 @@ export function ProductsApp({
 
   async function open(product: Product) {
     setNotice(null)
+    setIsConfirmingDelete(false)
     setErrors({})
     setIsNew(false)
     setStep(0)
-    // Meditação: os links ficam no conteúdo protegido, lido com o login da admin.
-    const content =
-      product.kind === 'meditation'
-        ? await backend.loadMeditationContent(product.id).catch(() => null)
-        : null
-    setForm(formFromProduct(product, content ?? undefined))
+    // Meditação: os links ficam no conteúdo protegido, lido com o login da admin. Jornada: os títulos
+    // dos dias e a trava da estrutura vêm do rascunho dela (ADR-025).
+    if (product.kind === 'meditation') {
+      const content = await backend.loadMeditationContent(product.id).catch(() => null)
+      setForm(formFromProduct(product, content ?? undefined))
+    } else {
+      setForm(formFromProduct(product, undefined, await loadJourneySeed(product.id, backend)))
+    }
   }
 
   function create() {
@@ -239,6 +248,59 @@ export function ProductsApp({
   }
 
   const patch = (change: Partial<ProductForm>) => setForm((f) => (f ? { ...f, ...change } : f))
+
+  // Apagar vale para o produto como está salvo (Rascunho ou Em breve), não para o que está na tela.
+  const savedProduct = form && !isNew ? products.find((p) => p.id === form.id) : undefined
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
+
+  async function remove() {
+    if (!savedProduct) return
+    setIsSaving(true)
+    const result = await deleteProduct(savedProduct, products, backend)
+    setIsSaving(false)
+    setIsConfirmingDelete(false)
+    if (result.kind === 'error') {
+      setNotice(result.message)
+      return
+    }
+    catalog?.replace(result.catalog)
+    setProducts(result.catalog)
+    setForm(null)
+    setNotice(`"${savedProduct.title}" foi apagado.`)
+  }
+
+  const deleteControl =
+    savedProduct && canDeleteProduct(savedProduct) ? (
+      isConfirmingDelete ? (
+        <span role="group" aria-label="Confirmar" className="flex items-center gap-2 text-sm">
+          <span className="text-ink-muted">Apagar de vez?</span>
+          <button
+            type="button"
+            disabled={isSaving}
+            onClick={() => void remove()}
+            className="rounded-full bg-wine px-3.5 py-1.5 font-semibold text-on-admin hover:opacity-90"
+          >
+            Apagar
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsConfirmingDelete(false)}
+            className="rounded-full px-3 py-1.5 text-ink-muted hover:text-ink"
+          >
+            Não
+          </button>
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setIsConfirmingDelete(true)}
+          className="inline-flex items-center gap-1.5 text-sm text-ink-faint hover:text-wine"
+        >
+          <UiIcon name="trash" size={16} />
+          Apagar produto
+        </button>
+      )
+    ) : null
 
   const list = (
     <div className="flex flex-col gap-1.5 rounded-[18px] border border-line bg-surface p-3">
@@ -316,7 +378,10 @@ export function ProductsApp({
       <div className="mx-auto flex w-full max-w-6xl animate-[page-in_400ms_ease-out] flex-col gap-4.5 px-7 py-7">
         {header}
         <div className="grid grid-cols-[420px_minmax(0,1fr)] items-start gap-5.5">
-          {list}
+          {/* A lista fica parada ao lado enquanto o editor rola (abaixo da faixa azul). */}
+          <div className="sticky top-16 max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-[18px]">
+            {list}
+          </div>
           {form ? (
             <div className="flex flex-col gap-3.5">
               <ProductEditor
@@ -334,7 +399,12 @@ export function ProductsApp({
               />
               {noticeLine}
               <div className="flex flex-wrap items-center justify-end gap-2.5">
-                {contentLink && <span className="mr-auto">{contentLink}</span>}
+                {(contentLink || deleteControl) && (
+                  <span className="mr-auto flex flex-wrap items-center gap-x-5 gap-y-2">
+                    {contentLink}
+                    {deleteControl}
+                  </span>
+                )}
                 <button type="button" onClick={() => setForm(null)} className={ghostButton}>
                   Descartar
                 </button>
@@ -356,9 +426,12 @@ export function ProductsApp({
               </div>
             </div>
           ) : (
-            <p className="rounded-[18px] border border-dashed border-line p-8 text-ink-muted">
-              Escolha um produto na lista para editar, ou crie um novo.
-            </p>
+            <div className="flex flex-col gap-3">
+              {noticeLine}
+              <p className="rounded-[18px] border border-dashed border-line p-8 text-ink-muted">
+                Escolha um produto na lista para editar, ou crie um novo.
+              </p>
+            </div>
           )}
         </div>
         {isPreviewOpen && form && (
@@ -399,6 +472,7 @@ export function ProductsApp({
         {form.title || (isNew ? 'Novo produto' : 'Produto')}
       </h1>
       {contentLink}
+      {step === 0 && deleteControl}
       <p className="text-sm text-ink-faint">
         Passo {step + 1} de {steps.length} · {current.label}
       </p>

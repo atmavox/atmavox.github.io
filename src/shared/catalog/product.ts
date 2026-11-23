@@ -35,20 +35,35 @@ interface ProductBase {
   order: number
 }
 
-export type JourneyStructure = 'days' | 'weeks' | 'themes'
+/**
+ * Como a jornada se divide: dias corridos (`days`), semanas de 7 dias (`weeks`), partes com faixas de
+ * dias escolhidas pela Andreía (`parts`) ou temas sem dias (`themes`). Ver `journeyLayout.ts`.
+ */
+export type JourneyStructure = 'days' | 'weeks' | 'parts' | 'themes'
 
 export interface JourneyTheme {
   /** O que vai no canto do quadradinho: "I", "2"… */
   label: string
+  /** Nome da semana, parte ou tema (o da semana pode ficar vazio). */
   title: string
+  /** Só nas partes: o último dia da parte (a última vai sempre até o fim). */
+  lastDay?: number
 }
 
 export interface JourneyProduct extends ProductBase {
   kind: 'journey'
   structure: JourneyStructure
-  /** "21 dias", "Jornada em áudio". */
+  /** "21 dias", "4 temas": gerado pelo Modo Andreía a partir da estrutura. */
   durationLabel: string
+  /** Semanas, partes ou temas, na ordem. */
   themes: readonly JourneyTheme[]
+  /** Quantos dias (não vale para temas). Sem ele, o número escrito na duração. */
+  dayCount?: number
+  /**
+   * Títulos dos 3 primeiros dias com título, que viram os cartões do banner. São os únicos títulos de
+   * dia no catálogo (público); os outros ficam no rascunho da jornada, só para a admin.
+   */
+  previewDays?: readonly string[]
 }
 
 export interface MeditationProduct extends ProductBase {

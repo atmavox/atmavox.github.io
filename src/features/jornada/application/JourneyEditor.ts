@@ -15,6 +15,7 @@ import {
   setOpening as setOpeningIn,
   setWeekTheme as setWeekThemeIn,
 } from '../domain/journeyEditing'
+import { withDayTitles } from '../domain/journeySkeleton'
 import { parseJourney } from '../domain/parseJourney'
 import type { JourneyContent } from './JourneyContent'
 import type { MediaCache } from './MediaCache'
@@ -179,11 +180,13 @@ export function createJourneyEditor({
       try {
         const backend = await loadBackend()
         const published = content.getSnapshot()
-        const [draftJson, versions] = await Promise.all([
+        const [draftJson, versions, dayTitles] = await Promise.all([
           backend.loadDraft(journeyId),
           backend.listVersions(journeyId),
+          backend.loadDayTitles(journeyId),
         ])
-        const saved = parse(draftJson) ?? published
+        // Sem rascunho ainda: os títulos dos dias dados no produto entram nos dias vazios.
+        const saved = parse(draftJson) ?? withDayTitles(published, dayTitles ?? [])
         const working = parse(workingCopy.load(journeyId)) ?? saved
         set({ status: 'ready', published, saved, working, versions })
       } catch {

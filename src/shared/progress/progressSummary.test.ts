@@ -57,6 +57,28 @@ describe('trilha da jornada', () => {
     expect(trail.nextDay).toBeNull()
   })
 
+  it('em partes: cada trecho tem a faixa de dias da parte', () => {
+    const parts: JourneyProduct = {
+      ...chama,
+      structure: 'parts',
+      dayCount: 21,
+      themes: [
+        { label: '1', title: 'Descobrindo', lastDay: 10 },
+        { label: '2', title: 'Desabrochando' },
+      ],
+    }
+    const trail = journeyTrail(parts, {
+      completedDays: Array.from({ length: 10 }, (_, i) => i + 1),
+      reflections: 0,
+      victories: 0,
+    })
+    expect(trail.steps).toMatchObject([
+      { title: 'Descobrindo', firstDay: 1, lastDay: 10, state: 'done' },
+      { title: 'Desabrochando', firstDay: 11, lastDay: 21, state: 'next' },
+    ])
+    expect(trail.nextStep).toBe(2)
+  })
+
   it('sem começar, o primeiro trecho é o próximo', () => {
     const trail = journeyTrail(chama, { completedDays: [], reflections: 0, victories: 0 })
     expect(trail.steps.map((s) => s.state)).toEqual(['next', 'later', 'later'])

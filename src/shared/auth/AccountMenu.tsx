@@ -86,9 +86,6 @@ export function AccountMenu() {
           </a>
           {isAdmin && (
             <>
-              <a href="#/jornada/editar" onClick={() => setIsMenuOpen(false)} className={menuLink}>
-                Editar a jornada
-              </a>
               <a href="#/admin/produtos" onClick={() => setIsMenuOpen(false)} className={menuLink}>
                 Produtos e preços
               </a>

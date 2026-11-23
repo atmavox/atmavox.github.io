@@ -1,4 +1,5 @@
 // Busca e filtros do hub de jornadas (F9, mock aprovado: índice lateral por território).
+import { dayGroups } from '../../shared/catalog/journeyLayout'
 import {
   TERRITORIES,
   TERRITORY_LABELS,
@@ -68,6 +69,7 @@ function matchesQuery(journey: JourneyProduct, query: string): boolean {
     journey.phrase,
     TERRITORY_LABELS[journey.territory],
     ...journey.themes.map((t) => t.title),
+    ...(journey.previewDays ?? []),
   ]
   return haystack.some((text) => normalize(text).includes(wanted))
 }
@@ -124,9 +126,17 @@ export function hasActiveFilters(filters: JourneyFilters): boolean {
   )
 }
 
-/** "Por dias", "3 semanas", "Por temas". */
-export function structureLabel(structure: JourneyStructure, themeCount: number): string {
+/** "Por dias", "3 semanas", "2 partes", "Por temas" (`groupCount`: quantas semanas ou partes). */
+export function structureLabel(structure: JourneyStructure, groupCount: number): string {
   if (structure === 'days') return 'Por dias'
   if (structure === 'themes') return 'Por temas'
-  return themeCount > 0 ? `${themeCount} ${themeCount === 1 ? 'semana' : 'semanas'}` : 'Por semanas'
+  if (structure === 'parts') {
+    return groupCount > 0 ? `${groupCount} ${groupCount === 1 ? 'parte' : 'partes'}` : 'Por partes'
+  }
+  return groupCount > 0 ? `${groupCount} ${groupCount === 1 ? 'semana' : 'semanas'}` : 'Por semanas'
+}
+
+/** O rótulo da estrutura de uma jornada do catálogo. */
+export function journeyStructureLabel(journey: JourneyProduct): string {
+  return structureLabel(journey.structure, dayGroups(journey).length)
 }

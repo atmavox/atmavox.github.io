@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { dayStatus, type EditorState, type JourneyEditor } from '../../application/JourneyEditor'
+import { partHeading } from '../../application/navigation'
 import { allDays, structureOf, type DaySection, type JourneyDay } from '../../domain/journey'
 import {
   canRemoveDay,
@@ -78,7 +79,7 @@ export function DayEditor({ editor, state, day, onBack, onOpenDay }: DayEditorPr
     ? `Tema ${position} · ${week?.theme ?? ''}`
     : structure === 'days'
       ? `Dia ${position}`
-      : `${week ? `Semana ${week.roman} · ${week.theme} · ` : ''}Dia ${position}`
+      : `${week ? `${partHeading(state.working, week)} · ${week.theme} · ` : ''}Dia ${position}`
   const previous = days[index - 1]
   const next = days[index + 1]
   const update = (changed: JourneyDay) => editor.editDay(changed)

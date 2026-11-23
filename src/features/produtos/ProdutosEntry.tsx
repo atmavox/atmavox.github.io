@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { AdminHeader } from '../../shared/ui/AdminHeader'
 import { useAuthSession } from '../../shared/auth/AuthContext'
 import { LoginDialog } from '../../shared/auth/LoginDialog'
 import { useCatalog } from '../../shared/catalog/CatalogContext'
@@ -15,44 +16,6 @@ import {
 } from './infrastructure/accessAdmin'
 import { AccessesApp } from './ui/AccessesApp'
 import { ProductsApp } from './ui/ProductsApp'
-
-/** Faixa azul do Modo Andreía (protótipo aprovado), com as áreas dela. */
-function AdminBar({ active }: { active: 'produtos' | 'acessos' }) {
-  const link = (on: boolean) =>
-    `rounded-full px-3.5 py-1.5 ${on ? 'bg-white/18 font-medium text-on-admin' : 'text-on-admin/80 hover:text-on-admin'}`
-  return (
-    <header className="sticky top-0 z-20 flex flex-wrap items-center gap-x-4 gap-y-1 bg-admin px-5 py-2.5 text-sm text-on-admin">
-      <b className="font-semibold">Modo Andreía</b>
-      <nav aria-label="Áreas do Modo Andreía" className="flex flex-wrap gap-1">
-        <a href="#/jornada/editar" className={link(false)}>
-          Editar a jornada
-        </a>
-        <a
-          href="#/admin/produtos"
-          aria-current={active === 'produtos' ? 'page' : undefined}
-          className={link(active === 'produtos')}
-        >
-          Produtos
-        </a>
-        <a
-          href="#/admin/acessos"
-          aria-current={active === 'acessos' ? 'page' : undefined}
-          className={link(active === 'acessos')}
-        >
-          Acessos
-        </a>
-      </nav>
-      <span className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1">
-        <a href="#/jornadas" className="text-on-admin/90 hover:text-on-admin">
-          Voltar ao hub
-        </a>
-        <a href="#/" className="text-on-admin/90 hover:text-on-admin">
-          Ver o site ↗
-        </a>
-      </span>
-    </header>
-  )
-}
 
 /**
  * Porta de entrada do Modo Andreía de produtos (`#/admin/produtos`), carregada sob demanda: só a admin
@@ -151,7 +114,7 @@ export function ProdutosEntry({
 
   return (
     <div className="min-h-dvh bg-bg">
-      <AdminBar active={area} />
+      <AdminHeader active={area} />
       {body}
     </div>
   )

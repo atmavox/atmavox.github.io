@@ -108,6 +108,8 @@ Conteúdo editável (ADR-015) e papel de admin:
 ```n admins/{uid}                         # existe = é admin (criado à mão no console)
  published/{journeyId}                # content: JSON da jornada no ar; publishedAt
  drafts/{journeyId}                   # content: rascunho salvo; updatedAt
+                                      # dayTitles: JSON dos títulos dos dias dados no produto, até o
+                                      # primeiro rascunho (ADR-025; o setDoc do rascunho o descarta)
  drafts/{journeyId}/versions/{auto}   # uma cópia por publicação (histórico)
  media/{auto}                         # dataUrl: imagem WebP/JPEG reduzida; width, height (ADR-014)
 ```
@@ -142,10 +144,13 @@ interface ProductBase {
 }
 interface JourneyProduct extends ProductBase {
   kind: 'journey'
-  structure: 'days' | 'weeks' | 'themes' // "Por dias", "3 semanas", "Por temas"
-  durationLabel: string // "21 dias", "Jornada em áudio"
-  themes: { label: string; title: string }[] // os quadradinhos: I · Nomeando o Cinza…
+  structure: 'days' | 'weeks' | 'parts' | 'themes' // "Por dias", "3 semanas", "2 partes", "Por temas"
+  durationLabel: string // gerado: "21 dias", "4 temas"
+  themes: { label: string; title: string; lastDay?: number }[] // semanas, partes (com o último dia) ou temas
+  dayCount?: number // quantos dias (não vale para temas)
+  previewDays?: string[] // os 3 primeiros dias com título: cartões I, II, III do banner (ADR-025)
 }
+// Trechos de dias (semanas, partes, temas): shared/catalog/journeyLayout.ts (`dayGroups`, `cardTiles`).
 interface MeditationProduct extends ProductBase {
   kind: 'meditation'
   media: 'audio' | 'video'

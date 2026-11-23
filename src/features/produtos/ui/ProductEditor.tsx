@@ -1,9 +1,9 @@
-import { X } from 'lucide-react'
 import { TERRITORIES, TERRITORY_LABELS, type Territory } from '../../../shared/catalog/product'
 import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import type { AccessTerm, FormErrors, ProductForm } from '../domain/productForm'
 import { Field, Section, Segmented } from './fields'
+import { StructureSection } from './StructureSection'
 import { inputClass } from './styles'
 
 export type EditorPart = 'tipo' | 'conteudo' | 'preco' | 'situacao'
@@ -153,93 +153,7 @@ export function ProductEditor({
           </Section>
 
           {isJourney ? (
-            <Section title="Estrutura">
-              <Segmented
-                label="Estrutura"
-                value={form.structure}
-                options={[
-                  { id: 'days', label: 'Por dias' },
-                  { id: 'weeks', label: 'Dias + semanas' },
-                  { id: 'themes', label: 'Por temas' },
-                ]}
-                onChange={(structure) => onChange({ structure })}
-              />
-              <Field
-                label="Duração"
-                error={errors.durationLabel}
-                hint='Ex.: "21 dias" ou "Jornada em áudio".'
-              >
-                {(props) => (
-                  <input
-                    {...props}
-                    value={form.durationLabel}
-                    onChange={(e) => onChange({ durationLabel: e.target.value })}
-                    className={inputClass}
-                  />
-                )}
-              </Field>
-              <div className="flex flex-col gap-2">
-                <span className="text-sm text-ink-muted">
-                  {form.structure === 'weeks' ? 'Semanas' : 'Temas'} (os quadradinhos do cartão)
-                </span>
-                {form.themes.map((theme, index) => (
-                  <div key={index} className="grid grid-cols-[64px_1fr_36px] items-center gap-2">
-                    <input
-                      aria-label={`Número do tema ${index + 1}`}
-                      value={theme.label}
-                      onChange={(e) =>
-                        onChange({
-                          themes: form.themes.map((t, i) =>
-                            i === index ? { ...t, label: e.target.value } : t,
-                          ),
-                        })
-                      }
-                      className={inputClass}
-                    />
-                    <input
-                      aria-label={`Nome do tema ${index + 1}`}
-                      value={theme.title}
-                      onChange={(e) =>
-                        onChange({
-                          themes: form.themes.map((t, i) =>
-                            i === index ? { ...t, title: e.target.value } : t,
-                          ),
-                        })
-                      }
-                      className={inputClass}
-                    />
-                    <button
-                      type="button"
-                      aria-label={`Apagar o tema ${index + 1}`}
-                      onClick={() =>
-                        onChange({ themes: form.themes.filter((_, i) => i !== index) })
-                      }
-                      className="grid size-9 place-items-center rounded-full text-ink-faint hover:text-accent"
-                    >
-                      <X aria-hidden size={16} />
-                    </button>
-                  </div>
-                ))}
-                {errors.themes && <p className="text-sm text-accent">{errors.themes}</p>}
-                <button
-                  type="button"
-                  onClick={() =>
-                    onChange({
-                      themes: [
-                        ...form.themes,
-                        { label: String(form.themes.length + 1), title: '' },
-                      ],
-                    })
-                  }
-                  className="self-start text-sm font-semibold text-admin-ink hover:underline"
-                >
-                  + Tema
-                </button>
-                <p className="text-xs text-ink-faint">
-                  Os dias e os textos de cada dia ficam em "Editar a jornada".
-                </p>
-              </div>
-            </Section>
+            <StructureSection form={form} errors={errors} onChange={onChange} />
           ) : (
             <Section title="Mídia">
               <Segmented

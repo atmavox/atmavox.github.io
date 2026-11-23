@@ -39,11 +39,13 @@ export function Segmented<T extends string>({
   value,
   options,
   onChange,
+  disabled = false,
 }: {
   label: string
   value: T
   options: readonly { id: T; label: string }[]
   onChange: (value: T) => void
+  disabled?: boolean
 }) {
   return (
     <div
@@ -57,8 +59,9 @@ export function Segmented<T extends string>({
           type="button"
           role="radio"
           aria-checked={value === option.id}
+          disabled={disabled}
           onClick={() => onChange(option.id)}
-          className={`rounded-full px-3.5 py-1.5 text-sm ${
+          className={`rounded-full px-3.5 py-1.5 text-sm transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${
             value === option.id
               ? 'bg-admin font-medium text-on-admin'
               : 'text-ink-muted hover:text-admin-ink'

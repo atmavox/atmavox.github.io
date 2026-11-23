@@ -2,7 +2,7 @@ import { BRAND_TAB_TITLE } from '../../../../shared/brand/links'
 import { useCallback, useContext, useEffect, useState, useSyncExternalStore } from 'react'
 import type { JourneyEditor } from '../../application/JourneyEditor'
 import { allDays, structureOf } from '../../domain/journey'
-import { findDay, nextDayNumber } from '../../domain/journeyEditing'
+import { findDay } from '../../domain/journeyEditing'
 import { JourneyContext } from '../JourneyContext'
 import { useJourney } from '../useJourney'
 import { AdminBar } from './AdminBar'
@@ -75,10 +75,8 @@ function Editor({ editor }: { editor: JourneyEditor }) {
         state={state}
         onOpenDay={setOpenDay}
         onPublish={() => setIsConfirmingPublish(true)}
-        onAddDay={(weekNumber) => {
-          const created = nextDayNumber(state.working)
-          void editor.addDay(weekNumber).then(() => setOpenDay(created))
-        }}
+        // Só cria o cartão: a Andreía abre o dia quando quiser.
+        onAddDay={(weekNumber) => void editor.addDay(weekNumber)}
       />
     )
   }

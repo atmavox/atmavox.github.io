@@ -119,10 +119,13 @@ export interface JourneyWeek {
   days: readonly JourneyDay[]
 }
 
-/** Como a jornada se divide e abre (ADR-024): semanas e dias pelo calendário; temas por conclusão. */
-export type JourneyStructure = 'weeks' | 'themes' | 'days'
+/**
+ * Como a jornada se divide e abre (ADR-024): semanas, partes e dias pelo calendário; temas por
+ * conclusão. Partes são como semanas de tamanho livre (sem Revisões).
+ */
+export type JourneyStructure = 'weeks' | 'parts' | 'themes' | 'days'
 
-export const JOURNEY_STRUCTURES: readonly JourneyStructure[] = ['weeks', 'themes', 'days']
+export const JOURNEY_STRUCTURES: readonly JourneyStructure[] = ['weeks', 'parts', 'themes', 'days']
 
 export interface Question {
   fieldId: FieldId
@@ -158,25 +161,7 @@ export function structureOf(journey: Journey): JourneyStructure {
   return journey.structure ?? 'weeks'
 }
 
-/** Algarismo romano das semanas (I, II, III, IV…). */
-export function toRoman(n: number): string {
-  const table: [number, string][] = [
-    [10, 'X'],
-    [9, 'IX'],
-    [5, 'V'],
-    [4, 'IV'],
-    [1, 'I'],
-  ]
-  let rest = n
-  let out = ''
-  for (const [value, symbol] of table) {
-    while (rest >= value) {
-      out += symbol
-      rest -= value
-    }
-  }
-  return out
-}
+export { toRoman } from '../../../shared/lib/roman'
 
 export function allDays(journey: Journey): JourneyDay[] {
   return journey.weeks.flatMap((week) => week.days)

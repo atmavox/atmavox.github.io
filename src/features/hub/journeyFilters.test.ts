@@ -115,5 +115,7 @@ describe('apoio do hub', () => {
     expect(structureLabel('weeks', 3)).toBe('3 semanas')
     expect(structureLabel('days', 0)).toBe('Por dias')
     expect(structureLabel('themes', 4)).toBe('Por temas')
+    expect(structureLabel('parts', 2)).toBe('2 partes')
+    expect(structureLabel('parts', 1)).toBe('1 parte')
   })
 })

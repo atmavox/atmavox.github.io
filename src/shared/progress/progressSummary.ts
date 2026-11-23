@@ -1,5 +1,6 @@
 // Resumo do progresso de uma jornada para o perfil (`users/{uid}/journeys/{id}`), lido por REST com o
 // login. Só os números que o perfil mostra: o conteúdo das reflexões nunca sai da jornada.
+import { dayCountOf, dayGroups } from '../catalog/journeyLayout'
 import type { JourneyProduct } from '../catalog/product'
 import {
   documentsUrl,
@@ -84,15 +85,12 @@ export interface Trail {
   nextStep: number | null
 }
 
-/** "21 dias" → 21; sem número, 0. */
-const daysOf = (label: string) => Number(/(\d+)\s*dias?/i.exec(label)?.[1] ?? 0)
-
 /**
- * A trilha de uma jornada (perfil, mock aprovado): os temas do catálogo viram trechos com dias iguais
- * (21 dias em 3 semanas = 7 cada). Feito, o próximo (onde está o primeiro dia não feito) e os depois.
+ * A trilha de uma jornada (perfil, mock aprovado): as semanas, partes ou temas do catálogo viram
+ * trechos com as faixas de dias deles. Feito, o próximo (onde está o primeiro dia não feito) e os depois.
  */
 export function journeyTrail(journey: JourneyProduct, progress: ProgressSummary): Trail {
-  const totalDays = daysOf(journey.durationLabel)
+  const totalDays = dayCountOf(journey)
   const done = new Set(progress.completedDays.filter((d) => d <= totalDays))
   let nextDay: number | null = null
   for (let day = 1; day <= totalDays; day += 1) {
@@ -101,19 +99,19 @@ export function journeyTrail(journey: JourneyProduct, progress: ProgressSummary)
       break
     }
   }
-  const themes = journey.themes.length > 0 ? journey.themes : [{ label: '', title: journey.title }]
-  const perStep = Math.max(1, Math.ceil(totalDays / themes.length))
+  // Dias corridos: um trecho só, com o nome da jornada.
+  const groups = dayGroups(journey).map((group) =>
+    journey.structure === 'days' ? { ...group, title: journey.title } : group,
+  )
   let nextStep: number | null = null
-  const steps = themes.map((theme, index) => {
-    const firstDay = index * perStep + 1
-    const lastDay = Math.min(totalDays, (index + 1) * perStep)
+  const steps = groups.map(({ label, title, firstDay, lastDay }, index) => {
     let doneDays = 0
     for (let day = firstDay; day <= lastDay; day += 1) if (done.has(day)) doneDays += 1
     const isNext = nextDay !== null && nextDay >= firstDay && nextDay <= lastDay
     if (isNext) nextStep = index + 1
     const state: StepState =
       doneDays === lastDay - firstDay + 1 ? 'done' : isNext ? 'next' : 'later'
-    return { label: theme.label, title: theme.title, state, firstDay, lastDay, doneDays }
+    return { label, title, state, firstDay, lastDay, doneDays }
   })
   return { steps, totalDays, doneDays: done.size, nextDay, nextStep }
 }

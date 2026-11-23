@@ -1,21 +1,30 @@
 // O formulário de produto do Modo Andreía (mock aprovado): tudo em texto, como a Andreía digita, e a
 // conversão de/para o produto do catálogo (ADR-019), com as validações em português.
+import { dayCountOf, dayGroups, durationLabelOf } from '../../../shared/catalog/journeyLayout'
 import { parseCatalog } from '../../../shared/catalog/parseCatalog'
-import type {
-  JourneyStructure,
-  Product,
-  ProductStatus,
-  Territory,
-} from '../../../shared/catalog/product'
+import type { Product, ProductStatus, Territory } from '../../../shared/catalog/product'
+import {
+  listItem,
+  normalizeStructure,
+  previewDaysOf,
+  structureOf,
+  themesOf,
+  type ListItem,
+  type PartItem,
+  type StructureForm,
+} from './structureForm'
 
 export type AccessTerm = 'forever' | '1' | '3' | '6' | '12'
 
-export interface ThemeForm {
-  label: string
-  title: string
+/** O que o produto sabe do conteúdo da jornada ao abrir (rascunho em `drafts/{id}`, ADR-025). */
+export interface JourneySeed {
+  /** Títulos dos dias guardados no rascunho; null se não há. */
+  dayTitles: string[] | null
+  /** A jornada já tem conteúdo no editor: a estrutura só muda lá. */
+  locked: boolean
 }
 
-export interface ProductForm {
+export interface ProductForm extends StructureForm {
   /** Vazio enquanto é novo: o id nasce do nome ao salvar a primeira vez e nunca mais muda. */
   id: string
   kind: 'journey' | 'meditation'
@@ -30,11 +39,11 @@ export interface ProductForm {
   /** "97,00" */
   price: string
   access: AccessTerm
-  // Jornada
-  structure: JourneyStructure
-  /** "21 dias" */
-  durationLabel: string
-  themes: ThemeForm[]
+  // Jornada (a estrutura vem de `StructureForm`)
+  /** Os cartões do banner que já estão no catálogo (valem enquanto a estrutura está travada). */
+  previewDays: string[]
+  /** A jornada já tem conteúdo no editor: duração, divisões e nomes só mudam lá (ADR-025). */
+  structureLocked: boolean
   // Meditação
   media: 'audio' | 'video'
   /** Minutos, em texto ("15"). */
@@ -53,8 +62,10 @@ export interface MeditationContent {
   ebookUrl?: string
 }
 
+const NEW_JOURNEY_DAYS = 21
+
 export function emptyForm(kind: ProductForm['kind'], order: number): ProductForm {
-  return {
+  return normalizeStructure({
     id: '',
     kind,
     title: '',
@@ -67,16 +78,22 @@ export function emptyForm(kind: ProductForm['kind'], order: number): ProductForm
     paid: false,
     price: '',
     access: '12',
-    structure: 'days',
-    durationLabel: '',
+    layout: 'days',
+    split: 'none',
+    dayCount: NEW_JOURNEY_DAYS,
+    weeks: [],
+    parts: [],
     themes: [],
+    dayTitles: [],
+    previewDays: [],
+    structureLocked: false,
     media: 'audio',
     minutes: '',
     group: '',
     mediaUrl: '',
     ebookUrl: '',
     ebookPages: '',
-  }
+  })
 }
 
 /** "Saindo do Estado Cinza!" → "saindo-do-estado-cinza". */
@@ -116,7 +133,11 @@ export function youtubeIdOf(url: string): string | null {
 
 const HTTPS = /^https:\/\/\S+$/i
 
-export function formFromProduct(product: Product, content?: MeditationContent): ProductForm {
+export function formFromProduct(
+  product: Product,
+  content?: MeditationContent,
+  seed?: JourneySeed,
+): ProductForm {
   const base = emptyForm(product.kind, product.order)
   const pricing = product.pricing
   const shared: ProductForm = {
@@ -138,12 +159,26 @@ export function formFromProduct(product: Product, content?: MeditationContent): 
         : '12',
   }
   if (product.kind === 'journey') {
-    return {
+    const { structure } = product
+    const items = (titles: readonly { title: string }[]): ListItem[] =>
+      titles.map((t) => listItem(t.title))
+    const parts: PartItem[] =
+      structure === 'parts'
+        ? dayGroups(product).map((g) => ({ ...listItem(g.title), lastDay: g.lastDay }))
+        : []
+    return normalizeStructure({
       ...shared,
-      structure: product.structure,
-      durationLabel: product.durationLabel,
-      themes: product.themes.map((t) => ({ ...t })),
-    }
+      layout: structure === 'themes' ? 'themes' : 'days',
+      split: structure === 'weeks' || structure === 'parts' ? structure : 'none',
+      dayCount:
+        structure === 'themes' ? (product.dayCount ?? NEW_JOURNEY_DAYS) : dayCountOf(product),
+      weeks: structure === 'weeks' ? items(product.themes) : [],
+      parts,
+      themes: structure === 'themes' ? items(product.themes) : [],
+      dayTitles: (seed?.dayTitles ?? []).map((title) => listItem(title)),
+      previewDays: [...(product.previewDays ?? [])],
+      structureLocked: seed?.locked ?? false,
+    })
   }
   return {
     ...shared,
@@ -172,10 +207,17 @@ export function validateForm(form: ProductForm, takenIds: readonly string[]): Fo
     errors.price = 'Digite o preço em reais, por exemplo 97,00.'
   }
   if (form.kind === 'journey') {
-    if (!/\S/.test(form.durationLabel))
-      errors.durationLabel = 'Diga a duração, por exemplo "21 dias".'
-    if (form.themes.some((t) => !t.label.trim() || !t.title.trim())) {
-      errors.themes = 'Cada tema precisa de número e nome (ou apague o tema vazio).'
+    const structure = structureOf(form)
+    if (structure === 'themes') {
+      if (form.themes.length === 0) errors.themes = 'Adicione pelo menos um tema.'
+      else if (form.themes.some((t) => !t.title.trim())) {
+        errors.themes = 'Cada tema precisa de um nome (ou apague o tema vazio).'
+      }
+    } else if (!Number.isInteger(form.dayCount) || form.dayCount < 1 || form.dayCount > 99) {
+      errors.dayCount = 'A duração vai de 1 a 99 dias.'
+    }
+    if (structure === 'parts' && form.parts.some((p) => !p.title.trim())) {
+      errors.parts = 'Cada parte precisa de um nome.'
     }
   } else {
     const minutes = Number(form.minutes)
@@ -228,12 +270,23 @@ export function productFromForm(form: ProductForm): Product {
     order: form.order,
   }
   if (form.kind === 'journey') {
+    const structure = structureOf(form)
+    const themes = themesOf(form)
+    const isThemes = structure === 'themes'
+    // Travada, a lista de títulos não foi lida do rascunho: ficam os cartões que já estavam.
+    const previewDays = isThemes
+      ? []
+      : form.structureLocked
+        ? form.previewDays
+        : previewDaysOf(form)
     return {
       ...base,
       kind: 'journey',
-      structure: form.structure,
-      durationLabel: form.durationLabel.trim(),
-      themes: form.themes.map((t) => ({ label: t.label.trim(), title: t.title.trim() })),
+      structure,
+      durationLabel: durationLabelOf(structure, form.dayCount, themes.length),
+      themes,
+      ...(isThemes ? {} : { dayCount: form.dayCount }),
+      ...(previewDays.length > 0 ? { previewDays } : {}),
     }
   }
   const pages = Number(form.ebookPages)

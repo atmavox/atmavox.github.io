@@ -378,6 +378,50 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ ritmo diário de verdade, regra pura e testada, sem custo. ➖ a hora vem do
   relógio do aparelho: quem adiantar o relógio abre antes (aceito, como a proteção leve do ADR-020).
 
+## ADR-025 · Jornada em partes e títulos dos dias fora do catálogo
+
+- **Status:** aceita · 2026-11-23 (mock `Downloads/atmavox-estrutura-produto-v2.html`, aprovado)
+- **Contexto:** a Andreía quer dividir os dias em partes de tamanho livre ("Parte 1 · Descobrindo você
+  mesma", dias 1 a 10; "Parte 2 · Desabrochando", 11 a 21) e dar título a cada dia já no cadastro do
+  produto. Os 3 primeiros dias com título viram os cartões do banner (I, II, III). O catálogo é público
+  (ADR-019): tudo o que está nele pode ser lido sem comprar.
+- **Decisão:**
+  - Estrutura nova `parts` no catálogo e na jornada. No produto, cada parte é um item de `themes` com
+    `lastDay` (a última vai até o fim); a jornada guarda as partes como `weeks` de tamanhos livres, com
+    abas `parte-N`, dias pelo calendário (como as semanas) e **sem Revisões**.
+  - O produto ganha `dayCount` (número) e a duração passa a ser gerada ("21 dias", "4 temas").
+    `shared/catalog/journeyLayout.ts` é a fonte única dos trechos de dias (`dayGroups`): hub, perfil e
+    esqueleto da jornada usam a mesma conta.
+  - **Títulos dos dias:** no catálogo vão só os 3 do banner (`previewDays`). A lista inteira vai para
+    `drafts/{id}`, campo `dayTitles` (JSON), que só a admin lê. O editor da jornada usa esses títulos ao
+    montar os dias enquanto não há rascunho (`withDayTitles`, só em dias intocados).
+  - Quando o editor da jornada salva qualquer coisa (`drafts/{id}.content`) ou a jornada é publicada, a
+    estrutura **trava** no produto: duração, divisões, ordem e nomes passam a mudar só em "Editar a
+    jornada".
+- **Alternativas consideradas:** todos os títulos no catálogo (mais simples, mas ficariam legíveis sem
+  comprar); o Modo Andreía de produtos gravar a jornada inteira no rascunho (exigiria que `produtos`
+  conhecesse o formato da jornada); partes como semanas com Revisões (as revisões são fixas por semana).
+- **Consequências:** ➕ partes e títulos sem expor o conteúdo; uma conta só para os trechos de dias.
+  ➖ depois da trava, títulos mudados no editor da jornada não atualizam os cartões do banner sozinhos
+  (ficam os do último "Salvar" do produto).
+
+## ADR-026 · Arrastar para ordenar próprio, com pointer events
+
+- **Status:** aceita · 2026-11-23
+- **Contexto:** o quadro de dias usava o arrastar nativo do HTML (`draggable`), que não funciona com o
+  dedo. A Estrutura do produto precisa de ordenar semanas, partes, temas e títulos no computador e no
+  celular ("segurar o cartão em qualquer lugar"), com animação suave.
+- **Decisão:** um motor pequeno em `shared/ui/sortable.ts` (+ `useSortable`), sem biblioteca: pointer
+  events para mouse e dedo; puxador arrasta na hora; no celular, segurar 450 ms sem mexer ativa o
+  arrastar (mexer antes é rolar a página); setas do teclado no puxador; o lugar de soltar é o mais
+  perto do centro (serve para lista e grade); os outros escorregam e, ao soltar, tudo desliza (FLIP).
+  Quando a lista muda por fora (item criado ou apagado), os vizinhos também deslizam e o novo aparece
+  suave. Respeita `prefers-reduced-motion`.
+- **Alternativas consideradas:** dnd-kit (bom, mas mais uma dependência para um uso simples);
+  manter o `draggable` (sem toque).
+- **Consequências:** ➕ funciona no celular, sem dependência, um jeito só no site todo. ➖ código
+  próprio para manter; o "segurar" precisa ser conferido em aparelhos reais.
+
 ---
 
 ## Modelo

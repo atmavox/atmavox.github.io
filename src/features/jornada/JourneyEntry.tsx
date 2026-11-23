@@ -1,6 +1,7 @@
 import { useContext, useState, type ReactNode } from 'react'
 import { AuthContext } from '../../shared/auth/AuthContext'
 import { isJourney, useCatalog } from '../../shared/catalog/CatalogContext'
+import { dayGroups } from '../../shared/catalog/journeyLayout'
 import { DEFAULT_JOURNEY_ID, journeyIdFromPath } from './application/navigation'
 import { createJourneySkeleton } from './domain/journeySkeleton'
 import type { Journey } from './domain/journey'
@@ -37,17 +38,14 @@ export function JourneyEntry({ path, loginBackground }: EntryProps) {
   const journeyId = journeyIdFromPath(path)
   const product = useCatalog().find(journeyId)
   const journeyProduct = product && isJourney(product) ? product : null
+  const structure = journeyProduct?.structure ?? 'days'
+  const groups = journeyProduct ? dayGroups(journeyProduct) : []
   const newJourney =
     journeyId === DEFAULT_JOURNEY_ID
       ? null
-      : createJourneySkeleton({
-          id: journeyId,
-          structure: journeyProduct?.structure ?? 'days',
-          durationLabel: journeyProduct?.durationLabel ?? '',
-          themeTitles: journeyProduct?.themes.map((t) => t.title) ?? [],
-        })
+      : createJourneySkeleton({ id: journeyId, structure, groups })
   // A estrutura entra na chave: se o catálogo chega depois (ou muda), o esqueleto é refeito.
-  const key = `${journeyId}:${journeyProduct?.structure ?? ''}:${journeyProduct?.durationLabel ?? ''}:${journeyProduct?.themes.length ?? 0}`
+  const key = `${journeyId}:${structure}:${JSON.stringify(groups)}`
   return (
     <JourneyServicesProvider
       key={key}

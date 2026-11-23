@@ -1,6 +1,7 @@
 // Lê o catálogo vindo de fora (Firestore). Um produto com forma errada fica de fora sem derrubar os
 // outros: a vitrine continua de pé. Só uma lista que nem é lista devolve null (o site usa o catálogo
 // do código).
+import { MAX_DAY_COUNT, PREVIEW_DAY_COUNT } from './journeyLayout'
 import {
   TERRITORIES,
   type JourneyProduct,
@@ -26,7 +27,7 @@ const oneOf = <T extends string>(options: readonly T[], value: unknown): T | und
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/
 const STATUSES: readonly ProductStatus[] = ['draft', 'soon', 'published']
-const STRUCTURES: readonly JourneyStructure[] = ['days', 'weeks', 'themes']
+const STRUCTURES: readonly JourneyStructure[] = ['days', 'weeks', 'parts', 'themes']
 
 function parsePricing(raw: unknown): Pricing | undefined {
   if (!isObject(raw)) return undefined
@@ -38,11 +39,23 @@ function parsePricing(raw: unknown): Pricing | undefined {
   return { type: 'paid', priceCents, accessMonths }
 }
 
+/** O nome da semana pode ficar vazio (o cartão mostra "Semana II"); o rótulo, não. */
 function parseTheme(raw: unknown): JourneyTheme | undefined {
   if (!isObject(raw)) return undefined
   const label = str(raw.label)
-  const title = str(raw.title)
-  return label && title ? { label, title } : undefined
+  const title = typeof raw.title === 'string' ? raw.title : undefined
+  if (!label || title === undefined) return undefined
+  const lastDay = positiveInt(raw.lastDay)
+  return { label, title, ...(lastDay ? { lastDay } : {}) }
+}
+
+/** Até 3 títulos de dia, sem vazios; nada disso, o campo some. */
+function parsePreviewDays(raw: unknown): string[] | undefined {
+  if (!Array.isArray(raw)) return undefined
+  const titles = raw
+    .filter((title): title is string => typeof title === 'string' && title.trim() !== '')
+    .slice(0, PREVIEW_DAY_COUNT)
+  return titles.length > 0 ? titles : undefined
 }
 
 function parseProduct(raw: unknown): Product | undefined {
@@ -75,12 +88,16 @@ function parseProduct(raw: unknown): Product | undefined {
     if (!structure || !durationLabel || !themes || themes.some((t) => t === undefined)) {
       return undefined
     }
+    const dayCount = positiveInt(raw.dayCount)
+    const previewDays = parsePreviewDays(raw.previewDays)
     const journey: JourneyProduct = {
       ...base,
       kind: 'journey',
       structure,
       durationLabel,
       themes: themes as JourneyTheme[],
+      ...(dayCount && dayCount <= MAX_DAY_COUNT ? { dayCount } : {}),
+      ...(previewDays ? { previewDays } : {}),
     }
     return journey
   }

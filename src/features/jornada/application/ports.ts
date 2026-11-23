@@ -51,6 +51,8 @@ export interface VersionSummary {
  */
 export interface JourneyEditorBackend {
   loadDraft(journeyId: string): Promise<string | null>
+  /** Títulos dos dias dados no Modo Andreía de produtos, antes do primeiro rascunho (dayTitles.ts). */
+  loadDayTitles(journeyId: string): Promise<string[] | null>
   saveDraft(journeyId: string, json: string): Promise<void>
   /** Grava a versão publicada e guarda uma cópia no histórico. */
   publish(journeyId: string, json: string): Promise<void>

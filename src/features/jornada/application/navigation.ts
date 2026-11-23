@@ -1,12 +1,14 @@
 import { structureOf, type Journey, type JourneyWeek } from '../domain/journey'
 
 /**
- * Abas da jornada. As partes mudam com a estrutura: `semana-N` (por semana), `tema-N` (por tema) ou
- * `dias` (por dias). Os links antigos `semana-1..3` da Chama Interna continuam valendo.
+ * Abas da jornada. As partes mudam com a estrutura: `semana-N` (por semana), `parte-N` (em partes),
+ * `tema-N` (por tema) ou `dias` (por dias). Os links antigos `semana-1..3` da Chama Interna continuam
+ * valendo.
  */
 export type JourneyTabId =
   | 'abertura'
   | `semana-${number}`
+  | `parte-${number}`
   | `tema-${number}`
   | 'dias'
   | 'revisoes'
@@ -50,18 +52,26 @@ export function journeyIdFromPath(path: string): string {
   return editorJourneyId(path) ?? routeFromPath(path).journeyId
 }
 
-/** A aba de uma parte (semana, tema ou o bloco de dias). */
+/** A aba de uma parte (semana, parte, tema ou o bloco de dias). */
 export function partTabId(journey: Journey, part: JourneyWeek): JourneyTabId {
   const structure = structureOf(journey)
   if (structure === 'days') return 'dias'
+  if (structure === 'parts') return `parte-${part.number}`
   return structure === 'themes' ? `tema-${part.number}` : `semana-${part.number}`
 }
 
-function partLabel(journey: Journey, part: JourneyWeek): string {
+/** "Semana II", "Parte 1" ou "Dias" (o cabeçalho da aba e do quadro do editor). */
+export function partHeading(journey: Journey, part: JourneyWeek): string {
   const structure = structureOf(journey)
   if (structure === 'days') return 'Dias'
-  if (structure === 'themes') return part.theme.trim() || `Tema ${part.number}`
+  if (structure === 'parts') return `Parte ${part.number}`
+  if (structure === 'themes') return `Tema ${part.number}`
   return `Semana ${part.roman}`
+}
+
+function partLabel(journey: Journey, part: JourneyWeek): string {
+  if (structureOf(journey) === 'themes') return part.theme.trim() || `Tema ${part.number}`
+  return partHeading(journey, part)
 }
 
 /** As abas desta jornada, na ordem em que se abrem. Revisões só existem na jornada por semanas. */
@@ -101,7 +111,8 @@ const FIXED_TABS: ReadonlySet<string> = new Set([
 ])
 
 const isTabId = (segment: string | undefined): segment is JourneyTabId =>
-  segment !== undefined && (FIXED_TABS.has(segment) || /^(semana|tema)-[1-9]\d?$/.test(segment))
+  segment !== undefined &&
+  (FIXED_TABS.has(segment) || /^(semana|parte|tema)-[1-9]\d?$/.test(segment))
 
 export interface JourneyRoute {
   journeyId: string

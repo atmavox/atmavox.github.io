@@ -10,6 +10,43 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.18.0] · 2026-11-23
+
+### Adicionado
+
+- Jornada **em partes** (ADR-025): faixas de dias de tamanho livre ("Parte 1 · Descobrindo você mesma",
+  dias 1 a 10), uma aba por parte, dias pelo calendário e sem Revisões. Hub, perfil e esqueleto da
+  jornada usam a mesma conta dos trechos de dias (`shared/catalog/journeyLayout.ts`).
+- Cartões do banner com os **3 primeiros dias com título** (I, II, III); sem títulos, as semanas,
+  partes ou temas, como antes.
+- Títulos dos dias dados no produto entram nos dias vazios de uma jornada nova, no editor. Ficam no
+  rascunho da jornada (só a admin lê); no catálogo, só os 3 do banner.
+- Modo Andreía de produtos, bloco **Estrutura** (mock v2 aprovado): "Por dias" (sem divisão, em
+  semanas, em partes) ou "Por temas"; duração em número com − e + (por temas, sem duração); semanas que
+  aparecem sozinhas a cada 7 dias; partes com "termina no dia"; títulos dos dias (opcional). Numeração
+  automática pela posição, em trilha. Trava com aviso quando a jornada já tem conteúdo no editor.
+- **Arrastar para ordenar** (`shared/ui/sortable.ts`, ADR-026): puxador à esquerda e setas no
+  computador; no celular, segurar o item em qualquer lugar; setas do teclado. Os outros abrem espaço e
+  tudo desliza ao soltar. Vale na Estrutura e no quadro de dias do editor (agora funciona com o dedo).
+- Apagar produto que não está publicado (Rascunho ou Em breve), com confirmação.
+
+### Alterado
+
+- Cabeçalho único do Modo Andreía (produtos, acessos e editor da jornada): Produtos · Acessos, "Voltar
+  ao hub" e "Ver o site" com ícones. Sem "Editar a jornada" solto na faixa dos hubs e no menu da conta
+  (não dizia qual jornada); cada jornada se edita pelo produto. "← Produtos" acima do título no editor.
+- Por semana, o dia novo depois de uma semana cheia abre a semana seguinte (o dia 22 vira Semana IV).
+- "Novo dia" só cria o cartão (não abre mais a edição). Dia e semana entram e saem com transição suave.
+- Campos de texto do editor da jornada mais evidentes (mock `Downloads/atmavox-campos-editaveis.html`,
+  faixa azul da opção D + lápis da opção B): faixa azul à esquerda e lápis ao lado; vazios, com fundo
+  azul claro e o exemplo em itálico.
+- Lista de produtos fica parada ao lado enquanto o editor rola (computador).
+
+### Corrigido
+
+- Rodapé sempre no fim da página no computador, mesmo em páginas curtas (perfil, pagamento).
+- O dia sozinho na última semana pode ser apagado (a semana sai junto).
+
 ## [1.17.1] · 2026-11-23
 
 ### Corrigido

@@ -57,6 +57,13 @@ export class InMemoryEditorBackend implements JourneyEditorBackend {
     return this.drafts.get(journeyId) ?? null
   }
 
+  readonly dayTitles = new Map<string, string[]>()
+
+  async loadDayTitles(journeyId: string) {
+    this.check()
+    return this.dayTitles.get(journeyId) ?? null
+  }
+
   async saveDraft(journeyId: string, json: string) {
     this.check()
     this.drafts.set(journeyId, json)

@@ -13,6 +13,7 @@ import {
   writeBatch,
   type Firestore,
 } from 'firebase/firestore/lite'
+import { DAY_TITLES_FIELD, parseDayTitles } from '../../../../shared/catalog/dayTitles'
 import type { FirebaseConfig } from '../../../../shared/firebase/config'
 import { getFirebaseApp } from '../../../../shared/firebase/firebaseApp'
 import type {
@@ -76,6 +77,11 @@ function createEditorBackend(db: Firestore): JourneyEditorBackend {
     async loadDraft(journeyId) {
       const snapshot = await getDoc(doc(db, 'drafts', journeyId))
       return snapshot.exists() ? contentOf(snapshot.data()) : null
+    },
+    async loadDayTitles(journeyId) {
+      const snapshot = await getDoc(doc(db, 'drafts', journeyId))
+      const value: unknown = snapshot.exists() ? snapshot.get(DAY_TITLES_FIELD) : null
+      return parseDayTitles(typeof value === 'string' ? value : null)
     },
     async saveDraft(journeyId, json) {
       await setDoc(doc(db, 'drafts', journeyId), { content: json, updatedAt: Date.now() })

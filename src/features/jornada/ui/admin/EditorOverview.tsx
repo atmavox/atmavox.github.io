@@ -1,4 +1,6 @@
-import { useCallback, useState, type KeyboardEvent } from 'react'
+import { useCallback, useState } from 'react'
+import { useMediaQuery } from '../../../../shared/lib/useMediaQuery'
+import { useSortable } from '../../../../shared/ui/useSortable'
 import {
   dayStatus,
   draftDayCount,
@@ -53,13 +55,31 @@ function WeekHeading({
       </h2>
     )
   }
-  const prefix = structure === 'themes' ? `Tema ${position}` : `Semana ${week.roman}`
+  const prefix =
+    structure === 'themes'
+      ? `Tema ${position}`
+      : structure === 'parts'
+        ? `Parte ${position}`
+        : `Semana ${week.roman}`
   return (
     <h2 className="mb-2.5 flex items-center gap-2.5 text-[13px] font-semibold tracking-[0.2em] text-accent uppercase">
       <span className="shrink-0">{prefix} ·</span>
       <InlineText
         singleLine
-        label={structure === 'themes' ? `Nome do ${prefix}` : `Tema da ${prefix}`}
+        label={
+          structure === 'themes'
+            ? `Nome do ${prefix}`
+            : structure === 'parts'
+              ? `Nome da ${prefix}`
+              : `Tema da ${prefix}`
+        }
+        placeholder={
+          structure === 'themes'
+            ? 'Nome do tema'
+            : structure === 'parts'
+              ? 'Nome da parte'
+              : 'Tema da semana'
+        }
         value={theme}
         onChange={setTheme}
         onBlur={() => {
@@ -97,16 +117,141 @@ function OpeningField({ editor, value }: { editor: JourneyEditor; value: string 
   )
 }
 
+/** Quanto o cartão apagado leva para sumir (o mesmo tempo da transição dele). */
+const LEAVE_MS = 280
+
+interface WeekCardsProps {
+  week: JourneyWeek
+  weekIndex: number
+  editor: JourneyEditor
+  state: EditorState
+  positions: ReadonlyMap<number, number>
+  isThemes: boolean
+  isLastWeek: boolean
+  onOpenDay: (dayNumber: number) => void
+  onAddDay: (weekNumber: number) => void
+  onRemove: (day: JourneyDay) => void
+  /** O dia que está sendo apagado: some devagar antes de sair da lista. */
+  leavingDay: number | null
+}
+
+/**
+ * Os cartões de uma semana (ou parte). Arrastar muda a ordem dentro dela: pelo puxador no computador,
+ * segurando o cartão no celular, ou com as setas do teclado no puxador. O número do dia acompanha a
+ * posição; as respostas continuam presas ao dia.
+ */
+function WeekCards({
+  week,
+  weekIndex,
+  editor,
+  state,
+  positions,
+  isThemes,
+  isLastWeek,
+  onOpenDay,
+  onAddDay,
+  onRemove,
+  leavingDay,
+}: WeekCardsProps) {
+  const isWide = useMediaQuery('(min-width: 900px)')
+  const unit = isThemes ? 'tema' : 'dia'
+  const sortable = useSortable({
+    ids: week.days.map((day) => String(day.number)),
+    onMove: (from, to) => {
+      const day = week.days[from]
+      if (day) void editor.moveDay(day.number, to - from)
+    },
+    // Por tema, cada tema tem um conteúdo só: nada de arrastar nem apagar.
+    disabled: isThemes || state.isBusy,
+  })
+
+  return (
+    <ol className="grid grid-cols-2 gap-2.5 lg:grid-cols-7">
+      {week.days.map((day) => {
+        const status = dayStatus(state, day.number)
+        const position = positions.get(day.number) ?? 0
+        const id = String(day.number)
+        return (
+          <li
+            key={day.number}
+            {...sortable.itemProps(id, !isWide && !isThemes)}
+            className={`flex min-h-37.5 flex-col gap-2 rounded-[18px] border bg-surface px-3 pt-3 pb-2.5 transition-[box-shadow,background-color,opacity,scale] duration-300 [-webkit-touch-callout:none] hover:shadow-[0_6px_18px_rgb(0_0_0/0.08)] motion-reduce:transition-none data-[dragging=true]:z-10 data-[dragging=true]:shadow-[0_14px_32px_rgb(20_14_10/0.24)] data-[dragging=true]:outline data-[dragging=true]:outline-admin/45 data-[pressing=true]:bg-admin/10 ${
+              status === 'draft' ? 'border-draft/45' : 'border-line'
+            } ${leavingDay === day.number ? 'pointer-events-none scale-90 opacity-0' : ''}`}
+          >
+            <span className="flex items-center justify-between font-display text-[28px] leading-none text-accent">
+              {String(isThemes ? weekIndex + 1 : position).padStart(2, '0')}
+              <span className={`flex items-center gap-1 ${isThemes ? 'hidden' : ''}`}>
+                <button
+                  type="button"
+                  aria-label={`Apagar dia ${position}: ${day.title}`}
+                  title={
+                    canRemoveDay(state.working, day.number)
+                      ? 'Apagar dia'
+                      : 'Cada semana precisa de pelo menos um dia'
+                  }
+                  disabled={!canRemoveDay(state.working, day.number) || state.isBusy}
+                  onClick={() => onRemove(day)}
+                  className="grid size-7 place-items-center rounded-full text-ink-faint hover:bg-wine/10 hover:text-wine disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-ink-faint"
+                >
+                  <EditorIcon name="trash" size={15} />
+                </button>
+                <button
+                  type="button"
+                  {...sortable.handleProps(id)}
+                  aria-label={`Arrastar dia ${position} (ou use as setas do teclado)`}
+                  className={
+                    isWide
+                      ? 'grid size-7 cursor-grab touch-none place-items-center rounded-full text-ink-faint hover:bg-admin/10 hover:text-admin-ink active:cursor-grabbing'
+                      : 'sr-only'
+                  }
+                >
+                  <EditorIcon name="grip" size={16} />
+                </button>
+              </span>
+            </span>
+            <span className="flex-1 text-sm leading-snug text-ink">
+              {isThemes ? week.theme || day.title : day.title}
+            </span>
+            <StatusTag status={status} className="self-start" />
+            <button
+              type="button"
+              onClick={() => onOpenDay(day.number)}
+              aria-label={`Editar ${unit} ${isThemes ? weekIndex + 1 : position}: ${isThemes ? week.theme : day.title}`}
+              className={`${btn} justify-center px-2.5 py-1.5 text-[13px]`}
+            >
+              {isThemes ? 'Editar tema' : 'Editar dia'}
+            </button>
+          </li>
+        )
+      })}
+      {!isThemes && isLastWeek && (
+        // Registrado no arrastar só para deslizar junto quando um dia entra ou sai.
+        <li {...sortable.itemProps('novo-dia')}>
+          <button
+            type="button"
+            disabled={state.isBusy}
+            onClick={() => onAddDay(week.number)}
+            className="grid h-full min-h-37.5 w-full place-items-center rounded-[18px] border-[1.5px] border-dashed border-line text-sm text-ink-faint hover:border-admin-ink hover:text-admin-ink"
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <EditorIcon name="plus" size={18} /> Novo dia
+            </span>
+          </button>
+        </li>
+      )}
+    </ol>
+  )
+}
+
 /** Quadro de todos os dias: cartões por semana, arrastar para reordenar, "Publicar" só aqui. */
 export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }: OverviewProps) {
   const structure = structureOf(state.working)
   const isThemes = structure === 'themes'
-  const unit = isThemes ? 'tema' : 'dia'
   const product = useCatalog().find(state.working.id)
   const isChama = state.working.id === DEFAULT_JOURNEY_ID
-  const [dragging, setDragging] = useState<number | null>(null)
-  const [over, setOver] = useState<number | null>(null)
   const [removing, setRemoving] = useState<JourneyDay | null>(null)
+  const [leavingDay, setLeavingDay] = useState<number | null>(null)
   const cancelRemove = useCallback(() => setRemoving(null), [setRemoving])
   const days = allDays(state.working)
   const positions = new Map(days.map((day, index) => [day.number, index + 1]))
@@ -115,33 +260,24 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
   const blocker = publishBlocker(state)
   const lastWeek = state.working.weeks.at(-1)?.number
 
-  /** Solta um cartão sobre outro da mesma semana: ocupa o lugar dele. */
-  function drop(week: JourneyWeek, targetNumber: number) {
-    if (dragging === null || dragging === targetNumber) return
-    const from = week.days.findIndex((d) => d.number === dragging)
-    const to = week.days.findIndex((d) => d.number === targetNumber)
-    if (from !== -1 && to !== -1) void editor.moveDay(dragging, to - from)
-  }
-
-  // Teclado: as setas no "puxador" movem o dia (o arrastar com mouse não serve para todo mundo).
-  function onGripKey(event: KeyboardEvent, dayNumber: number) {
-    const delta = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[event.key]
-    if (delta === undefined) return
-    event.preventDefault()
-    void editor.moveDay(dayNumber, delta)
-  }
-
   return (
     <div className="pt-6 pb-24">
       <div className="mb-4.5 flex flex-wrap items-end justify-between gap-4">
         <div>
+          <a
+            href="#/admin/produtos"
+            className="mb-1.5 inline-flex items-center gap-1 text-sm text-ink-muted hover:text-admin-ink"
+          >
+            <EditorIcon name="back" size={16} />
+            Produtos
+          </a>
           <h1 className="font-display text-[32px] text-ink">
             {product?.title ?? 'A Chama Interna'}
           </h1>
           <p className="mt-1.5 mb-2.5 text-ink-muted">
             {isThemes
               ? 'Clique num tema para editar o conteúdo dele.'
-              : 'Clique num dia para editar. Arraste os cartões para mudar a ordem.'}
+              : 'Clique num dia para editar. Arraste os cartões para mudar a ordem (no celular, segure o cartão).'}
           </p>
           <div className="flex items-center gap-2.5 text-sm text-ink-muted">
             <div
@@ -183,7 +319,15 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
       {!isChama && <OpeningField editor={editor} value={state.working.opening ?? ''} />}
 
       {state.working.weeks.map((week, weekIndex) => (
-        <section key={week.number} className="mt-4.5">
+        <section
+          key={week.number}
+          // Semana nova entra suave; a que vai sumir (o único dia dela sendo apagado) sai suave.
+          className={`mt-4.5 animate-[page-in_350ms_ease-out] transition-[opacity,translate] duration-300 ${
+            leavingDay !== null && week.days.length === 1 && week.days[0]?.number === leavingDay
+              ? '-translate-y-1 opacity-0'
+              : ''
+          }`}
+        >
           <WeekHeading
             key={week.theme}
             week={week}
@@ -191,94 +335,19 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
             structure={structure}
             position={weekIndex + 1}
           />
-          <ol className="grid grid-cols-2 gap-2.5 lg:grid-cols-7">
-            {week.days.map((day) => {
-              const status = dayStatus(state, day.number)
-              const position = positions.get(day.number) ?? 0
-              return (
-                <li
-                  key={day.number}
-                  // Por tema, cada tema tem um conteúdo só: nada de arrastar nem apagar.
-                  draggable={!isThemes}
-                  onDragStart={() => setDragging(day.number)}
-                  onDragEnd={() => {
-                    setDragging(null)
-                    setOver(null)
-                  }}
-                  onDragOver={(event) => {
-                    event.preventDefault()
-                    setOver(day.number)
-                  }}
-                  onDragLeave={() => setOver(null)}
-                  onDrop={() => {
-                    drop(week, day.number)
-                    setOver(null)
-                  }}
-                  className={`flex min-h-37.5 cursor-grab flex-col gap-2 rounded-[18px] border bg-surface px-3 pt-3 pb-2.5 transition-[box-shadow,transform] hover:-translate-y-px hover:shadow-[0_6px_18px_rgb(0_0_0/0.08)] ${
-                    status === 'draft' ? 'border-draft/45' : 'border-line'
-                  } ${dragging === day.number ? 'opacity-40' : ''} ${
-                    over === day.number && dragging !== day.number
-                      ? 'outline-2 outline-admin-ink outline-dashed'
-                      : ''
-                  }`}
-                >
-                  <span className="flex items-center justify-between font-display text-[28px] leading-none text-accent">
-                    {String(isThemes ? weekIndex + 1 : position).padStart(2, '0')}
-                    <span className={`flex items-center gap-1 ${isThemes ? 'hidden' : ''}`}>
-                      <button
-                        type="button"
-                        aria-label={`Apagar dia ${position}: ${day.title}`}
-                        title={
-                          canRemoveDay(state.working, day.number)
-                            ? 'Apagar dia'
-                            : 'Cada semana precisa de pelo menos um dia'
-                        }
-                        disabled={!canRemoveDay(state.working, day.number) || state.isBusy}
-                        onClick={() => setRemoving(day)}
-                        className="grid size-7 place-items-center rounded-full text-ink-faint hover:bg-wine/10 hover:text-wine disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-ink-faint"
-                      >
-                        <EditorIcon name="trash" size={15} />
-                      </button>
-                      <button
-                        type="button"
-                        aria-label={`Mover dia ${position} (use as setas)`}
-                        onKeyDown={(event) => onGripKey(event, day.number)}
-                        className="cursor-grab rounded text-ink-faint"
-                      >
-                        <EditorIcon name="grip" size={16} />
-                      </button>
-                    </span>
-                  </span>
-                  <span className="flex-1 text-sm leading-snug text-ink">
-                    {isThemes ? week.theme || day.title : day.title}
-                  </span>
-                  <StatusTag status={status} className="self-start" />
-                  <button
-                    type="button"
-                    onClick={() => onOpenDay(day.number)}
-                    aria-label={`Editar ${unit} ${isThemes ? weekIndex + 1 : position}: ${isThemes ? week.theme : day.title}`}
-                    className={`${btn} justify-center px-2.5 py-1.5 text-[13px]`}
-                  >
-                    {isThemes ? 'Editar tema' : 'Editar dia'}
-                  </button>
-                </li>
-              )
-            })}
-            {!isThemes && week.number === lastWeek && (
-              <li>
-                <button
-                  type="button"
-                  disabled={state.isBusy}
-                  onClick={() => onAddDay(week.number)}
-                  className="grid h-full min-h-37.5 w-full place-items-center rounded-[18px] border-[1.5px] border-dashed border-line text-sm text-ink-faint hover:border-admin-ink hover:text-admin-ink"
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    <EditorIcon name="plus" size={18} /> Novo dia
-                  </span>
-                </button>
-              </li>
-            )}
-          </ol>
+          <WeekCards
+            week={week}
+            weekIndex={weekIndex}
+            editor={editor}
+            state={state}
+            positions={positions}
+            isThemes={isThemes}
+            isLastWeek={week.number === lastWeek}
+            onOpenDay={onOpenDay}
+            onAddDay={onAddDay}
+            onRemove={setRemoving}
+            leavingDay={leavingDay}
+          />
         </section>
       ))}
 
@@ -290,7 +359,11 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
           onCancel={cancelRemove}
           onConfirm={() => {
             setRemoving(null)
-            void editor.removeDay(removing.number)
+            // O cartão some devagar; depois sai da lista e os vizinhos deslizam para o lugar dele.
+            setLeavingDay(removing.number)
+            setTimeout(() => {
+              void editor.removeDay(removing.number).finally(() => setLeavingDay(null))
+            }, LEAVE_MS)
           }}
         >
           “{removing.title}” sai da jornada quando você publicar. O que as participantes já

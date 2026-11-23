@@ -56,6 +56,22 @@ describe('dias e semanas', () => {
     expect(findDay(journey, 22)?.sections.map((s) => s.type)).toEqual(['ritual', 'closing'])
   })
 
+  it('por semana: o dia 22 de uma jornada de 21 abre a Semana IV', () => {
+    const journey = addDay(chamaInterna21, 3, 's')
+    expect(journey.weeks).toHaveLength(4)
+    expect(journey.weeks[3]).toMatchObject({ number: 4, roman: 'IV', theme: '' })
+    expect(journey.weeks[3]?.days.map((d) => d.number)).toEqual([22])
+    expect(journey.weeks[2]?.days).toHaveLength(7)
+  })
+
+  it('o dia sozinho na última semana pode ser apagado: a semana sai junto', () => {
+    const withWeek4 = addDay(chamaInterna21, 3, 's')
+    expect(canRemoveDay(withWeek4, 22)).toBe(true)
+    const back = removeDay(withWeek4, 22)
+    expect(back.weeks).toHaveLength(3)
+    expect(back.retiredDays).toEqual([22])
+  })
+
   it('subir um dia mantém o número (a identidade) e muda só a ordem', () => {
     const journey = moveDay(chamaInterna21, 2, -1)
     expect(journey.weeks[0]?.days.slice(0, 2).map((d) => d.number)).toEqual([2, 1])

@@ -1,7 +1,8 @@
 import { Clock } from 'lucide-react'
+import { cardTiles } from '../../../shared/catalog/journeyLayout'
 import type { Offer } from '../../../shared/catalog/offer'
 import type { JourneyProduct } from '../../../shared/catalog/product'
-import { structureLabel } from '../journeyFilters'
+import { journeyStructureLabel } from '../journeyFilters'
 import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { OfferBadge, OfferButton } from './OfferBits'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
@@ -22,7 +23,7 @@ function Meta({ journey }: { journey: JourneyProduct }) {
         <Clock aria-hidden size={13} />
         {journey.durationLabel}
       </span>
-      <span className={metaPill}>{structureLabel(journey.structure, journey.themes.length)}</span>
+      <span className={metaPill}>{journeyStructureLabel(journey)}</span>
     </>
   )
 }
@@ -35,18 +36,22 @@ function SoonCorner() {
   )
 }
 
-/** Quadradinhos dos temas (no mínimo três colunas, para não ficarem enormes com poucos temas). */
+/**
+ * Quadradinhos do cartão: os 3 primeiros dias com título ou as semanas, partes e temas (no mínimo três
+ * colunas, para não ficarem enormes com poucos).
+ */
 function Tiles({ journey }: { journey: JourneyProduct }) {
-  if (journey.themes.length === 0) return null
+  const tiles = cardTiles(journey)
+  if (tiles.length === 0) return null
   return (
     <ul
       aria-label="Temas"
       className="grid gap-2"
       style={{
-        gridTemplateColumns: `repeat(${Math.max(3, journey.themes.length)}, minmax(0, 1fr))`,
+        gridTemplateColumns: `repeat(${Math.max(3, tiles.length)}, minmax(0, 1fr))`,
       }}
     >
-      {journey.themes.map((theme) => (
+      {tiles.map((theme) => (
         <li
           key={theme.label}
           className="flex aspect-square min-w-0 flex-col justify-between rounded-[10px] border border-line bg-[color-mix(in_oklab,var(--gold)_10%,var(--surface))] p-2"
@@ -119,9 +124,9 @@ export function CompactJourneyRow({ journey, offer, onPurchase }: CardProps) {
         <div className="flex flex-wrap gap-1.5">
           <Meta journey={journey} />
         </div>
-        {journey.themes.length > 0 && (
+        {cardTiles(journey).length > 0 && (
           <ul aria-label="Temas" className="flex flex-wrap gap-1.5">
-            {journey.themes.map((theme) => (
+            {cardTiles(journey).map((theme) => (
               <li
                 key={theme.label}
                 className="rounded-lg bg-gold/12 px-2 py-1 text-xs text-ink-muted"

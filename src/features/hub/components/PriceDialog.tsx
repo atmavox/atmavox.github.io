@@ -8,7 +8,7 @@ import { formatPrice } from '../../../shared/catalog/offer'
 import type { Product } from '../../../shared/catalog/product'
 import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
-import { structureLabel } from '../journeyFilters'
+import { journeyStructureLabel } from '../journeyFilters'
 import { formatDuration, mediaLabel } from '../meditations'
 
 interface PriceDialogProps {
@@ -82,7 +82,7 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
 
   const includes = isJourney
     ? [
-        `${product.durationLabel} de rituais, escrita e presença, ${structureLabel(product.structure, product.themes.length).toLowerCase()}`,
+        `${product.durationLabel} de rituais, escrita e presença, ${journeyStructureLabel(product).toLowerCase()}`,
         accessText(pricing.accessMonths),
         'Progresso e reflexões salvos na sua conta',
       ]

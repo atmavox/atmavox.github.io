@@ -132,8 +132,10 @@ testes de conteúdo garantem 21 dias, revisões em 7/14/21, ids únicos e nenhum
     dela mostra um aviso e "Continuar em…".
   - **Abas pela estrutura (ADR-024):** por semana, como acima (com quantas semanas houver; Revisões só
     se a jornada tiver); **por tema**, uma aba por tema com o nome dele, sem dias: o tema inteiro numa
-    página, com "Concluir tema ✦", que abre o tema seguinte; **por dias**, uma aba "Dias" com os cartões.
-    Vitórias abrem depois da última parte. Por tema, a vitória não pede o dia do protocolo.
+    página, com "Concluir tema ✦", que abre o tema seguinte; **por dias**, uma aba "Dias" com os cartões;
+    **em partes** (ADR-025), uma aba por parte ("Parte 1"), cada uma com a faixa de dias escolhida no
+    produto, abrindo pelo calendário como as semanas e sem Revisões. Vitórias abrem depois da última
+    parte. Por tema, a vitória não pede o dia do protocolo.
   - **Progresso antigo respeitado:** dia ou aba que já tinha respostas ou marcações continua aberto.
   - **Admin:** as regras aceitam `bypass` (Fase 4, modo Andreía).
 - O exemplo de vitória do original aparece só enquanto a lista está vazia, marcado como "Exemplo".
@@ -286,9 +288,16 @@ Editar a jornada →" e o mesmo atalho no menu da conta. Qualquer outra pessoa q
   versão no **Histórico** (gaveta lateral), com "Voltar para esta" (vira rascunho salvo; publica-se de
   novo para ir ao ar).
 - **Estrutura** (novo dia, apagar dia, ordem dos dias, tema da semana) vai direto para o rascunho salvo.
+  "Novo dia" só cria o cartão (não abre a edição). Por semana, depois de uma semana cheia (7 dias), o
+  dia novo abre a semana seguinte. Cartões e semanas entram e saem com transição suave.
+- **Ordem dos dias** (ADR-026): arrastar pelo puxador no computador, segurar o cartão no celular, ou
+  setas do teclado no puxador.
 - **Apagar dia** (no editor do dia, com confirmação): o dia sai da jornada ao publicar; cada semana
-  fica com pelo menos um dia; o número do dia apagado é **aposentado** (`retiredDays`) e nunca volta a
-  ser usado por um dia novo; o que as participantes escreveram nele continua guardado.
+  fica com pelo menos um dia (o dia sozinho na última semana pode sair: a semana sai junto); o número do
+  dia apagado é **aposentado** (`retiredDays`) e nunca volta a ser usado por um dia novo; o que as
+  participantes escreveram nele continua guardado.
+- **Cabeçalho único** do Modo Andreía (produtos, acessos, editor): Produtos · Acessos, "Voltar ao hub"
+  e "Ver o site"; no editor, o nome da jornada e o Histórico, e "← Produtos" acima do título.
 - **Ids nunca mudam:** o número do dia é a identidade das respostas (`d{n}:…`); reordenar só muda a
   posição. Blocos novos e cópias ganham ids novos. Apagar um bloco não apaga respostas já escritas.
 - **Blocos:** check-in, ritual, pergunta, afirmação, fechamento (etapas, pedem "Feito"), áudio e vídeo
@@ -341,7 +350,8 @@ setas no cabeçalho da seção no computador (só quando sobra cartão), desliza
 **Hub de jornadas (`#/jornadas`):**
 
 - **Expandida** (padrão, a A5): cartões largos agrupados por território, com banner, duração,
-  estrutura, tag, nome, frase, quadradinhos dos temas e botão.
+  estrutura, tag, nome, frase, quadradinhos e botão. Os quadradinhos são os **3 primeiros dias com
+  título** (I, II, III); sem títulos, as semanas, partes ou temas (ADR-025).
 - **Compacta** (a A4): uma linha por jornada (miniatura, nome, frase, duração, temas, tag, botão).
 - Chave Expandida/Compacta; a escolha fica no aparelho.
 - **Filtros** abertos por padrão numa coluna à esquerda (busca, territórios com contagem, "Mostrar":
@@ -369,3 +379,20 @@ prazo de acesso, banner, frase, temas, território, destaque, ordem, status) e l
 Uma jornada só pode ficar **Publicada** depois que o conteúdo dela for publicado no editor
 (`published/{id}` com `content`); antes disso, Rascunho ou Em breve. A Chama Interna, com o conteúdo
 no código, sempre pode.
+
+**Estrutura de uma jornada no produto** (mock `Downloads/atmavox-estrutura-produto-v2.html`, ADR-025):
+
+- **Por dias:** duração em número (− e +, de 1 a 99) e "Dividir os dias": sem divisão; **em semanas**
+  (uma a cada 7 dias, aparecem sozinhas, só o nome é digitado); **em partes** (cada uma com nome e
+  "termina no dia", a última vai até o fim; "+ Parte" divide a última ao meio; apagar junta os dias à
+  vizinha; mudar a ordem troca os nomes e mantém as faixas).
+- **Por temas:** sem duração, só a lista de temas ("4 temas" no hub).
+- **Títulos dos dias** (opcional, recolhido): por semana ou parte; os 3 primeiros com título viram os
+  cartões I, II, III do banner. Vão para o rascunho da jornada; no catálogo, só esses 3.
+- Numeração pela posição (não se digita), em trilha; ordem por arrastar (ADR-026) ou setas ▲ ▼ no
+  computador.
+- **Trava:** quando o editor da jornada já salvou algo (ou ela foi publicada), a estrutura fica
+  desativada com um aviso e o link "Editar o conteúdo da jornada".
+- **Apagar produto:** só Rascunho ou Em breve, com confirmação ("Apagar de vez?"); a jornada perde
+  também o rascunho. Útil para testes.
+- A lista de produtos fica parada ao lado enquanto o editor rola (computador).

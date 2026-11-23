@@ -160,6 +160,25 @@ aprovados antes do código.
              próximo tema ao concluir o anterior; Revisões só em "por semana")
       3. [x] editor de dias para jornada nova, com os N dias vazios prontos
       4. [x] "Publicada" só com dias publicados (Modo Andreía de produtos)
+      5. Estrutura dinâmica (pedido de 2026-11-23, mock `Downloads/atmavox-estrutura-produto-v2.html`,
+         ADR-025):
+         1. [x] Jornada em partes + cartões do banner com os 3 primeiros dias com título + títulos dos
+                dias no rascunho da jornada (1.18.0)
+         2. [x] Formulário e tela "Estrutura": por dias (sem divisão, em semanas, em partes) ou por
+                temas, duração em número, trilha com ordem automática, títulos dos dias, trava quando a
+                jornada já tem conteúdo
+         3. [x] Arrastar para ordenar compartilhado (puxador no computador, segurar no celular,
+                teclado), também no quadro de dias do editor
+         4. [x] Ajustes pedidos no caminho: cabeçalho único do Modo Andreía, apagar produto não
+                publicado, dia 22 abre a Semana IV, "Novo dia" sem abrir a edição, transições suaves
+         - [x] Campos editáveis mais evidentes: faixa azul (opção D) + lápis (opção B) do mock
+               `Downloads/atmavox-campos-editaveis.html`
+         - [ ] Conferir no celular de verdade o "segurar e arrastar" (Android e iPhone)
+         - [ ] Depois da trava, títulos mudados no editor da jornada não atualizam os cartões do
+               banner sozinhos (ADR-025); avaliar atualizar o `previewDays` ao publicar a jornada
+      - [ ] **Ícones no lugar dos emojis** (regra nova em `conventions.md`, mock
+            `Downloads/atmavox-icones-emoji.html`): temperatura do dia opção B (luas + chama) e botão
+            de tema opção 1 (sol de raios + lua crescente)
       - [ ] **Pendência (2026-11-23): envio de áudio das meditações.** Hoje o editor pede o link de um
             arquivo já hospedado. Opções: Cloudflare R2 pelo Worker do pagamento (recomendado: grátis até
             10 GB, sem custo de download, áudio pago só entregue a quem tem acesso; exige cartão na
