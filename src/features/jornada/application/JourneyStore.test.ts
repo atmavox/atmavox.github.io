@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { emptyVictoryDraft } from '../domain/victories'
 import { InMemoryProgressRepository } from '../infrastructure/InMemoryProgressRepository'
 import { createJourneyStore } from './JourneyStore'
-import { tabFromPath } from './navigation'
+import { routeFromPath, tabHref } from './navigation'
 
 function setup() {
   const repository = new InMemoryProgressRepository()
@@ -57,11 +57,37 @@ describe('JourneyStore', () => {
   })
 })
 
-describe('tabFromPath', () => {
-  it('reconhece as abas e cai na Abertura em rota desconhecida', () => {
+describe('routeFromPath e tabHref', () => {
+  it('lê a jornada e a aba do caminho novo', () => {
+    expect(routeFromPath('/jornada/chama-interna-21/semana-2')).toEqual({
+      journeyId: 'chama-interna-21',
+      tab: 'semana-2',
+    })
+    expect(routeFromPath('/jornada/ritual-matinal')).toEqual({
+      journeyId: 'ritual-matinal',
+      tab: 'abertura',
+    })
+  })
+
+  it('monta o link de cada aba com o id da jornada', () => {
+    expect(tabHref('chama-interna-21', 'abertura')).toBe('#/jornada/chama-interna-21')
+    expect(tabHref('chama-interna-21', 'vitorias')).toBe('#/jornada/chama-interna-21/vitorias')
+  })
+})
+
+describe('caminhos antigos, sem id da jornada', () => {
+  const tabFromPath = (path: string) => {
+    const route = routeFromPath(path)
+    expect(route.journeyId).toBe('chama-interna-21')
+    return route.tab
+  }
+  it('abrem a jornada de 21 dias na aba pedida', () => {
     expect(tabFromPath('/jornada')).toBe('abertura')
     expect(tabFromPath('/jornada/semana-2')).toBe('semana-2')
     expect(tabFromPath('/jornada/vitorias')).toBe('vitorias')
-    expect(tabFromPath('/jornada/qualquer-coisa')).toBe('abertura')
+  })
+
+  it('aba desconhecida depois do id cai na Abertura', () => {
+    expect(routeFromPath('/jornada/chama-interna-21/qualquer-coisa').tab).toBe('abertura')
   })
 })

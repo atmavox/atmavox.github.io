@@ -1,4 +1,4 @@
-import type { Territory } from '../../../shared/catalog/product'
+import type { Territory } from '../catalog/product'
 
 export type BannerTone = 'flame' | 'gray' | 'wine' | 'dawn' | 'dusk' | 'sea'
 

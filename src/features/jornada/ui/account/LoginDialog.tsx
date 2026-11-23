@@ -1,22 +1,32 @@
 import { X } from 'lucide-react'
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
+import type { BannerTone } from '../../../../shared/ui/bannerTones'
 import { GoogleLogo } from '../../../../shared/ui/GoogleLogo'
+import { ProductBanner } from '../../../../shared/ui/ProductBanner'
 import type { Account } from '../../application/account'
 import { AuthFailure } from '../../application/ports'
 
 type Mode = 'entrar' | 'criar' | 'recuperar'
 
-const TITLES: Record<Mode, string> = {
-  entrar: 'Salve sua jornada em qualquer aparelho',
-  criar: 'Criar uma conta',
-  recuperar: 'Recuperar a senha',
+type Variant = 'optional' | 'gate'
+
+const TITLES: Record<Variant, Record<Mode, string>> = {
+  optional: {
+    entrar: 'Salve sua jornada em qualquer aparelho',
+    criar: 'Criar uma conta',
+    recuperar: 'Recuperar a senha',
+  },
+  gate: {
+    entrar: 'Entre para guardar sua jornada',
+    criar: 'Criar uma conta',
+    recuperar: 'Recuperar a senha',
+  },
 }
 
-const SUBMIT: Record<Mode, string> = {
-  entrar: 'Entrar',
-  criar: 'Criar conta',
-  recuperar: 'Enviar link',
+const SUBMIT: Record<Variant, Record<Mode, string>> = {
+  optional: { entrar: 'Entrar', criar: 'Criar conta', recuperar: 'Enviar link' },
+  gate: { entrar: 'Entrar e começar', criar: 'Criar conta e começar', recuperar: 'Enviar link' },
 }
 
 const inputClass =
@@ -24,11 +34,27 @@ const inputClass =
 
 interface LoginDialogProps {
   account: Account
+  /** Fechar sem entrar (X, Esc ou toque fora). */
   onClose: () => void
+  /**
+   * "optional": entrar pelo botão do cabeçalho (sincronizar). "gate": a jornada pede login (ADR-020),
+   * por cima do hub desfocado, mostrando a jornada escolhida.
+   */
+  variant?: Variant
+  chosen?: { title: string; tone: BannerTone }
+  /** Entrou. Sem ele, fecha a janela; no portão, a própria tela troca e não há o que fechar. */
+  onSignedIn?: () => void
 }
 
-/** Janela de login: Google ou e-mail/senha. A conta é opcional (F5). */
-export function LoginDialog({ account, onClose }: LoginDialogProps) {
+/** Janela de login: Google ou e-mail/senha. */
+export function LoginDialog({
+  account,
+  onClose,
+  variant = 'optional',
+  chosen,
+  onSignedIn,
+}: LoginDialogProps) {
+  const isGate = variant === 'gate'
   const [mode, setMode] = useState<Mode>('entrar')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -68,7 +94,7 @@ export function LoginDialog({ account, onClose }: LoginDialogProps) {
       await action()
       if (successNotice) setNotice(successNotice)
       // Entrou: a janela cumpriu o papel. (Se a pessoa só fechou a janela do Google, continua aberta.)
-      else if (account.getSnapshot().user) onClose()
+      else if (account.getSnapshot().user) (onSignedIn ?? onClose)()
     } catch (caught) {
       setError(caught instanceof AuthFailure ? caught.message : 'Algo deu errado. Tente de novo.')
     } finally {
@@ -91,7 +117,11 @@ export function LoginDialog({ account, onClose }: LoginDialogProps) {
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-40 grid place-items-end bg-black/55 sm:place-items-center">
+    <div
+      className={`fixed inset-0 z-40 grid place-items-end sm:place-items-center ${
+        isGate ? 'bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.35))]' : 'bg-black/55'
+      }`}
+    >
       {/* O fundo escuro fecha a janela; o botão "Fechar" é o caminho acessível. */}
       <button
         type="button"
@@ -108,9 +138,16 @@ export function LoginDialog({ account, onClose }: LoginDialogProps) {
         className="relative w-full max-w-md rounded-t-3xl border border-line bg-surface p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:rounded-3xl"
       >
         <div className="mb-4 flex items-start justify-between gap-4">
-          <h2 id={ids.title} className="font-display text-2xl leading-snug text-ink">
-            {TITLES[mode]}
-          </h2>
+          <div className="flex flex-col gap-1.5">
+            {isGate && mode === 'entrar' && (
+              <p className="text-xs font-semibold tracking-[0.24em] text-accent uppercase">
+                Para começar
+              </p>
+            )}
+            <h2 id={ids.title} className="font-display text-2xl leading-snug text-ink">
+              {TITLES[variant][mode]}
+            </h2>
+          </div>
           <button
             type="button"
             onClick={onClose}
@@ -123,10 +160,29 @@ export function LoginDialog({ account, onClose }: LoginDialogProps) {
 
         {mode === 'entrar' && (
           <>
-            <p className="mb-5 text-sm leading-relaxed text-ink-muted">
-              É opcional. Sem conta, tudo continua salvo neste aparelho. Com a conta, suas respostas
-              ficam guardadas só para você e aparecem em qualquer celular ou computador.
-            </p>
+            {isGate ? (
+              <>
+                <p className="mb-4 text-sm leading-relaxed text-ink-muted">
+                  Suas reflexões e seu progresso ficam salvos na sua conta, em qualquer aparelho.
+                </p>
+                {chosen && (
+                  <div className="mb-4 flex items-center gap-3 rounded-2xl border border-line bg-bg p-2.5">
+                    <ProductBanner tone={chosen.tone} className="size-16 shrink-0 rounded-[10px]" />
+                    <div>
+                      <span className="text-sm text-ink-faint">Você escolheu</span>
+                      <b className="block font-display text-lg font-medium text-ink">
+                        {chosen.title}
+                      </b>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="mb-5 text-sm leading-relaxed text-ink-muted">
+                É opcional. Sem conta, tudo continua salvo neste aparelho. Com a conta, suas
+                respostas ficam guardadas só para você e aparecem em qualquer celular ou computador.
+              </p>
+            )}
             <button
               type="button"
               disabled={isBusy}
@@ -134,7 +190,7 @@ export function LoginDialog({ account, onClose }: LoginDialogProps) {
               className="mb-4 flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-line bg-bg font-medium text-ink transition-colors hover:border-accent disabled:opacity-60"
             >
               <GoogleLogo size={20} />
-              Entrar com Google
+              {isGate ? 'Continuar com o Google' : 'Entrar com Google'}
             </button>
             <p className="mb-4 flex items-center gap-3 text-xs text-ink-faint before:h-px before:flex-1 before:bg-line after:h-px after:flex-1 after:bg-line">
               ou com e-mail
@@ -195,7 +251,7 @@ export function LoginDialog({ account, onClose }: LoginDialogProps) {
             disabled={isBusy}
             className="mt-1 min-h-12 rounded-full bg-accent font-semibold text-bg transition-opacity hover:opacity-90 disabled:opacity-60"
           >
-            {isBusy ? 'Aguarde…' : SUBMIT[mode]}
+            {isBusy ? 'Aguarde…' : SUBMIT[variant][mode]}
           </button>
         </form>
 
@@ -215,7 +271,7 @@ export function LoginDialog({ account, onClose }: LoginDialogProps) {
               onClick={() => switchMode('criar')}
               className="min-h-10 text-accent"
             >
-              Criar conta com e-mail
+              {isGate ? 'Primeira vez aqui? Criar conta' : 'Criar conta com e-mail'}
             </button>
           )}
           {mode === 'entrar' && (

@@ -3,9 +3,8 @@ import { formatPrice, type OfferAction, type OfferTag } from '../../../shared/ca
 import type { JourneyProduct } from '../../../shared/catalog/product'
 import { notifyMeHref } from '../content'
 
-/** Até existirem as rotas por jornada e o login (Etapa D, passo 4), todo "Começar" abre a de 21 dias. */
-const START_HREF = '#/jornada'
-
+/** A jornada pede login: sem conta, ela mesma abre a janela de login sobre o hub (ADR-020). */
+const journeyHref = (journey: JourneyProduct) => `#/jornada/${journey.id}`
 const pill =
   'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs'
 
@@ -61,7 +60,7 @@ export function OfferButton({ action, journey }: { action: OfferAction; journey:
   const label = ACTION_LABELS[action]
   return (
     <a
-      href={START_HREF}
+      href={journeyHref(journey)}
       aria-label={`${label}: ${journey.title}`}
       className="inline-flex min-h-10 items-center gap-2 rounded-full bg-accent px-[18px] font-semibold whitespace-nowrap text-bg hover:opacity-90"
     >

@@ -8,6 +8,7 @@ import {
   type VictoryDraft,
   type VictoryDraftError,
 } from '../../domain/victories'
+import { tabHref } from '../../application/navigation'
 import { PageHeader } from '../components/PageHeader'
 import { useJourney } from '../useJourney'
 
@@ -67,7 +68,7 @@ function VictoryItem({ victory, onRemove }: { victory: Victory; onRemove?: () =>
 }
 
 export function VictoriesPage() {
-  const { progress, store } = useJourney()
+  const { journey, progress, store } = useJourney()
   const [draft, setDraft] = useState<VictoryDraft>(emptyVictoryDraft)
   const [errors, setErrors] = useState<VictoryDraftError[]>([])
   const ids = { date: useId(), day: useId(), action: useId(), result: useId(), errors: useId() }
@@ -197,7 +198,7 @@ export function VictoriesPage() {
       <div className="mt-8 flex flex-col items-start gap-2 border-t border-line pt-6">
         {progress.completedSteps.includes(VICTORIES_STEP) ? (
           <a
-            href="#/jornada/encerramento"
+            href={tabHref(journey.id, 'encerramento')}
             className="inline-flex min-h-11 items-center rounded-full bg-accent px-6 font-semibold text-bg hover:opacity-90"
           >
             Ir para o Encerramento →

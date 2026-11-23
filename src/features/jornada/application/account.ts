@@ -23,6 +23,11 @@ export interface AccountState {
   isBackendLoading: boolean
   /** A conta tem o papel de admin: vê a jornada inteira, sem cadeados. */
   isAdmin: boolean
+  /**
+   * Já se sabe se há alguém logado. Com sessão lembrada no aparelho, só depois da primeira resposta
+   * do Firebase: até lá a jornada mostra "carregando", e não a tela de login (ADR-020).
+   */
+  authChecked: boolean
 }
 
 export interface Account {
@@ -64,7 +69,13 @@ export function createAccount({
   debounceMs = 800,
   onReconnect,
 }: AccountDeps): Account {
-  let state: AccountState = { user: null, sync: 'idle', isBackendLoading: false, isAdmin: false }
+  let state: AccountState = {
+    user: null,
+    sync: 'idle',
+    isBackendLoading: false,
+    isAdmin: false,
+    authChecked: !hint.get(),
+  }
   const listeners = new Set<() => void>()
   let backendPromise: Promise<CloudBackend> | null = null
   let pushTimer: ReturnType<typeof setTimeout> | null = null
@@ -105,11 +116,11 @@ export function createAccount({
   async function handleUser(backend: CloudBackend, user: AuthUser | null) {
     if (!user) {
       cancelPush()
-      set({ user: null, sync: 'idle', isAdmin: false })
+      set({ user: null, sync: 'idle', isAdmin: false, authChecked: true })
       return
     }
     hint.set(true)
-    set({ user, sync: 'connecting' })
+    set({ user, sync: 'connecting', authChecked: true })
     void checkAdmin(backend, user.uid)
     try {
       const remote = await backend.cloud.load(user.uid)
@@ -159,7 +170,7 @@ export function createAccount({
     if (state.user && state.sync === 'offline') void push()
   })
 
-  if (hint.get()) void ensureBackend().catch(() => set({ sync: 'idle' }))
+  if (hint.get()) void ensureBackend().catch(() => set({ sync: 'idle', authChecked: true }))
 
   async function withBackend(action: (backend: CloudBackend) => Promise<void>) {
     let backend: CloudBackend

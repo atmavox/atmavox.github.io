@@ -28,7 +28,18 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
   deslizam e botão "Filtros". Sem login, as pagas mostram "Pago" e nenhum preço.- "Quem já viveu" pronto para depoimentos reais (carrossel com mais de um); fica escondido enquanto não
   houver nenhum.
 
+- Jornada pede login (ADR-020): sem conta, o hub de jornadas fica desfocado e abre a janela "Entre para
+  guardar sua jornada", com a jornada escolhida, Google, e-mail e senha; fechar volta ao hub. Quem já
+  tinha entrado vê "Carregando…" enquanto a sessão volta, sem a janela piscar. Sem Firebase configurado
+  (desenvolvimento e testes), a jornada abre direto.
+- Rotas por jornada: `#/jornada/chama-interna-21/semana-1`. Os links antigos (`#/jornada/semana-1`)
+  continuam abrindo a jornada de 21 dias; uma jornada que ainda não existe mostra "ainda não está
+  disponível" com o caminho para o hub.
+
 ### Alterado
+
+- Áudio de boas-vindas novo (gravação da Andreía), agora com música de fundo: 1 min, volume
+  equilibrado com o resto do site (receita em `features.md`, F1 → Mídia).
 
 - Celular: abas Início · Jornadas · Meditações · Contato ("Ouvir" virou "Meditações"; `#/ouvir` continua
   funcionando). Computador: menu Início, Jornadas, Meditações, Encontros, Sobre, Contato; "Jornadas"

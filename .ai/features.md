@@ -15,7 +15,7 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 
 - **Celular (< 700 px): "app com abas".** Barra fixa embaixo com Início · Jornadas · Meditações · Contato.
   - Início: retrato + slogan + "Um espaço para perceber… Com Andreía Oliveirà."; "Conhecer as jornadas";
-    cartão "Comece aqui" (áudio de boas-vindas, 48 s); fileiras de jornadas e de meditações (deslizar
+    cartão "Comece aqui" (áudio de boas-vindas, 1 min, com música de fundo); fileiras de jornadas e de meditações (deslizar
     com o dedo, pontinhos); faixa dos encontros (TikTok); frase da marca com "Ver as jornadas";
     "Quem já viveu" (só com depoimento real); redes sociais; A Ativadora (retrato, práticas, WhatsApp).
   - Jornadas: o hub de jornadas (F9), compacto por padrão.
@@ -46,7 +46,13 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
   3. `agate` nas pausas (limiar −55 dBFS), realce de presença (+3 dB em 3,5 kHz e agudos +3 dB) e
      `loudnorm=I=-16:TP=-1.5:LRA=11`; AAC 96 kbps mono.
      Resultado medido: silêncios em −121 dB e pausas 23 dB mais baixas que o original, sem perder nitidez.
-- Vídeos do YouTube como **fachada**: só a miniatura carrega; o player (`youtube-nocookie.com`) entra
+- **Áudio de boas-vindas com fundo (2026-11-22):** a Andreía mandou uma gravação nova, limpa
+  ("Boas Vindas - Site", 57,6 s, −35 LUFS), e uma música ("fundo"). Mixagem com ffmpeg: voz com
+  `highpass=80` + `loudnorm` para −16 LUFS, entrando aos 5 s (a música só ganha corpo por volta de 4 s);
+  música a −14 dB, com fade-in de 1 s, abaixando sob a voz (`sidechaincompress`, limiar 0,02, razão 4) e
+  saindo em fade de 4 s depois da última frase; `alimiter` no fim (o `loudnorm` dinâmico na mistura
+  subia a introdução). Resultado: 1 min 07 s, −15,9 LUFS, pico −1,9 dBTP, música 15 a 18 dB abaixo da
+  voz; AAC 128 kbps estéreo.- Vídeos do YouTube como **fachada**: só a miniatura carrega; o player (`youtube-nocookie.com`) entra
   quando a pessoa toca.
 
 **Regras:**
@@ -181,10 +187,13 @@ pura, testada) + `useTheme` (o `data-theme` do `<html>` é a fonte da verdade, s
 
 ---
 
-## F5 · Login opcional e sincronização 🔨 (código pronto; falta configurar o console: `firebase-setup.md`)
+## F5 · Login e sincronização 🔨 (código pronto; falta configurar o console: `firebase-setup.md`)
 
-**Objetivo:** quem quiser entra e passa a ter o progresso salvo em qualquer aparelho. Quem não quiser usa
-normalmente.
+**Objetivo:** o progresso fica salvo na conta, em qualquer aparelho. Desde 2026-11-22 a **jornada pede
+login** (ADR-020): sem conta, abre a janela "Entre para guardar sua jornada" sobre o hub desfocado, com
+a jornada escolhida; fechar volta a `#/jornadas`. O que a pessoa já tinha feito no aparelho antes do
+login é mesclado à conta. Com sessão lembrada, a jornada mostra "Carregando…" até a nuvem responder
+(`authChecked`), para a janela não piscar.
 
 **Regras:**
 

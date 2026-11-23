@@ -2,9 +2,9 @@ import { Clock } from 'lucide-react'
 import type { Offer } from '../../../shared/catalog/offer'
 import type { JourneyProduct } from '../../../shared/catalog/product'
 import { structureLabel } from '../journeyFilters'
-import { TONE_BY_TERRITORY } from './bannerTones'
+import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { OfferBadge, OfferButton } from './OfferBits'
-import { ProductBanner } from './ProductBanner'
+import { ProductBanner } from '../../../shared/ui/ProductBanner'
 
 interface CardProps {
   journey: JourneyProduct

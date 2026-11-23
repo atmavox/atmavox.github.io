@@ -123,8 +123,10 @@ aprovados antes do código.
    3. [x] Hub de jornadas (`#/jornadas`): expandida/compacta (lembrada no aparelho), filtros recolhíveis
           (busca sem acento, território, disponível/em breve, duração), tag "Pago"; "Conhecer" da vitrine
           leva ao hub; "Começar jornada" ainda abre a de 21 dias direto (login no passo 4)
-   4. [ ] Login obrigatório na jornada + janela de login sobre a tela desfocada; rotas
-          `#/jornada/{id}`
+   4. [x] Login obrigatório na jornada (ADR-020): janela "Entre para guardar sua jornada" sobre o hub
+          desfocado, com a jornada escolhida; fechar volta ao hub; sessão lembrada espera a nuvem
+          ("Carregando…") antes de pedir login; rotas `#/jornada/{id}/{aba}` (links antigos sem id abrem
+          a de 21 dias; id desconhecido mostra "ainda não está disponível")
    5. [ ] Hub de meditações (`#/meditacoes`) e página da meditação (play + e-book)
    6. [ ] Regras do Firestore: catálogo, acesso, `published` só com acesso; conteúdo pago fora do
           código do site

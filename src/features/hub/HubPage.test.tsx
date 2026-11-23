@@ -99,7 +99,7 @@ describe('hub no celular (abas)', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Começar jornada: A Chama Interna' })).toHaveAttribute(
       'href',
-      '#/jornada',
+      '#/jornada/chama-interna-21',
     )
     expect(
       screen.getByRole('link', { name: 'Quero ser avisada: Ritual Matinal' }).getAttribute('href'),

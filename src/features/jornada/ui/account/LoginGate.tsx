@@ -1,0 +1,46 @@
+import type { ReactNode } from 'react'
+import { seedCatalog } from '../../../../shared/catalog/seedCatalog'
+import { TONE_BY_TERRITORY } from '../../../../shared/ui/bannerTones'
+import type { Account } from '../../application/account'
+import { LoginDialog } from './LoginDialog'
+
+const HUB_HREF = '#/jornadas'
+const noop = () => {}
+
+interface LoginGateProps {
+  account: Account
+  journeyId: string
+  /** O que fica desfocado por trás (o hub de jornadas, entregue pela composição em `app/`). */
+  background?: ReactNode
+}
+
+/**
+ * A jornada pede login (ADR-020): o hub fica desfocado e a janela mostra a jornada escolhida. Fechar
+ * volta ao hub; ao entrar, a jornada aparece no lugar (com o progresso do aparelho mesclado à conta).
+ */
+export function LoginGate({ account, journeyId, background }: LoginGateProps) {
+  const product = seedCatalog.find((p) => p.id === journeyId)
+  const chosen = product
+    ? { title: product.title, tone: TONE_BY_TERRITORY[product.territory] }
+    : undefined
+
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none min-h-dvh blur-[7px] saturate-90 select-none"
+      >
+        {background}
+      </div>
+      <LoginDialog
+        account={account}
+        variant="gate"
+        {...(chosen ? { chosen } : {})}
+        onClose={() => {
+          window.location.hash = HUB_HREF
+        }}
+        onSignedIn={noop}
+      />
+    </>
+  )
+}

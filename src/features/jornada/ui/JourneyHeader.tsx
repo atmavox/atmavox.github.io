@@ -2,7 +2,7 @@ import { Lock } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
-import { EDITOR_HREF, JOURNEY_TABS, type JourneyTabId } from '../application/navigation'
+import { EDITOR_HREF, JOURNEY_TABS, tabHref, type JourneyTabId } from '../application/navigation'
 import { isTabUnlocked } from '../application/tabAccess'
 import { tabProgress } from '../application/tabProgress'
 import { overallProgress } from '../domain/measures'
@@ -98,7 +98,7 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
               <li key={tab.id} className="relative shrink-0 snap-center md:min-w-0">
                 <a
                   ref={isActive ? activeRef : undefined}
-                  href={tab.href}
+                  href={tabHref(journey.id, tab.id)}
                   aria-current={isActive ? 'page' : undefined}
                   className={`flex flex-col gap-1.5 border-b-2 px-3 pt-3 pb-2.5 text-xs font-medium tracking-wider whitespace-nowrap uppercase transition-colors md:px-2 md:text-[0.8rem] ${
                     isActive ? 'border-accent text-ink' : 'border-transparent hover:text-ink'

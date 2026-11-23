@@ -2,8 +2,8 @@ import { ArrowRight, Clock } from 'lucide-react'
 import { productOffer } from '../../../shared/catalog/offer'
 import type { JourneyProduct } from '../../../shared/catalog/product'
 import { notifyMeHref } from '../content'
-import { TONE_BY_TERRITORY } from './bannerTones'
-import { ProductBanner } from './ProductBanner'
+import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
+import { ProductBanner } from '../../../shared/ui/ProductBanner'
 
 /** "Conhecer" leva ao hub de jornadas (F9); é lá que a pessoa começa (com login, a partir do passo 4). */
 const JOURNEY_HREF = '#/jornadas'

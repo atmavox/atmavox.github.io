@@ -60,11 +60,12 @@ ui  →  application  →  domain  ←  content
 | --------------------------------------------------- | ----------------------------------------- |
 | `#/`                                                | Hub (início)                              |
 | `#/ouvir`, `#/encontros`, `#/jornadas`, `#/contato` | Hub: aba no celular, âncora no computador |
-| `#/jornada`                                         | Abertura da jornada                       |
-| `#/jornada/semana-1`…`3`                            | Semanas                                   |
-| `#/jornada/revisoes`                                | Revisões semanais                         |
-| `#/jornada/vitorias`                                | Registro de vitórias                      |
-| `#/jornada/encerramento`                            | Encerramento                              |
+| `#/jornada/{id}`                                    | Abertura da jornada (pede login, ADR-020) |
+| `#/jornada/{id}/semana-1`…`3`                       | Semanas                                   |
+| `#/jornada/{id}/revisoes`                           | Revisões semanais                         |
+| `#/jornada/{id}/vitorias`                           | Registro de vitórias                      |
+| `#/jornada/{id}/encerramento`                       | Encerramento                              |
+| `#/jornada`, `#/jornada/semana-1`…                  | Links antigos: abrem `chama-interna-21`   |
 | `#/jornada/editar`                                  | Modo Andreía (só admin)                   |
 
 O hash evita o 404 do GitHub Pages ao recarregar uma página interna e permite compartilhar o link de uma aba.

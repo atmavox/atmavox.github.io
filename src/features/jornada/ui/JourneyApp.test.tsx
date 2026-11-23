@@ -60,7 +60,7 @@ describe('JourneyApp', () => {
     expect(screen.getByRole('listitem', { name: 'Dia 1, aberto' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Continuar no dia 1 →' })).toHaveAttribute(
       'href',
-      '#/jornada/semana-1',
+      '#/jornada/chama-interna-21/semana-1',
     )
   })
 
@@ -128,7 +128,7 @@ describe('JourneyApp', () => {
     expect(screen.getByRole('heading', { name: 'Esta etapa ainda está fechada' })).toBeVisible()
     expect(screen.getByRole('link', { name: 'Continuar em Semana I →' })).toHaveAttribute(
       'href',
-      '#/jornada/semana-1',
+      '#/jornada/chama-interna-21/semana-1',
     )
   })
 

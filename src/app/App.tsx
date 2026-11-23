@@ -19,7 +19,8 @@ export function App() {
   if (isJourney) {
     return (
       <Suspense fallback={<div className="min-h-dvh bg-bg" aria-busy="true" />}>
-        <JourneyEntry path={path} />
+        {/* O hub de jornadas fica desfocado atrás da janela de login da jornada (ADR-020). */}
+        <JourneyEntry path={path} loginBackground={<HubPage path="/jornadas" />} />
       </Suspense>
     )
   }

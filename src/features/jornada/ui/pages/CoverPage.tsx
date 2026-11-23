@@ -1,6 +1,6 @@
 import { BrandMark } from '../../../../shared/ui/BrandMark'
 import { RichText } from '../../../../shared/ui/RichText'
-import { JOURNEY_TABS } from '../../application/navigation'
+import { JOURNEY_TABS, tabHref } from '../../application/navigation'
 import { furthestUnlockedTab } from '../../application/tabAccess'
 import { coverCopy } from '../../content/copy'
 import { hasStarted, nextDayToDo, START_STEP } from '../../domain/access'
@@ -69,7 +69,7 @@ function StartOrContinue() {
         className={buttonClass}
         onClick={() => {
           store.markStepDone(START_STEP)
-          window.location.hash = '#/jornada/semana-1'
+          window.location.hash = tabHref(journey.id, 'semana-1')
         }}
       >
         Começar a jornada ✦
@@ -80,14 +80,17 @@ function StartOrContinue() {
   const nextDay = nextDayToDo(journey, progress)
   const target = nextDay
     ? {
-        href: `#/jornada/semana-${Math.ceil(nextDay / DAYS_PER_WEEK)}`,
+        href: tabHref(journey.id, `semana-${Math.ceil(nextDay / DAYS_PER_WEEK) as 1 | 2 | 3}`),
         label: `Continuar no dia ${nextDay}`,
       }
     : (() => {
         const tab = JOURNEY_TABS.find(
           (t) => t.id === furthestUnlockedTab(journey, progress, access),
         )
-        return { href: tab?.href ?? '#/jornada', label: `Continuar em ${tab?.label ?? 'Abertura'}` }
+        return {
+          href: tabHref(journey.id, tab?.id ?? 'abertura'),
+          label: `Continuar em ${tab?.label ?? 'Abertura'}`,
+        }
       })()
 
   return (

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { BrandMark } from '../../../shared/ui/BrandMark'
+import { BrandMark } from './BrandMark'
 import type { BannerTone } from './bannerTones'
 
 interface ProductBannerProps {

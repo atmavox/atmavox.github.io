@@ -49,6 +49,18 @@ describe('conta e sincronização', () => {
     expect(loadBackend).toHaveBeenCalledOnce()
   })
 
+  it('sem sessão lembrada, já se sabe que não há ninguém logado', () => {
+    const { account } = setup()
+    expect(account.getSnapshot().authChecked).toBe(true)
+  })
+
+  it('com sessão lembrada, só sabe quem está logado depois da resposta da nuvem', async () => {
+    const { account } = setup({ hint: true })
+    expect(account.getSnapshot().authChecked).toBe(false)
+    await vi.advanceTimersByTimeAsync(0)
+    expect(account.getSnapshot().authChecked).toBe(true)
+  })
+
   it('ao entrar, mescla aparelho e nuvem e grava nos dois', async () => {
     const local = new InMemoryProgressRepository(
       setEntry(completeDay(emptyProgress(), 1, 1), 'd1:reflexao', 'do aparelho', 1),

@@ -1,8 +1,8 @@
 import { Headphones, Pause, Play, Video } from 'lucide-react'
 import { useAudioPlayer } from '../../../shared/media/useAudioPlayer'
 import type { HubAudio } from '../content'
-import type { BannerTone } from './bannerTones'
-import { ProductBanner } from './ProductBanner'
+import type { BannerTone } from '../../../shared/ui/bannerTones'
+import { ProductBanner } from '../../../shared/ui/ProductBanner'
 
 const TONES: readonly BannerTone[] = ['dawn', 'dusk', 'sea', 'flame', 'gray', 'wine']
 
