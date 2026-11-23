@@ -14,8 +14,8 @@ import {
 import { useProgressSummaries } from '../../../shared/progress/useProgressSummaries'
 import { coverToneAt } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
-import { allJourneys } from '../content'
-import { allMeditations, formatDuration, mediaLabel, meditationHref } from '../meditations'
+import { formatDuration, mediaLabel, meditationHref } from '../meditations'
+import { useCatalog } from '../../../shared/catalog/CatalogContext'
 
 type Tab = 'geral' | 'jornadas' | 'meditacoes' | 'conta'
 const TABS: readonly { id: Tab; label: string }[] = [
@@ -24,8 +24,6 @@ const TABS: readonly { id: Tab; label: string }[] = [
   { id: 'meditacoes', label: 'Meditações' },
   { id: 'conta', label: 'Conta' },
 ]
-
-const JOURNEY_IDS = allJourneys.map((j) => j.id)
 
 const DATE = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo' })
 
@@ -186,7 +184,11 @@ export function ProfilePage({
   const [tab, setTab] = useState<Tab>('geral')
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isConfirmingExit, setIsConfirmingExit] = useState(false)
-  const progress = useProgressSummaries(JOURNEY_IDS, progressLoader)
+  const { journeys: allJourneys, meditations: allMeditations } = useCatalog()
+  const progress = useProgressSummaries(
+    allJourneys.map((j) => j.id),
+    progressLoader,
+  )
   const isWide = layout === 'wide'
   const compact = !isWide
   const wrap = isWide

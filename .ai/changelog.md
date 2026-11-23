@@ -10,6 +10,28 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.11.0] · 2026-11-23
+
+### Adicionado
+
+- Modo Andreía de produtos (`#/admin/produtos`, mock aprovado): no computador, lista de produtos ao lado
+  e editor em blocos (Básico, Estrutura ou Mídia, Preço e acesso, Situação), com "Ver como fica no
+  hub" antes de salvar; no celular, passo a passo (Tipo, Conteúdo, Preço e acesso, Situação) que termina
+  em "Revisar". Salva o catálogo no Firestore, o `free` de cada conteúdo e os links das meditações
+  (só para quem tem acesso). Atalhos no menu da conta da Andreía e na faixa do editor da jornada.
+- O catálogo do site passa a vir do Firestore (`catalog/public`), guardado no aparelho; o do código
+  fica como reserva.
+
+### Alterado
+
+- Publicar a jornada no editor não mexe mais no campo `free` (quem decide grátis ou paga é o catálogo).
+
+### Corrigido
+
+- Transições suaves no site todo: troca de página e de aba, janelas (login, preço, prévia) e menus
+  entram devagar; botões e links mudam de cor com suavidade e "afundam" de leve ao clicar.
+- Logo ao lado de "Atmavox" no cabeçalho da página inicial (computador).
+
 ## [1.10.0] · 2026-11-23
 
 ### Adicionado

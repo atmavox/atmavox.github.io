@@ -79,7 +79,7 @@ export function AccountButton() {
       {isMenuOpen && (
         <div
           id={menuId}
-          className="absolute top-12 right-0 z-30 w-72 rounded-2xl border border-line bg-surface p-4 shadow-[0_10px_30px_rgb(0_0_0/0.35)]"
+          className="absolute top-12 right-0 z-30 w-72 animate-[menu-in_200ms_ease-out] rounded-2xl border border-line bg-surface p-4 shadow-[0_10px_30px_rgb(0_0_0/0.35)]"
         >
           <p className="truncate text-sm text-ink">{user.email ?? user.displayName}</p>
           <p className="mt-1 flex items-center gap-2 text-sm text-ink-muted">
@@ -99,6 +99,13 @@ export function AccountButton() {
                 className="mt-2 flex min-h-10 items-center justify-center rounded-full bg-accent font-semibold text-bg hover:opacity-90"
               >
                 Editar a jornada →
+              </a>
+              <a
+                href="#/admin/produtos"
+                onClick={() => setIsMenuOpen(false)}
+                className="mt-2 flex min-h-10 items-center justify-center rounded-full border border-accent/50 font-semibold text-accent hover:bg-accent/10"
+              >
+                Produtos e preços →
               </a>
             </p>
           )}

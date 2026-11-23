@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { seedCatalog } from '../../../../shared/catalog/seedCatalog'
+import { useCatalog } from '../../../../shared/catalog/CatalogContext'
 import { TONE_BY_TERRITORY } from '../../../../shared/ui/bannerTones'
 import type { Account } from '../../application/account'
 import { LoginDialog } from '../../../../shared/auth/LoginDialog'
@@ -19,7 +19,7 @@ interface LoginGateProps {
  * volta ao hub; ao entrar, a jornada aparece no lugar (com o progresso do aparelho mesclado à conta).
  */
 export function LoginGate({ account, journeyId, background }: LoginGateProps) {
-  const product = seedCatalog.find((p) => p.id === journeyId)
+  const product = useCatalog().find(journeyId)
   const chosen = product
     ? { title: product.title, tone: TONE_BY_TERRITORY[product.territory] }
     : undefined

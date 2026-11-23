@@ -1,0 +1,119 @@
+import { useEffect, useMemo, useState } from 'react'
+import { useAuthSession } from '../../shared/auth/AuthContext'
+import { LoginDialog } from '../../shared/auth/LoginDialog'
+import { useCatalog } from '../../shared/catalog/CatalogContext'
+import { readFirebaseConfig } from '../../shared/firebase/config'
+import {
+  createInMemoryProductsBackend,
+  createProductsBackend,
+  type ProductsBackend,
+} from './infrastructure/productsBackend'
+import { ProductsApp } from './ui/ProductsApp'
+
+/** Faixa azul do Modo Andreía (protótipo aprovado), com as áreas dela. */
+function AdminBar({ active }: { active: 'produtos' | 'acessos' }) {
+  const link = (on: boolean) =>
+    `rounded-full px-3.5 py-1.5 ${on ? 'bg-white/18 font-medium text-on-admin' : 'text-on-admin/80 hover:text-on-admin'}`
+  return (
+    <header className="sticky top-0 z-20 flex flex-wrap items-center gap-x-4 gap-y-1 bg-admin px-5 py-2.5 text-sm text-on-admin">
+      <b className="font-semibold">Modo Andreía</b>
+      <nav aria-label="Áreas do Modo Andreía" className="flex flex-wrap gap-1">
+        <a href="#/jornada/editar" className={link(false)}>
+          Editar a jornada
+        </a>
+        <a
+          href="#/admin/produtos"
+          aria-current={active === 'produtos' ? 'page' : undefined}
+          className={link(active === 'produtos')}
+        >
+          Produtos
+        </a>
+      </nav>
+      <a href="#/" className="ml-auto text-on-admin/90 hover:text-on-admin">
+        Ver o site ↗
+      </a>
+    </header>
+  )
+}
+
+/**
+ * Porta de entrada do Modo Andreía de produtos (`#/admin/produtos`), carregada sob demanda: só a admin
+ * baixa este código. Sem login, pede para entrar; quem não é admin vê um aviso.
+ */
+export function ProdutosEntry({ backend: injected }: { backend?: ProductsBackend }) {
+  const { session, state } = useAuthSession()
+  const { store } = useCatalog()
+  const [isLoginOpen, setIsLoginOpen] = useState(false)
+  const [admin, setAdmin] = useState<{ uid: string; isAdmin: boolean } | null>(null)
+  const uid = state?.user?.uid ?? null
+
+  const backend = useMemo<ProductsBackend | null>(() => {
+    if (injected) return injected
+    const config = readFirebaseConfig(import.meta.env)
+    if (!config || !session) return null
+    return createProductsBackend(config, () => session.getIdToken())
+  }, [injected, session])
+
+  useEffect(() => {
+    if (!uid || !backend) return
+    let cancelled = false
+    void backend.isAdmin(uid).then((isAdmin) => {
+      if (!cancelled) setAdmin({ uid, isAdmin })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [uid, backend])
+
+  useEffect(() => {
+    document.title = 'AtmaVox'
+  }, [])
+
+  const message = (text: string, action?: React.ReactNode) => (
+    <div className="flex min-h-[60dvh] flex-col items-center justify-center gap-4 px-6 text-center">
+      <p className="max-w-md text-ink-muted">{text}</p>
+      {action}
+    </div>
+  )
+
+  let body: React.ReactNode
+  if (!backend && !injected) {
+    body = message('O Modo Andreía precisa do Firebase configurado.')
+  } else if (!state?.authChecked) {
+    body = message('Carregando…')
+  } else if (!uid || !session) {
+    body = message(
+      'Entre com a conta da Andreía para editar os produtos.',
+      <>
+        <button
+          type="button"
+          onClick={() => setIsLoginOpen(true)}
+          className="inline-flex min-h-11 items-center rounded-full bg-admin px-6 font-semibold text-on-admin"
+        >
+          Entrar
+        </button>
+        {isLoginOpen && session && (
+          <LoginDialog account={session} variant="hub" onClose={() => setIsLoginOpen(false)} />
+        )}
+      </>,
+    )
+  } else if (admin?.uid !== uid) {
+    body = message('Carregando…')
+  } else if (!admin.isAdmin) {
+    body = message(
+      'Esta área é só da Andreía.',
+      <a href="#/" className="font-medium text-accent underline">
+        Voltar ao site
+      </a>,
+    )
+  } else {
+    body = <ProductsApp backend={backend ?? createInMemoryProductsBackend()} catalog={store} />
+  }
+
+  return (
+    <div className="min-h-dvh bg-bg">
+      <AdminBar active="produtos" />
+      {body}
+    </div>
+  )
+}

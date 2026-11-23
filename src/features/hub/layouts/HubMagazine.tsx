@@ -2,6 +2,7 @@ import { ArrowRight, MessageCircle } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { AccountMenu } from '../../../shared/auth/AccountMenu'
+import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
@@ -28,13 +29,12 @@ import {
   individualSession,
   introAudio,
   journeysIntro,
-  listenItems,
   meditationsIntro,
-  showcaseJourneys,
   signature,
   specialties,
   type HubAudio,
 } from '../content'
+import { toHubAudio } from '../meditations'
 import {
   activeMenuItem,
   DESKTOP_MENU,
@@ -65,6 +65,8 @@ export function HubMagazine({
   payment?: PaymentReturn | null
   isProfile?: boolean
 }) {
+  const { featuredJourneys: showcaseJourneys, featuredMeditations } = useCatalog()
+  const listenItems = featuredMeditations.map((m) => toHubAudio(m))
   const [openVideo, setOpenVideo] = useState<HubAudio | null>(null)
   // Ao pausar, o vídeo sai devagar (esmaece e recolhe) em vez de sumir de uma vez.
   const { shown: shownVideo, leaving: videoLeaving } = useLingering(openVideo)
@@ -150,7 +152,11 @@ export function HubMagazine({
           </div>
         ) : (
           <div className={`${wrap} flex items-center gap-6 py-3`}>
-            <a href="#/" className="font-display tracking-[0.18em] text-gold uppercase">
+            <a
+              href="#/"
+              className="flex items-center gap-2 font-display tracking-[0.18em] text-gold uppercase"
+            >
+              <BrandMark className="w-[22px]" />
               Atmavox
             </a>
             <nav aria-label="Seções" className="ml-auto flex items-center gap-5 lg:gap-7">
@@ -177,7 +183,7 @@ export function HubMagazine({
       </header>
 
       {page ? (
-        <main>
+        <main key={`${page}-${meditationId ?? ''}`} className="animate-[page-in_400ms_ease-out]">
           {page === 'pagamento' && payment && <PaymentReturnPage payment={payment} layout="wide" />}
           {page === 'perfil' && <ProfilePage layout="wide" />}
           {page === 'jornadas' && <JourneysHub layout="wide" />}
@@ -187,7 +193,7 @@ export function HubMagazine({
           )}
         </main>
       ) : (
-        <main>
+        <main key="inicio" className="animate-[page-in_400ms_ease-out]">
           <section className="relative overflow-hidden bg-[radial-gradient(120%_80%_at_30%_20%,color-mix(in_oklab,var(--accent)_20%,transparent),transparent_60%)]">
             {/* Logo grande e transparente, cortada pela borda esquerda, atrás da pergunta (mock aprovado). */}
             <div className="pointer-events-none absolute top-1/2 -left-[260px] w-[760px] -translate-y-1/2 opacity-25">

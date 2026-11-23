@@ -6,7 +6,8 @@ import { BrandMark } from '../../../shared/ui/BrandMark'
 import { useAccess } from '../../../shared/catalog/AccessContext'
 import { useNow } from '../../../shared/lib/useNow'
 import { usePurchaseFlow } from './usePurchaseFlow'
-import { allJourneys, journeysIntro } from '../content'
+import { journeysIntro } from '../content'
+import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import {
   countByTerritory,
   DURATION_LABELS,
@@ -63,6 +64,7 @@ const toolButton =
 
 /** Hub de jornadas (`#/jornadas`, F9): expandida (A5) ou compacta (A4), com filtros recolhíveis. */
 export function JourneysHub({ layout }: { layout: Layout }) {
+  const { journeys: allJourneys } = useCatalog()
   const [filters, setFilters] = useState<JourneyFilters>(EMPTY_FILTERS)
   const [view, setViewState] = useState<View>(() => readView(layout))
   const [filtersOpen, setFiltersOpen] = useState(true)

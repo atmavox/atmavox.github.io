@@ -3,9 +3,17 @@ import { isJourneyPath } from '../features/jornada/application/navigation'
 import { HubPage } from '../features/hub/HubPage'
 import { AuthContext } from '../shared/auth/AuthContext'
 import { AccessContext } from '../shared/catalog/AccessContext'
+import { CatalogContext } from '../shared/catalog/CatalogContext'
 import { createAppServices } from './createAppServices'
 import { useHashRoute } from '../shared/lib/useHashRoute'
 import { useStopAudioOnAreaChange } from '../shared/media/useStopAudioOnAreaChange'
+
+// O Modo Andreía de produtos só é baixado por quem abre #/admin.
+const ProdutosEntry = lazy(() =>
+  import('../features/produtos/ProdutosEntry').then((module) => ({
+    default: module.ProdutosEntry,
+  })),
+)
 
 // A jornada só é baixada por quem entra nela: o hub (link da bio) fica leve.
 const JourneyEntry = lazy(() =>
@@ -16,11 +24,13 @@ const JourneyEntry = lazy(() =>
 // dentro da mesma área, mas para ao passar do hub para a jornada (ou o contrário).
 export function App() {
   // Uma sessão de login para o site todo: hub e jornada sabem quem entrou (ADR-022).
-  const [{ session, access }] = useState(createAppServices)
+  const [{ session, access, catalog }] = useState(createAppServices)
   return (
     <AuthContext.Provider value={session}>
       <AccessContext.Provider value={access}>
-        <Routes />
+        <CatalogContext.Provider value={catalog}>
+          <Routes />
+        </CatalogContext.Provider>
       </AccessContext.Provider>
     </AuthContext.Provider>
   )
@@ -30,6 +40,14 @@ function Routes() {
   const path = useHashRoute()
   const isJourney = isJourneyPath(path)
   useStopAudioOnAreaChange(isJourney ? 'jornada' : 'hub')
+
+  if (path === '/admin' || path.startsWith('/admin/')) {
+    return (
+      <Suspense fallback={<div className="min-h-dvh bg-bg" aria-busy="true" />}>
+        <ProdutosEntry />
+      </Suspense>
+    )
+  }
 
   if (isJourney) {
     return (

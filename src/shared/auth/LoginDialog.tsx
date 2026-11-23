@@ -124,7 +124,7 @@ export function LoginDialog({
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-40 grid place-items-end sm:place-items-center ${
+      className={`fixed inset-0 z-40 grid animate-[fade-in_250ms_ease-out] place-items-end sm:place-items-center ${
         isGate ? 'bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.35))]' : 'bg-black/55'
       }`}
     >
@@ -141,7 +141,7 @@ export function LoginDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby={ids.title}
-        className="relative w-full max-w-md rounded-t-3xl border border-line bg-surface p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:rounded-3xl"
+        className="relative w-full max-w-md animate-[dialog-in_320ms_ease-out] rounded-t-3xl border border-line bg-surface p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:rounded-3xl"
       >
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="flex flex-col gap-1.5">

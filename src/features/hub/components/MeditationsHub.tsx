@@ -4,7 +4,6 @@ import { coverToneAt } from '../../../shared/ui/bannerTones'
 import { BrandMark } from '../../../shared/ui/BrandMark'
 import { meditationsIntro } from '../content'
 import {
-  allMeditations,
   availableMeditationFilters,
   filterMeditations,
   MEDITATION_FILTER_LABELS,
@@ -17,6 +16,7 @@ import { OfferBadge } from './OfferBits'
 import { useAccess } from '../../../shared/catalog/AccessContext'
 import { useNow } from '../../../shared/lib/useNow'
 import { usePurchaseFlow } from './usePurchaseFlow'
+import { useCatalog } from '../../../shared/catalog/CatalogContext'
 
 const intro = 'Áudios e vídeos curtos para perceber, respirar e voltar a si.'
 
@@ -29,6 +29,7 @@ const chip = (on: boolean) =>
 
 /** Hub de meditações (`#/meditacoes`, variante B do mock): grade de capas com filtros. */
 export function MeditationsHub({ layout }: { layout: 'wide' | 'narrow' }) {
+  const { meditations: allMeditations } = useCatalog()
   const [filter, setFilter] = useState<MeditationFilter>('todas')
   const purchase = usePurchaseFlow()
   const access = useAccess()

@@ -150,8 +150,12 @@ aprovados antes do código.
             (`firebase-setup.md`, seção 8); sem elas, o acesso pago não funciona (o resto segue normal)
             8b. [x] Login nos hubs com abas Início · Jornadas · Meditações (mock aprovado, opção 3) e página de
             perfil (`#/perfil`): abas, trilha de progresso, tipo de acesso
-   9. [ ] Modo Andreía: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
-          temas, território, destaque) e liberar acesso à mão
+   9. [~] Modo Andreía de produtos (mock aprovado): [x] lista + editor + prévia (computador) e passo a
+      passo com "Revisar" (celular), catálogo no Firestore; [ ] tela de Acessos (liberar à mão por
+      e-mail, revogar); [ ] imagem do banner; [ ] dias de uma jornada nova (hoje o editor de dias só
+      conhece a de 21 dias: uma jornada nova deve ficar "Em breve" até isso existir)
+      - Antes: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
+        temas, território, destaque) e liberar acesso à mão
 6. [x] Pagamento por produto: decidido Mercado Pago (Checkout Pro) + Worker gratuito (2026-11-22),
        implementação no passo 5.8
 

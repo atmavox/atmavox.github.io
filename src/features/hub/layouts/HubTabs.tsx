@@ -9,6 +9,7 @@ import {
 import { useEffect, type ComponentType } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { AccountMenu } from '../../../shared/auth/AccountMenu'
+import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { BrandMark } from '../../../shared/ui/BrandMark'
@@ -27,17 +28,8 @@ import { Portrait } from '../components/Portrait'
 import { ShowcaseJourneyCard } from '../components/ShowcaseJourneyCard'
 import { SocialLinks } from '../components/SocialLinks'
 import { Testimonials } from '../components/Testimonials'
-import {
-  about,
-  contactCta,
-  hero,
-  introAudio,
-  listenItems,
-  showcaseJourneys,
-  signature,
-  specialties,
-} from '../content'
-import { meditationHref } from '../meditations'
+import { about, contactCta, hero, introAudio, signature, specialties } from '../content'
+import { meditationHref, toHubAudio } from '../meditations'
 import { HUB_AREA_MENU, HUB_TABS, type HubTab, type PaymentReturn } from '../navigation'
 import { coverToneAt } from '../../../shared/ui/bannerTones'
 
@@ -53,6 +45,8 @@ const primaryButton =
   'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 font-semibold text-bg hover:opacity-90'
 
 function InicioPanel() {
+  const { featuredJourneys: showcaseJourneys, featuredMeditations } = useCatalog()
+  const listenItems = featuredMeditations.map((m) => toHubAudio(m))
   return (
     <>
       <section className="flex flex-col gap-5 pt-1">
@@ -208,7 +202,10 @@ export function HubTabs({
         <MiniPlayer />
       </header>
 
-      <main className="mx-auto flex max-w-xl flex-col gap-8 px-5 pt-2">
+      <main
+        key={`${activeTab}-${meditationId ?? ''}-${isProfile ? 'perfil' : ''}-${payment?.status ?? ''}`}
+        className="mx-auto flex max-w-xl animate-[page-in_400ms_ease-out] flex-col gap-8 px-5 pt-2"
+      >
         {isProfile ? (
           <ProfilePage layout="narrow" />
         ) : payment ? (

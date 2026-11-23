@@ -24,10 +24,6 @@ import type {
 import { parseProgress, type JourneyProgress } from '../../domain/progress'
 import { PUBLISHED_COLLECTION } from '../FirestoreRestJourneySource'
 import { MEDIA_COLLECTION } from '../FirestoreRestMediaSource'
-import { seedCatalog } from '../../../../shared/catalog/seedCatalog'
-
-/** Produto fora do catálogo conta como pago: na dúvida, o conteúdo fica protegido. */
-const isFreeProduct = (id: string) => seedCatalog.find((p) => p.id === id)?.pricing.type === 'free'
 
 /** users/{uid}/journeys/{journeyId}: um documento por pessoa e por jornada (architecture.md). */
 class FirestoreProgressRepository implements CloudProgressRepository {
@@ -87,12 +83,13 @@ function createEditorBackend(db: Firestore): JourneyEditorBackend {
     async publish(journeyId, json) {
       const publishedAt = Date.now()
       const batch = writeBatch(db)
-      // `free` espelha o catálogo: as regras só entregam jornada paga a quem tem acesso (ADR-020).
-      batch.set(doc(db, PUBLISHED_COLLECTION, journeyId), {
-        content: json,
-        publishedAt,
-        free: isFreeProduct(journeyId),
-      })
+      // `merge`: o campo `free` é do Modo Andreía de produtos (o catálogo decide grátis ou paga, e as
+      // regras só entregam jornada paga a quem tem acesso, ADR-020); publicar não mexe nele.
+      batch.set(
+        doc(db, PUBLISHED_COLLECTION, journeyId),
+        { content: json, publishedAt },
+        { merge: true },
+      )
       batch.set(doc(collection(db, 'drafts', journeyId, 'versions')), {
         content: json,
         publishedAt,

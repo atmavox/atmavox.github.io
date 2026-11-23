@@ -93,7 +93,7 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
       ]
 
   return createPortal(
-    <div className="fixed inset-0 z-40 grid place-items-end bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.35))] sm:place-items-center">
+    <div className="fixed inset-0 z-40 grid animate-[fade-in_250ms_ease-out] place-items-end bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.35))] sm:place-items-center">
       <button
         type="button"
         aria-hidden="true"
@@ -106,7 +106,7 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative flex max-h-dvh w-full max-w-[520px] flex-col gap-4 overflow-y-auto rounded-t-3xl border border-line bg-bg p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-[0_30px_80px_rgb(20_14_10/0.35)] sm:rounded-3xl sm:p-7"
+        className="relative flex max-h-dvh w-full max-w-[520px] animate-[dialog-in_320ms_ease-out] flex-col gap-4 overflow-y-auto rounded-t-3xl border border-line bg-bg p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-[0_30px_80px_rgb(20_14_10/0.35)] sm:rounded-3xl sm:p-7"
       >
         <button
           type="button"

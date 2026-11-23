@@ -174,6 +174,14 @@ quem entra na conta.
 - Um script inline no `index.html` aplica o tema salvo antes da primeira pintura (sem "piscar").
 - O Tailwind expõe os tokens como cores (`bg-surface`, `text-accent`).
 
+## Modo Andreía de produtos (`features/produtos`)
+
+Carregado sob demanda em `#/admin/produtos` (só a admin baixa). `domain/productForm.ts` (formulário,
+validação, conversão para o produto), `application/saveProduct.ts` (grava conteúdo e depois catálogo),
+`infrastructure/productsBackend.ts` (REST com o token da admin: `catalog/public`, `published/{id}`,
+`admins/{uid}`) e `ui/` (lista + editor + prévia; passo a passo no celular). O site lê o catálogo pela
+`CatalogStore` (`shared/catalog`, contexto em `app/`), com cópia no aparelho e o do código de reserva.
+
 ## Pagamentos (ADR-023)
 
 ```

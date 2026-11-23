@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { MeditationProduct } from '../../shared/catalog/product'
 import {
-  allMeditations,
   availableMeditationFilters,
   filterMeditations,
   formatDuration,
@@ -9,6 +8,11 @@ import {
   toHubAudio,
 } from './meditations'
 import { meditationIdFromPath, hubSectionFromPath } from './navigation'
+import { visibleProducts } from '../../shared/catalog/product'
+import { seedCatalog } from '../../shared/catalog/seedCatalog'
+import { isMeditation } from '../../shared/catalog/CatalogContext'
+
+const allMeditations = visibleProducts(seedCatalog).filter(isMeditation)
 
 const base = allMeditations[0]!
 const withEbook: MeditationProduct = { ...base, id: 'com-ebook', ebook: { pages: 24 } }

@@ -74,7 +74,7 @@ export function AccountMenu() {
       {isMenuOpen && (
         <div
           id={menuId}
-          className="absolute top-11 right-0 z-30 flex w-72 flex-col gap-1 rounded-2xl border border-line bg-surface p-3 text-left shadow-[0_10px_30px_rgb(0_0_0/0.25)]"
+          className="absolute top-11 right-0 z-30 flex w-72 animate-[menu-in_200ms_ease-out] flex-col gap-1 rounded-2xl border border-line bg-surface p-3 text-left shadow-[0_10px_30px_rgb(0_0_0/0.25)]"
         >
           <p className="truncate px-3 py-1 text-sm text-ink-muted">
             {user.email ?? user.displayName}

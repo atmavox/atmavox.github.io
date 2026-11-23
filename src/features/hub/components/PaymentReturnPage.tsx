@@ -2,7 +2,7 @@ import { ArrowRight, CheckCircle2, Clock, MessageCircle, XCircle } from 'lucide-
 import { useEffect, useState } from 'react'
 import { useAuthSession } from '../../../shared/auth/AuthContext'
 import { useAccess } from '../../../shared/catalog/AccessContext'
-import { seedCatalog } from '../../../shared/catalog/seedCatalog'
+import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import { useNow } from '../../../shared/lib/useNow'
 import { contactCta } from '../content'
 import type { PaymentReturn } from '../navigation'
@@ -24,7 +24,8 @@ export function PaymentReturnPage({
   payment: PaymentReturn
   layout: 'wide' | 'narrow'
 }) {
-  const product = seedCatalog.find((p) => p.id === payment.productId)
+  const { find } = useCatalog()
+  const product = payment.productId ? find(payment.productId) : undefined
   const access = useAccess()
   const { state } = useAuthSession()
   const now = useNow()

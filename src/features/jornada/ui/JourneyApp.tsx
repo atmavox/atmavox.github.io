@@ -17,7 +17,7 @@ import { ReviewsPage } from './pages/ReviewsPage'
 import { VictoriesPage } from './pages/VictoriesPage'
 import { WeekPage } from './pages/WeekPage'
 import { BRAND_TAB_TITLE } from '../../../shared/brand/links'
-import { seedCatalog } from '../../../shared/catalog/seedCatalog'
+import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import { useAccess } from '../../../shared/catalog/AccessContext'
 import { useNow } from '../../../shared/lib/useNow'
 import { useAccount } from './useAccount'
@@ -127,7 +127,7 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
   const { account, state } = useAccount()
   const access = useAccess()
   const now = useNow()
-  const product = seedCatalog.find((p) => p.id === journeyId)
+  const product = useCatalog().find(journeyId)
   const userId = state?.user?.uid
 
   // Quem acabou de entrar pode ter acesso a uma jornada paga: busca de novo, agora com o login.
@@ -166,7 +166,10 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
   return (
     <div className="min-h-dvh">
       <JourneyHeader activeTab={tab} />
-      <main className="mx-auto max-w-2xl px-4 pb-16 lg:max-w-3xl">
+      <main
+        key={tab}
+        className="mx-auto max-w-2xl animate-[page-in_400ms_ease-out] px-4 pb-16 lg:max-w-3xl"
+      >
         <TabContent tab={tab} />
       </main>
     </div>

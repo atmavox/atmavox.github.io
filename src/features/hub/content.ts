@@ -7,14 +7,6 @@ import {
   brandLinks,
   whatsAppMessage,
 } from '../../shared/brand/links'
-import {
-  featuredProducts,
-  visibleProducts,
-  type JourneyProduct,
-  type Product,
-} from '../../shared/catalog/product'
-import { seedCatalog } from '../../shared/catalog/seedCatalog'
-import { allMeditations, toHubAudio } from './meditations'
 
 export interface HubAudio {
   id: string
@@ -81,10 +73,6 @@ export const introAudio: HubAudio = {
   audioSrc: '/audio/atmavox-boas-vindas.m4a',
 }
 
-/** Meditações em destaque na vitrine, do catálogo (ADR-019). Encontros gravados entram como meditações. */
-export const listenItems: readonly HubAudio[] = allMeditations
-  .filter((m) => m.featured)
-  .map((m) => toHubAudio(m))
 export const meditationsIntro = {
   title: 'Pausas guiadas para voltar ao centro',
 } as const
@@ -108,15 +96,6 @@ export const encounters: readonly Encounter[] = [
       'O que você consegue perceber quando deixa de tentar resolver tudo por alguns instantes?',
   },
 ]
-
-const isJourney = (product: Product): product is JourneyProduct => product.kind === 'journey'
-
-/**
- * Jornadas da vitrine (destaques) e da aba Jornadas, do catálogo do código por enquanto. A leitura do
- * catálogo no Firestore entra junto com o Modo Andreía de produtos (Etapa D).
- */
-export const showcaseJourneys = featuredProducts(seedCatalog).filter(isJourney)
-export const allJourneys = visibleProducts(seedCatalog).filter(isJourney)
 
 /** Os encontros não têm horário fixo: quando acontecem, são um quadro ao vivo no TikTok (ADR-021). */
 export const encountersInfo = {

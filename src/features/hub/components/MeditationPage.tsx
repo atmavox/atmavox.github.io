@@ -7,7 +7,6 @@ import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import {
   FREE_MEDIA,
-  findMeditation,
   formatDuration,
   mediaLabel,
   parseMeditationContent,
@@ -17,6 +16,7 @@ import { productOffer } from '../../../shared/catalog/offer'
 import { AudioItem } from './AudioItem'
 import { OfferBadge } from './OfferBits'
 import { usePurchaseFlow } from './usePurchaseFlow'
+import { useCatalog } from '../../../shared/catalog/CatalogContext'
 
 const backLink = (
   <a
@@ -30,7 +30,8 @@ const backLink = (
 
 /** Página de uma meditação (`#/meditacao/{id}`): capa, play e, quando houver, o e-book. */
 export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'narrow' }) {
-  const meditation = findMeditation(id)
+  const { meditations } = useCatalog()
+  const meditation = meditations.find((m) => m.id === id)
   const purchase = usePurchaseFlow()
   const access = useAccess()
   const now = useNow()

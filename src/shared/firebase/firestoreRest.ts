@@ -28,6 +28,56 @@ export async function getJson(
   return response.json()
 }
 
+/** Valor no formato REST do Firestore (só os tipos que o site grava). */
+export type RestValue =
+  | { stringValue: string }
+  | { integerValue: string }
+  | { booleanValue: boolean }
+  | { nullValue: null }
+
+export const restString = (value: string): RestValue => ({ stringValue: value })
+export const restInteger = (value: number): RestValue => ({
+  integerValue: String(Math.trunc(value)),
+})
+export const restBoolean = (value: boolean): RestValue => ({ booleanValue: value })
+export const restNull = (): RestValue => ({ nullValue: null })
+
+/**
+ * Grava só os campos dados (`updateMask`), criando o documento se não existir. Precisa do token de quem
+ * pode gravar (as regras decidem: ADR-020).
+ */
+export async function patchDocument(
+  config: RestConfig,
+  path: string,
+  fields: Record<string, RestValue>,
+  token: string,
+  fetchFn: FetchFn = (input, init) => fetch(input, init),
+): Promise<void> {
+  const mask = Object.keys(fields)
+    .map((name) => `&updateMask.fieldPaths=${encodeURIComponent(name)}`)
+    .join('')
+  const response = await fetchFn(documentsUrl(config, path, mask), {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields }),
+  })
+  if (!response.ok) throw new Error(`Firestore respondeu ${response.status}`)
+}
+
+export async function deleteDocument(
+  config: RestConfig,
+  path: string,
+  token: string,
+  fetchFn: FetchFn = (input, init) => fetch(input, init),
+): Promise<void> {
+  const response = await fetchFn(documentsUrl(config, path), {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok && response.status !== 404)
+    throw new Error(`Firestore respondeu ${response.status}`)
+}
+
 type Fields = Record<string, unknown>
 
 const isObject = (value: unknown): value is Record<string, unknown> =>

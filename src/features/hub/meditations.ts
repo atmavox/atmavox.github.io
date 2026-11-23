@@ -1,8 +1,7 @@
 // Meditações do hub (F9): os metadados vêm do catálogo; aqui ficam só os links das gratuitas, que são
 // públicos de qualquer forma. O conteúdo das pagas vai morar em `published/{id}`, liberado por acesso
 // (ADR-020), quando a compra existir.
-import { visibleProducts, type MeditationProduct, type Product } from '../../shared/catalog/product'
-import { seedCatalog } from '../../shared/catalog/seedCatalog'
+import type { MeditationProduct } from '../../shared/catalog/product'
 import type { HubAudio } from './content'
 
 export type MeditationMedia = ({ audioSrc: string } | { youtubeId: string }) & {
@@ -43,11 +42,6 @@ export const FREE_MEDIA: Readonly<Record<string, MeditationMedia>> = {
   'boas-vindas': { audioSrc: '/audio/atmavox-boas-vindas.m4a' },
   'retorne-ao-seu-centro': { youtubeId: 'jKuKSAQUTCA' },
 }
-
-const isMeditation = (product: Product): product is MeditationProduct =>
-  product.kind === 'meditation'
-
-export const allMeditations = visibleProducts(seedCatalog).filter(isMeditation)
 
 /** 48 → "48 s"; 67 → "1 min"; 300 → "5 min". */
 export function formatDuration(seconds: number): string {
@@ -111,10 +105,6 @@ export function availableMeditationFilters(
       f === 'todas' ||
       ((f !== 'gratis' || logged) && filterMeditations(meditations, f, owned).length > 0),
   )
-}
-
-export function findMeditation(id: string): MeditationProduct | undefined {
-  return allMeditations.find((m) => m.id === id)
 }
 
 export const meditationHref = (id: string) => `#/meditacao/${id}`
