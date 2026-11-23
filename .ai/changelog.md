@@ -10,6 +10,17 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.22.0] · 2026-11-23
+
+### Adicionado
+
+- Modo Andreía · Ativações (`#/admin/ativacoes`, F10, ADR-029): **Terapias** (tabela com arrastar e
+  ativar no computador, cartões no celular; formulário em janela ou em blocos; sem preço não ativa) e
+  **Anamnese** (seções, edição de cada pergunta, nome e telefone fixos, perguntas salvas guardadas em vez
+  de apagadas). Começam pelas quatro terapias combinadas e pelo modelo de anamnese aprovado no mock.
+- Celular no Modo Andreía da ativação: abas embaixo e botão redondo para voltar ao site.
+- Guia do robô oficial do WhatsApp em `processos-manuais.md` (seção 3), para fazer com a Andreía.
+
 ## [1.21.2] · 2026-11-23
 
 ### Alterado

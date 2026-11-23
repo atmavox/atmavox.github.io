@@ -408,3 +408,55 @@ no código, sempre pode.
   com o nome e as 6 cores em mini-banners que mostram o nome digitado, e "Criar território".
 - Criar grava na hora e já escolhe; o produto muda só no "Salvar". Nome repetido não passa.
 - No hub, um território criado entra depois dos 4 da marca e só aparece no filtro quando tem jornada.
+
+## F10 · Ativação individual paga 🔨 (passo 1 de 5: terapias e anamnese no Modo Andreía)
+
+Mocks aprovados (2026-11-23): `Downloads/atmavox-ativacao-pessoa-v3.html` (pessoa) e
+`Downloads/atmavox-ativacao-andreia-v3.html` (Modo Andreía). Decisão: ADR-029.
+
+**Fluxo da pessoa** (passos 3 a 5): a aba **Contato** explica a ativação (sem item novo no menu) e leva
+a `#/ativacao`. Do login ao "Pagamento confirmado", tudo acontece numa **janela sobre o hub
+desfocado**; fechar antes do login volta ao início, depois do login leva ao perfil, aba **Ativações**.
+
+1. Login obrigatório (etapas na vertical ao lado no computador; barra em partes no celular).
+2. Anamnese por etapas (as seções do Modo Andreía). Nome e telefone com WhatsApp sempre no começo.
+   Quem já respondeu vê tudo preenchido para conferir. Caixa de consentimento no fim.
+3. Terapia: computador com banner da escolhida e lista ao lado (filtro "Todas"); celular com cartões.
+   A pergunta extra da terapia escolhida aparece no cartão.
+4. Data de preferência: calendário do mês com os horários livres daquela terapia (swipe no celular).
+   "A Andreía confere a agenda e aprova o horário com você pelo WhatsApp."
+5. Resumo com "Editar" em cada bloco e o total; pagar pelo Mercado Pago. O pedido nasce aqui.
+6. Pagamento confirmado: check grande, número do pedido, prévia da mensagem e "Avisar a Andreía no
+   WhatsApp" (mensagem pronta, editável em Mensagens).
+
+**Status do pedido:** Aguardando pagamento → Paga → Solicitada (avisou no WhatsApp, esperando a
+Andreía) → Agendada (horário aprovado e confirmado) → Realizada; e Cancelada. Sem pagamento em 2 dias,
+o pedido some. A data escolhida é **preferência**: o horário só sai da agenda quando a Andreía aprova e
+a pessoa confirma pelo link (reservado por 24 h).
+
+**Perfil · Ativações:** um cartão por pedido (ícone, terapia, pedido e data, status, próxima ação);
+clicar abre embaixo as etapas na vertical e os detalhes. "Ver minha anamnese" em cada cartão.
+
+**Modo Andreía (`#/admin/ativacoes/…`):** abas Terapias e Anamnese (passo 1); Pedidos, Agenda e
+Mensagens nos passos seguintes. No computador, abas logo abaixo da faixa azul; no celular, abas
+embaixo da tela e um botão redondo que volta ao site.
+
+- **Terapias** ✅: tabela (arrastar para ordenar, ativar na linha, "Editar") no computador; cartões
+  (segurar para ordenar) no celular. Formulário em janela no computador e em quatro blocos que abrem
+  um de cada vez no celular (Texto, Aparência, Sessão, Pergunta extra). Campos: nome, descrição, ícone,
+  cor, modalidade, duração, preço, ativa e perguntas extras (sim/não, uma opção, texto). **Sem preço
+  não ativa.** Começa pelas quatro terapias combinadas, sem preço e desativadas.
+- **Anamnese** ✅: seções que abrem; tocar numa pergunta abre a edição dela (texto, explicação, tipo,
+  opções, obrigatória, subir/descer, tirar do formulário). Nome e telefone são fixos (só o texto
+  muda). Pergunta já salva que sai do formulário fica **guardada** (as respostas usam o id dela) e pode
+  voltar. Barra fixa com "Alterações não salvas", Descartar e Salvar. Começa pelo modelo aprovado.
+- **Pedidos** (passo 4): quadro por status no computador, lista por dia no celular; o pedido abre numa
+  janela (dados fixos à esquerda, só a anamnese rola) ou numa folha. "Aprovar" e "Sugerir outro
+  horário" abrem o WhatsApp com a mensagem pronta.
+- **Agenda** (passo 2): grade da semana (arrastar cria horário livre; o "+" abre o formulário
+  completo) e vista do mês; no celular, o dia com toque no horário vazio.
+- **Mensagens** (passo 5): os textos prontos do WhatsApp com campos ({nome}, {data}, {link}…) e prévia.
+
+**Critérios de aceite do passo 1:** terapias e anamnese salvam em `catalog/therapies` e
+`catalog/anamnesis`; terapia sem preço não fica ativa; nome e telefone não saem nem mudam de tipo;
+pergunta salva nunca some (vai para as guardadas); funciona no computador e no celular.

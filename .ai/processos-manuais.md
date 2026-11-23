@@ -13,6 +13,7 @@ variables → Actions** (abas **Variables** e **Secrets**).
 - [ ] Redes sociais: Instagram (`INSTAGRAM_TOKEN`, renovar a cada 60 dias)
 - [ ] Redes sociais: Spotify (`SOCIAL_SPOTIFY_RSS`, quando o podcast existir)
 - [ ] Pagamentos: conta de serviço do Firebase + Mercado Pago + Worker + webhook + botão + compra de teste
+- [ ] Robô do WhatsApp (depois dos pagamentos): app na Meta + número em "coexistence" + token + webhook
 
 ---
 
@@ -136,3 +137,75 @@ Mercado Pago ──volta──▶ Worker /retorno ──▶ site #/pagamento/apr
   A Andreía pode liberar à mão (`firebase-setup.md`, seção 8), sem prejuízo para ninguém.
 - Estorno pelo Mercado Pago tira o acesso que veio daquele pagamento automaticamente.
 - Direito de arrependimento (7 dias, compra online): o estorno é feito pelo painel do Mercado Pago.
+
+---
+
+## 3. Robô do WhatsApp (API oficial da Meta · depois dos pagamentos)
+
+O robô responde a pessoa que avisa o pagamento, envia o "horário aprovado" com botão de confirmar e
+usa os textos da tela **Mensagens** do Modo Andreía. Quem conversa continua sendo a Andreía, no app
+do WhatsApp Business de sempre. A Andreía **já tem conta no Meta Business**, o que adianta o passo 3.1.
+
+Só a API oficial é segura. **Não use** Z-API, Evolution, Baileys ou similares (simulam o WhatsApp Web,
+violam os termos e o número pode ser banido).
+
+Antes de começar, confira na página oficial de preços da Meta
+(<https://developers.facebook.com/docs/whatsapp/pricing>): em outubro de 2026 a cobrança mudou. O
+esperado é custo zero no volume da Andreía para respostas dentro da conversa aberta pela pessoa; o
+lembrete na véspera (modelo fora da janela de 24 h) pode ser pago e, nesse caso, fica desligado.
+
+### 3.1 Conta e verificação (com a Andreía)
+
+1. Em <https://business.facebook.com>, entrar com a conta da Andreía e conferir em **Configurações do
+   negócio → Central de segurança** se o negócio está **verificado**. Se não estiver, iniciar a
+   verificação (pede documentos do negócio ou da Andreía; pode levar alguns dias).
+2. Conferir se o número do WhatsApp Business dela está no app **WhatsApp Business** atualizado
+   (versão 2.24.17 ou mais nova). É ele que vai funcionar no app e no robô ao mesmo tempo
+   ("coexistence").
+
+### 3.2 App na Meta
+
+1. Em <https://developers.facebook.com/apps>, **Criar app** → tipo **Empresa** → ligar ao portfólio
+   do negócio da Andreía.
+2. Adicionar o produto **WhatsApp** → **Configuração da API**.
+3. Em **Números de telefone**, **Adicionar número** → escolher **usar o número do app WhatsApp
+   Business** (coexistence) e seguir o passo a passo, que pede um código no celular da Andreía.
+   Se essa opção não aparecer, anote a mensagem e avise o desenvolvedor antes de seguir: sem
+   coexistence, o número sai do app e ela perde a conversa pelo celular.
+4. Anotar o **ID do número de telefone** e o **ID da conta do WhatsApp Business** (aparecem na mesma
+   tela). Não são segredos.
+
+### 3.3 Token permanente (segredo)
+
+1. Em **Configurações do negócio → Usuários → Usuários do sistema**, criar um usuário do sistema
+   "atmavox-robo" (função Administrador) e dar a ele acesso ao app e à conta do WhatsApp.
+2. **Gerar token** com as permissões `whatsapp_business_messaging` e
+   `whatsapp_business_management`, sem validade.
+3. Colar direto no Worker (pasta `worker/`), sem passar por conversa nem arquivo:
+
+   ```bash
+   npx wrangler@4 secret put WA_TOKEN          # o token do usuário do sistema
+   npx wrangler@4 secret put WA_APP_SECRET     # app → Configurações → Básico → Chave secreta do app
+   npx wrangler@4 secret put WA_VERIFY_TOKEN   # uma senha longa inventada na hora (usada no 3.4)
+   ```
+
+### 3.4 Webhook
+
+1. No app → WhatsApp → **Configuração** → **Webhook** → **Editar**:
+   - URL: `https://<endereço do Worker>/whatsapp`
+   - Token de verificação: o mesmo `WA_VERIFY_TOKEN` do passo 3.3.
+2. Em **Campos do webhook**, assinar **messages**.
+3. Avisar o desenvolvedor com o ID do número (3.2) para ligar o robô no site.
+
+### 3.5 Mensagens fora da janela (só se o custo permitir)
+
+O lembrete na véspera precisa de um **modelo aprovado** pela Meta (categoria Utilidade). Em
+**WhatsApp Manager → Modelos de mensagem**, criar o modelo com o texto da tela Mensagens, trocando
+os campos por `{{1}}`, `{{2}}`… A aprovação costuma sair em minutos.
+
+### 3.6 Testar
+
+1. Fazer uma compra de teste (seção 2.6) e tocar em "Avisar a Andreía": o robô deve responder em
+   segundos, e a conversa aparece também no app da Andreía.
+2. Aprovar o horário no Modo Andreía: a pessoa recebe a mensagem com o botão **Confirmar**.
+3. Nos logs (`npx wrangler@4 tail`), nenhum aviso pode aparecer como "assinatura inválida".

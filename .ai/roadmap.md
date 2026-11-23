@@ -217,11 +217,49 @@ Surgiu no caminho:
         `INSTAGRAM_TOKEN`) e lembrar de renovar a chave a cada 60 dias (ou automatizar a renovação)
   - [ ] Spotify: quando o podcast existir, a Variable `SOCIAL_SPOTIFY_RSS` (o Facebook sai do foco)
 
-- [ ] **Ativação individual paga** (conversa com a Andreía em 2026-11-23; plano proposto, aguardando ok
-      e mocks): login obrigatório → anamnese (editável no Modo Andreía) → escolha da terapia (preços
-      editáveis) → data de preferência (agenda da Andreía) → pagamento → mensagem pronta no WhatsApp →
-      histórico e status no perfil. Passos: 0. mocks; 1. terapias + anamnese no Modo Andreía; 2. agenda; 3. fluxo da pessoa; 4. pagamento e status; 5. WhatsApp + perfil + pedidos no Modo
-      Andreía
+- [~] **Ativação individual paga** (F10, ADR-029; conversa com a Andreía em 2026-11-23): login
+  obrigatório → anamnese (editável no Modo Andreía) → terapia (preços editáveis) → data de
+  preferência (agenda da Andreía) → pagamento → mensagem pronta no WhatsApp → histórico e status no
+  perfil. 0. [x] Mocks aprovados (pessoa v3 e Modo Andreía v3)
+  1. [x] Terapias + anamnese no Modo Andreía (`#/admin/ativacoes`, `catalog/therapies` e
+         `catalog/anamnesis`) (1.22.0)
+  2. [ ] Agenda no Modo Andreía (`catalog/availability`, grade da semana + mês, formulário completo)
+  3. [ ] Fluxo da pessoa na janela sobre o hub (Contato → login → anamnese → terapia → data → resumo)
+  4. [ ] Pedidos e status (regras novas do Firestore, Worker cobrando terapias; o pagamento real
+         depende do Mercado Pago, ainda pendente) + tela Pedidos no Modo Andreía
+  5. [ ] Aprovação pelo site com link de confirmação + Mensagens + aba Ativações no perfil
+  - [ ] A Andreía confere os textos das terapias e da anamnese, põe os preços e ativa
+  - Decidido: sem item novo no menu (a aba Contato explica e leva à ativação); status Aguardando
+    pagamento → Paga → Solicitada → Agendada → Realizada (+ Cancelada); a data escolhida é só
+    preferência e o horário sai da agenda quando a Andreía confirma
+  - [ ] Mocks enviados (`Downloads/atmavox-ativacao-pessoa.html` com 3 modelos de anamnese e
+        `Downloads/atmavox-ativacao-andreia.html` com 3 caminhos de confirmação pelo WhatsApp):
+        aguardando escolha. Pessoa: escolhas feitas e refinadas em
+        `Downloads/atmavox-ativacao-pessoa-v2.html` (anamnese com perguntas gerais e holísticas, sem tom
+        clínico); falta o retorno do Modo Andreía
+  - [x] Pessoa aprovada (2026-11-23, `Downloads/atmavox-ativacao-pessoa-v3.html`): Contato C com
+        cartão do WhatsApp; do login ao "Pagamento confirmado" tudo numa janela sobre o hub
+        desfocado (fechar antes do login volta ao início; depois, leva ao perfil na aba Ativações);
+        etapas em bolinhas no computador e barra em partes no celular (na anamnese, uma barra só);
+        anamnese "Completo por áreas" por etapas; terapia C no PC (filtro "Todas") e A no celular com
+        a pergunta extra; calendário com swipe no celular; resumo B; pago A; perfil A com detalhes ao
+        abrir o cartão e "Ver minha anamnese"; nome e telefone (WhatsApp) obrigatórios em "Seus dados"
+  - [x] Modo Andreía v2 → v3 (`Downloads/atmavox-ativacao-andreia-v3.html`): pedido em janela no PC
+        (anamnese inteira se expande na própria janela) e folha no celular; agenda com arrastar na
+        grade + "+" que abre o formulário completo, Semana e Mês; terapia em janela no PC; anamnese
+        por seções; aprovação no site (A) + tela "Mensagens" com os textos prontos do WhatsApp (os
+        mesmos que um robô usaria depois); celular com abas embaixo + botão redondo para o site.
+        Aprovado em 2026-11-23: formulário de terapia no celular em seções que abrem (A); na janela
+        do pedido, os dados ficam fixos à esquerda e só a anamnese rola
+  - [ ] Depois: robô oficial do WhatsApp (Cloud API pelo Worker, número em "coexistence" com o app
+        da Andreía), usando os mesmos textos de "Mensagens" e o mesmo "aprovar"
+  - [ ] (histórico) Modo Andreía v2, aguardando escolha: como o
+        pedido abre (gaveta, janela ou página), como marcar horário livre (arrastar na grade ou
+        botão + formulário; grade com Semana e Mês), formulário de terapia (janela ou gaveta), menu
+        do celular (abas embaixo, título com menu ou menu lateral) e como aprovar o horário (site,
+        robô no Telegram, robô oficial no WhatsApp; sugestão: site + Telegram)
+  - [ ] Mercado Pago segue pendente (`processos-manuais.md`, seção 2): o desenvolvedor avisa quando
+        configurar com a Andreía; até lá o pagamento da ativação fica "em breve"
 
 ## Depois
 

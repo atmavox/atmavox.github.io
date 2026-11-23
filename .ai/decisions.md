@@ -462,6 +462,36 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ grátis, rápido (arquivo estático) e sem chave no site. ➖ a publicação nova
   aparece em até 6 horas; a chave do Instagram precisa ser renovada a cada 60 dias.
 
+## ADR-029 · Ativação individual: terapias, anamnese, pedidos e agenda
+
+- **Status:** aceita · 2026-11-23 (passo 1 feito: terapias e anamnese)
+- **Contexto:** a "Ativação individual" deixa de ser só um link de WhatsApp e passa a ser paga, com
+  anamnese editável, terapias com preço, agenda da Andreía e acompanhamento no perfil, sem custo fixo
+  e sem robô obrigatório.
+- **Decisão:**
+  - **Terapias** em `catalog/therapies` e **anamnese** em `catalog/anamnesis` (JSON em `content`):
+    leitura pública, gravação só da admin (regra que já existe para `catalog/`). Tipos e regras puras em
+    `src/shared/ativacao/` (o hub e o Modo Andreía usam), tela em `features/produtos/ui/ativacoes/`.
+  - **Ids imutáveis:** terapia (slug) e perguntas (id gerado na criação). Pergunta salva que sai do
+    formulário vai para `archived`, nunca some: as respostas são guardadas por id (como os campos da
+    jornada). Nome e telefone são perguntas fixas, sempre no começo.
+  - **Terapia sem preço não fica ativa** (validação no formulário e na leitura).
+  - **Pedidos** (passos seguintes) em `users/{uid}/sessions/{pedido}`: a pessoa cria só como
+    "Aguardando pagamento"; status muda só pelo Worker (pagamento) ou pela admin. Anamnese respondida
+    em `users/{uid}/anamnesis/current`, lida só pela pessoa e pela admin.
+  - **Agenda** em `catalog/availability`: faixas livres por terapia; a pessoa vê só os horários de
+    início; a data escolhida é preferência. O horário sai da agenda quando a Andreía aprova e a pessoa
+    confirma pelo link de uso único (reserva de 24 h).
+  - **WhatsApp:** links `wa.me` com textos editáveis (tela Mensagens). Robô oficial (Cloud API pelo
+    Worker, número em coexistence) fica para depois, com os mesmos textos e o mesmo "aprovar"; APIs não
+    oficiais estão descartadas (risco de banir o número).
+- **Alternativas consideradas:** guardar terapias dentro do `catalog/public` (misturaria com os
+  produtos da vitrine e o Worker teria de distinguir); apagar perguntas de verdade (perderia o texto das
+  respostas antigas); robô do WhatsApp desde o início (contas e custo ainda incertos).
+- **Consequências:** ➕ nada novo para configurar no passo 1; a Andreía edita tudo sem desenvolvedor;
+  respostas antigas sempre legíveis. ➖ perguntas guardadas acumulam no documento (pequeno); a agenda e
+  os pedidos pedem regras novas do Firestore nos próximos passos.
+
 ---
 
 ## Modelo

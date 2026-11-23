@@ -22,6 +22,26 @@ const PATHS = {
     </>
   ),
   plus: <path d="M12 6v12M6 12h12" />,
+  close: <path d="M6 6l12 12M18 6 6 18" />,
+  pen: <path d="M4 20l1-4.5L15.5 5a2 2 0 0 1 2.8 0l.7.7a2 2 0 0 1 0 2.8L8.5 19z" />,
+  home: (
+    <>
+      <path d="M4 11l8-6.5 8 6.5V20H4z" />
+      <path d="M10 20v-5h4v5" />
+    </>
+  ),
+  leaf: (
+    <>
+      <path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z" />
+      <path d="m5 19 8-8" />
+    </>
+  ),
+  file: (
+    <>
+      <path d="M7 3.5h7l4 4V20.5H6V3.5z" />
+      <path d="M14 3.5V8h4M9 12.5h6M9 16h4" />
+    </>
+  ),
 } satisfies Record<string, ReactNode>
 
 export type UiIconName = keyof typeof PATHS | 'grip'

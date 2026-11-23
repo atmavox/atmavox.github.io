@@ -30,6 +30,7 @@ src/
       ui/                 JourneyApp, JourneyHeader, pages/ (uma por aba), components/ (dia, blocos…),
                           account/ (login), admin/ (Modo Andreía, carregado sob demanda)
   shared/
+    ativacao/             ativação individual (ADR-029): therapy.ts e anamnesis.ts (tipos, leitura, edição pura)
     auth/                 login do site (ADR-022): sessão, janela de login, Firebase Auth sob demanda
     firebase/             config e app do Firebase, divididos entre o login e a nuvem da jornada
     brand/                links da marca (redes, áudio, WhatsApp) e assinatura
@@ -69,6 +70,7 @@ ui  →  application  →  domain  ←  content
 | `#/jornada/{id}/encerramento`                       | Encerramento                              |
 | `#/jornada`, `#/jornada/semana-1`…                  | Links antigos: abrem `chama-interna-21`   |
 | `#/jornada/editar`                                  | Modo Andreía (só admin)                   |
+| `#/admin/ativacoes/terapias`, `…/anamnese`          | Modo Andreía da ativação (ADR-029)        |
 
 O hash evita o 404 do GitHub Pages ao recarregar uma página interna e permite compartilhar o link de uma aba.
 
@@ -123,6 +125,8 @@ próprio `admins/{uid}`. O restante é negado.
 ```
 catalog/public                        # content: JSON com Product[]; updatedAt (leitura pública, por REST)
 catalog/territories                   # content: JSON com os territórios criados { id, name, tone }[] (ADR-027)
+catalog/therapies                     # content: JSON com Therapy[] da ativação individual (ADR-029)
+catalog/anamnesis                     # content: JSON com o formulário da anamnese { sections, consent, archived }
 # Fora do Firestore: public/social.json + public/social/*.jpg, gerados no deploy (ADR-028)
 published/{productId}                 # content: jornada ou meditação; free: boolean (cópia do catálogo)
 users/{uid}/access/{productId}        # grantedAt, expiresAt | null, source: 'manual' | 'payment', ref?

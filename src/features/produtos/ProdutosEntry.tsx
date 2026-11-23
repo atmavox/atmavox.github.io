@@ -14,7 +14,14 @@ import {
   createInMemoryAccessAdmin,
   type AccessAdmin,
 } from './infrastructure/accessAdmin'
+import {
+  createAtivacoesBackend,
+  createInMemoryAtivacoesBackend,
+  type AtivacoesBackend,
+} from './infrastructure/ativacoesBackend'
 import { AccessesApp } from './ui/AccessesApp'
+import { AtivacoesApp } from './ui/ativacoes/AtivacoesApp'
+import { sectionFromPath } from './ui/ativacoes/sections'
 import { ProductsApp } from './ui/ProductsApp'
 
 /**
@@ -25,12 +32,18 @@ export function ProdutosEntry({
   path = '/admin/produtos',
   backend: injected,
   accessAdmin: injectedAccess,
+  ativacoes: injectedAtivacoes,
 }: {
   path?: string
   backend?: ProductsBackend
   accessAdmin?: AccessAdmin
+  ativacoes?: AtivacoesBackend
 }) {
-  const area = path.startsWith('/admin/acessos') ? 'acessos' : 'produtos'
+  const area = path.startsWith('/admin/acessos')
+    ? 'acessos'
+    : path.startsWith('/admin/ativacoes')
+      ? 'ativacoes'
+      : 'produtos'
   const { session, state } = useAuthSession()
   const { store, products } = useCatalog()
   const [isLoginOpen, setIsLoginOpen] = useState(false)
@@ -50,6 +63,13 @@ export function ProdutosEntry({
     if (!config || !session) return null
     return createAccessAdmin(config, () => session.getIdToken())
   }, [injectedAccess, session])
+
+  const ativacoes = useMemo<AtivacoesBackend | null>(() => {
+    if (injectedAtivacoes) return injectedAtivacoes
+    const config = readFirebaseConfig(import.meta.env)
+    if (!config || !session) return null
+    return createAtivacoesBackend(config, () => session.getIdToken())
+  }, [injectedAtivacoes, session])
 
   useEffect(() => {
     if (!uid || !backend) return
@@ -107,6 +127,11 @@ export function ProdutosEntry({
     body =
       area === 'acessos' ? (
         <AccessesApp admin={accessAdmin ?? createInMemoryAccessAdmin()} products={products} />
+      ) : area === 'ativacoes' ? (
+        <AtivacoesApp
+          backend={ativacoes ?? createInMemoryAtivacoesBackend()}
+          section={sectionFromPath(path)}
+        />
       ) : (
         <ProductsApp backend={backend ?? createInMemoryProductsBackend()} catalog={store} />
       )

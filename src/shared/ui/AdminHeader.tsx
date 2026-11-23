@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-export type AdminArea = 'produtos' | 'acessos'
+export type AdminArea = 'produtos' | 'acessos' | 'ativacoes'
 
 /**
  * A faixa azul de todas as telas do Modo Andreía (produtos, acessos e o editor de cada jornada): as
@@ -37,10 +37,11 @@ export function AdminHeader({
 
   return (
     <header className="sticky top-0 z-40 flex h-13 items-center gap-2 bg-admin px-4 text-sm text-on-admin sm:gap-4 sm:px-5">
-      <b className="shrink-0 font-semibold">Modo Andreía</b>
+      <b className="hidden shrink-0 font-semibold sm:inline">Modo Andreía</b>
       <nav aria-label="Áreas do Modo Andreía" className="flex shrink-0 gap-0.5">
         {area('produtos', 'Produtos')}
         {area('acessos', 'Acessos')}
+        {area('ativacoes', 'Ativações')}
       </nav>
       {context && (
         <span className="hidden min-w-0 truncate rounded-full bg-on-admin/16 px-3 py-0.5 text-[13px] lg:inline">
