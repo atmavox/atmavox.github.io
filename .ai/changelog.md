@@ -10,6 +10,12 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.6.1] · 2026-11-22
+
+Reúne as etapas D.1 a D.5 (uma minor cada: 1.2.0 a 1.6.0) e as correções pedidas no caminho (áudio de
+boas-vindas novo e vídeo em largura total). As versões subiram juntas porque a regra de versão por etapa
+entrou agora (`conventions.md`).
+
 ### Adicionado
 
 - Catálogo de produtos em `shared/catalog` (ADR-019): tipos de jornada e meditação, leitura segura do

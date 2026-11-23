@@ -201,7 +201,7 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Decisão:** `site.json` na raiz guarda `site`, `client` e `version` (SemVer). O site lê o arquivo por
   `shared/brand/site.ts`, que valida o formato, e mostra a versão no rodapé. O `package.json` repete a
   mesma versão, e um teste garante que as duas não se separam. **Major** e **minor** sobem só quando o
-  desenvolvedor pede; **patch** o Claude sobe a cada correção ou ajuste pequeno.
+  desenvolvedor pede; **patch** o Claude sobe a cada correção ou ajuste pequeno. _Atualizado em
 - **Alternativas consideradas:** só o `package.json` (o cliente pediu um arquivo com o nome do site e do
   cliente); injetar a versão no build pelo Vite (mais uma configuração sem ganho real).
 - **Consequências:** ➕ versão visível e conferida por teste. ➖ duas cópias do número (protegidas pelo

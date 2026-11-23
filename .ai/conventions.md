@@ -68,8 +68,9 @@
 [SemVer](https://semver.org/lang/pt-BR/) `major.minor.patch`, no `site.json` e no `package.json` (e no
 `package-lock.json`), sempre iguais:
 
-- **major** (grandes mudanças) e **minor** (features novas): **só quando o desenvolvedor pedir**.
-- **patch** (correções e ajustes pequenos): o Claude sobe sozinho, um por entrega.
+- **minor**: o Claude sobe sozinho **a cada etapa (passo) terminada** de um plano, junto com o commit dela.
+- **patch**: o Claude sobe sozinho **a cada correção ou ajuste que o desenvolvedor pedir**.
+- **major**: só quando o desenvolvedor pedir (ex.: ao terminar um conjunto grande de mudanças).
 - Ao subir, a seção "Não lançado" do `changelog.md` vira a versão nova, com data.
 
 ## Commits (o desenvolvedor executa; o Claude só sugere)
