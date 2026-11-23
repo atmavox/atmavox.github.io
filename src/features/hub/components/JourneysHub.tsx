@@ -1,7 +1,8 @@
 import { LayoutList, ListFilter, Rows3, Search } from 'lucide-react'
 import { useId, useState } from 'react'
 import { productOffer } from '../../../shared/catalog/offer'
-import { TERRITORIES, TERRITORY_LABELS, type JourneyProduct } from '../../../shared/catalog/product'
+import type { JourneyProduct } from '../../../shared/catalog/product'
+import { useTerritories } from '../../../shared/catalog/TerritoryContext'
 import { BrandMark } from '../../../shared/ui/BrandMark'
 import { useAccess } from '../../../shared/catalog/AccessContext'
 import { useNow } from '../../../shared/lib/useNow'
@@ -90,9 +91,10 @@ export function JourneysHub({ layout }: { layout: Layout }) {
   }
   const update = (patch: Partial<JourneyFilters>) => setFilters((f) => ({ ...f, ...patch }))
 
-  const results = filterJourneys(allJourneys, filters, owned)
-  const groups = groupByTerritory(results)
-  const counts = countByTerritory(allJourneys)
+  const { territories } = useTerritories()
+  const results = filterJourneys(allJourneys, filters, owned, territories)
+  const groups = groupByTerritory(results, territories)
+  const counts = countByTerritory(allJourneys, territories)
   const isWide = layout === 'wide'
   const countText = `${results.length} ${results.length === 1 ? 'jornada' : 'jornadas'}`
 
@@ -209,17 +211,17 @@ export function JourneysHub({ layout }: { layout: Layout }) {
               className="-mx-5 flex gap-2 overflow-x-auto px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {showChips}
-              {TERRITORIES.map((territory) => (
+              {counts.map(({ territory }) => (
                 <button
-                  key={territory}
+                  key={territory.id}
                   type="button"
-                  aria-pressed={filters.territory === territory}
+                  aria-pressed={filters.territory === territory.id}
                   onClick={() =>
-                    update({ territory: filters.territory === territory ? null : territory })
+                    update({ territory: filters.territory === territory.id ? null : territory.id })
                   }
-                  className={chip(filters.territory === territory)}
+                  className={chip(filters.territory === territory.id)}
                 >
-                  {TERRITORY_LABELS[territory]}
+                  {territory.name}
                 </button>
               ))}
             </div>
@@ -247,9 +249,9 @@ export function JourneysHub({ layout }: { layout: Layout }) {
           </div>
         ) : (
           groups.map((group) => (
-            <section key={group.territory} className="flex flex-col gap-4">
+            <section key={group.territory.id} className="flex flex-col gap-4">
               <h2 className="flex items-baseline gap-2 font-display text-[1.4rem] text-ink">
-                {TERRITORY_LABELS[group.territory]}
+                {group.territory.name}
                 <small className="font-sans text-sm text-ink-faint">
                   {group.journeys.length} {group.journeys.length === 1 ? 'jornada' : 'jornadas'}
                 </small>
@@ -310,23 +312,24 @@ export function JourneysHub({ layout }: { layout: Layout }) {
                   Territórios
                 </h2>
                 <ul className="flex flex-col">
-                  {[null, ...TERRITORIES].map((territory) => {
-                    const on = filters.territory === territory
+                  {[null, ...counts].map((item) => {
+                    const id = item?.territory.id ?? null
+                    const on = filters.territory === id
                     return (
-                      <li key={territory ?? 'todas'}>
+                      <li key={id ?? 'todas'}>
                         <button
                           type="button"
                           aria-pressed={on}
-                          onClick={() => update({ territory })}
+                          onClick={() => update({ territory: id })}
                           className={`flex w-full justify-between rounded-xl px-3 py-2 text-left transition-colors ${
                             on
                               ? 'bg-accent/14 font-medium text-accent'
                               : 'text-ink-muted hover:text-accent'
                           }`}
                         >
-                          {territory ? TERRITORY_LABELS[territory] : 'Todas'}
+                          {item ? item.territory.name : 'Todas'}
                           <span className="font-medium text-ink-faint">
-                            {territory ? counts[territory] : allJourneys.length}
+                            {item ? item.count : allJourneys.length}
                           </span>
                         </button>
                       </li>
@@ -367,11 +370,11 @@ export function JourneysHub({ layout }: { layout: Layout }) {
               ? empty
               : groups.map((group) => (
                   <section
-                    key={group.territory}
+                    key={group.territory.id}
                     className={`flex flex-col ${view === 'compact' ? '' : 'gap-4'}`}
                   >
                     <h2 className="mb-1 flex items-baseline gap-2.5 font-display text-[1.7rem] text-ink">
-                      {TERRITORY_LABELS[group.territory]}
+                      {group.territory.name}
                       <small className="font-sans text-sm text-ink-faint">
                         {group.journeys.length}{' '}
                         {group.journeys.length === 1 ? 'jornada' : 'jornadas'}

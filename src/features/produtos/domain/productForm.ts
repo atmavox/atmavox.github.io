@@ -2,7 +2,7 @@
 // conversão de/para o produto do catálogo (ADR-019), com as validações em português.
 import { dayCountOf, dayGroups, durationLabelOf } from '../../../shared/catalog/journeyLayout'
 import { parseCatalog } from '../../../shared/catalog/parseCatalog'
-import type { Product, ProductStatus, Territory } from '../../../shared/catalog/product'
+import type { Product, ProductStatus, TerritoryId } from '../../../shared/catalog/product'
 import {
   listItem,
   normalizeStructure,
@@ -31,7 +31,7 @@ export interface ProductForm extends StructureForm {
   title: string
   phrase: string
   bannerMediaId: string
-  territory: Territory
+  territory: TerritoryId
   status: ProductStatus
   featured: boolean
   order: number

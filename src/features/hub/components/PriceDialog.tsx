@@ -6,7 +6,6 @@ import { useAccess } from '../../../shared/catalog/AccessContext'
 import { paymentsUrl, requestCheckout } from '../../../shared/catalog/checkout'
 import { formatPrice } from '../../../shared/catalog/offer'
 import type { Product } from '../../../shared/catalog/product'
-import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import { journeyStructureLabel } from '../journeyFilters'
 import { formatDuration, mediaLabel } from '../meditations'
@@ -117,7 +116,7 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
           <X aria-hidden size={16} />
         </button>
         <ProductBanner
-          tone={TONE_BY_TERRITORY[product.territory]}
+          territory={product.territory}
           mediaId={product.bannerMediaId}
           className="aspect-video rounded-[18px]"
         >

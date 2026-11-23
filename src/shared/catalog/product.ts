@@ -1,15 +1,8 @@
 // Produtos do catálogo (ADR-019): o que a vitrine e os hubs mostram de cada jornada ou meditação.
 // O conteúdo (dias, links de áudio, vídeo e e-book) nunca fica aqui: vive em `published/{id}`.
 
-export const TERRITORIES = ['estado-cinza', 'consciencia', 'presenca', 'expansao'] as const
-export type Territory = (typeof TERRITORIES)[number]
-
-export const TERRITORY_LABELS: Record<Territory, string> = {
-  'estado-cinza': 'Estado Cinza',
-  consciencia: 'Consciência',
-  presenca: 'Presença',
-  expansao: 'Expansão',
-}
+/** Id de um território (`territories.ts`): os 4 da marca ou um criado pela Andreía (ADR-027). */
+export type TerritoryId = string
 
 export type Pricing =
   | { type: 'free' }
@@ -27,7 +20,7 @@ interface ProductBase {
   phrase: string
   /** Imagem em `media/{id}` (ADR-014). Sem ela, o cartão usa um fundo da marca. */
   bannerMediaId?: string
-  territory: Territory
+  territory: TerritoryId
   status: ProductStatus
   pricing: Pricing
   /** Aparece na página inicial. */

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { JourneyProduct } from '../../shared/catalog/product'
+import { DEFAULT_TERRITORIES } from '../../shared/catalog/territories'
 import {
   countByTerritory,
   durationDays,
@@ -92,17 +93,42 @@ describe('apoio do hub', () => {
   })
 
   it('agrupa por território na ordem da marca, sem grupos vazios', () => {
-    expect(groupByTerritory(all).map((g) => g.territory)).toEqual([
+    expect(groupByTerritory(all).map((g) => g.territory.id)).toEqual([
       'estado-cinza',
       'consciencia',
       'presenca',
     ])
-    expect(countByTerritory(all)).toEqual({
-      'estado-cinza': 1,
-      consciencia: 1,
-      presenca: 2,
-      expansao: 0,
-    })
+    expect(countByTerritory(all).map((c) => [c.territory.id, c.count])).toEqual([
+      ['estado-cinza', 1],
+      ['consciencia', 1],
+      ['presenca', 2],
+      ['expansao', 0],
+    ])
+  })
+
+  it('território criado: entra no fim, só aparece quando tem jornada e a busca acha pelo nome', () => {
+    const territories = [
+      ...DEFAULT_TERRITORIES,
+      { id: 'corpo', name: 'Corpo', tone: 'dusk' as const },
+    ]
+    const corpo = journey({ id: 'corpo-1', title: 'Respirar', territory: 'corpo' })
+    expect(countByTerritory(all, territories).map((c) => c.territory.id)).not.toContain('corpo')
+    expect(groupByTerritory([...all, corpo], territories).at(-1)?.territory.name).toBe('Corpo')
+    expect(
+      ids(
+        filterJourneys(
+          [...all, corpo],
+          { ...EMPTY_FILTERS, query: 'corpo' },
+          new Set(),
+          territories,
+        ),
+      ),
+    ).toEqual(['corpo-1'])
+  })
+
+  it('produto com território que a lista ainda não tem continua num grupo', () => {
+    const orphan = journey({ id: 'orfa', territory: 'novo' })
+    expect(groupByTerritory([orphan]).map((g) => g.territory.id)).toEqual(['novo'])
   })
 
   it('sabe quando há filtro ligado', () => {

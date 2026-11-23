@@ -8,7 +8,8 @@ import {
   createLocalCatalogCache,
   type CatalogStore,
 } from '../shared/catalog/catalogStore'
-import { readFirebaseConfig } from '../shared/firebase/config'
+import { createTerritoryStore, type TerritoryStore } from '../shared/catalog/territoryStore'
+import { readFirebaseConfig, type FirebaseConfig } from '../shared/firebase/config'
 import { documentsUrl, fieldsOf, getJson, stringField } from '../shared/firebase/firestoreRest'
 
 /**
@@ -28,30 +29,33 @@ export interface AppServices {
   session: AuthSession | null
   access: AccessStore | null
   catalog: CatalogStore
+  territories: TerritoryStore
+}
+
+/** O `content` de um documento público de `catalog/` (catálogo, territórios), por REST e sem login. */
+function publicCatalogDoc(config: FirebaseConfig, path: string) {
+  return async () => {
+    const fields = fieldsOf(
+      await getJson(documentsUrl(config, path, '&mask.fieldPaths=content'), null),
+    )
+    return (fields && stringField(fields, 'content')) ?? null
+  }
 }
 
 /** Login e acessos do site, criados uma vez (ADR-022, ADR-020); `null` sem as variáveis do Firebase. */
 export function createAppServices(): AppServices {
   const config = readFirebaseConfig(import.meta.env)
+  // O catálogo e os territórios são públicos: lidos por REST, sem login e sem o SDK (ADR-019, ADR-027).
   const catalog = createCatalogStore({
     cache: createLocalCatalogCache(),
-    // O catálogo é público: lido por REST, sem login e sem o SDK (ADR-019).
-    ...(config
-      ? {
-          source: async () => {
-            const fields = fieldsOf(
-              await getJson(
-                documentsUrl(config, 'catalog/public', '&mask.fieldPaths=content'),
-                null,
-              ),
-            )
-            return (fields && stringField(fields, 'content')) ?? null
-          },
-        }
-      : {}),
+    ...(config ? { source: publicCatalogDoc(config, 'catalog/public') } : {}),
   })
+  const territories = createTerritoryStore(
+    config ? { source: publicCatalogDoc(config, 'catalog/territories') } : {},
+  )
   void catalog.refresh()
-  if (!config) return { session: null, access: null, catalog }
+  void territories.refresh()
+  if (!config) return { session: null, access: null, catalog, territories }
   const session = createAuthSession({
     hint: createLocalSessionHint(),
     onSignedOut: clearJourneyProgressOnDevice,
@@ -60,5 +64,5 @@ export function createAppServices(): AppServices {
   })
   const access = createAccessStore({ session, load: createRestAccessLoader(config) })
   syncProfileOnLogin(session, config)
-  return { session, access, catalog }
+  return { session, access, catalog, territories }
 }

@@ -1,10 +1,16 @@
 import type { ReactNode } from 'react'
+import { useTerritories } from '../catalog/TerritoryContext'
 import { BrandMark } from './BrandMark'
 import type { BannerTone } from './bannerTones'
 import { useBannerImage } from './useBannerImage'
 
-interface ProductBannerProps {
-  tone: BannerTone
+type ProductBannerProps = (
+  | /** A cor do território do produto (ADR-027). */ { territory: string; tone?: never }
+  | /** Uma cor escolhida (capas de meditação, prévia de um território novo). */ {
+      tone: BannerTone
+      territory?: never
+    }
+) & {
   /** Imagem escolhida pela Andreía (`media/{id}`); enquanto carrega (ou sem ela), o fundo desenhado. */
   mediaId?: string | undefined
   /** Produto "Em breve": o desenho fica um pouco mais apagado. */
@@ -14,12 +20,15 @@ interface ProductBannerProps {
 }
 
 export function ProductBanner({
-  tone,
+  tone: chosenTone,
+  territory,
   mediaId,
   muted = false,
   className = '',
   children,
 }: ProductBannerProps) {
+  const { territoryOf } = useTerritories()
+  const tone = chosenTone ?? territoryOf(territory ?? '').tone
   const image = useBannerImage(mediaId)
   return (
     <div className={`relative overflow-hidden ${className}`}>

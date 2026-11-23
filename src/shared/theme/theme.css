@@ -184,6 +184,39 @@
   }
 }
 
+/* Folhas que sobem de baixo no celular (território do produto). */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* Passo seguinte (desliza da direita) e voltar (desliza da esquerda), como num app de celular. */
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes step-back {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* As barras do símbolo da marca "falam" devagar (BrandMark com `speaking`). */
 @keyframes speak {
   0%,

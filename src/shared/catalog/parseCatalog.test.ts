@@ -45,7 +45,8 @@ describe('parseCatalog', () => {
   it('deixa de fora só o produto quebrado', () => {
     const broken = [
       { ...journey, id: 'Com Espaço' },
-      { ...journey, id: 'sem-territorio', territory: 'outro' },
+      { ...journey, id: 'territorio-invalido', territory: 'Com Espaço' },
+      { ...journey, id: 'sem-territorio', territory: undefined },
       { ...journey, id: 'preco-quebrado', pricing: { type: 'paid', priceCents: 97.5 } },
       { ...journey, id: 'tema-quebrado', themes: [{ label: 'I' }] },
       { ...meditation, id: 'sem-duracao', durationSec: 0 },
@@ -90,6 +91,10 @@ describe('parseCatalog', () => {
       parseCatalog([{ ...journey, themes: [{ label: 'I', title: '' }], dayCount: 500 }]) ?? []
     expect(parsed).toMatchObject({ themes: [{ label: 'I', title: '' }] })
     expect(parsed).not.toHaveProperty('dayCount')
+  })
+
+  it('aceita território criado pela Andreía (qualquer id válido)', () => {
+    expect(parseCatalog([{ ...journey, territory: 'corpo' }])?.[0]?.territory).toBe('corpo')
   })
 
   it('o que não é lista devolve null', () => {

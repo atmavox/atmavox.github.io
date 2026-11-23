@@ -7,6 +7,7 @@ import {
   serializeDayTitles,
 } from '../../../shared/catalog/dayTitles'
 import type { Product } from '../../../shared/catalog/product'
+import type { Territory } from '../../../shared/catalog/territories'
 import {
   deleteDocument,
   documentsUrl,
@@ -27,6 +28,8 @@ import type { MeditationContent } from '../domain/productForm'
 export interface ProductsBackend {
   isAdmin(uid: string): Promise<boolean>
   saveCatalog(products: readonly Product[]): Promise<void>
+  /** Os territórios criados pela Andreía em `catalog/territories` (os 4 da marca vêm do código). */
+  saveTerritories(territories: readonly Territory[]): Promise<void>
   /** `free` espelha o catálogo: as regras só entregam conteúdo pago a quem tem acesso (ADR-020). */
   setFree(productId: string, free: boolean): Promise<void>
   loadMeditationContent(productId: string): Promise<MeditationContent | null>
@@ -90,6 +93,15 @@ export function createProductsBackend(
         config,
         'catalog/public',
         { content: restString(JSON.stringify(products)), updatedAt: restInteger(now()) },
+        await token(),
+        fetchFn,
+      )
+    },
+    async saveTerritories(territories) {
+      await patchDocument(
+        config,
+        'catalog/territories',
+        { content: restString(JSON.stringify(territories)), updatedAt: restInteger(now()) },
         await token(),
         fetchFn,
       )
@@ -198,9 +210,11 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
   dayTitles: Map<string, string[]>
   /** Jornadas com rascunho salvo no editor. */
   draftJourneys: Set<string>
+  territories: Territory[] | null
 } {
   const state = {
     catalog: null as Product[] | null,
+    territories: null as Territory[] | null,
     free: new Map<string, boolean>(),
     contents: new Map<string, MeditationContent>(),
     images: new Map<string, CompressedImage>(),
@@ -212,6 +226,9 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
     isAdmin: async () => admin,
     saveCatalog: async (products: readonly Product[]) => {
       state.catalog = [...products]
+    },
+    saveTerritories: async (territories: readonly Territory[]) => {
+      state.territories = [...territories]
     },
     setFree: async (id: string, free: boolean) => {
       state.free.set(id, free)

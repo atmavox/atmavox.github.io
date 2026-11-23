@@ -396,3 +396,14 @@ no código, sempre pode.
 - **Apagar produto:** só Rascunho ou Em breve, com confirmação ("Apagar de vez?"); a jornada perde
   também o rascunho. Útil para testes.
 - A lista de produtos fica parada ao lado enquanto o editor rola (computador).
+
+**Território do produto** (mock `Downloads/atmavox-territorio-v2.html`, ADR-027):
+
+- O campo mostra a cor do banner e o nome do território.
+- **Computador:** ao abrir, "Buscar ou criar território" (o cursor já vai para lá); a lista filtra
+  sem acento; setas e Enter escolhem. Nome que não existe vira "Criar «Nome»" com as 6 cores em
+  bolinhas e "Criar e escolher".
+- **Celular:** a lista sobe de baixo; "Novo território" desliza para o segundo passo ("← Territórios"),
+  com o nome e as 6 cores em mini-banners que mostram o nome digitado, e "Criar território".
+- Criar grava na hora e já escolhe; o produto muda só no "Salvar". Nome repetido não passa.
+- No hub, um território criado entra depois dos 4 da marca e só aparece no filtro quando tem jornada.

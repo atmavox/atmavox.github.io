@@ -16,9 +16,10 @@ interface InlineTextProps {
 }
 
 // Mock aprovado (`Downloads/atmavox-campos-editaveis.html`): a faixa azul à esquerda (opção D) com o
-// lápis ao lado (opção B). Vazio, ganha fundo azul claro e o exemplo em itálico.
-const base =
-  'rounded-r-md border-l-[3px] border-admin-ink/45 bg-transparent pl-2 pr-1 outline-none transition-colors duration-200 placeholder:text-admin-ink/75 placeholder:italic hover:border-admin-ink hover:bg-admin/10 focus:border-admin-ink focus:bg-admin/10'
+// lápis ao lado (opção B). O fundo azul é só do campo; o lápis, sem fundo, fica mais forte e com mais
+// cor ao passar o mouse ou editar. Vazio, o campo ganha fundo azul claro e o exemplo em itálico.
+const fieldBase =
+  'rounded-r-md border-l-[3px] border-admin-ink/45 bg-transparent pl-2 pr-1 outline-none transition-colors duration-200 placeholder:text-admin-ink/75 placeholder:italic group-hover/inline:border-admin-ink group-hover/inline:bg-admin/10 focus:border-admin-ink focus:bg-admin/10'
 const empty = 'bg-admin/8'
 
 /**
@@ -36,8 +37,18 @@ export function InlineText({
   fit,
 }: InlineTextProps) {
   const width = fit ? 'w-auto min-w-8 [field-sizing:content]' : 'w-full min-w-0 flex-1'
-  const look = `${base} ${value.trim() === '' ? empty : ''} ${width} ${className}`
+  const look = `${fieldBase} ${value.trim() === '' ? empty : ''} ${width} ${className}`
   const ref = useRef<HTMLTextAreaElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  /** Clicar no lápis leva o cursor para o fim do texto (o fundo azul vem do foco do campo). */
+  function focusField() {
+    const field = singleLine ? inputRef.current : ref.current
+    if (!field) return
+    field.focus()
+    const end = field.value.length
+    field.setSelectionRange(end, end)
+  }
 
   // Cresce com o texto, sem barra de rolagem dentro do bloco.
   useLayoutEffect(() => {
@@ -47,15 +58,20 @@ export function InlineText({
     el.style.height = `${el.scrollHeight}px`
   }, [value])
 
+  // Fora da ordem do Tab (o próprio campo já recebe o foco); o mouse não tira o foco ao clicar.
   const pen = (
-    <span
+    <button
+      type="button"
+      tabIndex={-1}
       aria-hidden="true"
-      className={`shrink-0 text-admin-ink opacity-55 transition-opacity duration-200 group-hover/inline:opacity-100 group-focus-within/inline:opacity-100 ${
-        singleLine ? '' : 'mt-1'
+      onMouseDown={(event) => event.preventDefault()}
+      onClick={focusField}
+      className={`grid shrink-0 cursor-text place-items-center p-0.5 text-admin-ink opacity-50 transition-opacity duration-200 group-focus-within/inline:opacity-100 group-hover/inline:opacity-100 [&_svg]:transition-[stroke-width] [&_svg]:duration-200 group-focus-within/inline:[&_svg]:[stroke-width:2] group-hover/inline:[&_svg]:[stroke-width:2] ${
+        singleLine ? '' : 'mt-0.5'
       }`}
     >
       <EditorIcon name="pen" size={15} />
-    </span>
+    </button>
   )
 
   return (
@@ -66,6 +82,7 @@ export function InlineText({
     >
       {singleLine ? (
         <input
+          ref={inputRef}
           aria-label={label}
           value={value}
           placeholder={placeholder}

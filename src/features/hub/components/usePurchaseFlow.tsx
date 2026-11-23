@@ -2,7 +2,6 @@ import { useCallback, useState, type ReactNode } from 'react'
 import { useAuthSession } from '../../../shared/auth/AuthContext'
 import { LoginDialog } from '../../../shared/auth/LoginDialog'
 import type { Product } from '../../../shared/catalog/product'
-import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { PriceDialog } from './PriceDialog'
 
 type Step = { kind: 'login'; product: Product } | { kind: 'price'; product: Product } | null
@@ -35,7 +34,7 @@ export function usePurchaseFlow(): {
         variant="gate"
         chosen={{
           title: product.title,
-          tone: TONE_BY_TERRITORY[product.territory],
+          territory: product.territory,
           mediaId: product.bannerMediaId,
         }}
         onClose={close}

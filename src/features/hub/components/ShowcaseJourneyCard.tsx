@@ -3,7 +3,6 @@ import { cardTiles } from '../../../shared/catalog/journeyLayout'
 import { productOffer } from '../../../shared/catalog/offer'
 import type { JourneyProduct } from '../../../shared/catalog/product'
 import { notifyMeHref } from '../content'
-import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 
 /** "Conhecer" leva ao hub de jornadas (F9); é lá que a pessoa começa (com login, a partir do passo 4). */
@@ -28,7 +27,7 @@ export function ShowcaseJourneyCard({ journey, size }: ShowcaseJourneyCardProps)
       className={`flex flex-col overflow-hidden rounded-[20px] border border-line bg-surface ${WIDTH[size]} ${isSoon ? 'opacity-[0.92]' : ''}`}
     >
       <ProductBanner
-        tone={TONE_BY_TERRITORY[journey.territory]}
+        territory={journey.territory}
         mediaId={journey.bannerMediaId}
         muted={isSoon}
         className="aspect-video"

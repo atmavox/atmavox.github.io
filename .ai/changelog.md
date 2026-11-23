@@ -10,6 +10,26 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.19.0] · 2026-11-23
+
+### Adicionado
+
+- **Territórios criados pela Andreía** (ADR-027): ficam em `catalog/territories` (leitura pública,
+  gravação só da admin), com nome e uma das 6 cores de banner. Os 4 da marca continuam garantidos pelo
+  código. Hub, filtros, agrupamento e a cor dos banners passam a ler essa lista; um território criado só
+  aparece no filtro do hub quando tem jornada.
+- **Seletor de território** no produto (mock `Downloads/atmavox-territorio-v2.html`), no lugar do menu
+  do navegador. Computador: a cor e o nome; ao abrir, "Buscar ou criar território" (nome novo vira
+  "Criar «…»" com as bolinhas de cor). Celular: a lista sobe de baixo e "Novo território" desliza para
+  um segundo passo com as cores em mini-banners.
+
+## [1.18.1] · 2026-11-23
+
+### Alterado
+
+- Editor da jornada: clicar no lápis de um campo leva o cursor para o fim do texto. O lápis não tem
+  fundo; ao passar o mouse ou editar, fica com mais cor e traço um pouco mais forte.
+
 ## [1.18.0] · 2026-11-23
 
 ### Adicionado

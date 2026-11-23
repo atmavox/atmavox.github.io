@@ -2,16 +2,14 @@
 // outros: a vitrine continua de pé. Só uma lista que nem é lista devolve null (o site usa o catálogo
 // do código).
 import { MAX_DAY_COUNT, PREVIEW_DAY_COUNT } from './journeyLayout'
-import {
-  TERRITORIES,
-  type JourneyProduct,
-  type JourneyStructure,
-  type JourneyTheme,
-  type MeditationProduct,
-  type Pricing,
-  type Product,
-  type ProductStatus,
-  type Territory,
+import type {
+  JourneyProduct,
+  JourneyStructure,
+  JourneyTheme,
+  MeditationProduct,
+  Pricing,
+  Product,
+  ProductStatus,
 } from './product'
 
 type Raw = Record<string, unknown>
@@ -62,7 +60,9 @@ function parseProduct(raw: unknown): Product | undefined {
   if (!isObject(raw)) return undefined
   const id = typeof raw.id === 'string' && SLUG.test(raw.id) ? raw.id : undefined
   const title = str(raw.title)
-  const territory: Territory | undefined = oneOf(TERRITORIES, raw.territory)
+  // Qualquer território com id válido: os criados pela Andreía também (ADR-027).
+  const territory =
+    typeof raw.territory === 'string' && SLUG.test(raw.territory) ? raw.territory : undefined
   const status = oneOf(STATUSES, raw.status)
   const pricing = parsePricing(raw.pricing)
   const order = typeof raw.order === 'number' && Number.isFinite(raw.order) ? raw.order : undefined

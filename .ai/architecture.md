@@ -122,13 +122,19 @@ próprio `admins/{uid}`. O restante é negado.
 
 ```
 catalog/public                        # content: JSON com Product[]; updatedAt (leitura pública, por REST)
+catalog/territories                   # content: JSON com os territórios criados { id, name, tone }[] (ADR-027)
 published/{productId}                 # content: jornada ou meditação; free: boolean (cópia do catálogo)
 users/{uid}/access/{productId}        # grantedAt, expiresAt | null, source: 'manual' | 'payment', ref?
 interest/{productId}/people/{uid}     # "Quero ser avisada" de um produto "Em breve"; createdAt
 ```
 
 ```ts
-type Territory = 'estado-cinza' | 'consciencia' | 'presenca' | 'expansao'
+// Território: os 4 da marca no código + os criados (catalog/territories); o produto guarda só o id.
+interface Territory {
+  id: string
+  name: string
+  tone: 'flame' | 'wine' | 'dawn' | 'sea' | 'dusk' | 'gray'
+}
 type Pricing = { type: 'free' } | { type: 'paid'; priceCents: number; accessMonths: number | null } // null = acesso para sempre
 
 interface ProductBase {
@@ -136,7 +142,7 @@ interface ProductBase {
   title: string
   phrase: string // frase emblemática do cartão
   bannerMediaId?: string // imagem em media/{id} (ADR-014)
-  territory: Territory
+  territory: string // id do território (ADR-027)
   status: 'draft' | 'soon' | 'published' // draft não aparece; soon = "Em breve"
   pricing: Pricing
   featured: boolean // aparece na página inicial

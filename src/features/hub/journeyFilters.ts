@@ -1,19 +1,14 @@
 // Busca e filtros do hub de jornadas (F9, mock aprovado: índice lateral por território).
 import { dayGroups } from '../../shared/catalog/journeyLayout'
-import {
-  TERRITORIES,
-  TERRITORY_LABELS,
-  type JourneyProduct,
-  type JourneyStructure,
-  type Territory,
-} from '../../shared/catalog/product'
+import type { JourneyProduct, JourneyStructure, TerritoryId } from '../../shared/catalog/product'
+import { DEFAULT_TERRITORIES, territoryOf, type Territory } from '../../shared/catalog/territories'
 
 export type ShowFilter = 'todas' | 'disponiveis' | 'em-breve' | 'gratis' | 'minhas'
 export type DurationFilter = 'ate-7' | '8-14' | '15-mais'
 
 export interface JourneyFilters {
   query: string
-  territory: Territory | null
+  territory: TerritoryId | null
   show: ShowFilter
   duration: DurationFilter | null
 }
@@ -61,13 +56,17 @@ export function normalize(text: string): string {
     .trim()
 }
 
-function matchesQuery(journey: JourneyProduct, query: string): boolean {
+function matchesQuery(
+  journey: JourneyProduct,
+  query: string,
+  territories: readonly Territory[],
+): boolean {
   const wanted = normalize(query)
   if (!wanted) return true
   const haystack = [
     journey.title,
     journey.phrase,
-    TERRITORY_LABELS[journey.territory],
+    territoryOf(territories, journey.territory).name,
     ...journey.themes.map((t) => t.title),
     ...(journey.previewDays ?? []),
   ]
@@ -91,30 +90,61 @@ export function filterJourneys(
   filters: JourneyFilters,
   /** Ids com acesso válido (filtro "Minhas"). */
   owned: ReadonlySet<string> = new Set(),
+  /** Os territórios do site (a busca acha pelo nome deles). */
+  territories: readonly Territory[] = DEFAULT_TERRITORIES,
 ): JourneyProduct[] {
   return journeys.filter(
     (j) =>
-      matchesQuery(j, filters.query) &&
+      matchesQuery(j, filters.query, territories) &&
       (filters.territory === null || j.territory === filters.territory) &&
       matchesShow(j, filters.show, owned) &&
       (filters.duration === null || inDuration(durationDays(j.durationLabel), filters.duration)),
   )
 }
 
-/** Grupos por território, na ordem da marca, só com os que têm jornada. */
-export function groupByTerritory(
+/**
+ * Os territórios na ordem do site (os 4 da marca, depois os criados), mais algum que um produto use e
+ * a lista ainda não tenha (ex.: a nuvem não respondeu): nenhuma jornada fica sem grupo.
+ */
+function territoriesInUse(
   journeys: readonly JourneyProduct[],
-): { territory: Territory; journeys: JourneyProduct[] }[] {
-  return TERRITORIES.map((territory) => ({
-    territory,
-    journeys: journeys.filter((j) => j.territory === territory),
-  })).filter((group) => group.journeys.length > 0)
+  territories: readonly Territory[],
+): Territory[] {
+  const extra = [...new Set(journeys.map((j) => j.territory))]
+    .filter((id) => !territories.some((t) => t.id === id))
+    .map((id) => territoryOf(territories, id))
+  return [...territories, ...extra]
 }
 
-export function countByTerritory(journeys: readonly JourneyProduct[]): Record<Territory, number> {
-  const counts = Object.fromEntries(TERRITORIES.map((t) => [t, 0])) as Record<Territory, number>
-  for (const j of journeys) counts[j.territory] += 1
-  return counts
+/** Grupos por território, na ordem do site, só com os que têm jornada. */
+export function groupByTerritory(
+  journeys: readonly JourneyProduct[],
+  territories: readonly Territory[] = DEFAULT_TERRITORIES,
+): { territory: Territory; journeys: JourneyProduct[] }[] {
+  return territoriesInUse(journeys, territories)
+    .map((territory) => ({
+      territory,
+      journeys: journeys.filter((j) => j.territory === territory.id),
+    }))
+    .filter((group) => group.journeys.length > 0)
+}
+
+/**
+ * Quantas jornadas cada território tem, para o filtro. Os 4 da marca aparecem sempre (mesmo com 0);
+ * um território criado só aparece quando tem jornada.
+ */
+export function countByTerritory(
+  journeys: readonly JourneyProduct[],
+  territories: readonly Territory[] = DEFAULT_TERRITORIES,
+): { territory: Territory; count: number }[] {
+  return territoriesInUse(journeys, territories)
+    .map((territory) => ({
+      territory,
+      count: journeys.filter((j) => j.territory === territory.id).length,
+    }))
+    .filter(
+      ({ territory, count }) => count > 0 || DEFAULT_TERRITORIES.some((t) => t.id === territory.id),
+    )
 }
 
 export function hasActiveFilters(filters: JourneyFilters): boolean {

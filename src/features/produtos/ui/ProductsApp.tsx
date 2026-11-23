@@ -5,7 +5,6 @@ import { formatPrice } from '../../../shared/catalog/offer'
 import type { Product } from '../../../shared/catalog/product'
 import type { CatalogStore } from '../../../shared/catalog/catalogStore'
 import { useMediaQuery } from '../../../shared/lib/useMediaQuery'
-import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import { rememberBannerImage } from '../../../shared/ui/useBannerImage'
 import { UiIcon } from '../../../shared/ui/UiIcon'
@@ -23,7 +22,10 @@ import {
   type ProductForm,
 } from '../domain/productForm'
 import type { ProductsBackend } from '../infrastructure/productsBackend'
+import { createTerritory } from '../application/createTerritory'
+import { useTerritories } from '../../../shared/catalog/TerritoryContext'
 import { ProductEditor, type EditorPart } from './ProductEditor'
+import type { CreateTerritory } from './TerritoryPicker'
 import { ProductPreview } from './ProductPreview'
 
 type Filter = 'todos' | 'journey' | 'meditation'
@@ -71,7 +73,7 @@ function ProductRow({
         } ${isActive ? 'bg-admin/10 outline outline-1 outline-admin/35' : 'hover:bg-admin/5'}`}
       >
         <ProductBanner
-          tone={TONE_BY_TERRITORY[product.territory]}
+          territory={product.territory}
           mediaId={product.bannerMediaId}
           className="aspect-square rounded-xl"
         />
@@ -165,6 +167,7 @@ export function ProductsApp({
   catalog: CatalogStore | null
 }) {
   const isWide = useMediaQuery('(min-width: 900px)')
+  const { territories, store: territoryStore } = useTerritories()
   const [products, setProducts] = useState<readonly Product[]>(() => catalog?.getSnapshot() ?? [])
   const [filter, setFilter] = useState<Filter>('todos')
   const [form, setForm] = useState<ProductForm | null>(null)
@@ -248,6 +251,14 @@ export function ProductsApp({
   }
 
   const patch = (change: Partial<ProductForm>) => setForm((f) => (f ? { ...f, ...change } : f))
+
+  // Território novo: grava na hora e entra na lista do site; o produto só muda no "Salvar".
+  const createTerritoryHere: CreateTerritory = async (name, tone) => {
+    const result = await createTerritory(territories, name, tone, backend)
+    if (result.kind === 'invalid') return result
+    territoryStore?.replace(result.list)
+    return { kind: 'created', id: result.territory.id }
+  }
 
   // Apagar vale para o produto como está salvo (Rascunho ou Em breve), não para o que está na tela.
   const savedProduct = form && !isNew ? products.find((p) => p.id === form.id) : undefined
@@ -388,6 +399,8 @@ export function ProductsApp({
                 form={form}
                 errors={errors}
                 onChange={patch}
+                territories={territories}
+                onCreateTerritory={createTerritoryHere}
                 parts={
                   isNew
                     ? ['tipo', 'conteudo', 'preco', 'situacao']
@@ -491,6 +504,8 @@ export function ProductsApp({
           form={form}
           errors={errors}
           onChange={patch}
+          territories={territories}
+          onCreateTerritory={createTerritoryHere}
           parts={[current.id]}
           isNew={isNew}
           onPickBanner={(file) => void pickBanner(file)}

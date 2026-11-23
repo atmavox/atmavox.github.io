@@ -1,14 +1,6 @@
-import type { Territory } from '../catalog/product'
+import type { BannerTone } from '../catalog/territories'
 
-export type BannerTone = 'flame' | 'gray' | 'wine' | 'dawn' | 'dusk' | 'sea'
-
-/** Fundo desenhado de cada território, enquanto o produto não tem imagem própria (mock aprovado). */
-export const TONE_BY_TERRITORY: Record<Territory, BannerTone> = {
-  'estado-cinza': 'flame',
-  consciencia: 'wine',
-  presenca: 'dawn',
-  expansao: 'sea',
-}
+export type { BannerTone } from '../catalog/territories'
 
 const COVER_TONES: readonly BannerTone[] = ['dawn', 'dusk', 'sea', 'flame', 'gray', 'wine']
 

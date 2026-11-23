@@ -1,10 +1,10 @@
-import { TERRITORIES, TERRITORY_LABELS, type Territory } from '../../../shared/catalog/product'
-import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
+import type { Territory } from '../../../shared/catalog/territories'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import type { AccessTerm, FormErrors, ProductForm } from '../domain/productForm'
 import { Field, Section, Segmented } from './fields'
 import { StructureSection } from './StructureSection'
 import { inputClass } from './styles'
+import { TerritoryPicker, type CreateTerritory } from './TerritoryPicker'
 
 export type EditorPart = 'tipo' | 'conteudo' | 'preco' | 'situacao'
 
@@ -18,6 +18,9 @@ interface ProductEditorProps {
   /** Escolheu uma foto para o banner: o app reduz e envia (ADR-014). */
   onPickBanner?: (file: File) => void
   bannerState?: 'idle' | 'sending' | 'error'
+  /** Os territórios do site e como criar um novo (ADR-027). */
+  territories: readonly Territory[]
+  onCreateTerritory: CreateTerritory
 }
 
 const ACCESS_OPTIONS: readonly { id: AccessTerm; label: string }[] = [
@@ -37,6 +40,8 @@ export function ProductEditor({
   isNew,
   onPickBanner,
   bannerState = 'idle',
+  territories,
+  onCreateTerritory,
 }: ProductEditorProps) {
   const isJourney = form.kind === 'journey'
   const has = (part: EditorPart) => parts.includes(part)
@@ -91,7 +96,7 @@ export function ProductEditor({
               <span className="text-sm text-ink-muted">Banner</span>
               <div className="flex items-center gap-3">
                 <ProductBanner
-                  tone={TONE_BY_TERRITORY[form.territory]}
+                  territory={form.territory}
                   mediaId={form.bannerMediaId || undefined}
                   className="h-16 w-28 shrink-0 rounded-xl"
                 />
@@ -134,22 +139,18 @@ export function ProductEditor({
                 </p>
               )}
             </div>{' '}
-            <Field label="Território" hint="Agrupa e filtra no hub.">
-              {(props) => (
-                <select
-                  {...props}
-                  value={form.territory}
-                  onChange={(e) => onChange({ territory: e.target.value as Territory })}
-                  className={inputClass}
-                >
-                  {TERRITORIES.map((t) => (
-                    <option key={t} value={t}>
-                      {TERRITORY_LABELS[t]}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </Field>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm text-ink-muted">Território</span>
+              <TerritoryPicker
+                value={form.territory}
+                territories={territories}
+                onChange={(territory) => onChange({ territory })}
+                onCreate={onCreateTerritory}
+              />
+              <p className="text-xs text-ink-faint">
+                Agrupa e filtra no hub; dá a cor do banner dos produtos sem imagem.
+              </p>
+            </div>
           </Section>
 
           {isJourney ? (

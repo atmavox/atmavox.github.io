@@ -3,7 +3,6 @@ import { cardTiles } from '../../../shared/catalog/journeyLayout'
 import type { Offer } from '../../../shared/catalog/offer'
 import type { JourneyProduct } from '../../../shared/catalog/product'
 import { journeyStructureLabel } from '../journeyFilters'
-import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { OfferBadge, OfferButton } from './OfferBits'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 
@@ -73,7 +72,7 @@ export function ExpandedJourneyCard({ journey, offer, onPurchase }: CardProps) {
       className={`grid grid-cols-[1.05fr_1fr] overflow-hidden rounded-3xl border border-line bg-surface ${isSoon(journey) ? 'opacity-90' : ''}`}
     >
       <ProductBanner
-        tone={TONE_BY_TERRITORY[journey.territory]}
+        territory={journey.territory}
         mediaId={journey.bannerMediaId}
         muted={isSoon(journey)}
         className="h-full min-h-[250px]"
@@ -107,7 +106,7 @@ export function CompactJourneyRow({ journey, offer, onPurchase }: CardProps) {
       className={`grid grid-cols-[110px_1.2fr_1.3fr_auto] items-center gap-[18px] border-b border-line py-3.5 ${isSoon(journey) ? 'opacity-90' : ''}`}
     >
       <ProductBanner
-        tone={TONE_BY_TERRITORY[journey.territory]}
+        territory={journey.territory}
         mediaId={journey.bannerMediaId}
         muted={isSoon(journey)}
         className="aspect-[4/3] rounded-xl"
@@ -152,7 +151,7 @@ export function PhoneCompactRow({ journey, offer, onPurchase }: CardProps) {
       className={`grid grid-cols-[76px_1fr] items-center gap-3.5 border-b border-line py-3 ${isSoon(journey) ? 'opacity-90' : ''}`}
     >
       <ProductBanner
-        tone={TONE_BY_TERRITORY[journey.territory]}
+        territory={journey.territory}
         mediaId={journey.bannerMediaId}
         muted={isSoon(journey)}
         className="aspect-square rounded-xl"
@@ -178,7 +177,7 @@ export function PhoneExpandedCard({ journey, offer, onPurchase }: CardProps) {
       className={`flex flex-col overflow-hidden rounded-[20px] border border-line bg-surface ${isSoon(journey) ? 'opacity-90' : ''}`}
     >
       <ProductBanner
-        tone={TONE_BY_TERRITORY[journey.territory]}
+        territory={journey.territory}
         mediaId={journey.bannerMediaId}
         muted={isSoon(journey)}
         className="aspect-video"

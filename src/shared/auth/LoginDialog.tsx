@@ -1,7 +1,6 @@
 import { X } from 'lucide-react'
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
-import type { BannerTone } from '../ui/bannerTones'
 import { GoogleLogo } from '../ui/GoogleLogo'
 import { ProductBanner } from '../ui/ProductBanner'
 import type { LoginActions } from './session'
@@ -47,7 +46,7 @@ interface LoginDialogProps {
    * por cima do hub desfocado, mostrando a jornada escolhida. "hub": o "Entrar" do cabeçalho dos hubs.
    */
   variant?: Variant
-  chosen?: { title: string; tone: BannerTone; mediaId?: string | undefined }
+  chosen?: { title: string; territory: string; mediaId?: string | undefined }
   /** Entrou. Sem ele, fecha a janela; no portão, a própria tela troca e não há o que fechar. */
   onSignedIn?: () => void
 }
@@ -174,7 +173,7 @@ export function LoginDialog({
                 {chosen && (
                   <div className="mb-4 flex items-center gap-3 rounded-2xl border border-line bg-bg p-2.5">
                     <ProductBanner
-                      tone={chosen.tone}
+                      territory={chosen.territory}
                       mediaId={chosen.mediaId}
                       className="size-16 shrink-0 rounded-[10px]"
                     />

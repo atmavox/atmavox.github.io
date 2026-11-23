@@ -3,7 +3,6 @@ import { useAccess } from '../../../shared/catalog/AccessContext'
 import { usePaidContent } from '../../../shared/catalog/usePaidContent'
 import { useNow } from '../../../shared/lib/useNow'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
-import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import {
   FREE_MEDIA,
@@ -74,7 +73,7 @@ export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'n
         <YouTubeFacade videoId={media.youtubeId} title={meditation.title} />
       ) : (
         <ProductBanner
-          tone={TONE_BY_TERRITORY[meditation.territory]}
+          territory={meditation.territory}
           mediaId={meditation.bannerMediaId}
           className="aspect-video rounded-3xl"
         />

@@ -4,6 +4,7 @@ import { HubPage } from '../features/hub/HubPage'
 import { AuthContext } from '../shared/auth/AuthContext'
 import { AccessContext } from '../shared/catalog/AccessContext'
 import { CatalogContext } from '../shared/catalog/CatalogContext'
+import { TerritoryContext } from '../shared/catalog/TerritoryContext'
 import { createAppServices } from './createAppServices'
 import { useHashRoute } from '../shared/lib/useHashRoute'
 import { useStopAudioOnAreaChange } from '../shared/media/useStopAudioOnAreaChange'
@@ -24,12 +25,14 @@ const JourneyEntry = lazy(() =>
 // dentro da mesma área, mas para ao passar do hub para a jornada (ou o contrário).
 export function App() {
   // Uma sessão de login para o site todo: hub e jornada sabem quem entrou (ADR-022).
-  const [{ session, access, catalog }] = useState(createAppServices)
+  const [{ session, access, catalog, territories }] = useState(createAppServices)
   return (
     <AuthContext.Provider value={session}>
       <AccessContext.Provider value={access}>
         <CatalogContext.Provider value={catalog}>
-          <Routes />
+          <TerritoryContext.Provider value={territories}>
+            <Routes />
+          </TerritoryContext.Provider>
         </CatalogContext.Provider>
       </AccessContext.Provider>
     </AuthContext.Provider>

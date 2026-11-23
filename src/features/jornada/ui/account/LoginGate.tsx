@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { useCatalog } from '../../../../shared/catalog/CatalogContext'
-import { TONE_BY_TERRITORY } from '../../../../shared/ui/bannerTones'
 import type { Account } from '../../application/account'
 import { LoginDialog } from '../../../../shared/auth/LoginDialog'
 
@@ -23,7 +22,7 @@ export function LoginGate({ account, journeyId, background }: LoginGateProps) {
   const chosen = product
     ? {
         title: product.title,
-        tone: TONE_BY_TERRITORY[product.territory],
+        territory: product.territory,
         mediaId: product.bannerMediaId,
       }
     : undefined

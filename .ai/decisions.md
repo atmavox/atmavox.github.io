@@ -422,6 +422,27 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ funciona no celular, sem dependência, um jeito só no site todo. ➖ código
   próprio para manter; o "segurar" precisa ser conferido em aparelhos reais.
 
+## ADR-027 · Territórios como dados do catálogo
+
+- **Status:** aceita · 2026-11-23 (mock `Downloads/atmavox-territorio-v2.html`: A no computador, C
+  no celular)
+- **Contexto:** os 4 territórios (Estado Cinza, Consciência, Presença, Expansão) eram uma lista fixa no
+  código, cada um com uma cor de banner. A Andreía quer criar territórios novos sem desenvolvedor.
+- **Decisão:**
+  - `shared/catalog/territories.ts`: `Territory = { id, name, tone }`. Os 4 da marca ficam no código
+    (`DEFAULT_TERRITORIES`) e vêm sempre primeiro; os criados ficam em `catalog/territories` (`content`
+    com JSON), lido por REST sem login como o catálogo, com cópia no aparelho (`territoryStore.ts`).
+  - O produto guarda só o id (`territory: string`); `parseCatalog` aceita qualquer slug. Um id que a
+    lista ainda não tem continua aparecendo (nome = id, cor "Entardecer"): nada quebra se a nuvem falhar.
+  - A cor do banner sai do território (`ProductBanner territory={…}`), não mais de um mapa fixo.
+  - Criar grava na hora (`createTerritory`), só os criados; o produto muda só no "Salvar". Nome
+    repetido (sem acento e maiúscula) é recusado.
+  - As regras do Firestore não mudam: `catalog/{doc}` já é leitura pública e gravação da admin.
+- **Alternativas consideradas:** territórios dentro de `catalog/public` (mudaria o formato do catálogo
+  e quebraria quem tem a cópia antiga no aparelho); só os 4 fixos (pedido da Andreía).
+- **Consequências:** ➕ a Andreía cria territórios sozinha; o site segue de pé sem a nuvem. ➖ renomear
+  e apagar ainda não existem (ficam para quando ela pedir).
+
 ---
 
 ## Modelo

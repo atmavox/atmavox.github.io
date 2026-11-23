@@ -172,7 +172,10 @@ aprovados antes do código.
          4. [x] Ajustes pedidos no caminho: cabeçalho único do Modo Andreía, apagar produto não
                 publicado, dia 22 abre a Semana IV, "Novo dia" sem abrir a edição, transições suaves
          - [x] Campos editáveis mais evidentes: faixa azul (opção D) + lápis (opção B) do mock
-               `Downloads/atmavox-campos-editaveis.html`
+               `Downloads/atmavox-campos-editaveis.html`; clicar no lápis leva ao campo (1.18.1)
+      6. [x] Territórios criados pela Andreía + seletor próprio (busca que cria no computador, segundo
+             passo no celular), ADR-027 (1.19.0)
+         - [ ] Renomear e apagar territórios (quando ela pedir)
          - [ ] Conferir no celular de verdade o "segurar e arrastar" (Android e iPhone)
          - [ ] Depois da trava, títulos mudados no editor da jornada não atualizam os cartões do
                banner sozinhos (ADR-025); avaliar atualizar o `previewDays` ao publicar a jornada

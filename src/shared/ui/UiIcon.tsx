@@ -13,6 +13,14 @@ const PATHS = {
     </>
   ),
   minus: <path d="M6 12h12" />,
+  check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  back: <path d="m15 18-6-6 6-6" />,
+  search: (
+    <>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m16 16 4 4" />
+    </>
+  ),
   plus: <path d="M12 6v12M6 12h12" />,
 } satisfies Record<string, ReactNode>
 

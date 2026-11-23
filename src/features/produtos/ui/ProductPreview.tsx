@@ -2,7 +2,6 @@ import { Clock } from 'lucide-react'
 import { cardTiles } from '../../../shared/catalog/journeyLayout'
 import { formatPrice } from '../../../shared/catalog/offer'
 import type { Product } from '../../../shared/catalog/product'
-import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 
 const pill =
@@ -21,7 +20,7 @@ export function ProductPreview({ product }: { product: Product }) {
     <div className="flex flex-col gap-3">
       <article className="overflow-hidden rounded-[18px] border border-line bg-surface">
         <ProductBanner
-          tone={TONE_BY_TERRITORY[product.territory]}
+          territory={product.territory}
           mediaId={product.bannerMediaId}
           className="h-40"
         />

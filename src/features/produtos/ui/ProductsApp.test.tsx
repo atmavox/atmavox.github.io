@@ -5,6 +5,8 @@ import { InMemoryAuth } from '../../../shared/auth/InMemoryAuth'
 import { createAuthSession } from '../../../shared/auth/session'
 import { CatalogContext } from '../../../shared/catalog/CatalogContext'
 import { createCatalogStore } from '../../../shared/catalog/catalogStore'
+import { TerritoryContext } from '../../../shared/catalog/TerritoryContext'
+import { createTerritoryStore } from '../../../shared/catalog/territoryStore'
 import { setWideViewport } from '../../../test/viewport'
 import { createInMemoryProductsBackend } from '../infrastructure/productsBackend'
 import { ProdutosEntry } from '../ProdutosEntry'
@@ -103,6 +105,32 @@ describe('Modo Andreía de produtos no computador', () => {
     setWideViewport(false)
   })
 
+  it('território: busca que cria um novo, com a cor, e já escolhe', async () => {
+    localStorage.clear()
+    setWideViewport(true)
+    const { backend, catalog } = setup()
+    const territories = createTerritoryStore({})
+    render(
+      <TerritoryContext.Provider value={territories}>
+        <ProductsApp backend={backend} catalog={catalog} />
+      </TerritoryContext.Provider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: /A Chama Interna/ }))
+    fireEvent.click(await screen.findByRole('button', { name: /Estado Cinza/ }))
+    const search = screen.getByRole('combobox', { name: 'Buscar ou criar território' })
+    expect(search).toHaveFocus()
+    fireEvent.change(search, { target: { value: 'Corpo' } })
+    fireEvent.click(screen.getByRole('radio', { name: 'Mar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Criar e escolher' }))
+
+    await waitFor(() =>
+      expect(backend.territories).toEqual([{ id: 'corpo', name: 'Corpo', tone: 'sea' }]),
+    )
+    expect(territories.getSnapshot().at(-1)?.id).toBe('corpo')
+    expect(screen.getByRole('button', { name: /Corpo/ })).toBeInTheDocument()
+    setWideViewport(false)
+  })
+
   it('formulário com erro não salva e aponta o campo', async () => {
     setWideViewport(true)
     const { backend, catalog } = setup()
@@ -144,6 +172,27 @@ describe('Modo Andreía de produtos no celular', () => {
     expect(backend.contents.get('pausa-da-tarde')).toEqual({
       audioUrl: 'https://cdn.example/pausa.m4a',
     })
+  })
+})
+
+describe('território no celular', () => {
+  it('a lista sobe; "Novo território" desliza para o segundo passo e cria', async () => {
+    localStorage.clear()
+    setWideViewport(false)
+    const { backend, catalog } = setup()
+    render(
+      <TerritoryContext.Provider value={createTerritoryStore({})}>
+        <ProductsApp backend={backend} catalog={catalog} />
+      </TerritoryContext.Provider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: /Ritual Matinal/ }))
+    fireEvent.click(await screen.findByRole('button', { name: /Presença/ }))
+    expect(screen.getByRole('dialog', { name: 'Território' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Novo território' }))
+    fireEvent.change(screen.getByLabelText('Nome do território'), { target: { value: 'Raiz' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Criar território' }))
+    await waitFor(() => expect(backend.territories?.[0]?.id).toBe('raiz'))
+    expect(screen.queryByRole('dialog')).toBeNull()
   })
 })
 
