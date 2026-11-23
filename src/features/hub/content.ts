@@ -14,6 +14,7 @@ import {
   type Product,
 } from '../../shared/catalog/product'
 import { seedCatalog } from '../../shared/catalog/seedCatalog'
+import { allMeditations, toHubAudio } from './meditations'
 
 export interface HubAudio {
   id: string
@@ -70,7 +71,7 @@ export const hero = {
 
 /**
  * Áudio curto de boas-vindas da tela inicial: introdutório e estimulante, tocado no player do site.
- * (Os vídeos, como "Retorne ao Seu Centro", ficam para a jornada.) Título provisório: confirmar com a Andreía.
+ * Título provisório: confirmar com a Andreía.
  */
 export const introAudio: HubAudio = {
   id: 'boas-vindas',
@@ -80,21 +81,10 @@ export const introAudio: HubAudio = {
   audioSrc: '/audio/atmavox-boas-vindas.m4a',
 }
 
-/**
- * Meditações grátis da vitrine e da aba Meditações (mock aprovado em 2026-11-22). As pagas e o hub de
- * meditações vêm do catálogo (ADR-019, Etapa D). Encontros gravados entram aqui quando forem publicados.
- */
-export const listenItems: readonly HubAudio[] = [
-  introAudio,
-  {
-    id: 'retorne-ao-seu-centro',
-    kind: 'video',
-    title: 'Retorne ao Seu Centro',
-    meta: 'Vídeo · 5 min',
-    youtubeId: 'jKuKSAQUTCA',
-  },
-]
-
+/** Meditações em destaque na vitrine, do catálogo (ADR-019). Encontros gravados entram como meditações. */
+export const listenItems: readonly HubAudio[] = allMeditations
+  .filter((m) => m.featured)
+  .map(toHubAudio)
 export const meditationsIntro = {
   title: 'Pausas guiadas para voltar ao centro',
 } as const

@@ -127,7 +127,12 @@ aprovados antes do código.
           desfocado, com a jornada escolhida; fechar volta ao hub; sessão lembrada espera a nuvem
           ("Carregando…") antes de pedir login; rotas `#/jornada/{id}/{aba}` (links antigos sem id abrem
           a de 21 dias; id desconhecido mostra "ainda não está disponível")
-   5. [ ] Hub de meditações (`#/meditacoes`) e página da meditação (play + e-book)
+   5. [x] Hub de meditações (`#/meditacoes`, variante B): grade de capas com tipo ("+ E-book" quando
+          houver), play e tag; filtros Todas/Áudio/Vídeo/Com e-book (só os que mostram algo); página
+          da meditação (`#/meditacao/{id}`) com o áudio no player do site ou o vídeo; meditações
+          grátis no catálogo (Boas-vindas, Retorne ao Seu Centro). Na página inicial, o vídeo abre na
+          largura toda da seção. **Pagas** (login → preço → acesso, "Baixar e-book") ficam para o passo 6,
+          junto com o acesso: o login precisa sair da jornada para `shared/` (o hub também vai usar)
    6. [ ] Regras do Firestore: catálogo, acesso, `published` só com acesso; conteúdo pago fora do
           código do site
    7. [ ] Modo Andreía: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
@@ -148,6 +153,12 @@ Surgiu no caminho:
       `published` da meditação; quem tem acesso vê o botão "Baixar e-book" (ADR-020)
 - [x] Histórico do git (2026-11-22): fica como está; o desenvolvedor considerou que ninguém vai procurar
       o conteúdo lá (ADR-020)
+
+- [ ] **Última publicação das redes na página inicial** (pedido de 2026-11-22): card em "Nas redes
+      sociais". Sem custo e sem segredo no navegador: um job agendado do GitHub Actions busca a última
+      publicação e gera um JSON estático no deploy. YouTube por RSS (público, sem chave); Instagram pela
+      Graph API (exige conta profissional, app na Meta e token guardado nos segredos do Actions, renovado
+      a cada 60 dias); TikTok não tem "última publicação" sem app aprovado. Precisa de mock antes.
 
 ## Depois
 

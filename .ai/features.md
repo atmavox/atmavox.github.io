@@ -19,7 +19,7 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
     com o dedo, pontinhos); faixa dos encontros (TikTok); frase da marca com "Ver as jornadas";
     "Quem já viveu" (só com depoimento real); redes sociais; A Ativadora (retrato, práticas, WhatsApp).
   - Jornadas: o hub de jornadas (F9), compacto por padrão.
-  - Meditações: áudios e vídeos grátis, com filtro (Tudo · Áudios · Vídeos · Encontros gravados).
+  - Meditações: o hub de meditações (F9) e, a partir dele, a página de cada meditação.
   - Contato: sobre a Andreía, botão do WhatsApp, redes, assinatura.
 - **Tablet e computador (≥ 700 px): "revista".** Página única com menu no topo (Início, Jornadas,
   Meditações, Encontros, Sobre, Contato): topo com a pergunta, a logo falando no fundo, "Conhecer as

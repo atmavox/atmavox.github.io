@@ -6,7 +6,7 @@ import {
   MessageCircle,
   type LucideIcon,
 } from 'lucide-react'
-import { useEffect, useState, type ComponentType } from 'react'
+import { useEffect, type ComponentType } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
@@ -17,6 +17,8 @@ import { CardRow } from '../components/CardRow'
 import { EncountersBand } from '../components/EncountersBand'
 import { JourneysHub } from '../components/JourneysHub'
 import { MeditationCover } from '../components/MeditationCover'
+import { MeditationPage } from '../components/MeditationPage'
+import { MeditationsHub } from '../components/MeditationsHub'
 import { PhraseBand } from '../components/PhraseBand'
 import { Portrait } from '../components/Portrait'
 import { ShowcaseJourneyCard } from '../components/ShowcaseJourneyCard'
@@ -28,13 +30,13 @@ import {
   hero,
   introAudio,
   listenItems,
-  meditationsIntro,
   showcaseJourneys,
   signature,
   specialties,
-  type HubAudio,
 } from '../content'
+import { meditationHref } from '../meditations'
 import { HUB_TABS, type HubTab } from '../navigation'
+import { coverToneAt } from '../../../shared/ui/bannerTones'
 
 const TAB_ICONS: Record<HubTab, LucideIcon> = {
   inicio: CircleDot,
@@ -81,7 +83,12 @@ function InicioPanel() {
         more={{ label: 'Ver todas', href: '#/meditacoes' }}
       >
         {listenItems.map((item, index) => (
-          <MeditationCover key={item.id} item={item} index={index} />
+          <MeditationCover
+            key={item.id}
+            item={item}
+            tone={coverToneAt(index)}
+            href={meditationHref(item.id)}
+          />
         ))}
       </CardRow>
 
@@ -124,57 +131,6 @@ function InicioPanel() {
   )
 }
 
-const FILTERS: readonly { id: 'tudo' | HubAudio['kind']; label: string }[] = [
-  { id: 'tudo', label: 'Tudo' },
-  { id: 'audio', label: 'Áudios' },
-  { id: 'video', label: 'Vídeos' },
-  { id: 'encontro', label: 'Encontros gravados' },
-]
-
-function MeditacoesPanel() {
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]['id']>('tudo')
-  const available = FILTERS.filter(
-    (f) => f.id === 'tudo' || listenItems.some((item) => item.kind === f.id),
-  )
-  const visible = listenItems.filter((item) => filter === 'tudo' || item.kind === filter)
-
-  return (
-    <>
-      <header>
-        <h1 className="font-display text-3xl text-ink">Meditações</h1>
-        <p className="mt-1 text-ink-muted">{meditationsIntro.title}</p>
-      </header>
-      {/* Só mostra filtros quando há mais de um tipo de conteúdo para filtrar. */}
-      {available.length > 2 && (
-        <div role="group" aria-label="Filtrar" className="flex flex-wrap gap-2">
-          {available.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              aria-pressed={filter === f.id}
-              onClick={() => setFilter(f.id)}
-              className={`min-h-9 rounded-full border px-4 text-sm transition-colors ${
-                filter === f.id
-                  ? 'border-accent bg-accent/15 text-accent'
-                  : 'border-line text-ink-muted hover:border-accent hover:text-accent'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-      )}
-      <ul className="flex flex-col">
-        {visible.map((item) => (
-          <li key={item.id} className="border-b border-line py-4">
-            <AudioItem item={item} variant="row" />
-          </li>
-        ))}
-      </ul>
-    </>
-  )
-}
-
 function JornadasPanel() {
   return <JourneysHub layout="narrow" />
 }
@@ -198,20 +154,32 @@ function ContatoPanel() {
   )
 }
 
-const PANELS: Record<HubTab, ComponentType> = {
+const PANELS: Record<Exclude<HubTab, 'meditacoes'>, ComponentType> = {
   inicio: InicioPanel,
   jornadas: JornadasPanel,
-  meditacoes: MeditacoesPanel,
   contato: ContatoPanel,
 }
 
-/** Celular (< 700 px): "app com abas", com a barra fixa embaixo (ADR-010). */
-export function HubTabs({ activeTab }: { activeTab: HubTab }) {
-  const Panel = PANELS[activeTab]
+/** Aba Meditações: o hub, ou a página de uma meditação (`#/meditacao/{id}`). */
+function MeditacoesPanel({ meditationId }: { meditationId: string | null }) {
+  return meditationId ? (
+    <MeditationPage id={meditationId} layout="narrow" />
+  ) : (
+    <MeditationsHub layout="narrow" />
+  )
+}
 
+/** Celular (< 700 px): "app com abas", com a barra fixa embaixo (ADR-010). */
+export function HubTabs({
+  activeTab,
+  meditationId,
+}: {
+  activeTab: HubTab
+  meditationId: string | null
+}) {
   useEffect(() => {
     window.scrollTo({ top: 0 })
-  }, [activeTab])
+  }, [activeTab, meditationId])
 
   return (
     <div className="min-h-dvh overflow-x-clip pb-28">
@@ -227,7 +195,14 @@ export function HubTabs({ activeTab }: { activeTab: HubTab }) {
       </header>
 
       <main className="mx-auto flex max-w-xl flex-col gap-8 px-5 pt-2">
-        <Panel />
+        {activeTab === 'meditacoes' ? (
+          <MeditacoesPanel meditationId={meditationId} />
+        ) : (
+          (() => {
+            const Panel = PANELS[activeTab]
+            return <Panel />
+          })()
+        )}
       </main>
 
       <nav

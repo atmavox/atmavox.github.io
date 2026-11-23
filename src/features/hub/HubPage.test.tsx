@@ -106,12 +106,37 @@ describe('hub no celular (abas)', () => {
     ).toContain('wa.me')
   })
 
-  it('a aba Meditações filtra por áudio e vídeo', () => {
+  it('a aba Meditações é o hub: filtra por áudio e vídeo e leva à página de cada uma', () => {
     render(<HubPage path="/meditacoes" />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Meditações' })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Vídeos' }))
-    expect(screen.queryByText('Boas-vindas')).toBeNull()
-    expect(screen.getByText('Retorne ao Seu Centro')).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Pausas guiadas para voltar ao centro' }),
+    ).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Vídeo' }))
+    expect(screen.queryByRole('link', { name: 'Boas-vindas' })).toBeNull()
+    expect(screen.getByRole('link', { name: 'Retorne ao Seu Centro' })).toHaveAttribute(
+      'href',
+      '#/meditacao/retorne-ao-seu-centro',
+    )
+    expect(screen.queryByRole('button', { name: 'Com e-book' })).toBeNull()
+  })
+
+  it('a página da meditação toca o áudio no player do site', () => {
+    render(<HubPage path="/meditacao/boas-vindas" />)
+    expect(screen.getByRole('heading', { level: 1, name: 'Boas-vindas' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Ouvir Boas-vindas' })).toBeInTheDocument()
+    const tabs = screen.getByRole('navigation', { name: 'Seções' })
+    expect(within(tabs).getByRole('link', { name: 'Meditações' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+  })
+
+  it('meditação que não existe avisa e volta para a lista', () => {
+    render(<HubPage path="/meditacao/nao-existe" />)
+    expect(screen.getByRole('heading', { name: 'Meditação não encontrada' })).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('main')).getByRole('link', { name: 'Meditações' }),
+    ).toHaveAttribute('href', '#/meditacoes')
   })
 
   it('a aba Contato mostra o nome oficial e a assinatura', () => {

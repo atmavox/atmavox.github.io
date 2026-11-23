@@ -1,29 +1,52 @@
-import { Headphones, Pause, Play, Video } from 'lucide-react'
+import { BookOpen, Headphones, Pause, Play, Video } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { useAudioPlayer } from '../../../shared/media/useAudioPlayer'
-import type { HubAudio } from '../content'
 import type { BannerTone } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
+import type { HubAudio } from '../content'
 
-const TONES: readonly BannerTone[] = ['dawn', 'dusk', 'sea', 'flame', 'gray', 'wine']
+interface MeditationCoverProps {
+  item: HubAudio
+  tone: BannerTone
+  /** Página da meditação: o título vira link (e o play do vídeo também). */
+  href?: string
+  hasEbook?: boolean
+  /** Tag de preço do hub ("Pago", "Grátis"…). */
+  tag?: ReactNode
+  /** "row": largura fixa da fileira do celular; "grid": ocupa a coluna. */
+  size?: 'row' | 'grid'
+}
 
-/** Capa quadrada de meditação (fileira do celular). Áudio toca no player do site; vídeo abre o YouTube. */
-export function MeditationCover({ item, index }: { item: HubAudio; index: number }) {
+/** Capa quadrada de meditação. Áudio toca no player do site; vídeo abre a página (ou o YouTube). */
+export function MeditationCover({
+  item,
+  tone,
+  href,
+  hasEbook = false,
+  tag,
+  size = 'row',
+}: MeditationCoverProps) {
   const { state, player } = useAudioPlayer()
   const audioSrc = item.audioSrc
   const isPlaying = !!audioSrc && state.track?.id === item.id && state.status === 'playing'
   const isVideo = item.kind === 'video'
   const playClass =
-    'absolute right-3 bottom-3 grid size-10 place-items-center rounded-full bg-accent text-bg'
+    'absolute right-3 bottom-3 grid size-10 place-items-center rounded-full bg-accent text-bg hover:opacity-90'
+  const videoHref = href ?? (item.youtubeId ? `https://youtu.be/${item.youtubeId}` : undefined)
 
   return (
-    <article className="flex w-[160px] flex-col gap-2.5">
-      <ProductBanner
-        tone={TONES[index % TONES.length] ?? 'dawn'}
-        className="aspect-square rounded-[18px]"
-      >
-        <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full border border-line bg-bg/80 px-2 py-0.5 text-[0.68rem] text-ink-muted">
+    <article className={`flex flex-col gap-2.5 ${size === 'row' ? 'w-[160px]' : 'w-full'}`}>
+      <ProductBanner tone={tone} className="aspect-square rounded-[18px]">
+        <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full border border-line bg-bg/85 px-2 py-0.5 text-[0.68rem] text-ink-muted">
           {isVideo ? <Video aria-hidden size={12} /> : <Headphones aria-hidden size={12} />}
           {isVideo ? 'Vídeo' : 'Áudio'}
+          {hasEbook && (
+            <>
+              {' + '}
+              <BookOpen aria-hidden size={12} />
+              E-book
+            </>
+          )}
         </span>
         {audioSrc ? (
           <button
@@ -36,11 +59,10 @@ export function MeditationCover({ item, index }: { item: HubAudio; index: number
             {isPlaying ? <Pause aria-hidden size={18} /> : <Play aria-hidden size={18} />}
           </button>
         ) : (
-          item.youtubeId && (
+          videoHref && (
             <a
-              href={`https://youtu.be/${item.youtubeId}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={videoHref}
+              {...(href ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
               aria-label={`Assistir ${item.title}`}
               className={playClass}
             >
@@ -50,8 +72,19 @@ export function MeditationCover({ item, index }: { item: HubAudio; index: number
         )}
       </ProductBanner>
       <div>
-        <p className="font-medium text-ink">{item.title}</p>
-        <p className="text-sm text-ink-faint">{item.meta}</p>
+        <p className="font-medium text-ink">
+          {href ? (
+            <a href={href} className="hover:text-accent">
+              {item.title}
+            </a>
+          ) : (
+            item.title
+          )}
+        </p>
+        <p className="flex flex-wrap items-center gap-2 text-sm text-ink-faint">
+          {item.meta}
+          {tag}
+        </p>
       </div>
     </article>
   )

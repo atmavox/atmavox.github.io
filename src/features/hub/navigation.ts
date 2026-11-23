@@ -35,8 +35,15 @@ const SECTIONS: readonly HubSection[] = [
 /** Caminhos antigos que continuam funcionando (links já compartilhados). */
 const ALIASES: Readonly<Record<string, HubSection>> = { ouvir: 'meditacoes' }
 
-/** "/meditacoes" → "meditacoes". Qualquer outro caminho cai no início. */
+/** "/meditacao/boas-vindas" → "boas-vindas" (a página de uma meditação); outro caminho → null. */
+export function meditationIdFromPath(path: string): string | null {
+  const match = /^\/meditacao\/([a-z0-9-]+)\/?$/.exec(path)
+  return match?.[1] ?? null
+}
+
+/** "/meditacoes" → "meditacoes". A página de uma meditação fica em Meditações. O resto cai no início. */
 export function hubSectionFromPath(path: string): HubSection {
+  if (meditationIdFromPath(path)) return 'meditacoes'
   const segment = path.replace(/^\//, '')
   return SECTIONS.find((section) => section === segment) ?? ALIASES[segment] ?? 'inicio'
 }

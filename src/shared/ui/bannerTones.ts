@@ -9,3 +9,10 @@ export const TONE_BY_TERRITORY: Record<Territory, BannerTone> = {
   presenca: 'dawn',
   expansao: 'sea',
 }
+
+const COVER_TONES: readonly BannerTone[] = ['dawn', 'dusk', 'sea', 'flame', 'gray', 'wine']
+
+/** Capas de meditação alternam os fundos (como no mock), para a grade não ficar de uma cor só. */
+export function coverToneAt(index: number): BannerTone {
+  return COVER_TONES[index % COVER_TONES.length] ?? 'dawn'
+}

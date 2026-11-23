@@ -9,15 +9,21 @@ interface AudioItemProps {
   /** "card": cartão de destaque ("Comece aqui"); "row": linha da lista de Ouvir. */
   variant: 'card' | 'row'
   eyebrow?: string
+  /**
+   * Para quem quer mostrar o vídeo em outro lugar (ex.: na largura toda da seção): o item só avisa o
+   * toque e mostra o estado; o vídeo não abre embaixo dele.
+   */
+  video?: { isOpen: boolean; onToggle: () => void }
 }
 
 /**
  * Um áudio com botão de play. Com MP3, toca no player do site (e no mini player). Sem MP3 ainda, o mesmo
  * botão abre o vídeo do YouTube logo abaixo, já tocando.
  */
-export function AudioItem({ item, variant, eyebrow }: AudioItemProps) {
+export function AudioItem({ item, variant, eyebrow, video }: AudioItemProps) {
   const { state, player } = useAudioPlayer()
-  const [isVideoOpen, setIsVideoOpen] = useState(false)
+  const [isOwnVideoOpen, setIsOwnVideoOpen] = useState(false)
+  const isVideoOpen = video ? video.isOpen : isOwnVideoOpen
   const audioSrc = item.audioSrc
 
   const isCurrent = state.track?.id === item.id
@@ -26,7 +32,8 @@ export function AudioItem({ item, variant, eyebrow }: AudioItemProps) {
 
   function handlePlay() {
     if (audioSrc) player.toggle({ id: item.id, title: item.title, src: audioSrc })
-    else setIsVideoOpen((open) => !open)
+    else if (video) video.onToggle()
+    else setIsOwnVideoOpen((open) => !open)
   }
 
   const isCard = variant === 'card'
@@ -68,7 +75,7 @@ export function AudioItem({ item, variant, eyebrow }: AudioItemProps) {
           <p className="text-sm text-ink-faint">{item.meta}</p>
         </div>
       </div>
-      {!audioSrc && isVideoOpen && item.youtubeId && (
+      {!video && !audioSrc && isVideoOpen && item.youtubeId && (
         <YouTubeFacade
           videoId={item.youtubeId}
           title={item.title}

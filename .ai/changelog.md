@@ -25,7 +25,10 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
   linha por jornada), com a escolha lembrada no aparelho; filtros abertos por padrão e recolhíveis
   (busca sem acento por nome, frase, território ou tema; territórios com contagem; disponíveis ou em
   breve; duração); "Limpar filtros" quando nada aparece. No celular, compacta por padrão, filtros que
-  deslizam e botão "Filtros". Sem login, as pagas mostram "Pago" e nenhum preço.- "Quem já viveu" pronto para depoimentos reais (carrossel com mais de um); fica escondido enquanto não
+  deslizam e botão "Filtros". Sem login, as pagas mostram "Pago" e nenhum preço.- Hub de meditações (`#/meditacoes`, F9): capas com tipo, play e tag; filtros por áudio, vídeo e e-book
+  (só os que têm resultado); página de cada meditação (`#/meditacao/{id}`) com o áudio no player do site
+  ou o vídeo. Boas-vindas e Retorne ao Seu Centro entram no catálogo; a vitrine e a aba Meditações do
+  celular passam a usar ele. Na página inicial, o vídeo abre na largura toda da seção de meditações.- "Quem já viveu" pronto para depoimentos reais (carrossel com mais de um); fica escondido enquanto não
   houver nenhum.
 
 - Jornada pede login (ADR-020): sem conta, o hub de jornadas fica desfocado e abre a janela "Entre para

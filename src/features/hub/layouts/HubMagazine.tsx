@@ -1,13 +1,16 @@
 import { ArrowRight, MessageCircle } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
+import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { BrandMark } from '../../../shared/ui/BrandMark'
 import { AudioItem } from '../components/AudioItem'
 import { CardRow } from '../components/CardRow'
 import { EncountersBand } from '../components/EncountersBand'
 import { JourneysHub } from '../components/JourneysHub'
+import { MeditationPage } from '../components/MeditationPage'
+import { MeditationsHub } from '../components/MeditationsHub'
 import { PhraseBand } from '../components/PhraseBand'
 import { Portrait } from '../components/Portrait'
 import { ShowcaseJourneyCard } from '../components/ShowcaseJourneyCard'
@@ -25,6 +28,7 @@ import {
   showcaseJourneys,
   signature,
   specialties,
+  type HubAudio,
 } from '../content'
 import { DESKTOP_MENU, type HubSection } from '../navigation'
 
@@ -37,16 +41,33 @@ const ghostButton =
   'inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-accent/50 px-6 font-semibold text-accent hover:bg-accent/10'
 
 /** Tablet e computador (≥ 700 px): a vitrine numa página só, com menu no topo (ADR-010, ADR-021). */
-export function HubMagazine({ section }: { section: HubSection }) {
+export function HubMagazine({
+  section,
+  meditationId,
+}: {
+  section: HubSection
+  meditationId: string | null
+}) {
+  const [openVideo, setOpenVideo] = useState<HubAudio | null>(null)
+  // Hubs e página de meditação são páginas próprias; o resto são seções da vitrine.
+  const page =
+    section === 'jornadas'
+      ? 'jornadas'
+      : meditationId
+        ? 'meditacao'
+        : section === 'meditacoes'
+          ? 'meditacoes'
+          : null
+
   // O mesmo link (#/jornadas) que troca a aba no celular rola até a seção aqui.
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const behavior = prefersReducedMotion ? 'auto' : 'smooth'
-    // O hub de jornadas é uma página própria: abre no topo, sem animação.
-    if (section === 'jornadas') window.scrollTo({ top: 0 })
+    // Páginas próprias abrem no topo, sem animação.
+    if (page) window.scrollTo({ top: 0 })
     else if (section === 'inicio') window.scrollTo({ top: 0, behavior })
     else document.getElementById(section)?.scrollIntoView({ behavior, block: 'start' })
-  }, [section])
+  }, [section, page, meditationId])
 
   return (
     <div className="min-h-dvh">
@@ -74,9 +95,13 @@ export function HubMagazine({ section }: { section: HubSection }) {
         <MiniPlayer />
       </header>
 
-      {section === 'jornadas' ? (
+      {page ? (
         <main>
-          <JourneysHub layout="wide" />
+          {page === 'jornadas' && <JourneysHub layout="wide" />}
+          {page === 'meditacoes' && <MeditationsHub layout="wide" />}
+          {page === 'meditacao' && meditationId && (
+            <MeditationPage id={meditationId} layout="wide" />
+          )}
         </main>
       ) : (
         <main>
@@ -141,10 +166,21 @@ export function HubMagazine({ section }: { section: HubSection }) {
             <ul className="grid gap-x-12 md:grid-cols-2">
               {listenItems.map((item) => (
                 <li key={item.id} className="border-b border-line py-4">
-                  <AudioItem item={item} variant="row" />
+                  <AudioItem
+                    item={item}
+                    variant="row"
+                    video={{
+                      isOpen: openVideo?.id === item.id,
+                      onToggle: () => setOpenVideo((open) => (open?.id === item.id ? null : item)),
+                    }}
+                  />
                 </li>
               ))}
             </ul>
+            {/* O vídeo abre na largura toda da seção, e não espremido na coluna do item. */}
+            {openVideo?.youtubeId && (
+              <YouTubeFacade videoId={openVideo.youtubeId} title={openVideo.title} startActive />
+            )}
           </section>
 
           <section id="encontros" className={`${wrap} scroll-mt-24`}>
