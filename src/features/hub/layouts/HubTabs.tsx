@@ -18,6 +18,7 @@ import { EncountersBand } from '../components/EncountersBand'
 import { JourneysHub } from '../components/JourneysHub'
 import { MeditationCover } from '../components/MeditationCover'
 import { MeditationPage } from '../components/MeditationPage'
+import { PaymentReturnPage } from '../components/PaymentReturnPage'
 import { MeditationsHub } from '../components/MeditationsHub'
 import { PhraseBand } from '../components/PhraseBand'
 import { Portrait } from '../components/Portrait'
@@ -35,7 +36,7 @@ import {
   specialties,
 } from '../content'
 import { meditationHref } from '../meditations'
-import { HUB_TABS, type HubTab } from '../navigation'
+import { HUB_TABS, type HubTab, type PaymentReturn } from '../navigation'
 import { coverToneAt } from '../../../shared/ui/bannerTones'
 
 const TAB_ICONS: Record<HubTab, LucideIcon> = {
@@ -173,9 +174,11 @@ function MeditacoesPanel({ meditationId }: { meditationId: string | null }) {
 export function HubTabs({
   activeTab,
   meditationId,
+  payment = null,
 }: {
   activeTab: HubTab
   meditationId: string | null
+  payment?: PaymentReturn | null
 }) {
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -195,7 +198,9 @@ export function HubTabs({
       </header>
 
       <main className="mx-auto flex max-w-xl flex-col gap-8 px-5 pt-2">
-        {activeTab === 'meditacoes' ? (
+        {payment ? (
+          <PaymentReturnPage payment={payment} layout="narrow" />
+        ) : activeTab === 'meditacoes' ? (
           <MeditacoesPanel meditationId={meditationId} />
         ) : (
           (() => {

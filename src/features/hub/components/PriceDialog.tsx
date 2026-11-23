@@ -1,6 +1,9 @@
-import { ArrowLeft, Check, Clock, Lock, ShieldCheck, X } from 'lucide-react'
-import { useEffect, useId, useRef } from 'react'
+import { ArrowLeft, ArrowRight, Check, Clock, Lock, ShieldCheck, X } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useAuthSession } from '../../../shared/auth/AuthContext'
+import { useAccess } from '../../../shared/catalog/AccessContext'
+import { paymentsUrl, requestCheckout } from '../../../shared/catalog/checkout'
 import { formatPrice } from '../../../shared/catalog/offer'
 import type { Product } from '../../../shared/catalog/product'
 import { TONE_BY_TERRITORY } from '../../../shared/ui/bannerTones'
@@ -22,11 +25,39 @@ function accessText(months: number | null): string {
 }
 
 /**
- * Preço de um produto pago, depois do login (mock aprovado, F·2). O pagamento pelo Mercado Pago entra
- * no passo 8 da Etapa D; até lá o botão fica desativado.
+ * Preço de um produto pago, depois do login (mock aprovado, F·2). "Pagar" abre o Mercado Pago pelo
  */
 export function PriceDialog({ product, onClose }: PriceDialogProps) {
   const titleId = useId()
+  const { session } = useAuthSession()
+  const access = useAccess()
+  const [isBusy, setIsBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const workerUrl = paymentsUrl(import.meta.env)
+
+  async function pay(url: string) {
+    setIsBusy(true)
+    setError(null)
+    const result = await requestCheckout({
+      workerUrl: url,
+      productId: product.id,
+      idToken: session ? await session.getIdToken() : null,
+    })
+    if (result.kind === 'redirect') {
+      window.location.assign(result.url)
+      return
+    }
+    setIsBusy(false)
+    if (result.kind === 'already-owned') {
+      // Já tinha acesso (outro aparelho, liberação manual): atualiza e fecha.
+      await access.refresh()
+      onClose()
+    } else if (result.kind === 'login') {
+      setError('Sua sessão expirou. Entre de novo para continuar.')
+    } else {
+      setError('Não foi possível abrir o pagamento agora. Tente de novo em instantes.')
+    }
+  }
   const dialogRef = useRef<HTMLDivElement>(null)
   const pricing = product.pricing
   const isJourney = product.kind === 'journey'
@@ -120,14 +151,31 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
             Pagamento seguro pelo Mercado Pago, com Pix ou cartão
           </li>
         </ul>
-        <button
-          type="button"
-          disabled
-          className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent font-semibold text-bg disabled:opacity-55"
-        >
-          <Lock aria-hidden size={18} />
-          Pagamento em breve
-        </button>
+        {error && (
+          <p role="alert" className="text-sm text-accent">
+            {error}
+          </p>
+        )}
+        {workerUrl ? (
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() => void pay(workerUrl)}
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent font-semibold text-bg hover:opacity-90 disabled:opacity-60"
+          >
+            {isBusy ? 'Abrindo o Mercado Pago…' : isJourney ? 'Pagar e começar' : 'Pagar e ouvir'}
+            {!isBusy && <ArrowRight aria-hidden size={18} />}
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent font-semibold text-bg disabled:opacity-55"
+          >
+            <Lock aria-hidden size={18} />
+            Pagamento em breve
+          </button>
+        )}
         <button
           type="button"
           onClick={onClose}

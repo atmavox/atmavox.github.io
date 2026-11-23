@@ -12,6 +12,7 @@ import { CardRow } from '../components/CardRow'
 import { EncountersBand } from '../components/EncountersBand'
 import { JourneysHub } from '../components/JourneysHub'
 import { MeditationPage } from '../components/MeditationPage'
+import { PaymentReturnPage } from '../components/PaymentReturnPage'
 import { MeditationsHub } from '../components/MeditationsHub'
 import { PhraseBand } from '../components/PhraseBand'
 import { Portrait } from '../components/Portrait'
@@ -32,7 +33,13 @@ import {
   specialties,
   type HubAudio,
 } from '../content'
-import { activeMenuItem, DESKTOP_MENU, isHomeAnchor, type HubSection } from '../navigation'
+import {
+  activeMenuItem,
+  DESKTOP_MENU,
+  isHomeAnchor,
+  type HubSection,
+  type PaymentReturn,
+} from '../navigation'
 
 const wrap = 'mx-auto w-full max-w-6xl px-6 md:px-12'
 const eyebrow = 'text-xs font-semibold tracking-[0.24em] text-accent uppercase'
@@ -46,9 +53,11 @@ const ghostButton =
 export function HubMagazine({
   section,
   meditationId,
+  payment = null,
 }: {
   section: HubSection
   meditationId: string | null
+  payment?: PaymentReturn | null
 }) {
   const [openVideo, setOpenVideo] = useState<HubAudio | null>(null)
   // Ao pausar, o vídeo sai devagar (esmaece e recolhe) em vez de sumir de uma vez.
@@ -75,8 +84,9 @@ export function HubMagazine({
     }
   }
   // Hubs e página de meditação são páginas próprias; o resto são seções da vitrine.
-  const page =
-    section === 'jornadas'
+  const page = payment
+    ? 'pagamento'
+    : section === 'jornadas'
       ? 'jornadas'
       : meditationId
         ? 'meditacao'
@@ -123,6 +133,7 @@ export function HubMagazine({
 
       {page ? (
         <main>
+          {page === 'pagamento' && payment && <PaymentReturnPage payment={payment} layout="wide" />}
           {page === 'jornadas' && <JourneysHub layout="wide" />}
           {page === 'meditacoes' && <MeditationsHub layout="wide" />}
           {page === 'meditacao' && meditationId && (

@@ -140,11 +140,18 @@ aprovados antes do código.
    7. [x] Acesso: regras do Firestore (catálogo, `published` só com acesso, `access` gravado só pelo
           servidor ou pela admin), conteúdo pago lido com o token, "Sua"/"Minhas", "Baixar e-book";
           conteúdo pago fora do código do site
-   8. [ ] Mercado Pago (Checkout Pro) + Worker gratuito na Cloudflare (ADR-023): cobrança com o preço do
-          catálogo, webhook com assinatura conferida, acesso gravado pelo servidor; guia das contas
+   8. [x] Mercado Pago (Checkout Pro) + Worker gratuito na Cloudflare (ADR-023): cobrança com o preço do
+          catálogo, webhook com assinatura conferida, acesso gravado pelo servidor; página de retorno;
+          guia das contas em `pagamentos.md`
+      - [ ] **Pendência do desenvolvedor (com a Andreía):** configurar as contas e publicar o Worker
+            (`pagamentos.md`, passos 1 a 5) e fazer a compra de teste (passo 6) antes de abrir as vendas.
+            Até lá o botão mostra "Pagamento em breve" e nada quebra
+      - [ ] **Pendência do desenvolvedor:** publicar as regras novas do Firestore no console
+            (`firebase-setup.md`, seção 8); sem elas, o acesso pago não funciona (o resto segue normal)
    9. [ ] Modo Andreía: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
-          temas, território, destaque) e liberar acesso à mão6. [x] Pagamento por produto: decidido Mercado Pago (Checkout Pro) + Worker gratuito (2026-11-22),
-          implementação no passo 5.8
+          temas, território, destaque) e liberar acesso à mão
+6. [x] Pagamento por produto: decidido Mercado Pago (Checkout Pro) + Worker gratuito (2026-11-22),
+       implementação no passo 5.8
 
 Surgiu no caminho:
 

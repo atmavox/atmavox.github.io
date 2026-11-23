@@ -202,6 +202,8 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   `shared/brand/site.ts`, que valida o formato, e mostra a versão no rodapé. O `package.json` repete a
   mesma versão, e um teste garante que as duas não se separam. **Major** e **minor** sobem só quando o
   desenvolvedor pede; **patch** o Claude sobe a cada correção ou ajuste pequeno. _Atualizado em
+  2026-11-22:_ **minor** sobe a cada etapa terminada e **patch** a cada correção pedida, sem esperar
+  pedido; **major** continua só quando o desenvolvedor pede (`conventions.md`).
 - **Alternativas consideradas:** só o `package.json` (o cliente pediu um arquivo com o nome do site e do
   cliente); injetar a versão no build pelo Vite (mais uma configuração sem ganho real).
 - **Consequências:** ➕ versão visível e conferida por teste. ➖ duas cópias do número (protegidas pelo
@@ -317,6 +319,35 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ um login só, visto pelo site inteiro; a jornada ficou menor; testes com
   `createTestAccount`. ➖ a sessão e a conta são dois objetos para manter em sincronia (a conta escuta a
   sessão); `shared/` passou a conhecer o Firebase (a regra do ESLint ganhou uma exceção para `firebase/*`).
+
+## ADR-023 · Pagamento pelo Mercado Pago com um Worker gratuito na Cloudflare
+
+- **Status:** aceita · 2026-11-23 (escolha do desenvolvedor e da Andreía em 2026-11-22)
+- **Contexto:** jornadas e meditações pagas precisam de cobrança automática, sem mensalidade e sem
+  expor chaves num site estático. O plano gratuito do Firebase não tem Cloud Functions.
+- **Decisão:**
+  - **Mercado Pago Checkout Pro**: a pessoa paga na página do Mercado Pago (Pix ou cartão); o site
+    nunca vê dados de pagamento. Sem mensalidade; taxa por venda (Pix ~0,99%).
+  - **Worker na Cloudflare** (`worker/`, plano gratuito), com três rotas:
+    - `POST /checkout`: confere o token de login do Firebase (assinatura do Google, projeto, prazo),
+      lê o preço **no catálogo** (do Firestore, ou o do código) e cria a cobrança, com
+      `external_reference = uid|produto` montado no servidor;
+    - `POST /webhook`: confere a assinatura do Mercado Pago (`x-signature`, HMAC-SHA256, aviso de até
+      10 min), consulta o pagamento na API do Mercado Pago (a fonte da verdade), confere moeda e valor
+      e grava `users/{uid}/access/{produto}` com a conta de serviço do Firebase. Repetir o aviso não
+      duplica; renovar antes de vencer soma o prazo; estorno tira só o acesso daquele pagamento;
+    - `GET /retorno`: devolve a pessoa a `#/pagamento/{aprovado|pendente|recusado}/{produto}`.
+  - Segredos (Access Token, assinatura do webhook, conta de serviço) só nos segredos do Worker.
+  - No site, `VITE_PAYMENTS_URL` liga o botão "Pagar"; sem ela, "Pagamento em breve".
+  - Publicação com `npx wrangler@4` (sem dependência nova no projeto). Guia em `pagamentos.md`.
+- **Alternativas consideradas:** Pix manual com liberação à mão (continua possível no Modo Andreía,
+  mas exige conferir cada pagamento); Hotmart/Kiwify (≈ 9% + R$ 2,49 por venda e o conteúdo já está
+  no site); InfinitePay e Asaas (avaliados no comparativo de 2026-11-22); Cloud Functions do Firebase
+  (exige plano pago).
+- **Consequências:** ➕ venda automática, custo zero fixo, preço e comprador conferidos no servidor,
+  testes cobrindo assinatura, token, renovação e estorno. ➖ mais uma conta (Cloudflare) e três
+  segredos para cuidar; o texto exato assinado pelo webhook vem dos SDKs oficiais e precisa ser
+  conferido com o simulador do painel antes de abrir as vendas.
 
 ---
 

@@ -35,6 +35,8 @@ jobs:
           VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN || secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID || secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID || secrets.VITE_FIREBASE_APP_ID }}
+          # Endereço do Worker de pagamentos (ADR-023). Sem ela, o botão mostra "Pagamento em breve".
+          VITE_PAYMENTS_URL: ${{ vars.VITE_PAYMENTS_URL }}
       - name: Guardar o build para publicação
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4

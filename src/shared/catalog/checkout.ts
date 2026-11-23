@@ -1,0 +1,46 @@
+// Começa um pagamento pelo Worker (ADR-023): o site só diz o produto; preço e comprador o Worker
+// confere do lado dele. Sem `VITE_PAYMENTS_URL`, o pagamento fica desligado ("Pagamento em breve").
+
+export type CheckoutResult =
+  | { kind: 'redirect'; url: string }
+  | { kind: 'already-owned' }
+  | { kind: 'login' }
+  | { kind: 'error' }
+
+/** Endereço do Worker de pagamentos, sem barra no fim; `null` se não configurado. */
+export function paymentsUrl(env: Partial<Record<string, string | undefined>>): string | null {
+  const url = env.VITE_PAYMENTS_URL?.trim().replace(/\/$/, '')
+  return url && /^https:\/\//.test(url) ? url : null
+}
+
+export async function requestCheckout({
+  workerUrl,
+  productId,
+  idToken,
+  fetchFn = (input, init) => fetch(input, init),
+}: {
+  workerUrl: string
+  productId: string
+  idToken: string | null
+  fetchFn?: (input: string, init?: RequestInit) => Promise<Response>
+}): Promise<CheckoutResult> {
+  if (!idToken) return { kind: 'login' }
+  try {
+    const response = await fetchFn(`${workerUrl}/checkout`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId }),
+    })
+    if (response.status === 401) return { kind: 'login' }
+    if (response.status === 409) return { kind: 'already-owned' }
+    if (!response.ok) return { kind: 'error' }
+    const body = (await response.json()) as { url?: unknown }
+    // Só segue para o Mercado Pago: nada de mandar a pessoa para um endereço qualquer.
+    return typeof body.url === 'string' &&
+      /^https:\/\/([\w-]+\.)*mercadopago\.com(\.br)?\//.test(body.url)
+      ? { kind: 'redirect', url: body.url }
+      : { kind: 'error' }
+  } catch {
+    return { kind: 'error' }
+  }
+}

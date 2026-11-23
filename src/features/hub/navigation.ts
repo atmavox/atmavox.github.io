@@ -65,3 +65,15 @@ export function activeMenuItem(section: HubSection): HubSection {
 
 export const isHomeAnchor = (section: HubSection) =>
   section === 'encontros' || section === 'sobre' || section === 'contato'
+
+export interface PaymentReturn {
+  status: 'aprovado' | 'pendente' | 'recusado'
+  productId: string | null
+}
+
+/** "/pagamento/aprovado/raizes": a volta do Mercado Pago pelo Worker (ADR-023). */
+export function paymentReturnFromPath(path: string): PaymentReturn | null {
+  const match = /^\/pagamento\/(aprovado|pendente|recusado)(?:\/([a-z0-9-]+))?\/?$/.exec(path)
+  if (!match) return null
+  return { status: match[1] as PaymentReturn['status'], productId: match[2] ?? null }
+}

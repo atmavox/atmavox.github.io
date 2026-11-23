@@ -17,6 +17,7 @@ Também serve para pessoas: quem chegar ao projeto entende o que é, por que exi
 | `features.md`                      | Especificação de cada feature e critérios de aceite              | ao implementar ou mudar uma feature    |
 | `decisions.md`                     | Registro das decisões de arquitetura (ADRs)                      | antes de reverter uma escolha          |
 | `firebase-setup.md`                | Passo a passo do console do Firebase e das variáveis do deploy   | ao configurar ou mexer no login        |
+| `pagamentos.md`                    | Mercado Pago + Worker da Cloudflare: contas, segredos e testes   | ao configurar ou mexer no pagamento    |
 | `guia-modo-andreia.md`             | Guia simples para a Andreía editar e publicar a jornada          | ao mudar o Modo Andreía (manter igual) |
 | `roadmap.md`                       | O que vem a seguir, em ordem                                     | ao escolher a próxima tarefa           |
 | `changelog.md`                     | Histórico de mudanças                                            | ao finalizar uma tarefa                |

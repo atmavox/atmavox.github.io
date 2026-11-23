@@ -10,6 +10,22 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.9.0] · 2026-11-23
+
+### Adicionado
+
+- Pagamento pelo Mercado Pago (ADR-023): Worker gratuito na Cloudflare (`worker/`) que cria a cobrança
+  com o preço do catálogo, confere a assinatura do aviso de pagamento, consulta o pagamento na API do
+  Mercado Pago e grava o acesso; renovação soma o prazo, estorno tira o acesso daquele pagamento.
+- Janela de preço com "Pagar e começar"/"Pagar e ouvir" (ligado por `VITE_PAYMENTS_URL`; sem ela,
+  "Pagamento em breve") e página de retorno (`#/pagamento/…`): aprovado, em análise ou não concluído.
+- Guia das contas e segredos em `.ai/pagamentos.md`.
+
+### Corrigido
+
+- Documentação cortada por um erro de script: ADR-017 (regra de versão), nota do login compartilhado
+  em `features.md` e dois itens colados no roadmap.
+
 ## [1.8.1] · 2026-11-23
 
 ### Corrigido

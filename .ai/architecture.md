@@ -174,6 +174,20 @@ quem entra na conta.
 - Um script inline no `index.html` aplica o tema salvo antes da primeira pintura (sem "piscar").
 - O Tailwind expõe os tokens como cores (`bg-surface`, `text-accent`).
 
+## Pagamentos (ADR-023)
+
+```
+worker/                 Worker da Cloudflare (fora do site; publicado com `npx wrangler@4 deploy`)
+  src/index.ts          liga os segredos às peças
+  src/app.ts            rotas /checkout, /webhook, /retorno (testadas sem rede)
+  src/mercadoPago.ts    cobrança, consulta do pagamento, assinatura do webhook
+  src/firebaseToken.ts  confere o token de login do Firebase
+  src/firestore.ts      conta de serviço do Google + leitura do catálogo e gravação do acesso
+```
+
+O Worker importa de `src/shared/catalog` (catálogo, prazo de acesso): uma regra só para site e servidor.
+No site, `shared/catalog/checkout.ts` chama o Worker e `PaymentReturnPage` mostra o resultado.
+
 ## Deploy
 
 ```
