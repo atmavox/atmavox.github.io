@@ -10,6 +10,12 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+### Adicionado
+
+- Catálogo de produtos em `shared/catalog` (ADR-019): tipos de jornada e meditação, leitura segura do
+  catálogo vindo da nuvem (um produto quebrado não derruba os outros), regra única de tag e botão de cada
+  produto (F9), prazo de acesso por meses de calendário, preço em reais e o catálogo inicial do código.
+
 ### Alterado
 
 - Propósito do site: a página inicial vira vitrine, nascem os hubs de jornadas e de meditações, e

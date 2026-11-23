@@ -31,6 +31,8 @@ src/
                           account/ (login), admin/ (Modo Andreía, carregado sob demanda)
   shared/
     brand/                links da marca (redes, áudio, WhatsApp) e assinatura
+    catalog/              produtos do catálogo (ADR-019): product.ts (tipos), parseCatalog.ts, offer.ts
+                          (tag e botão de cada produto, acesso, preço), seedCatalog.ts (catálogo do código)
     theme/                tokens CSS, useTheme, botão de tema
     ui/                   componentes genéricos (BrandMark, RichText)
     lib/                  utilitários sem regra de negócio (whatsapp, inlineMarkup, useHashRoute, useMediaQuery)
