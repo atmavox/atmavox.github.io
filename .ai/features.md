@@ -442,8 +442,8 @@ a pessoa confirma pelo link (reservado por 24 h).
 clicar abre embaixo as etapas na vertical e os detalhes. "Ver minha anamnese" em cada cartão.
 
 **Modo Andreía (`#/admin/ativacoes/…`):** abas Agenda, Terapias e Anamnese (passos 1 e 2); Pedidos e
-Mensagens nos passos seguintes. No computador, abas logo abaixo da faixa azul; no celular, abas
-embaixo da tela e um botão redondo que volta ao site.
+Mensagens. No computador, as seções logo abaixo da faixa azul, no estilo do menu do site; no celular,
+as áreas do Modo Andreía nas abas de baixo e as seções numa linha no topo.
 
 - **Terapias** ✅: tabela (arrastar para ordenar, ativar na linha, "Editar") no computador; cartões
   (segurar para ordenar) no celular. Formulário em janela no computador e em quatro blocos que abrem

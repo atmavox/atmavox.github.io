@@ -13,7 +13,10 @@ export function AdminHeader({
   active,
   context,
   actions,
+  compact = false,
 }: {
+  /** Celular com as abas embaixo (`AdminTabBar`): a faixa fica só com a tag. */
+  compact?: boolean
   /** A área aberta; no editor de uma jornada, nenhuma (a jornada aparece em `context`). */
   active?: AdminArea
   /** O que está sendo editado ("A Chama Interna · 21 dias"). */
@@ -37,6 +40,15 @@ export function AdminHeader({
   // O mesmo realce do "Começar a editar" da faixa do site.
   const exit =
     'inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-on-admin/90 transition-colors hover:bg-on-admin/12 hover:text-on-admin sm:px-3'
+
+  if (compact) {
+    return (
+      <header className="sticky top-0 z-40 flex h-13 items-center justify-between gap-3 bg-admin px-4 text-sm text-on-admin">
+        <AdminTag />
+        {actions}
+      </header>
+    )
+  }
 
   return (
     // Computador: como o cabeçalho do site, as áreas no meio (Modo Andreía à esquerda, saídas à direita).

@@ -8,7 +8,7 @@ export function AdminTag({ note = 'área da admin' }: { note?: string }) {
       <b className="shrink-0 rounded-full bg-on-admin/18 px-2.5 py-0.5 text-[11px] font-semibold tracking-[0.08em] uppercase">
         Modo Andreía
       </b>
-      <span className="hidden truncate text-[11px] text-on-admin/70 sm:inline">{note}</span>
+      <span className="truncate text-[11px] text-on-admin/70">{note}</span>
     </span>
   )
 }

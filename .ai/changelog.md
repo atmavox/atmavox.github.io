@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.26.1] · 2026-11-23
+
+### Alterado
+
+- Modo Andreía no celular (mock `atmavox-modo-andreia-celular.html`, A): as áreas (Produtos, Ativações,
+  Acessos e Ver o site) nas abas de baixo; as seções de Ativações numa linha no topo, no estilo do menu
+  do site, que desliza para o lado; a faixa azul só com a tag. O botão redondo saiu.
+
 ## [1.26.0] · 2026-11-23
 
 ### Adicionado

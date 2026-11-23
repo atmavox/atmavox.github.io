@@ -80,7 +80,6 @@ describe('Modo Andreía · terapias', () => {
     fireEvent.click(within(dialog).getByRole('button', { name: /Sessão/ }))
     expect(within(dialog).getByLabelText('Preço (R$)')).toBeInTheDocument()
     expect(within(dialog).queryByLabelText('Nome')).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Ver o site' })).toHaveAttribute('href', '#/')
   })
 })
 

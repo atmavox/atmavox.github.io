@@ -485,7 +485,7 @@ export function AnamnesisPanel({
 
       <div
         className={`sticky z-20 flex flex-wrap items-center justify-end gap-2.5 rounded-2xl border border-line bg-surface/95 px-4 py-3 backdrop-blur ${
-          isWide ? 'bottom-4' : 'bottom-[78px] mr-14'
+          isWide ? 'bottom-4' : 'bottom-[76px]'
         }`}
       >
         {notice && (

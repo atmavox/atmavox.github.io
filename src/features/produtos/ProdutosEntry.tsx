@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AdminHeader } from '../../shared/ui/AdminHeader'
+import { AdminTabBar } from '../../shared/ui/AdminTabBar'
+import { useMediaQuery } from '../../shared/lib/useMediaQuery'
 import { LoadingNote } from '../../shared/ui/LoadingNote'
 import { useAuthSession } from '../../shared/auth/AuthContext'
 import { LoginDialog } from '../../shared/auth/LoginDialog'
@@ -46,6 +48,8 @@ export function ProdutosEntry({
       ? 'ativacoes'
       : 'produtos'
   const { session, state } = useAuthSession()
+  // Celular (mock aprovado, A): áreas nas abas de baixo; a faixa azul fica só com a tag.
+  const isNarrow = !useMediaQuery('(min-width: 900px)')
   const { store, products } = useCatalog()
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [admin, setAdmin] = useState<{ uid: string; isAdmin: boolean } | null>(null)
@@ -140,15 +144,16 @@ export function ProdutosEntry({
 
   return (
     <div className="min-h-dvh bg-bg">
-      <AdminHeader active={area} />
+      <AdminHeader active={area} compact={isNarrow} />
       {/* A luz que desce (mock aprovado, A): um brilho âmbar difuso no topo da página, como no hub. */}
       <div className="relative">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-[300px] bg-[radial-gradient(60%_100%_at_30%_0%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_70%)]"
         />
-        <div className="relative">{body}</div>
+        <div className={`relative ${isNarrow ? 'pb-24' : ''}`}>{body}</div>
       </div>
+      {isNarrow && <AdminTabBar active={area} />}
     </div>
   )
 }

@@ -1,5 +1,4 @@
 import { useMediaQuery } from '../../../../shared/lib/useMediaQuery'
-import { UiIcon, type UiIconName } from '../../../../shared/ui/UiIcon'
 import type { AtivacoesBackend } from '../../infrastructure/ativacoesBackend'
 import { AgendaPanel } from './AgendaPanel'
 import { AnamnesisPanel } from './AnamnesisPanel'
@@ -9,12 +8,12 @@ import { TherapiesPanel } from './TherapiesPanel'
 
 import type { AtivacoesSection } from './sections'
 
-const SECTIONS: readonly { id: AtivacoesSection; label: string; icon: UiIconName }[] = [
-  { id: 'pedidos', label: 'Pedidos', icon: 'inbox' },
-  { id: 'agenda', label: 'Agenda', icon: 'calendar' },
-  { id: 'terapias', label: 'Terapias', icon: 'leaf' },
-  { id: 'anamnese', label: 'Anamnese', icon: 'file' },
-  { id: 'mensagens', label: 'Mensagens', icon: 'chat' },
+const SECTIONS: readonly { id: AtivacoesSection; label: string }[] = [
+  { id: 'pedidos', label: 'Pedidos' },
+  { id: 'agenda', label: 'Agenda' },
+  { id: 'terapias', label: 'Terapias' },
+  { id: 'anamnese', label: 'Anamnese' },
+  { id: 'mensagens', label: 'Mensagens' },
 ]
 
 /**
@@ -71,36 +70,28 @@ export function AtivacoesApp({
     )
   }
 
+  // Celular (mock aprovado, A): as seções numa linha no topo, como o menu do site, que desliza para o
+  // lado; as áreas do Modo Andreía ficam nas abas de baixo (AdminTabBar).
   return (
     <>
-      <div className="pb-24">{panel}</div>
-      <a
-        href="#/"
-        aria-label="Ver o site"
-        title="Ver o site"
-        className="fixed right-4 bottom-[84px] z-30 grid size-12 place-items-center rounded-full bg-ink text-bg shadow-[0_8px_20px_rgb(20_14_10/0.3)]"
-      >
-        <UiIcon name="home" size={21} />
-      </a>
       <nav
         aria-label="Ativação individual"
-        className="fixed inset-x-0 bottom-0 z-30 grid border-t border-line bg-surface pb-[env(safe-area-inset-bottom)]"
-        style={{ gridTemplateColumns: `repeat(${SECTIONS.length}, 1fr)` }}
+        className="sticky top-13 z-30 flex h-11 gap-5 overflow-x-auto border-b border-line bg-bg/90 px-4 backdrop-blur [scrollbar-width:none]"
       >
         {SECTIONS.map((s) => (
           <a
             key={s.id}
             href={`#/admin/ativacoes/${s.id}`}
             aria-current={section === s.id ? 'page' : undefined}
-            className={`flex flex-col items-center gap-0.5 py-2.5 text-[11px] ${
-              section === s.id ? 'font-semibold text-admin-ink' : 'text-ink-faint'
+            className={`flex shrink-0 items-center border-b-2 pt-0.5 text-sm whitespace-nowrap transition-colors ${
+              section === s.id ? 'border-accent text-ink' : 'border-transparent text-ink-muted'
             }`}
           >
-            <UiIcon name={s.icon} size={21} />
             {s.label}
           </a>
         ))}
       </nav>
+      {panel}
     </>
   )
 }
