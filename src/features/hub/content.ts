@@ -124,7 +124,6 @@ export const individualSession = {
 export const specialties: readonly string[] = [
   'Barras de Access',
   'PNL',
-  'Metáforas Ericksonianas',
   'Neurociência',
   'Radiestesia',
   'Reiki',

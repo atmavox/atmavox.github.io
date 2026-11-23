@@ -10,6 +10,12 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.21.1] · 2026-11-23
+
+### Alterado
+
+- "A Ativadora": a tag "Metáforas Ericksonianas" saiu da lista de práticas (faz parte da PNL).
+
 ## [1.21.0] · 2026-11-23
 
 ### Adicionado
