@@ -343,5 +343,10 @@ e play; filtros Todas, Áudio, Vídeo, Com e-book (logada: Grátis e Minhas). Gr
 seguem o mesmo fluxo das jornadas, com "Pagar e ouvir". Com acesso, a meditação mostra o play e "Baixar
 e-book".
 
+**Cabeçalho dos hubs e perfil (mocks aprovados em 2026-11-23):** nos hubs, abas Início · Jornadas ·
+Meditações e a conta ("Entrar" ou a bolinha com "Meu perfil" e "Sair da conta"); a página inicial fica
+sem login. O perfil (`#/perfil`) tem abas Visão geral, Jornadas, Meditações e Conta, com a trilha de
+cada jornada e a etiqueta do tipo de acesso ("Grátis", "Para sempre", "Até dd/mm/aaaa").
+
 **Modo Andreía (Etapa D):** criar e editar produtos do catálogo (tipo, estrutura, grátis/paga, preço,
 prazo de acesso, banner, frase, temas, território, destaque, ordem, status) e liberar acesso à mão.

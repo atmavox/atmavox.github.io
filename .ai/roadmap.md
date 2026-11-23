@@ -148,6 +148,8 @@ aprovados antes do código.
             Até lá o botão mostra "Pagamento em breve" e nada quebra
       - [ ] **Pendência do desenvolvedor:** publicar as regras novas do Firestore no console
             (`firebase-setup.md`, seção 8); sem elas, o acesso pago não funciona (o resto segue normal)
+            8b. [x] Login nos hubs com abas Início · Jornadas · Meditações (mock aprovado, opção 3) e página de
+            perfil (`#/perfil`): abas, trilha de progresso, tipo de acesso
    9. [ ] Modo Andreía: criar e editar produtos (estrutura, grátis/paga, preço, prazo, banner, frase,
           temas, território, destaque) e liberar acesso à mão
 6. [x] Pagamento por produto: decidido Mercado Pago (Checkout Pro) + Worker gratuito (2026-11-22),

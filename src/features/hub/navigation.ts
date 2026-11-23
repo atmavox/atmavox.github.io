@@ -89,3 +89,6 @@ export const HUB_AREA_MENU: readonly { id: HubTab; label: string; href: string }
 export function hubAreaItem(section: HubSection): HubTab | null {
   return section === 'jornadas' || section === 'meditacoes' ? section : null
 }
+
+/** "/perfil": a página de perfil, aberta pela bolinha da conta nos hubs (mock aprovado). */
+export const isProfilePath = (path: string) => path === '/perfil' || path === '/perfil/'

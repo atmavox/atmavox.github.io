@@ -79,11 +79,8 @@ export function AccountMenu() {
           <p className="truncate px-3 py-1 text-sm text-ink-muted">
             {user.email ?? user.displayName}
           </p>
-          <a href="#/jornadas" onClick={() => setIsMenuOpen(false)} className={menuLink}>
-            Minhas jornadas
-          </a>
-          <a href="#/meditacoes" onClick={() => setIsMenuOpen(false)} className={menuLink}>
-            Minhas meditações
+          <a href="#/perfil" onClick={() => setIsMenuOpen(false)} className={menuLink}>
+            Meu perfil
           </a>
           {isConfirmingExit ? (
             <div className="mt-2 flex flex-col gap-3 border-t border-line px-1 pt-3">

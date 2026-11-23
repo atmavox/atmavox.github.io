@@ -14,6 +14,7 @@ import { EncountersBand } from '../components/EncountersBand'
 import { JourneysHub } from '../components/JourneysHub'
 import { MeditationPage } from '../components/MeditationPage'
 import { PaymentReturnPage } from '../components/PaymentReturnPage'
+import { ProfilePage } from '../components/ProfilePage'
 import { MeditationsHub } from '../components/MeditationsHub'
 import { PhraseBand } from '../components/PhraseBand'
 import { Portrait } from '../components/Portrait'
@@ -57,10 +58,12 @@ export function HubMagazine({
   section,
   meditationId,
   payment = null,
+  isProfile = false,
 }: {
   section: HubSection
   meditationId: string | null
   payment?: PaymentReturn | null
+  isProfile?: boolean
 }) {
   const [openVideo, setOpenVideo] = useState<HubAudio | null>(null)
   // Ao pausar, o vídeo sai devagar (esmaece e recolhe) em vez de sumir de uma vez.
@@ -87,15 +90,17 @@ export function HubMagazine({
     }
   }
   // Hubs e página de meditação são páginas próprias; o resto são seções da vitrine.
-  const page = payment
-    ? 'pagamento'
-    : section === 'jornadas'
-      ? 'jornadas'
-      : meditationId
-        ? 'meditacao'
-        : section === 'meditacoes'
-          ? 'meditacoes'
-          : null
+  const page = isProfile
+    ? 'perfil'
+    : payment
+      ? 'pagamento'
+      : section === 'jornadas'
+        ? 'jornadas'
+        : meditationId
+          ? 'meditacao'
+          : section === 'meditacoes'
+            ? 'meditacoes'
+            : null
 
   // O mesmo link (#/jornadas) que troca a aba no celular rola até a seção aqui.
   useEffect(() => {
@@ -174,6 +179,7 @@ export function HubMagazine({
       {page ? (
         <main>
           {page === 'pagamento' && payment && <PaymentReturnPage payment={payment} layout="wide" />}
+          {page === 'perfil' && <ProfilePage layout="wide" />}
           {page === 'jornadas' && <JourneysHub layout="wide" />}
           {page === 'meditacoes' && <MeditationsHub layout="wide" />}
           {page === 'meditacao' && meditationId && (

@@ -20,6 +20,7 @@ import { JourneysHub } from '../components/JourneysHub'
 import { MeditationCover } from '../components/MeditationCover'
 import { MeditationPage } from '../components/MeditationPage'
 import { PaymentReturnPage } from '../components/PaymentReturnPage'
+import { ProfilePage } from '../components/ProfilePage'
 import { MeditationsHub } from '../components/MeditationsHub'
 import { PhraseBand } from '../components/PhraseBand'
 import { Portrait } from '../components/Portrait'
@@ -176,16 +177,19 @@ export function HubTabs({
   activeTab,
   meditationId,
   payment = null,
+  isProfile = false,
 }: {
   activeTab: HubTab
   meditationId: string | null
   payment?: PaymentReturn | null
+  isProfile?: boolean
 }) {
-  const isHubTab = activeTab === 'jornadas' || activeTab === 'meditacoes' || payment !== null
+  const isHubTab =
+    activeTab === 'jornadas' || activeTab === 'meditacoes' || payment !== null || isProfile
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
-  }, [activeTab, meditationId])
+  }, [activeTab, meditationId, isProfile])
 
   return (
     <div className="min-h-dvh overflow-x-clip pb-28">
@@ -205,7 +209,9 @@ export function HubTabs({
       </header>
 
       <main className="mx-auto flex max-w-xl flex-col gap-8 px-5 pt-2">
-        {payment ? (
+        {isProfile ? (
+          <ProfilePage layout="narrow" />
+        ) : payment ? (
           <PaymentReturnPage payment={payment} layout="narrow" />
         ) : activeTab === 'meditacoes' ? (
           <MeditacoesPanel meditationId={meditationId} />

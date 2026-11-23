@@ -10,6 +10,17 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.10.0] · 2026-11-23
+
+### Adicionado
+
+- Página de perfil (`#/perfil`, mock aprovado), aberta por "Meu perfil" na bolinha da conta: abas
+  Visão geral, Jornadas, Meditações e Conta (trocam ao clicar). A Visão geral mostra a trilha da jornada
+  em andamento (trechos feitos, o próximo dia com "Continuar" e os que vêm depois) e os números (dias,
+  reflexões, vitórias, meditações). Cada jornada e meditação diz o tipo de acesso: "Grátis", "Para
+  sempre", "Até dd/mm/aaaa" ou "Venceu em…". O progresso é lido da conta, só os números (as reflexões
+  não saem da jornada).
+
 ## [1.9.2] · 2026-11-23
 
 ### Alterado
