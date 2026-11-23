@@ -1,5 +1,6 @@
 import { MOODS } from '../../domain/journey'
 import { useJourney } from '../useJourney'
+import { MoodIcon } from './MoodIcon'
 
 interface MoodPickerProps {
   day: number
@@ -23,13 +24,13 @@ export function MoodPicker({ day, labelledBy }: MoodPickerProps) {
             aria-label={mood.label}
             title={mood.label}
             onClick={() => store.setMood(day, isSelected ? null : mood.value)}
-            className={`grid size-10 place-items-center rounded-full border text-lg transition ${
+            className={`grid size-10 place-items-center rounded-full border transition ${
               isSelected
-                ? 'scale-110 border-accent bg-accent/15'
-                : 'border-line hover:border-accent hover:bg-accent/10'
+                ? 'scale-110 border-accent bg-accent/15 text-accent'
+                : 'border-line text-ink-muted hover:border-accent hover:bg-accent/10 hover:text-accent'
             }`}
           >
-            <span aria-hidden="true">{mood.symbol}</span>
+            <MoodIcon mood={mood.value} />
           </button>
         )
       })}

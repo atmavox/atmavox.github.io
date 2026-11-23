@@ -179,9 +179,9 @@ aprovados antes do código.
          - [ ] Conferir no celular de verdade o "segurar e arrastar" (Android e iPhone)
          - [ ] Depois da trava, títulos mudados no editor da jornada não atualizam os cartões do
                banner sozinhos (ADR-025); avaliar atualizar o `previewDays` ao publicar a jornada
-      - [ ] **Ícones no lugar dos emojis** (regra nova em `conventions.md`, mock
+      - [x] **Ícones no lugar dos emojis** (regra nova em `conventions.md`, mock
             `Downloads/atmavox-icones-emoji.html`): temperatura do dia opção B (luas + chama) e botão
-            de tema opção 1 (sol de raios + lua crescente)
+            de tema opção 1 (sol de raios + lua crescente); teste que barra emoji novo (1.20.0)
       - [ ] **Pendência (2026-11-23): envio de áudio das meditações.** Hoje o editor pede o link de um
             arquivo já hospedado. Opções: Cloudflare R2 pelo Worker do pagamento (recomendado: grátis até
             10 GB, sem custo de download, áudio pago só entregue a quem tem acesso; exige cartão na

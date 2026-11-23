@@ -10,6 +10,17 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.20.0] · 2026-11-23
+
+### Alterado
+
+- Sem emoji no site (mock `Downloads/atmavox-icones-emoji.html`): a temperatura energética do dia
+  usa ícones próprios em traço fino (opção B: lua tracejada, lua nova, crescente, cheia e chama), na cor
+  do tema, dourados quando escolhidos; o botão de tema usa sol de raios e lua crescente (opção 1); o
+  play dos blocos de vídeo no editor também virou ícone.
+- Teste que falha se algum emoji entrar no código (`shared/brand/noEmoji.test.ts`); sinais da marca
+  como ✦ continuam liberados.
+
 ## [1.19.0] · 2026-11-23
 
 ### Adicionado

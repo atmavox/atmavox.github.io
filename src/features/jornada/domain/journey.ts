@@ -10,12 +10,13 @@ export const EMOTIONS = [
 ] as const
 export type Emotion = (typeof EMOTIONS)[number]
 
+/** Temperatura energética do dia. O desenho de cada nível fica em `ui/components/MoodIcon.tsx`. */
 export const MOODS = [
-  { value: 1, symbol: '😶', label: 'Anestesiada' },
-  { value: 2, symbol: '🌑', label: 'Lua nova' },
-  { value: 3, symbol: '🌓', label: 'Crescendo' },
-  { value: 4, symbol: '🌕', label: 'Lua cheia' },
-  { value: 5, symbol: '🔥', label: 'Chama acesa' },
+  { value: 1, label: 'Anestesiada' },
+  { value: 2, label: 'Lua nova' },
+  { value: 3, label: 'Crescendo' },
+  { value: 4, label: 'Lua cheia' },
+  { value: 5, label: 'Chama acesa' },
 ] as const
 export type Mood = (typeof MOODS)[number]['value']
 

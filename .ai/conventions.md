@@ -41,7 +41,7 @@
 - **Sem emoji** (🔒, 🔥, 🌕…) no site, nos mocks e nas mensagens da interface: cada aparelho desenha emoji de
   um jeito e eles fogem da identidade da marca. Use **ícones SVG desenhados para o projeto** (traço fino,
   `currentColor`, `aria-hidden` quando forem decorativos), no padrão do `EditorIcon`. Sinais tipográficos
-  da marca, como o ✦, continuam valendo.
+  da marca, como o ✦, continuam valendo. O teste `shared/brand/noEmoji.test.ts` barra emoji novo.
 
 ## Nomes
 

@@ -94,6 +94,7 @@ const PATHS = {
   back: <path d="M15 18l-6-6 6-6" />,
   next: <path d="M9 6l6 6-6 6" />,
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  play: <path d="M8.5 5.8v12.4L18.5 12 8.5 5.8z" fill="currentColor" />,
   pen: (
     <>
       <path d="M4 20h4L19 9l-4-4L4 16v4z" />

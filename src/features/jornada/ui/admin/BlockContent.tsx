@@ -119,7 +119,7 @@ function VideoPreview({
             aria-hidden="true"
             className="relative grid size-14 place-items-center rounded-full bg-black/55 text-white"
           >
-            ▶
+            <EditorIcon name="play" size={26} />
           </span>
           <div className="absolute inset-x-3 bottom-2.5 rounded-md bg-black/45 px-2 text-[13px] text-white [&_input]:text-white">
             {title}
@@ -135,7 +135,7 @@ function VideoPreview({
     return (
       <div className="flex items-center gap-3 rounded-2xl border border-line bg-field px-3.5 py-3">
         <span aria-hidden="true" className={PLAY}>
-          <span>▶</span>
+          <EditorIcon name="play" size={16} />
         </span>
         <span className="min-w-0 flex-1">
           {title}
@@ -265,7 +265,7 @@ export function BlockContent({ section, onChange, onUploadImage }: BlockContentP
           />
           <div className="flex items-center gap-3 rounded-2xl border border-line bg-field px-3.5 py-3">
             <span aria-hidden="true" className={PLAY}>
-              <span>▶</span>
+              <EditorIcon name="play" size={16} />
             </span>
             <InlineText
               singleLine
