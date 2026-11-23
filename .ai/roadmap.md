@@ -142,9 +142,9 @@ aprovados antes do código.
           conteúdo pago fora do código do site
    8. [x] Mercado Pago (Checkout Pro) + Worker gratuito na Cloudflare (ADR-023): cobrança com o preço do
           catálogo, webhook com assinatura conferida, acesso gravado pelo servidor; página de retorno;
-          guia das contas em `pagamentos.md`
+          guia das contas em `processos-manuais.md`, seção 2
       - [ ] **Pendência do desenvolvedor (com a Andreía):** configurar as contas e publicar o Worker
-            (`pagamentos.md`, passos 1 a 5) e fazer a compra de teste (passo 6) antes de abrir as vendas.
+            (`processos-manuais.md`, passos 2.1 a 2.5) e fazer a compra de teste (passo 2.6) antes de abrir as vendas.
             Até lá o botão mostra "Pagamento em breve" e nada quebra
       - [x] **Pendência do desenvolvedor (feito em 2026-11-23):** publicar as regras novas do Firestore no console
             (`firebase-setup.md`, seções 8 e 9); sem elas, o acesso pago e a tela Acessos não funcionam (o resto segue normal)
@@ -211,11 +211,17 @@ Surgiu no caminho:
 
 - [x] **Última publicação das redes na página inicial** (ADR-028, mock `Downloads/atmavox-redes.html`,
       1.21.0): gerada no deploy a cada 6 horas; mural no computador, cartões que deslizam no celular.
-      YouTube já funciona. Guia em `redes-sociais.md`.
+      YouTube já funciona. Guia em `processos-manuais.md`, seção 1.
   - [ ] **Desenvolvedor:** criar a Variable `SOCIAL_TIKTOK_URL` com o vídeo escolhido pela Andreía
   - [ ] **Desenvolvedor + Andreía:** ligar o Instagram (conta profissional, app na Meta, secret
         `INSTAGRAM_TOKEN`) e lembrar de renovar a chave a cada 60 dias (ou automatizar a renovação)
   - [ ] Spotify: quando o podcast existir, a Variable `SOCIAL_SPOTIFY_RSS` (o Facebook sai do foco)
+
+- [ ] **Ativação individual paga** (conversa com a Andreía em 2026-11-23; plano proposto, aguardando ok
+      e mocks): login obrigatório → anamnese (editável no Modo Andreía) → escolha da terapia (preços
+      editáveis) → data de preferência (agenda da Andreía) → pagamento → mensagem pronta no WhatsApp →
+      histórico e status no perfil. Passos: 0. mocks; 1. terapias + anamnese no Modo Andreía; 2. agenda; 3. fluxo da pessoa; 4. pagamento e status; 5. WhatsApp + perfil + pedidos no Modo
+      Andreía
 
 ## Depois
 

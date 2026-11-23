@@ -1,5 +1,5 @@
 # Worker de pagamentos da Atmavox (ADR-023). Plano gratuito da Cloudflare.
-# Publicar: na pasta worker/, `npx wrangler@4 deploy` (guia em .ai/pagamentos.md).
+# Publicar: na pasta worker/, `npx wrangler@4 deploy` (guia em .ai/processos-manuais.md).
 # Segredos (nunca aqui): MP_ACCESS_TOKEN, MP_WEBHOOK_SECRET, FIREBASE_SERVICE_ACCOUNT
 #   `npx wrangler@4 secret put MP_ACCESS_TOKEN` (e os outros dois)
 name = "atmavox-pagamentos"

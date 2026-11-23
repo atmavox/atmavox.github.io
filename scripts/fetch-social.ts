@@ -6,7 +6,7 @@
 // Configuração (Settings > Secrets and variables > Actions do repositório):
 // - SOCIAL_TIKTOK_URL (variable): link do vídeo do TikTok escolhido pela Andreía (fixado).
 // - SOCIAL_SPOTIFY_RSS (variable): feed RSS do podcast, quando existir.
-// - INSTAGRAM_TOKEN (secret): chave da API do Instagram (guia em `.ai/redes-sociais.md`).
+// - INSTAGRAM_TOKEN (secret): chave da API do Instagram (guia em `.ai/processos-manuais.md`).
 import { mkdir, writeFile } from 'node:fs/promises'
 import {
   parseInstagramMedia,

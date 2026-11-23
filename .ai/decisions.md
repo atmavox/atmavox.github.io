@@ -339,7 +339,7 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
     - `GET /retorno`: devolve a pessoa a `#/pagamento/{aprovado|pendente|recusado}/{produto}`.
   - Segredos (Access Token, assinatura do webhook, conta de serviço) só nos segredos do Worker.
   - No site, `VITE_PAYMENTS_URL` liga o botão "Pagar"; sem ela, "Pagamento em breve".
-  - Publicação com `npx wrangler@4` (sem dependência nova no projeto). Guia em `pagamentos.md`.
+  - Publicação com `npx wrangler@4` (sem dependência nova no projeto). Guia em `processos-manuais.md` (antes `pagamentos.md`).
 - **Alternativas consideradas:** Pix manual com liberação à mão (continua possível no Modo Andreía,
   mas exige conferir cada pagamento); Hotmart/Kiwify (≈ 9% + R$ 2,49 por venda e o conteúdo já está
   no site); InfinitePay e Asaas (avaliados no comparativo de 2026-11-22); Cloud Functions do Firebase
@@ -455,7 +455,7 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   oficial com `INSTAGRAM_TOKEN` (secret); TikTok por um vídeo escolhido (`SOCIAL_TIKTOK_URL`) e o
   oEmbed público, porque o TikTok não entrega o último vídeo sem app aprovado. As leituras são funções
   puras em `src/shared/social/feeds.ts` (o Node 24 roda o TypeScript direto). Rede que falhar fica de
-  fora; sem nenhuma, só os ícones. Guia em `redes-sociais.md`.
+  fora; sem nenhuma, só os ícones. Guia em `processos-manuais.md` (antes `redes-sociais.md`).
 - **Alternativas consideradas:** buscar no navegador (exigiria chave exposta e esbarra em CORS); um
   Worker na Cloudflare (mais uma peça para manter, sem ganho); widgets prontos das redes (pesados e
   fora da marca).

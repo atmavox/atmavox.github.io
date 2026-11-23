@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.21.2] · 2026-11-23
+
+### Alterado
+
+- README sem destacar uma jornada específica (o nome dos produtos pode mudar).
+- Guias de pagamentos e redes sociais juntos em `.ai/processos-manuais.md` (processos manuais
+  pendentes, com uma lista para marcar); `pagamentos.md` e `redes-sociais.md` saíram.
+
 ## [1.21.1] · 2026-11-23
 
 ### Alterado

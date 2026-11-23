@@ -7,7 +7,7 @@
 **Consciência, presença e expansão.**
 
 O site de Andreía Oliveirà: um áudio de boas-vindas, os encontros ao vivo,<br>
-e a jornada de 21 dias para acender a Chama Interna — no celular, sem cadastro.
+as jornadas e as meditações guiadas, pensado para o celular.
 
 [**Abrir o site →**](https://atmavox.github.io)
 
@@ -49,12 +49,6 @@ a escolha e passa no contraste de leitura (AA) nos dois temas.
 
 </td>
 <td width="50%" valign="top">
-
-### 🔥 A Chama Interna · 21 dias
-
-O workbook da Andreía, interativo: rituais, check-in de emoções, reflexões escritas, afirmações,
-temperatura energética, revisões semanais e registro de vitórias. **Tudo o que a pessoa escreve fica
-salvo na hora**, e as abas vão do cinza ao âmbar conforme a jornada avança.
 
 ### ☁️ Login opcional
 
@@ -141,7 +135,7 @@ Firestore. O passo a passo do console está em [`.ai/firebase-setup.md`](.ai/fir
 ## 🗺️ Roadmap
 
 - [x] **Base** — Vite, TypeScript estrito, lint, testes e deploy automático
-- [x] **Jornada de 21 dias** — conteúdo original migrado, tudo salvo na hora, abas com evolução
+- [x] **Jornadas interativas** — tudo salvo na hora, abas com evolução
 - [x] **Temas** — claro "Areia" e escuro "Sépia" com contraste AA
 - [x] **Hub** — abas no celular, revista no computador, áudio de boas-vindas e encontros
 - [x] **Login opcional** — Google ou e-mail, sincronização entre aparelhos
