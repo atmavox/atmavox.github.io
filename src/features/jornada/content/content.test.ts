@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { allDays, allFieldIds, REVIEW_DAYS, TOTAL_DAYS } from '../domain/journey'
+import { allDays, allFieldIds } from '../domain/journey'
 import { chamaInterna21 } from './chama-interna-21'
 import { closingCopy, coverCopy, reviewsCopy, victoriesCopy } from './copy'
 
@@ -15,7 +15,7 @@ describe('conteúdo da jornada Chama Interna 21', () => {
   const days = allDays(chamaInterna21)
 
   it('tem 21 dias numerados em sequência, 7 por semana', () => {
-    expect(days).toHaveLength(TOTAL_DAYS)
+    expect(days).toHaveLength(21)
     expect(days.map((d) => d.number)).toEqual(Array.from({ length: 21 }, (_, i) => i + 1))
     for (const week of chamaInterna21.weeks) {
       expect(week.days.map((d) => d.number)).toEqual(
@@ -25,7 +25,7 @@ describe('conteúdo da jornada Chama Interna 21', () => {
   })
 
   it('tem revisões exatamente nos dias 7, 14 e 21', () => {
-    expect(days.filter((d) => d.isReview).map((d) => d.number)).toEqual([...REVIEW_DAYS])
+    expect(days.filter((d) => d.isReview).map((d) => d.number)).toEqual([7, 14, 21])
   })
 
   it('todo dia tem ritual e afirmação', () => {

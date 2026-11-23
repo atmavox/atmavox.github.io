@@ -1,9 +1,5 @@
 // Formato da jornada como dados. O conteúdo concreto fica em content/; aqui só a forma e as constantes.
 
-export const TOTAL_DAYS = 21
-export const DAYS_PER_WEEK = 7
-export const REVIEW_DAYS = [7, 14, 21] as const
-
 export const EMOTIONS = [
   'Pesada',
   'Ansiosa',
@@ -111,12 +107,22 @@ export interface JourneyDay {
   sections: readonly DaySection[]
 }
 
+/**
+ * Uma parte da jornada, que vira uma aba: uma semana (`weeks`), um tema (`themes`) ou o bloco único
+ * de dias (`days`). No tema não há dias: o conteúdo dele é uma única unidade em `days[0]` (guardada
+ * como dia só para reaproveitar etapas e respostas `d{n}:…`), e a tela nunca mostra "Dia".
+ */
 export interface JourneyWeek {
-  number: 1 | 2 | 3
-  roman: 'I' | 'II' | 'III'
+  number: number
+  roman: string
   theme: string
   days: readonly JourneyDay[]
 }
+
+/** Como a jornada se divide e abre (ADR-024): semanas e dias pelo calendário; temas por conclusão. */
+export type JourneyStructure = 'weeks' | 'themes' | 'days'
+
+export const JOURNEY_STRUCTURES: readonly JourneyStructure[] = ['weeks', 'themes', 'days']
 
 export interface Question {
   fieldId: FieldId
@@ -134,6 +140,8 @@ export interface WeeklyReview {
 
 export interface Journey {
   id: string
+  /** Sem ela, `weeks` (a Chama Interna, de antes das estruturas). */
+  structure?: JourneyStructure
   weeks: readonly JourneyWeek[]
   reviews: readonly WeeklyReview[]
   closingQuestions: readonly Question[]
@@ -142,6 +150,30 @@ export interface Journey {
    * por `d{número}:…`, e um dia novo com o mesmo número mostraria respostas de outro dia.
    */
   retiredDays?: readonly number[]
+}
+
+export function structureOf(journey: Journey): JourneyStructure {
+  return journey.structure ?? 'weeks'
+}
+
+/** Algarismo romano das semanas (I, II, III, IV…). */
+export function toRoman(n: number): string {
+  const table: [number, string][] = [
+    [10, 'X'],
+    [9, 'IX'],
+    [5, 'V'],
+    [4, 'IV'],
+    [1, 'I'],
+  ]
+  let rest = n
+  let out = ''
+  for (const [value, symbol] of table) {
+    while (rest >= value) {
+      out += symbol
+      rest -= value
+    }
+  }
+  return out
 }
 
 export function allDays(journey: Journey): JourneyDay[] {

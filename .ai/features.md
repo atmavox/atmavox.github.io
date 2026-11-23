@@ -127,8 +127,13 @@ testes de conteúdo garantem 21 dias, revisões em 7/14/21, ids únicos e nenhum
   - **Concluir dia:** "Concluir dia ✦" só libera com todas as etapas feitas. Concluir é definitivo.
     O ✦ do cabeçalho do card e o rastreador da Abertura só **mostram** o estado.
   - **Abas, nesta ordem:** Abertura ("Começar a jornada ✦") → Semana I → II → III (cada uma abre junto
-    com o primeiro dia dela) → Revisões (depois dos 21 dias concluídos) (as 11 perguntas com "Feito", uma de cada vez) → Vitórias ("Feito ✦") →
-    Encerramento. Aba fechada aparece com cadeado; abrir o link dela mostra um aviso e "Continuar em…".
+    com o primeiro dia dela) → Revisões (depois dos 21 dias concluídos; as 11 perguntas com "Feito", uma
+    de cada vez) → Vitórias ("Feito ✦") → Encerramento. Aba fechada aparece com cadeado; abrir o link
+    dela mostra um aviso e "Continuar em…".
+  - **Abas pela estrutura (ADR-024):** por semana, como acima (com quantas semanas houver; Revisões só
+    se a jornada tiver); **por tema**, uma aba por tema com o nome dele, sem dias: o tema inteiro numa
+    página, com "Concluir tema ✦", que abre o tema seguinte; **por dias**, uma aba "Dias" com os cartões.
+    Vitórias abrem depois da última parte. Por tema, a vitória não pede o dia do protocolo.
   - **Progresso antigo respeitado:** dia ou aba que já tinha respostas ou marcações continua aberto.
   - **Admin:** as regras aceitam `bypass` (Fase 4, modo Andreía).
 - O exemplo de vitória do original aparece só enquanto a lista está vazia, marcado como "Exemplo".

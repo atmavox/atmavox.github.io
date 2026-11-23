@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.15.0] · 2026-11-23
+
+### Adicionado
+
+- Jornada montada pela estrutura do produto: por semana (Semana I…N + Revisões), por tema (uma aba por
+  tema, sem dias, com "Concluir tema ✦" abrindo o próximo) ou por dias (uma aba "Dias"). A Abertura
+  de uma jornada nova mostra o título e a frase do produto; o cabeçalho mostra o nome da jornada.
+
 ## [1.14.0] · 2026-11-23
 
 ### Alterado

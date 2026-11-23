@@ -1,14 +1,16 @@
 import { Lock } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
+import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import {
   EDITOR_HREF,
-  JOURNEY_TABS,
+  journeyTabs,
+  partOfTab,
   tabHref,
-  weekNumberOfTab,
   type JourneyTabId,
 } from '../application/navigation'
+import { structureOf } from '../domain/journey'
 import { isTabUnlocked } from '../application/tabAccess'
 import { tabProgress } from '../application/tabProgress'
 import { overallProgress } from '../domain/measures'
@@ -28,6 +30,11 @@ function stageColor(ratio: number): string {
 export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
   const { journey, progress, access, isAdmin } = useJourney()
   const overall = overallProgress(journey, progress)
+  const tabs = journeyTabs(journey)
+  const product = useCatalog().find(journey.id)
+  const subtitle = product
+    ? `${product.title}${product.kind === 'journey' ? ` · ${product.durationLabel}` : ''}`
+    : 'A Chama Interna · 21 dias'
   const activeRef = useRef<HTMLAnchorElement>(null)
 
   // Centraliza a aba atual rolando só a fileira de abas (scrollIntoView rolaria a página inteira).
@@ -67,7 +74,7 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
         </a>
         <span aria-hidden="true" className="hidden h-4 w-px bg-line sm:block" />
         <span className="hidden truncate font-display text-ink-muted italic sm:block">
-          A Chama Interna · 21 dias
+          {subtitle}
         </span>
         <span className="ml-auto hidden text-sm text-ink-muted md:block">
           {overall.caption} da jornada
@@ -83,8 +90,11 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
         className="mx-auto max-w-6xl md:px-8"
         style={{ paddingTop: '5px' }}
       >
-        <ul className="relative flex snap-x overflow-x-auto px-2 [scrollbar-width:none] md:grid md:grid-cols-7 md:overflow-visible md:px-0">
-          {JOURNEY_TABS.map((tab) => {
+        <ul
+          className="relative flex snap-x overflow-x-auto px-2 [scrollbar-width:none] md:grid md:grid-cols-(--tab-count) md:overflow-visible md:px-0"
+          style={{ '--tab-count': `repeat(${tabs.length}, minmax(0, 1fr))` } as CSSProperties}
+        >
+          {tabs.map((tab) => {
             const isActive = tab.id === activeTab
             const stage = tabProgress(tab.id, journey, progress)
             if (!isTabUnlocked(tab.id, journey, progress, access)) {
@@ -93,8 +103,8 @@ export function JourneyHeader({ activeTab }: { activeTab: JourneyTabId }) {
                   <span
                     aria-disabled="true"
                     title={
-                      weekNumberOfTab(tab.id)
-                        ? 'Abre com o primeiro dia da semana'
+                      partOfTab(journey, tab.id) && structureOf(journey) !== 'themes'
+                        ? 'Abre com o primeiro dia dela, à meia-noite'
                         : 'Complete a etapa anterior para abrir'
                     }
                     className="flex flex-col gap-1.5 border-b-2 border-transparent px-3 pt-3 pb-2.5 text-xs font-medium tracking-wider whitespace-nowrap text-ink-faint uppercase opacity-70 md:px-2 md:text-[0.8rem]"

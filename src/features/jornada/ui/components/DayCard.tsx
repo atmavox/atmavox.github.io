@@ -73,15 +73,66 @@ function StepDoneButton({ day, section }: { day: number; section: DaySection }) 
   )
 }
 
+const UNIT_TEXT = {
+  dia: {
+    done: 'Dia concluído',
+    complete: 'Concluir dia ✦',
+    pending: 'Conclua as etapas para fechar o dia',
+  },
+  tema: {
+    done: 'Tema concluído',
+    complete: 'Concluir tema ✦',
+    pending: 'Conclua as etapas para fechar o tema',
+  },
+} as const
+
+/** As etapas de um dia (ou de um tema, que é uma unidade só) e o botão de concluir. */
+export function DaySteps({ day, unit = 'dia' }: { day: JourneyDay; unit?: 'dia' | 'tema' }) {
+  const { progress, store, access } = useJourney()
+  const isDone = progress.completedDays.includes(day.number)
+  const canComplete = canCompleteDay(progress, day)
+  const text = UNIT_TEXT[unit]
+  return (
+    <>
+      {day.sections.map((section, index) => {
+        if (!isStepUnlocked(progress, day, index, access)) {
+          return <LockedStep key={section.id} section={section} />
+        }
+        return (
+          <div key={section.id}>
+            <DaySectionView day={day.number} section={section} />
+            {!isStepDone(progress, day.number, section) && (
+              <StepDoneButton day={day.number} section={section} />
+            )}
+          </div>
+        )
+      })}
+      {isDone ? (
+        <p className="flex items-center gap-2 self-start rounded-full border border-accent px-5 py-2.5 text-sm font-medium text-accent">
+          <Check aria-hidden size={16} /> {text.done}
+        </p>
+      ) : (
+        <button
+          type="button"
+          disabled={!canComplete}
+          onClick={() => store.completeDay(day.number)}
+          className="self-start rounded-full bg-accent px-5 py-2.5 text-sm font-medium tracking-wide text-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {canComplete ? text.complete : text.pending}
+        </button>
+      )}
+    </>
+  )
+}
+
 export function DayCard({ day }: { day: JourneyDay }) {
-  const { journey, progress, store, access } = useJourney()
+  const { journey, progress, access } = useJourney()
   const [isOpen, setIsOpen] = useState(false)
   const contentId = useId()
   const isDone = progress.completedDays.includes(day.number)
   const isUnlocked = isDayUnlocked(journey, progress, day.number, access)
   const isHighlighted = isDone || day.isReview
   const dayLabel = String(day.number).padStart(2, '0')
-  const canComplete = canCompleteDay(progress, day)
   const steps = dayStepCount(progress, day)
 
   return (
@@ -161,33 +212,7 @@ export function DayCard({ day }: { day: JourneyDay }) {
         hidden={!isOpen || !isUnlocked}
         className="flex flex-col gap-6 border-t border-line px-4 pt-4 pb-5"
       >
-        {day.sections.map((section, index) => {
-          if (!isStepUnlocked(progress, day, index, access)) {
-            return <LockedStep key={section.id} section={section} />
-          }
-          return (
-            <div key={section.id}>
-              <DaySectionView day={day.number} section={section} />
-              {!isStepDone(progress, day.number, section) && (
-                <StepDoneButton day={day.number} section={section} />
-              )}
-            </div>
-          )
-        })}
-        {isDone ? (
-          <p className="flex items-center gap-2 self-start rounded-full border border-accent px-5 py-2.5 text-sm font-medium text-accent">
-            <Check aria-hidden size={16} /> Dia concluído
-          </p>
-        ) : (
-          <button
-            type="button"
-            disabled={!canComplete}
-            onClick={() => store.completeDay(day.number)}
-            className="self-start rounded-full bg-accent px-5 py-2.5 text-sm font-medium tracking-wide text-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {canComplete ? 'Concluir dia ✦' : 'Conclua as etapas para fechar o dia'}
-          </button>
-        )}
+        <DaySteps day={day} />
       </div>
     </article>
   )

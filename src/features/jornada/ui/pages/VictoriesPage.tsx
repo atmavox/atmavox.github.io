@@ -1,7 +1,7 @@
 import { useId, useState, type FormEvent } from 'react'
 import { victoriesCopy } from '../../content/copy'
 import { VICTORIES_STEP } from '../../domain/access'
-import { TOTAL_DAYS } from '../../domain/journey'
+import { allDays, structureOf } from '../../domain/journey'
 import type { Victory } from '../../domain/progress'
 import {
   emptyVictoryDraft,
@@ -12,9 +12,11 @@ import { tabHref } from '../../application/navigation'
 import { PageHeader } from '../components/PageHeader'
 import { useJourney } from '../useJourney'
 
-const ERROR_MESSAGES: Record<VictoryDraftError, string> = {
-  'action-required': 'Conte o que aconteceu para registrar a conquista.',
-  'invalid-day': `O dia do protocolo precisa ser um número de 1 a ${TOTAL_DAYS}.`,
+function errorMessages(dayCount: number): Record<VictoryDraftError, string> {
+  return {
+    'action-required': 'Conte o que aconteceu para registrar a conquista.',
+    'invalid-day': `O dia do protocolo precisa ser um número de 1 a ${dayCount}.`,
+  }
 }
 
 const inputClass =
@@ -69,6 +71,9 @@ function VictoryItem({ victory, onRemove }: { victory: Victory; onRemove?: () =>
 
 export function VictoriesPage() {
   const { journey, progress, store } = useJourney()
+  const dayCount = allDays(journey).length
+  // Por tema não há dias: a vitória não pede o dia do protocolo.
+  const hasDays = structureOf(journey) !== 'themes'
   const [draft, setDraft] = useState<VictoryDraft>(emptyVictoryDraft)
   const [errors, setErrors] = useState<VictoryDraftError[]>([])
   const ids = { date: useId(), day: useId(), action: useId(), result: useId(), errors: useId() }
@@ -115,23 +120,25 @@ export function VictoriesPage() {
               className={inputClass}
             />
           </div>
-          <div>
-            <label htmlFor={ids.day} className={labelClass}>
-              {victoriesCopy.dayLabel}
-            </label>
-            <input
-              id={ids.day}
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={TOTAL_DAYS}
-              placeholder={victoriesCopy.dayPlaceholder}
-              value={draft.day}
-              onChange={(e) => update('day')(e.target.value)}
-              aria-invalid={errors.includes('invalid-day')}
-              className={inputClass}
-            />
-          </div>
+          {hasDays && (
+            <div>
+              <label htmlFor={ids.day} className={labelClass}>
+                {victoriesCopy.dayLabel}
+              </label>
+              <input
+                id={ids.day}
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={dayCount}
+                placeholder={victoriesCopy.dayPlaceholder}
+                value={draft.day}
+                onChange={(e) => update('day')(e.target.value)}
+                aria-invalid={errors.includes('invalid-day')}
+                className={inputClass}
+              />
+            </div>
+          )}
         </div>
         <div className="mb-4">
           <label htmlFor={ids.action} className={labelClass}>
@@ -163,7 +170,7 @@ export function VictoriesPage() {
         {errors.length > 0 && (
           <ul id={ids.errors} role="alert" className="mb-4 text-sm text-accent">
             {errors.map((error) => (
-              <li key={error}>{ERROR_MESSAGES[error]}</li>
+              <li key={error}>{errorMessages(dayCount)[error]}</li>
             ))}
           </ul>
         )}

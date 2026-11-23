@@ -6,18 +6,18 @@ import {
   VICTORIES_STEP,
   type AccessOptions,
 } from '../domain/access'
-import type { Journey } from '../domain/journey'
+import { structureOf, type Journey } from '../domain/journey'
 import type { JourneyProgress } from '../domain/progress'
-import { JOURNEY_TABS, weekNumberOfTab, type JourneyTabId } from './navigation'
+import { journeyTabs, partOfTab, type JourneyTabId } from './navigation'
 
-/** Uma aba está completa quando libera a seguinte (a ordem é a de JOURNEY_TABS). */
+/** Uma aba está completa quando libera a seguinte (a ordem é a de `journeyTabs`). */
 export function isTabComplete(
   tab: JourneyTabId,
   journey: Journey,
   progress: JourneyProgress,
 ): boolean {
-  const week = weekNumberOfTab(tab)
-  if (week) return isWeekComplete(journey, progress, week)
+  const part = partOfTab(journey, tab)
+  if (part) return isWeekComplete(journey, progress, part.number)
   if (tab === 'abertura') return hasStarted(progress)
   if (tab === 'revisoes') return areReviewsComplete(journey, progress)
   if (tab === 'vitorias') return progress.completedSteps.includes(VICTORIES_STEP)
@@ -30,10 +30,9 @@ function tabHasOwnProgress(
   journey: Journey,
   progress: JourneyProgress,
 ): boolean {
-  const week = weekNumberOfTab(tab)
-  if (week) {
-    const days = journey.weeks.find((w) => w.number === week)?.days ?? []
-    return days.some(
+  const part = partOfTab(journey, tab)
+  if (part) {
+    return part.days.some(
       (day) =>
         progress.completedDays.includes(day.number) ||
         Object.keys(progress.entries).some((id) => id.startsWith(`d${day.number}:`)),
@@ -51,22 +50,20 @@ export function isTabUnlocked(
   progress: JourneyProgress,
   options: AccessOptions = {},
 ): boolean {
-  const index = JOURNEY_TABS.findIndex((t) => t.id === tab)
-  if (options.bypass || index <= 0) return true
-  // Semana: abre junto com o primeiro dia dela, pelo calendário (ADR-024).
-  const week = weekNumberOfTab(tab)
-  if (week) {
-    const firstDay = journey.weeks.find((w) => w.number === week)?.days[0]
-    return (
-      (firstDay !== undefined && isDayUnlocked(journey, progress, firstDay.number, options)) ||
-      tabHasOwnProgress(tab, journey, progress)
-    )
+  const tabs = journeyTabs(journey)
+  const index = tabs.findIndex((t) => t.id === tab)
+  if (index === -1) return false
+  if (options.bypass || index === 0) return true
+  if (tabHasOwnProgress(tab, journey, progress)) return true
+  // Semana e "Dias": abrem junto com o primeiro dia, pelo calendário (ADR-024). Tema: pela conclusão
+  // do tema anterior (a regra geral abaixo).
+  const part = partOfTab(journey, tab)
+  if (part && structureOf(journey) !== 'themes') {
+    const firstDay = part.days[0]
+    return firstDay !== undefined && isDayUnlocked(journey, progress, firstDay.number, options)
   }
-  const previous = JOURNEY_TABS[index - 1]
-  return (
-    (previous !== undefined && isTabComplete(previous.id, journey, progress)) ||
-    tabHasOwnProgress(tab, journey, progress)
-  )
+  const previous = tabs[index - 1]
+  return previous !== undefined && isTabComplete(previous.id, journey, progress)
 }
 
 /** A aba mais adiantada que a pessoa pode abrir agora (para onde mandar quem cai numa aba fechada). */
@@ -76,7 +73,7 @@ export function furthestUnlockedTab(
   options: AccessOptions = {},
 ): JourneyTabId {
   let furthest: JourneyTabId = 'abertura'
-  for (const tab of JOURNEY_TABS) {
+  for (const tab of journeyTabs(journey)) {
     if (isTabUnlocked(tab.id, journey, progress, options)) furthest = tab.id
     else break
   }

@@ -1,13 +1,15 @@
 // Lê uma jornada vinda de fora (Firestore). Se algo não tiver a forma esperada, devolve null e o
 // site segue com a versão que vem no código: conteúdo quebrado nunca chega à tela da participante.
-import type {
-  DaySection,
-  FieldId,
-  Journey,
-  JourneyDay,
-  JourneyWeek,
-  Question,
-  WeeklyReview,
+import {
+  JOURNEY_STRUCTURES,
+  toRoman,
+  type DaySection,
+  type FieldId,
+  type Journey,
+  type JourneyDay,
+  type JourneyWeek,
+  type Question,
+  type WeeklyReview,
 } from './journey'
 
 type Raw = Record<string, unknown>
@@ -135,15 +137,14 @@ function parseDay(raw: unknown): JourneyDay | null {
   }
 }
 
-const WEEK_ROMANS = { 1: 'I', 2: 'II', 3: 'III' } as const
-
 function parseWeek(raw: unknown): JourneyWeek | null {
   if (!isObject(raw)) return null
   const number = raw.number
-  if (number !== 1 && number !== 2 && number !== 3) return null
+  if (typeof number !== 'number' || !Number.isInteger(number) || number < 1 || number > 99)
+    return null
   const days = every(raw.days, parseDay)
   if (!days) return null
-  return { number, roman: WEEK_ROMANS[number], theme: str(raw.theme) ?? '', days }
+  return { number, roman: toRoman(number), theme: str(raw.theme) ?? '', days }
 }
 
 function parseQuestion(raw: unknown): Question | null {
@@ -193,8 +194,10 @@ export function parseJourney(raw: unknown): Journey | null {
         (day): day is number => typeof day === 'number' && Number.isInteger(day) && day >= 1,
       )
     : []
+  const structure = JOURNEY_STRUCTURES.find((s) => s === raw.structure)
   const journey: Journey = {
     id,
+    ...(structure && structure !== 'weeks' ? { structure } : {}),
     weeks,
     reviews,
     closingQuestions,

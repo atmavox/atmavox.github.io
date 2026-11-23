@@ -1,5 +1,17 @@
+import { structureOf, type Journey, type JourneyWeek } from '../domain/journey'
+
+/**
+ * Abas da jornada. As partes mudam com a estrutura: `semana-N` (por semana), `tema-N` (por tema) ou
+ * `dias` (por dias). Os links antigos `semana-1..3` da Chama Interna continuam valendo.
+ */
 export type JourneyTabId =
-  'abertura' | 'semana-1' | 'semana-2' | 'semana-3' | 'revisoes' | 'vitorias' | 'encerramento'
+  | 'abertura'
+  | `semana-${number}`
+  | `tema-${number}`
+  | 'dias'
+  | 'revisoes'
+  | 'vitorias'
+  | 'encerramento'
 
 export interface JourneyTab {
   id: JourneyTabId
@@ -11,26 +23,62 @@ export const JOURNEY_BASE_PATH = '/jornada'
 /** A jornada que existia antes das rotas por id: os links antigos (`#/jornada/semana-1`) abrem ela. */
 export const DEFAULT_JOURNEY_ID = 'chama-interna-21'
 
-export const JOURNEY_TABS: readonly JourneyTab[] = [
-  { id: 'abertura', label: 'Abertura' },
-  { id: 'semana-1', label: 'Semana I' },
-  { id: 'semana-2', label: 'Semana II' },
-  { id: 'semana-3', label: 'Semana III' },
-  { id: 'revisoes', label: 'Revisões' },
-  { id: 'vitorias', label: 'Vitórias' },
-  { id: 'encerramento', label: 'Encerramento' },
-]
-
 /** Modo Andreía (editor da jornada). */
 export const EDITOR_PATH = `${JOURNEY_BASE_PATH}/editar`
 export const EDITOR_HREF = `#${EDITOR_PATH}`
+
+/** A aba de uma parte (semana, tema ou o bloco de dias). */
+export function partTabId(journey: Journey, part: JourneyWeek): JourneyTabId {
+  const structure = structureOf(journey)
+  if (structure === 'days') return 'dias'
+  return structure === 'themes' ? `tema-${part.number}` : `semana-${part.number}`
+}
+
+function partLabel(journey: Journey, part: JourneyWeek): string {
+  const structure = structureOf(journey)
+  if (structure === 'days') return 'Dias'
+  if (structure === 'themes') return part.theme.trim() || `Tema ${part.number}`
+  return `Semana ${part.roman}`
+}
+
+/** As abas desta jornada, na ordem em que se abrem. Revisões só existem na jornada por semanas. */
+export function journeyTabs(journey: Journey): JourneyTab[] {
+  const parts = structureOf(journey) === 'days' ? journey.weeks.slice(0, 1) : journey.weeks
+  const hasReviews = structureOf(journey) === 'weeks' && journey.reviews.length > 0
+  return [
+    { id: 'abertura', label: 'Abertura' },
+    ...parts.map((part) => ({ id: partTabId(journey, part), label: partLabel(journey, part) })),
+    ...(hasReviews ? [{ id: 'revisoes' as const, label: 'Revisões' }] : []),
+    { id: 'vitorias', label: 'Vitórias' },
+    { id: 'encerramento', label: 'Encerramento' },
+  ]
+}
+
+/** A parte que a aba mostra, se for uma aba de parte. */
+export function partOfTab(journey: Journey, tab: JourneyTabId): JourneyWeek | undefined {
+  return journey.weeks.find((part) => partTabId(journey, part) === tab)
+}
+
+/** A aba da parte que contém o dia (para "Continuar no dia N"). */
+export function tabOfDay(journey: Journey, dayNumber: number): JourneyTabId | undefined {
+  const part = journey.weeks.find((p) => p.days.some((day) => day.number === dayNumber))
+  return part ? partTabId(journey, part) : undefined
+}
 
 export function isJourneyPath(path: string): boolean {
   return path === JOURNEY_BASE_PATH || path.startsWith(`${JOURNEY_BASE_PATH}/`)
 }
 
+const FIXED_TABS: ReadonlySet<string> = new Set([
+  'abertura',
+  'dias',
+  'revisoes',
+  'vitorias',
+  'encerramento',
+])
+
 const isTabId = (segment: string | undefined): segment is JourneyTabId =>
-  JOURNEY_TABS.some((tab) => tab.id === segment)
+  segment !== undefined && (FIXED_TABS.has(segment) || /^(semana|tema)-[1-9]\d?$/.test(segment))
 
 export interface JourneyRoute {
   journeyId: string
@@ -39,7 +87,8 @@ export interface JourneyRoute {
 
 /**
  * "/jornada/chama-interna-21/semana-1" → jornada e aba. Os caminhos antigos, sem id ("/jornada",
- * "/jornada/semana-1"), abrem a jornada padrão. Aba desconhecida cai na Abertura.
+ * "/jornada/semana-1"), abrem a jornada padrão. Aba desconhecida cai na Abertura (e uma aba que a
+ * jornada não tem também: ver `JourneyApp`).
  */
 export function routeFromPath(path: string): JourneyRoute {
   const [first, second] = path.slice(JOURNEY_BASE_PATH.length).split('/').filter(Boolean)
@@ -52,11 +101,4 @@ export function routeFromPath(path: string): JourneyRoute {
 /** "#/jornada/chama-interna-21" (Abertura) ou "#/jornada/chama-interna-21/semana-1". */
 export function tabHref(journeyId: string, tab: JourneyTabId): string {
   return tab === 'abertura' ? `#/jornada/${journeyId}` : `#/jornada/${journeyId}/${tab}`
-}
-
-export function weekNumberOfTab(tab: JourneyTabId): 1 | 2 | 3 | null {
-  if (tab === 'semana-1') return 1
-  if (tab === 'semana-2') return 2
-  if (tab === 'semana-3') return 3
-  return null
 }

@@ -4,6 +4,7 @@ import { createJourneyContent } from '../application/JourneyContent'
 import { createJourneyStore } from '../application/JourneyStore'
 import { chamaInterna21 } from '../content/chama-interna-21'
 import { START_STEP, VICTORIES_STEP } from '../domain/access'
+import { withSectionIds, type Journey } from '../domain/journey'
 import { emptyProgress, markStepDone, type JourneyProgress } from '../domain/progress'
 import { createInMemoryBackend, createTestAccount } from '../infrastructure/InMemoryCloudBackend'
 import { InMemoryProgressRepository } from '../infrastructure/InMemoryProgressRepository'
@@ -37,6 +38,47 @@ function readyForVictories(): JourneyProgress {
 const openDay1 = () =>
   fireEvent.click(screen.getByRole('button', { name: /Dia 1: O Estado que você não consegue/ }))
 const done = () => fireEvent.click(screen.getByRole('button', { name: 'Feito ✦' }))
+
+describe('JourneyApp por tema', () => {
+  const themes: Journey = {
+    id: 'corpo-que-escuta',
+    structure: 'themes',
+    weeks: ['Respiração', 'Sensação'].map((theme, i) => ({
+      number: i + 1,
+      roman: '',
+      theme,
+      days: [
+        withSectionIds({
+          number: i + 1,
+          title: theme,
+          subtitle: '',
+          isReview: false,
+          sections: [{ type: 'text', text: `Conteúdo de ${theme}.` }],
+        }),
+      ],
+    })),
+    reviews: [],
+    closingQuestions: [],
+  }
+
+  it('mostra o tema inteiro, sem "Dia", e concluir abre o próximo tema', () => {
+    const store = createJourneyStore({ repository: started() })
+    render(
+      <JourneyContext.Provider
+        value={{ content: createJourneyContent({ fallback: themes }), store, account: null }}
+      >
+        <JourneyApp path="/jornada/corpo-que-escuta/tema-1" />
+      </JourneyContext.Provider>,
+    )
+    expect(screen.getByRole('heading', { level: 1, name: 'Respiração' })).toBeVisible()
+    expect(screen.getByText('Tema 1 de 2')).toBeVisible()
+    expect(screen.queryByText(/Dia 1/)).not.toBeInTheDocument()
+    const nav = screen.getByRole('navigation', { name: 'Etapas da jornada' })
+    expect(within(nav).getByText(/Sensação/)).toHaveTextContent('fechada')
+    fireEvent.click(screen.getByRole('button', { name: 'Concluir tema ✦' }))
+    expect(within(nav).getByRole('link', { name: /Sensação/ })).toBeInTheDocument()
+  })
+})
 
 describe('JourneyApp', () => {
   it('a abertura mostra o rastreador e o botão de começar; a Semana I ainda está fechada', () => {

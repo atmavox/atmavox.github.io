@@ -2,10 +2,10 @@ import { Lock } from 'lucide-react'
 import { lazy, Suspense, useEffect, type ReactNode } from 'react'
 import {
   EDITOR_PATH,
-  JOURNEY_TABS,
+  journeyTabs,
+  partOfTab,
   routeFromPath,
   tabHref,
-  weekNumberOfTab,
   type JourneyTabId,
 } from '../application/navigation'
 import { LoginGate } from './account/LoginGate'
@@ -15,7 +15,9 @@ import { ClosingPage } from './pages/ClosingPage'
 import { CoverPage } from './pages/CoverPage'
 import { ReviewsPage } from './pages/ReviewsPage'
 import { VictoriesPage } from './pages/VictoriesPage'
+import { ThemePage } from './pages/ThemePage'
 import { WeekPage } from './pages/WeekPage'
+import { structureOf } from '../domain/journey'
 import { BRAND_TAB_TITLE } from '../../../shared/brand/links'
 import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import { useAccess } from '../../../shared/catalog/AccessContext'
@@ -26,9 +28,12 @@ import { useJourney } from './useJourney'
 /** Quem abre o link de uma aba ainda fechada vê o que falta e um atalho para onde está. */
 function LockedTab({ tab }: { tab: JourneyTabId }) {
   const { journey, progress, access } = useJourney()
-  const index = JOURNEY_TABS.findIndex((t) => t.id === tab)
-  const previous = JOURNEY_TABS[index - 1]
-  const furthest = JOURNEY_TABS.find((t) => t.id === furthestUnlockedTab(journey, progress, access))
+  const tabs = journeyTabs(journey)
+  const index = tabs.findIndex((t) => t.id === tab)
+  const previous = tabs[index - 1]
+  const furthest = tabs.find((t) => t.id === furthestUnlockedTab(journey, progress, access))
+  const opensByCalendar = partOfTab(journey, tab) !== undefined && structureOf(journey) !== 'themes'
+  const label = tabs[index]?.label ?? ''
   return (
     <div className="flex flex-col items-center gap-4 py-20 text-center">
       <span className="grid size-14 place-items-center rounded-full border border-line text-ink-faint">
@@ -36,9 +41,9 @@ function LockedTab({ tab }: { tab: JourneyTabId }) {
       </span>
       <h1 className="font-display text-3xl text-ink">Esta etapa ainda está fechada</h1>
       <p className="max-w-md text-ink-muted">
-        A jornada se abre aos poucos: complete{' '}
-        {previous ? `“${previous.label}”` : 'a etapa anterior'} para liberar “
-        {JOURNEY_TABS[index]?.label}”.
+        {opensByCalendar
+          ? `A jornada se abre aos poucos: um dia novo a cada meia-noite. “${label}” abre junto com o primeiro dia dela.`
+          : `A jornada se abre aos poucos: complete ${previous ? `“${previous.label}”` : 'a etapa anterior'} para liberar “${label}”.`}
       </p>
       {furthest && (
         <a
@@ -55,10 +60,10 @@ function LockedTab({ tab }: { tab: JourneyTabId }) {
 function TabContent({ tab }: { tab: JourneyTabId }) {
   const { journey, progress, access } = useJourney()
   if (!isTabUnlocked(tab, journey, progress, access)) return <LockedTab tab={tab} />
-  const weekNumber = weekNumberOfTab(tab)
-  const week = weekNumber ? journey.weeks.find((w) => w.number === weekNumber) : undefined
-
-  if (week) return <WeekPage week={week} />
+  const part = partOfTab(journey, tab)
+  if (part) {
+    return structureOf(journey) === 'themes' ? <ThemePage part={part} /> : <WeekPage week={part} />
+  }
   if (tab === 'revisoes') return <ReviewsPage />
   if (tab === 'vitorias') return <VictoriesPage />
   if (tab === 'encerramento') return <ClosingPage />
@@ -141,6 +146,7 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
   }, [tab])
 
   if (journeyId !== journey.id) return <UnavailableJourney />
+  const activeTab = journeyTabs(journey).some((t) => t.id === tab) ? tab : 'abertura'
   // Jornada pede login (ADR-020). Sem Firebase configurado (testes, desenvolvimento) não há como entrar.
   if (account && state && !state.user) {
     if (!state.authChecked) {
@@ -165,12 +171,12 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
 
   return (
     <div className="min-h-dvh">
-      <JourneyHeader activeTab={tab} />
+      <JourneyHeader activeTab={activeTab} />
       <main
-        key={tab}
+        key={activeTab}
         className="mx-auto max-w-2xl animate-[page-in_400ms_ease-out] px-4 pb-16 lg:max-w-3xl"
       >
-        <TabContent tab={tab} />
+        <TabContent tab={activeTab} />
       </main>
     </div>
   )

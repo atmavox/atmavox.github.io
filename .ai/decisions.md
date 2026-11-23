@@ -367,7 +367,11 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
     meia-noite seguinte. Ao mesclar aparelho e nuvem, vale o início mais antigo.
   - A tela troca de dia sozinha à meia-noite (um relógio único, `ui/releaseClock.ts`) e mostra nos dias
     fechados quando eles abrem ("Abre amanhã, à meia-noite" / "Abre em dd/mm").
-  - "Por tema" (concluir um tema libera o próximo) entra no passo 2, com o caderno montado pela estrutura.
+  - **Estruturas (passo 2):** a jornada guarda `structure` (`weeks` | `themes` | `days`; sem ela,
+    `weeks`) e as abas saem dela (`journeyTabs`): `semana-N` + Revisões; `tema-N` com o nome do tema;
+    ou uma aba `dias`. **Por tema não há dias:** cada tema é uma unidade de conteúdo só (guardada como
+    um dia, para reaproveitar etapas e respostas), com "Concluir tema ✦"; concluir abre o próximo tema,
+    sem calendário. Revisões só existem por semana.
 - **Alternativas consideradas:** hora de um servidor (exigiria serviço pago ou mais uma rota no Worker
   a cada abertura); liberar uma semana inteira por vez (descartado pelo desenvolvedor); um dia novo só
   depois de concluir o anterior (nada se acumula; descartado).

@@ -1,7 +1,10 @@
-import type { JourneyWeek } from '../../domain/journey'
+import { structureOf, type JourneyWeek } from '../../domain/journey'
 import { DayCard } from '../components/DayCard'
+import { useJourney } from '../useJourney'
 
+/** Uma semana (por semana) ou a aba "Dias" (por dias): os dias em cartões. */
 export function WeekPage({ week }: { week: JourneyWeek }) {
+  const isDays = structureOf(useJourney().journey) === 'days'
   const first = week.days[0]?.number
   const last = week.days[week.days.length - 1]?.number
 
@@ -9,7 +12,7 @@ export function WeekPage({ week }: { week: JourneyWeek }) {
     <div className="py-6">
       <header className="mb-6 flex items-center gap-4">
         <p className="text-xs font-medium tracking-[0.25em] whitespace-nowrap text-accent uppercase">
-          Semana {week.roman} · Dias {first}–{last}
+          {isDays ? 'Dias' : `Semana ${week.roman}`} · {first}–{last}
         </p>
         <span aria-hidden="true" className="h-px flex-1 bg-line" />
         <h1 className="text-xs font-medium tracking-[0.25em] text-ink-faint uppercase">

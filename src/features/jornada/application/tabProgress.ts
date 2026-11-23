@@ -8,15 +8,15 @@ import {
   type StageProgress,
 } from '../domain/measures'
 import type { JourneyProgress } from '../domain/progress'
-import { weekNumberOfTab, type JourneyTabId } from './navigation'
+import { partOfTab, type JourneyTabId } from './navigation'
 
 export function tabProgress(
   tab: JourneyTabId,
   journey: Journey,
   progress: JourneyProgress,
 ): StageProgress {
-  const weekNumber = weekNumberOfTab(tab)
-  if (weekNumber) return weekProgress(journey, progress, weekNumber)
+  const part = partOfTab(journey, tab)
+  if (part) return weekProgress(journey, progress, part.number)
   switch (tab) {
     case 'revisoes':
       return reviewsProgress(journey, progress)

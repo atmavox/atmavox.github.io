@@ -4,6 +4,7 @@
 import {
   allDays,
   isStepSection,
+  structureOf,
   type DaySection,
   type Journey,
   type JourneyDay,
@@ -126,22 +127,29 @@ export function isDayUnlocked(
   { bypass = false, now }: AccessOptions = {},
 ): boolean {
   if (bypass || dayHasOwnProgress(progress, dayNumber)) return true
-  const position = allDays(journey).findIndex((day) => day.number === dayNumber)
+  const days = allDays(journey)
+  const position = days.findIndex((day) => day.number === dayNumber)
   if (position === -1 || !hasStarted(progress)) return false
+  // Por tema: cada tema abre quando o anterior é concluído (não há calendário).
+  if (structureOf(journey) === 'themes') {
+    const previous = days[position - 1]
+    return previous === undefined || progress.completedDays.includes(previous.number)
+  }
   const { startedAt } = progress
   // Sem início guardado (ainda não ancorado), só o primeiro dia; o store ancora ao carregar.
   if (startedAt === null) return position === 0
   return position < releasedDayCount(startedAt, now ?? startedAt)
 }
 
-/** Quando o dia abre pelo calendário, ou null se a jornada ainda não começou (ou o dia não existe). */
+/** Quando o dia abre pelo calendário, ou null se não começou, se o dia não existe ou se é por tema. */
 export function dayOpensAt(
   journey: Journey,
   progress: JourneyProgress,
   dayNumber: number,
 ): number | null {
   const position = allDays(journey).findIndex((day) => day.number === dayNumber)
-  if (position === -1 || progress.startedAt === null) return null
+  if (position === -1 || progress.startedAt === null || structureOf(journey) === 'themes')
+    return null
   return releaseAt(progress.startedAt, position)
 }
 
