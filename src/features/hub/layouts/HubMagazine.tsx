@@ -1,6 +1,7 @@
 import { ArrowRight, MessageCircle } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { SITE } from '../../../shared/brand/site'
+import { AccountMenu } from '../../../shared/auth/AccountMenu'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
@@ -36,6 +37,8 @@ import {
 import {
   activeMenuItem,
   DESKTOP_MENU,
+  HUB_AREA_MENU,
+  hubAreaItem,
   isHomeAnchor,
   type HubSection,
   type PaymentReturn,
@@ -107,27 +110,64 @@ export function HubMagazine({
   return (
     <div className="min-h-dvh">
       <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur">
-        <div className={`${wrap} flex items-center gap-6 py-3`}>
-          <a href="#/" className="font-display tracking-[0.18em] text-gold uppercase">
-            Atmavox
-          </a>
-          <nav aria-label="Seções" className="ml-auto flex items-center gap-5 lg:gap-7">
-            {DESKTOP_MENU.map((item) => (
-              <a
-                key={item.id}
-                href={item.href}
-                aria-current={item.id === activeItem ? 'page' : undefined}
-                onClick={() => handleMenuClick(item.id, item.href)}
-                className={`text-[0.95rem] transition-colors duration-300 hover:text-accent ${
-                  item.id === activeItem || item.id === flashing ? 'text-accent' : 'text-ink-muted'
-                }`}
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
-          <ThemeToggle />
-        </div>
+        {page ? (
+          // Hubs: uma área própria (mock aprovado, opção 3): Início, Jornadas e Meditações em abas, e a
+          // conta à direita. A vitrine fica só para olhar, sem login.
+          <div className={`${wrap} flex min-h-[62px] items-center gap-6`}>
+            <a
+              href="#/"
+              className="flex items-center gap-2 font-display tracking-[0.18em] text-gold uppercase"
+            >
+              <BrandMark className="w-[22px]" />
+              Atmavox
+            </a>
+            <nav aria-label="Seções" className="flex items-stretch gap-7 self-stretch">
+              {HUB_AREA_MENU.map((item) => {
+                const isActive = item.id === hubAreaItem(section)
+                return (
+                  <a
+                    key={item.id}
+                    href={item.href}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={`flex items-center border-b-2 pt-0.5 text-base transition-colors hover:text-accent ${
+                      isActive ? 'border-accent text-ink' : 'border-transparent text-ink-muted'
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                )
+              })}
+            </nav>
+            <span className="ml-auto flex items-center gap-2.5">
+              <AccountMenu />
+              <ThemeToggle />
+            </span>
+          </div>
+        ) : (
+          <div className={`${wrap} flex items-center gap-6 py-3`}>
+            <a href="#/" className="font-display tracking-[0.18em] text-gold uppercase">
+              Atmavox
+            </a>
+            <nav aria-label="Seções" className="ml-auto flex items-center gap-5 lg:gap-7">
+              {DESKTOP_MENU.map((item) => (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  aria-current={item.id === activeItem ? 'page' : undefined}
+                  onClick={() => handleMenuClick(item.id, item.href)}
+                  className={`text-[0.95rem] transition-colors duration-300 hover:text-accent ${
+                    item.id === activeItem || item.id === flashing
+                      ? 'text-accent'
+                      : 'text-ink-muted'
+                  }`}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+            <ThemeToggle />
+          </div>
+        )}
         <MiniPlayer />
       </header>
 

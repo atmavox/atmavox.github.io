@@ -101,9 +101,14 @@ export function createAccount({
     }
   }
 
-  async function handleUser(user: AuthUser | null) {
+  async function handleUser(user: AuthUser | null, hadUser: boolean) {
     if (!user) {
       cancelPush()
+      // Saiu (pelo hub ou pela jornada): o que estava na tela e no aparelho era dessa conta.
+      if (hadUser) {
+        applyFromCloud(emptyProgress())
+        local.clear()
+      }
       set({ sync: 'idle', isAdmin: false })
       return
     }
@@ -151,8 +156,9 @@ export function createAccount({
     const user = session.getSnapshot().user
     const uid = user?.uid ?? null
     if (uid !== currentUid) {
+      const hadUser = currentUid !== null
       currentUid = uid
-      void handleUser(user)
+      void handleUser(user, hadUser)
     }
     notify()
   }

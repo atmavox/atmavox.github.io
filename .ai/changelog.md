@@ -10,6 +10,16 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.9.2] · 2026-11-23
+
+### Alterado
+
+- Login nos hubs: o cabeçalho dos hubs de jornadas e meditações (mock aprovado, opção 3) tem Início,
+  Jornadas e Meditações em abas e a conta ("Entrar" ou a inicial, com menu); no celular, a barra de
+  baixo vira Início · Jornadas · Meditações. A página inicial continua sem login.
+- Sair da conta, pelo hub ou pela jornada, apaga as reflexões guardadas no aparelho (elas continuam na
+  conta).
+
 ## [1.9.1] · 2026-11-23
 
 ### Corrigido

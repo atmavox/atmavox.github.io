@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { useEffect, type ComponentType } from 'react'
 import { SITE } from '../../../shared/brand/site'
+import { AccountMenu } from '../../../shared/auth/AccountMenu'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
 import { BrandMark } from '../../../shared/ui/BrandMark'
@@ -36,7 +37,7 @@ import {
   specialties,
 } from '../content'
 import { meditationHref } from '../meditations'
-import { HUB_TABS, type HubTab, type PaymentReturn } from '../navigation'
+import { HUB_AREA_MENU, HUB_TABS, type HubTab, type PaymentReturn } from '../navigation'
 import { coverToneAt } from '../../../shared/ui/bannerTones'
 
 const TAB_ICONS: Record<HubTab, LucideIcon> = {
@@ -180,6 +181,8 @@ export function HubTabs({
   meditationId: string | null
   payment?: PaymentReturn | null
 }) {
+  const isHubTab = activeTab === 'jornadas' || activeTab === 'meditacoes' || payment !== null
+
   useEffect(() => {
     window.scrollTo({ top: 0 })
   }, [activeTab, meditationId])
@@ -192,7 +195,11 @@ export function HubTabs({
             <BrandMark className="w-[22px]" />
             Atmavox
           </span>
-          <ThemeToggle />
+          <span className="flex items-center gap-2">
+            {/* Nos hubs a pessoa entra na conta (o login vale para o site todo, ADR-022). */}
+            {isHubTab && <AccountMenu />}
+            <ThemeToggle />
+          </span>
         </div>
         <MiniPlayer />
       </header>
@@ -212,10 +219,11 @@ export function HubTabs({
 
       <nav
         aria-label="Seções"
-        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-line bg-bg/95 px-2 pt-1.5 backdrop-blur"
+        className={`fixed inset-x-0 bottom-0 z-20 grid border-t border-line bg-bg/95 px-2 pt-1.5 backdrop-blur ${isHubTab ? 'grid-cols-3' : 'grid-cols-4'}`}
         style={{ paddingBottom: 'calc(6px + env(safe-area-inset-bottom))' }}
       >
-        {HUB_TABS.map((tab) => {
+        {/* Nos hubs, a barra é da área da conta: Início, Jornadas, Meditações (mock, opção 3). */}
+        {(isHubTab ? HUB_AREA_MENU : HUB_TABS).map((tab) => {
           const Icon = TAB_ICONS[tab.id]
           const isActive = tab.id === activeTab
           return (

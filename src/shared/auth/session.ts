@@ -32,12 +32,14 @@ interface AuthSessionDeps {
   /** Baixa o Firebase Auth sob demanda (ADR-005): quem só olha a vitrine não baixa nada. */
   loadAuth: () => Promise<AuthService>
   hint: SessionHint
+  /** Depois de sair: apaga o que é pessoal neste aparelho (as reflexões da jornada são íntimas). */
+  onSignedOut?: () => void
 }
 
 const CONNECTION_ERROR = 'Não foi possível conectar. Verifique sua internet e tente de novo.'
 
 /** Uma sessão de login para o site inteiro (ADR-022), criada em `app/`. */
-export function createAuthSession({ loadAuth, hint }: AuthSessionDeps): AuthSession {
+export function createAuthSession({ loadAuth, hint, onSignedOut }: AuthSessionDeps): AuthSession {
   let state: AuthSessionState = { user: null, isLoading: false, authChecked: !hint.get() }
   const listeners = new Set<() => void>()
   let authPromise: Promise<AuthService> | null = null
@@ -94,6 +96,7 @@ export function createAuthSession({ loadAuth, hint }: AuthSessionDeps): AuthSess
       const auth = await authPromise
       await auth.signOut()
       hint.set(false)
+      onSignedOut?.()
     },
     async getIdToken() {
       if (!authPromise || !state.user) return null

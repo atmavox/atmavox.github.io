@@ -77,3 +77,15 @@ export function paymentReturnFromPath(path: string): PaymentReturn | null {
   if (!match) return null
   return { status: match[1] as PaymentReturn['status'], productId: match[2] ?? null }
 }
+
+/** Cabeçalho dos hubs (mock aprovado, opção 3): a área da conta, com Início para voltar à vitrine. */
+export const HUB_AREA_MENU: readonly { id: HubTab; label: string; href: string }[] = [
+  { id: 'inicio', label: 'Início', href: '#/' },
+  { id: 'jornadas', label: 'Jornadas', href: '#/jornadas' },
+  { id: 'meditacoes', label: 'Meditações', href: '#/meditacoes' },
+]
+
+/** Aba marcada no cabeçalho dos hubs: Jornadas ou Meditações (a volta do pagamento não marca nenhuma). */
+export function hubAreaItem(section: HubSection): HubTab | null {
+  return section === 'jornadas' || section === 'meditacoes' ? section : null
+}

@@ -9,7 +9,7 @@ import { AuthFailure } from './ports'
 
 type Mode = 'entrar' | 'criar' | 'recuperar'
 
-type Variant = 'optional' | 'gate'
+type Variant = 'optional' | 'gate' | 'hub'
 
 const TITLES: Record<Variant, Record<Mode, string>> = {
   optional: {
@@ -22,11 +22,17 @@ const TITLES: Record<Variant, Record<Mode, string>> = {
     criar: 'Criar uma conta',
     recuperar: 'Recuperar a senha',
   },
+  hub: {
+    entrar: 'Entre na sua conta',
+    criar: 'Criar uma conta',
+    recuperar: 'Recuperar a senha',
+  },
 }
 
 const SUBMIT: Record<Variant, Record<Mode, string>> = {
   optional: { entrar: 'Entrar', criar: 'Criar conta', recuperar: 'Enviar link' },
   gate: { entrar: 'Entrar e começar', criar: 'Criar conta e começar', recuperar: 'Enviar link' },
+  hub: { entrar: 'Entrar', criar: 'Criar conta', recuperar: 'Enviar link' },
 }
 
 const inputClass =
@@ -38,7 +44,7 @@ interface LoginDialogProps {
   onClose: () => void
   /**
    * "optional": entrar pelo botão do cabeçalho (sincronizar). "gate": a jornada pede login (ADR-020),
-   * por cima do hub desfocado, mostrando a jornada escolhida.
+   * por cima do hub desfocado, mostrando a jornada escolhida. "hub": o "Entrar" do cabeçalho dos hubs.
    */
   variant?: Variant
   chosen?: { title: string; tone: BannerTone }
@@ -177,6 +183,11 @@ export function LoginDialog({
                   </div>
                 )}
               </>
+            ) : variant === 'hub' ? (
+              <p className="mb-5 text-sm leading-relaxed text-ink-muted">
+                Suas jornadas, meditações e reflexões ficam guardadas na sua conta, só para você, em
+                qualquer celular ou computador.
+              </p>
             ) : (
               <p className="mb-5 text-sm leading-relaxed text-ink-muted">
                 É opcional. Sem conta, tudo continua salvo neste aparelho. Com a conta, suas
