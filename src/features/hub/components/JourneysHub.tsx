@@ -3,6 +3,8 @@ import { useId, useState } from 'react'
 import { productOffer } from '../../../shared/catalog/offer'
 import { TERRITORIES, TERRITORY_LABELS, type JourneyProduct } from '../../../shared/catalog/product'
 import { BrandMark } from '../../../shared/ui/BrandMark'
+import { useAccess } from '../../../shared/catalog/AccessContext'
+import { useNow } from '../../../shared/lib/useNow'
 import { usePurchaseFlow } from './usePurchaseFlow'
 import { allJourneys, journeysIntro } from '../content'
 import {
@@ -65,9 +67,18 @@ export function JourneysHub({ layout }: { layout: Layout }) {
   const [view, setViewState] = useState<View>(() => readView(layout))
   const [filtersOpen, setFiltersOpen] = useState(true)
   const purchase = usePurchaseFlow()
-  // Acesso a produtos pagos entra no passo 7; até lá ninguém tem acesso, e o relógio não importa.
-  const offerOf = (journey: JourneyProduct) =>
-    productOffer(journey, { place: 'hub', logged: purchase.isLogged, now: 0 })
+  const access = useAccess()
+  const now = useNow()
+  const owned = new Set(allJourneys.filter((j) => access.owns(j.id, now)).map((j) => j.id))
+  const offerOf = (journey: JourneyProduct) => {
+    const productAccess = access.accessOf(journey.id)
+    return productOffer(journey, {
+      place: 'hub',
+      logged: purchase.isLogged,
+      now,
+      ...(productAccess ? { access: productAccess } : {}),
+    })
+  }
   const searchId = useId()
   const filtersId = useId()
 
@@ -77,7 +88,7 @@ export function JourneysHub({ layout }: { layout: Layout }) {
   }
   const update = (patch: Partial<JourneyFilters>) => setFilters((f) => ({ ...f, ...patch }))
 
-  const results = filterJourneys(allJourneys, filters)
+  const results = filterJourneys(allJourneys, filters, owned)
   const groups = groupByTerritory(results)
   const counts = countByTerritory(allJourneys)
   const isWide = layout === 'wide'
@@ -145,7 +156,7 @@ export function JourneysHub({ layout }: { layout: Layout }) {
 
   // "Grátis" só depois do login: antes dele, a vitrine não fala de preço (F9).
   const showIds = (Object.keys(SHOW_LABELS) as ShowFilter[]).filter(
-    (id) => id !== 'gratis' || purchase.isLogged,
+    (id) => (id !== 'gratis' && id !== 'minhas') || purchase.isLogged,
   )
   const showChips = showIds.map((id) => (
     <button

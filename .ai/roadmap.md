@@ -137,7 +137,7 @@ aprovados antes do código.
           depois do login, "Grátis" e preço com cadeado; filtro "Grátis"; produto pago sem login abre o
           login com o produto e depois a janela de preço (mock F·2), com o botão de pagar desativado até
           o Mercado Pago
-   7. [ ] Acesso: regras do Firestore (catálogo, `published` só com acesso, `access` gravado só pelo
+   7. [x] Acesso: regras do Firestore (catálogo, `published` só com acesso, `access` gravado só pelo
           servidor ou pela admin), conteúdo pago lido com o token, "Sua"/"Minhas", "Baixar e-book";
           conteúdo pago fora do código do site
    8. [ ] Mercado Pago (Checkout Pro) + Worker gratuito na Cloudflare (ADR-023): cobrança com o preço do

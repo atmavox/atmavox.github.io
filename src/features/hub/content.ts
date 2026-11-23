@@ -84,7 +84,7 @@ export const introAudio: HubAudio = {
 /** Meditações em destaque na vitrine, do catálogo (ADR-019). Encontros gravados entram como meditações. */
 export const listenItems: readonly HubAudio[] = allMeditations
   .filter((m) => m.featured)
-  .map(toHubAudio)
+  .map((m) => toHubAudio(m))
 export const meditationsIntro = {
   title: 'Pausas guiadas para voltar ao centro',
 } as const

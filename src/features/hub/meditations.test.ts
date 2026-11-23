@@ -5,6 +5,7 @@ import {
   availableMeditationFilters,
   filterMeditations,
   formatDuration,
+  parseMeditationContent,
   toHubAudio,
 } from './meditations'
 import { meditationIdFromPath, hubSectionFromPath } from './navigation'
@@ -41,5 +42,34 @@ describe('meditações do hub', () => {
     expect(meditationIdFromPath('/meditacao/boas-vindas')).toBe('boas-vindas')
     expect(meditationIdFromPath('/meditacoes')).toBeNull()
     expect(hubSectionFromPath('/meditacao/boas-vindas')).toBe('meditacoes')
+  })
+})
+
+describe('conteúdo de meditação paga', () => {
+  it('aceita áudio ou vídeo, com e-book opcional, só por https', () => {
+    expect(
+      parseMeditationContent(
+        JSON.stringify({ audioUrl: 'https://x.com/a.m4a', ebookUrl: 'https://drive/e' }),
+      ),
+    ).toEqual({ audioSrc: 'https://x.com/a.m4a', ebookUrl: 'https://drive/e' })
+    expect(parseMeditationContent(JSON.stringify({ youtubeId: 'jKuKSAQUTCA' }))).toEqual({
+      youtubeId: 'jKuKSAQUTCA',
+    })
+    expect(parseMeditationContent(JSON.stringify({ audioUrl: 'javascript:alert(1)' }))).toBeNull()
+    expect(
+      parseMeditationContent(
+        JSON.stringify({ youtubeId: 'jKuKSAQUTCA', ebookUrl: 'http://inseguro' }),
+      ),
+    ).toEqual({ youtubeId: 'jKuKSAQUTCA' })
+    expect(parseMeditationContent('não é json')).toBeNull()
+  })
+
+  it('"Minhas" mostra só as que a pessoa tem; o filtro só aparece com alguma', () => {
+    const owned = new Set(['boas-vindas'])
+    expect(filterMeditations(allMeditations, 'minhas', owned).map((m) => m.id)).toEqual([
+      'boas-vindas',
+    ])
+    expect(availableMeditationFilters(allMeditations, { logged: true })).not.toContain('minhas')
+    expect(availableMeditationFilters(allMeditations, { logged: true, owned })).toContain('minhas')
   })
 })

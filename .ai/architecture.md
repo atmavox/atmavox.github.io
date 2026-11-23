@@ -116,7 +116,7 @@ Regras do Firestore (`firestore.rules`): cada pessoa só lê e escreve `users/{s
 e `media` têm leitura pública e gravação só da admin; `drafts` é só da admin; cada pessoa só lê o
 próprio `admins/{uid}`. O restante é negado.
 
-### Catálogo e acesso (planejado, ADR-019 e ADR-020)
+### Catálogo e acesso (ADR-019 e ADR-020; regras em `firestore.rules`, acessos lidos por REST com o token)
 
 ```
 catalog/public                        # content: JSON com Product[]; updatedAt (leitura pública, por REST)

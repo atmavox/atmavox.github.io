@@ -2,7 +2,8 @@ import { lazy, Suspense, useState } from 'react'
 import { isJourneyPath } from '../features/jornada/application/navigation'
 import { HubPage } from '../features/hub/HubPage'
 import { AuthContext } from '../shared/auth/AuthContext'
-import { createAppSession } from '../shared/auth/createAppSession'
+import { AccessContext } from '../shared/catalog/AccessContext'
+import { createAppServices } from './createAppServices'
 import { useHashRoute } from '../shared/lib/useHashRoute'
 import { useStopAudioOnAreaChange } from '../shared/media/useStopAudioOnAreaChange'
 
@@ -15,10 +16,12 @@ const JourneyEntry = lazy(() =>
 // dentro da mesma área, mas para ao passar do hub para a jornada (ou o contrário).
 export function App() {
   // Uma sessão de login para o site todo: hub e jornada sabem quem entrou (ADR-022).
-  const [session] = useState(createAppSession)
+  const [{ session, access }] = useState(createAppServices)
   return (
     <AuthContext.Provider value={session}>
-      <Routes />
+      <AccessContext.Provider value={access}>
+        <Routes />
+      </AccessContext.Provider>
     </AuthContext.Provider>
   )
 }

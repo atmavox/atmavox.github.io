@@ -12,7 +12,7 @@ export function JourneyEntry({
   path: string
   loginBackground?: ReactNode
 }) {
-  // A sessão de login é do site todo (ADR-022): vem de pp/, e a jornada sincroniza por cima dela.
+  // A sessão de login é do site todo (ADR-022): vem de `app/`, e a jornada sincroniza por cima dela.
   const session = useContext(AuthContext)
   const [services] = useState(() => createServices(session))
   return (

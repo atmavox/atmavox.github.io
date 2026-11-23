@@ -14,6 +14,8 @@ import {
 } from '../meditations'
 import { MeditationCover } from './MeditationCover'
 import { OfferBadge } from './OfferBits'
+import { useAccess } from '../../../shared/catalog/AccessContext'
+import { useNow } from '../../../shared/lib/useNow'
 import { usePurchaseFlow } from './usePurchaseFlow'
 
 const intro = 'Áudios e vídeos curtos para perceber, respirar e voltar a si.'
@@ -29,8 +31,11 @@ const chip = (on: boolean) =>
 export function MeditationsHub({ layout }: { layout: 'wide' | 'narrow' }) {
   const [filter, setFilter] = useState<MeditationFilter>('todas')
   const purchase = usePurchaseFlow()
-  const filters = availableMeditationFilters(allMeditations, { logged: purchase.isLogged })
-  const visible = filterMeditations(allMeditations, filter)
+  const access = useAccess()
+  const now = useNow()
+  const owned = new Set(allMeditations.filter((m) => access.owns(m.id, now)).map((m) => m.id))
+  const filters = availableMeditationFilters(allMeditations, { logged: purchase.isLogged, owned })
+  const visible = filterMeditations(allMeditations, filter, owned)
   const isWide = layout === 'wide'
 
   const chips = filters.length > 1 && (
@@ -59,7 +64,13 @@ export function MeditationsHub({ layout }: { layout: 'wide' | 'narrow' }) {
     >
       {visible.map((m, index) => {
         // Sem login: "Pago" nas pagas, nada nas grátis; logada: preço ou "Grátis" (F9). O acesso entra no passo 7.
-        const { tag } = productOffer(m, { place: 'hub', logged: purchase.isLogged, now: 0 })
+        const productAccess = access.accessOf(m.id)
+        const { tag } = productOffer(m, {
+          place: 'hub',
+          logged: purchase.isLogged,
+          now,
+          ...(productAccess ? { access: productAccess } : {}),
+        })
         return (
           <li key={m.id}>
             <MeditationCover

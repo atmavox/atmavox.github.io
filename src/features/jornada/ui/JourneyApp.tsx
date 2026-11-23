@@ -16,6 +16,9 @@ import { CoverPage } from './pages/CoverPage'
 import { ReviewsPage } from './pages/ReviewsPage'
 import { VictoriesPage } from './pages/VictoriesPage'
 import { WeekPage } from './pages/WeekPage'
+import { seedCatalog } from '../../../shared/catalog/seedCatalog'
+import { useAccess } from '../../../shared/catalog/AccessContext'
+import { useNow } from '../../../shared/lib/useNow'
 import { useAccount } from './useAccount'
 import { useJourney } from './useJourney'
 
@@ -95,10 +98,41 @@ function UnavailableJourney() {
   )
 }
 
+/** Jornada paga sem acesso: volta para o hub, onde está o preço (ADR-020). */
+function PaidJourney({ title }: { title: string }) {
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
+      <span className="grid size-14 place-items-center rounded-full border border-line text-accent">
+        <Lock aria-hidden size={22} />
+      </span>
+      <h1 className="font-display text-3xl text-ink">{title} é uma jornada paga</h1>
+      <p className="max-w-md text-ink-muted">
+        Para começar, libere o acesso na lista de jornadas. Seu progresso fica guardado na sua
+        conta.
+      </p>
+      <a
+        href="#/jornadas"
+        className="inline-flex min-h-11 items-center rounded-full bg-accent px-6 font-semibold text-bg hover:opacity-90"
+      >
+        Ver o preço →
+      </a>
+    </div>
+  )
+}
+
 function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
   const { journeyId, tab } = routeFromPath(path)
-  const { journey } = useJourney()
+  const { journey, content, isAdmin } = useJourney()
   const { account, state } = useAccount()
+  const access = useAccess()
+  const now = useNow()
+  const product = seedCatalog.find((p) => p.id === journeyId)
+  const userId = state?.user?.uid
+
+  // Quem acabou de entrar pode ter acesso a uma jornada paga: busca de novo, agora com o login.
+  useEffect(() => {
+    if (userId) void content.refresh()
+  }, [userId, content])
 
   useEffect(() => {
     const label = JOURNEY_TABS.find((t) => t.id === tab)?.label ?? 'Abertura'
@@ -117,6 +151,16 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
       )
     }
     return <LoginGate account={account} journeyId={journeyId} background={loginBackground} />
+  }
+  if (product?.pricing.type === 'paid' && !isAdmin && !access.owns(product.id, now)) {
+    if (access.status === 'loading') {
+      return (
+        <p aria-busy="true" className="py-20 text-center text-ink-muted">
+          Carregando…
+        </p>
+      )
+    }
+    return <PaidJourney title={product.title} />
   }
 
   return (

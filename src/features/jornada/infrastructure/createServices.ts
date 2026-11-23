@@ -22,7 +22,13 @@ export function createServices(session: AuthSession | null): JourneyServices {
   const content = createJourneyContent({
     fallback,
     cache: createLocalJourneyContentCache(),
-    ...(firebaseConfig ? { source: createFirestoreRestJourneySource(firebaseConfig) } : {}),
+    ...(firebaseConfig
+      ? {
+          source: createFirestoreRestJourneySource(firebaseConfig, undefined, () =>
+            session ? session.getIdToken() : Promise.resolve(null),
+          ),
+        }
+      : {}),
   })
   void content.refresh()
 

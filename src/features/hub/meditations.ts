@@ -5,7 +5,38 @@ import { visibleProducts, type MeditationProduct, type Product } from '../../sha
 import { seedCatalog } from '../../shared/catalog/seedCatalog'
 import type { HubAudio } from './content'
 
-export type MeditationMedia = { audioSrc: string } | { youtubeId: string }
+export type MeditationMedia = ({ audioSrc: string } | { youtubeId: string }) & {
+  /** Link para baixar o e-book (ADR-020): só aparece para quem tem acesso. */
+  ebookUrl?: string
+}
+
+const HTTPS = /^https:\/\/[^\s]+$/i
+const YOUTUBE_ID = /^[\w-]{6,20}$/
+
+/**
+ * O conteúdo de uma meditação paga (`published/{id}`, JSON): `audioUrl` ou `youtubeId`, e `ebookUrl`
+ * opcional. Só links https; qualquer outra coisa vinda do banco é ignorada.
+ */
+export function parseMeditationContent(json: string): MeditationMedia | null {
+  let raw: unknown
+  try {
+    raw = JSON.parse(json)
+  } catch {
+    return null
+  }
+  if (typeof raw !== 'object' || raw === null) return null
+  const data = raw as Record<string, unknown>
+  const ebookUrl =
+    typeof data.ebookUrl === 'string' && HTTPS.test(data.ebookUrl) ? data.ebookUrl : undefined
+  const extra = ebookUrl ? { ebookUrl } : {}
+  if (typeof data.audioUrl === 'string' && HTTPS.test(data.audioUrl)) {
+    return { audioSrc: data.audioUrl, ...extra }
+  }
+  if (typeof data.youtubeId === 'string' && YOUTUBE_ID.test(data.youtubeId)) {
+    return { youtubeId: data.youtubeId, ...extra }
+  }
+  return null
+}
 
 /** Links das meditações gratuitas. */
 export const FREE_MEDIA: Readonly<Record<string, MeditationMedia>> = {
@@ -26,8 +57,10 @@ export function formatDuration(seconds: number): string {
 export const mediaLabel = (m: MeditationProduct) => (m.media === 'video' ? 'Vídeo' : 'Áudio')
 
 /** A meditação no formato dos itens de áudio do hub (player do site ou vídeo do YouTube). */
-export function toHubAudio(m: MeditationProduct): HubAudio {
-  const media = FREE_MEDIA[m.id]
+export function toHubAudio(
+  m: MeditationProduct,
+  media: MeditationMedia | undefined = FREE_MEDIA[m.id],
+): HubAudio {
   return {
     id: m.id,
     kind: m.media,
@@ -38,11 +71,12 @@ export function toHubAudio(m: MeditationProduct): HubAudio {
   }
 }
 
-export type MeditationFilter = 'todas' | 'gratis' | 'audio' | 'video' | 'ebook'
+export type MeditationFilter = 'todas' | 'gratis' | 'minhas' | 'audio' | 'video' | 'ebook'
 
 export const MEDITATION_FILTER_LABELS: Record<MeditationFilter, string> = {
   todas: 'Todas',
   gratis: 'Grátis',
+  minhas: 'Minhas',
   audio: 'Áudio',
   video: 'Vídeo',
   ebook: 'Com e-book',
@@ -51,8 +85,11 @@ export const MEDITATION_FILTER_LABELS: Record<MeditationFilter, string> = {
 export function filterMeditations(
   meditations: readonly MeditationProduct[],
   filter: MeditationFilter,
+  /** Ids com acesso válido (filtro "Minhas"). */
+  owned: ReadonlySet<string> = new Set(),
 ): MeditationProduct[] {
   if (filter === 'todas') return [...meditations]
+  if (filter === 'minhas') return meditations.filter((m) => owned.has(m.id))
   if (filter === 'ebook') return meditations.filter((m) => m.ebook !== undefined)
   if (filter === 'gratis') return meditations.filter((m) => m.pricing.type === 'free')
   return meditations.filter((m) => m.media === filter)
@@ -64,11 +101,15 @@ export function filterMeditations(
  */
 export function availableMeditationFilters(
   meditations: readonly MeditationProduct[],
-  { logged = false }: { logged?: boolean } = {},
+  {
+    logged = false,
+    owned = new Set<string>(),
+  }: { logged?: boolean; owned?: ReadonlySet<string> } = {},
 ): MeditationFilter[] {
   return (Object.keys(MEDITATION_FILTER_LABELS) as MeditationFilter[]).filter(
     (f) =>
-      f === 'todas' || ((f !== 'gratis' || logged) && filterMeditations(meditations, f).length > 0),
+      f === 'todas' ||
+      ((f !== 'gratis' || logged) && filterMeditations(meditations, f, owned).length > 0),
   )
 }
 

@@ -24,10 +24,35 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Versão publicada de cada jornada (modo Andreía): qualquer pessoa lê, sem login.
-    match /published/{journeyId} {
+    // Acesso vale se o documento existe e não venceu (expiresAt nulo = para sempre). ADR-020.
+    function hasAccess(productId) {
+      let path = /databases/$(database)/documents/users/$(request.auth.uid)/access/$(productId);
+      return request.auth != null
+        && exists(path)
+        && (get(path).data.expiresAt == null
+            || get(path).data.expiresAt > request.time.toMillis());
+    }
+
+    // Catálogo (ADR-019): o que a vitrine e os hubs mostram, sem conteúdo. Qualquer pessoa lê.
+    match /catalog/{doc} {
       allow read: if true;
       allow write: if isAdmin() && request.resource.size() < 1000 * 1024;
+    }
+
+    // Conteúdo de cada produto (ADR-020). Grátis: qualquer pessoa lê. Pago: só quem tem acesso válido
+    // (ou a admin). Documentos antigos sem `free` contam como grátis (a jornada de 21 dias).
+    // Só leitura de um documento por vez: ninguém lista o conteúdo de todos.
+    match /published/{productId} {
+      allow get: if resource.data.get('free', true) == true || isAdmin() || hasAccess(productId);
+      allow list: if false;
+      allow write: if isAdmin() && request.resource.size() < 1000 * 1024;
+    }
+
+    // Acessos de cada pessoa: ela só lê os próprios. Quem grava é a admin (liberação manual) ou o
+    // servidor do pagamento, com credencial de serviço (que não passa por estas regras).
+    match /users/{uid}/access/{productId} {
+      allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+      allow write: if isAdmin();
     }
 
     // Rascunhos e histórico de versões: só a admin.

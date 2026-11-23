@@ -17,5 +17,5 @@ export function useJourney() {
   )
   /** A admin vê tudo, sem cadeados (ADR-013). */
   const access: AccessOptions = { bypass: isAdmin }
-  return { journey, store, progress, access, isAdmin }
+  return { journey, content, store, progress, access, isAdmin }
 }

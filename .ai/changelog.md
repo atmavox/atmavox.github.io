@@ -10,6 +10,24 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.8.0] · 2026-11-23
+
+### Adicionado
+
+- Acesso pago (ADR-020): os acessos de quem entra são lidos com o login (`users/{uid}/access`); no hub,
+  "Sua" e "Continuar" com acesso válido, preço e "Renovar" com acesso vencido, e o filtro "Minhas".
+- Meditação paga com acesso: o conteúdo vem do Firestore com o token e a página mostra o player e
+  "Baixar e-book" (só links https).
+- Jornada paga sem acesso não abre: mostra que é paga e leva ao preço no hub.
+- Regras do Firestore: catálogo público, conteúdo pago só com acesso (sem listar), acessos lidos só pela
+  pessoa e gravados só pela admin ou pelo servidor; o editor grava `free` ao publicar. Passo a passo em
+  `firebase-setup.md` (seção 8).
+- Teste que impede conteúdo de produto pago de ficar no código do site.
+
+### Corrigido
+
+- Comentário do `JourneyEntry` com um caractere de controle.
+
 ## [1.7.0] · 2026-11-22
 
 ### Adicionado

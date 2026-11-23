@@ -6,11 +6,13 @@ export const PUBLISHED_COLLECTION = 'published'
 
 /**
  * Lê a jornada publicada pela API REST do Firestore, com um `fetch` simples: quem só faz a jornada
- * não baixa o SDK do Firebase (ADR-005). A leitura é pública pelas regras (`firestore.rules`).
+ * não baixa o SDK do Firebase (ADR-005). Jornada grátis é pública; paga só sai com o token de quem tem
+ * acesso (`firestore.rules`, ADR-020).
  */
 export function createFirestoreRestJourneySource(
   config: Pick<FirebaseConfig, 'projectId' | 'apiKey'>,
-  fetchFn: (url: string) => Promise<Response> = (url) => fetch(url),
+  fetchFn: (url: string, init?: RequestInit) => Promise<Response> = (url, init) => fetch(url, init),
+  getToken: () => Promise<string | null> = () => Promise.resolve(null),
 ): PublishedJourneySource {
   return {
     async load(journeyId) {
@@ -18,7 +20,11 @@ export function createFirestoreRestJourneySource(
         `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(config.projectId)}` +
         `/databases/(default)/documents/${PUBLISHED_COLLECTION}/${encodeURIComponent(journeyId)}` +
         `?key=${encodeURIComponent(config.apiKey)}&mask.fieldPaths=content`
-      const response = await fetchFn(url)
+      const token = await getToken()
+      const response = await fetchFn(
+        url,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {},
+      )
       if (response.status === 404) return null
       if (!response.ok) throw new Error(`Firestore respondeu ${response.status}`)
       const body: unknown = await response.json()

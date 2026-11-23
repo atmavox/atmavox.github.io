@@ -96,6 +96,23 @@ Google com o mesmo e-mail.)
 **Como conferir:** entre no site com a conta admin e abra o menu da inicial: aparece "Modo Andreía", e
 todas as abas e dias da jornada ficam abertos, sem cadeados. Se não aparecer, saia e entre de novo.
 
+## 8. Regras novas: catálogo e acesso pago (2026-11-23, ADR-020)
+
+O arquivo `firestore.rules` ganhou o catálogo (`catalog/`), os acessos (`users/{uid}/access/`) e o
+`published/` protegido (produto pago só para quem tem acesso). Para valer no site:
+
+1. Firebase Console → **Firestore Database** → **Regras**.
+2. Apague o conteúdo e cole o `firestore.rules` inteiro do repositório → **Publicar**.
+3. Confira: a jornada de 21 dias continua abrindo para quem entra (ela é grátis; o documento antigo,
+   sem o campo `free`, conta como grátis).
+
+Liberar um acesso à mão, até o Modo Andreía de produtos existir (passo 9 da Etapa D):
+
+1. Firestore → **Iniciar coleção** dentro de `users/{uid da pessoa}` (o uid aparece em Authentication →
+   Usuários) → coleção `access`, documento com o id do produto (ex.: `chama-interna-21`).
+2. Campos: `grantedAt` (number, `Date.now()` em milissegundos), `expiresAt` (number com o vencimento,
+   ou `null` para sempre) e `source` (string `manual`).
+
 ## Limites do plano gratuito
 
 Spark: 50 mil leituras e 20 mil gravações por dia no Firestore. O site lê uma vez ao entrar e grava no

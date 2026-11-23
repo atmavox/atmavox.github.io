@@ -7,7 +7,7 @@ import {
   type Territory,
 } from '../../shared/catalog/product'
 
-export type ShowFilter = 'todas' | 'disponiveis' | 'em-breve' | 'gratis'
+export type ShowFilter = 'todas' | 'disponiveis' | 'em-breve' | 'gratis' | 'minhas'
 export type DurationFilter = 'ate-7' | '8-14' | '15-mais'
 
 export interface JourneyFilters {
@@ -29,6 +29,7 @@ export const SHOW_LABELS: Record<ShowFilter, string> = {
   disponiveis: 'Disponíveis',
   'em-breve': 'Em breve',
   gratis: 'Grátis',
+  minhas: 'Minhas',
 }
 
 export const DURATION_LABELS: Record<DurationFilter, string> = {
@@ -71,8 +72,13 @@ function matchesQuery(journey: JourneyProduct, query: string): boolean {
   return haystack.some((text) => normalize(text).includes(wanted))
 }
 
-function matchesShow(journey: JourneyProduct, show: ShowFilter): boolean {
+function matchesShow(
+  journey: JourneyProduct,
+  show: ShowFilter,
+  owned: ReadonlySet<string>,
+): boolean {
   if (show === 'todas') return true
+  if (show === 'minhas') return owned.has(journey.id)
   if (show === 'em-breve') return journey.status === 'soon'
   if (show === 'gratis') return journey.status === 'published' && journey.pricing.type === 'free'
   return journey.status === 'published'
@@ -81,12 +87,14 @@ function matchesShow(journey: JourneyProduct, show: ShowFilter): boolean {
 export function filterJourneys(
   journeys: readonly JourneyProduct[],
   filters: JourneyFilters,
+  /** Ids com acesso válido (filtro "Minhas"). */
+  owned: ReadonlySet<string> = new Set(),
 ): JourneyProduct[] {
   return journeys.filter(
     (j) =>
       matchesQuery(j, filters.query) &&
       (filters.territory === null || j.territory === filters.territory) &&
-      matchesShow(j, filters.show) &&
+      matchesShow(j, filters.show, owned) &&
       (filters.duration === null || inDuration(durationDays(j.durationLabel), filters.duration)),
   )
 }
