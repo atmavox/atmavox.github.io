@@ -118,7 +118,8 @@ aprovados antes do código.
    1. [x] `shared/catalog`: tipos, `parseCatalog`, regra da tag de preço, com testes; catálogo inicial
           com a jornada de 21 dias (grátis até a Andreía definir preço e prazo) e o Ritual Matinal (em
           breve)
-   2. [ ] Página inicial vitrine (F9), encontros apontando para o TikTok
+   2. [x] Página inicial vitrine (F9), encontros apontando para o TikTok; abas do celular Início ·
+          Jornadas · Meditações · Contato; "Quem já viveu" só aparece com depoimento real
    3. [ ] Hub de jornadas (`#/jornadas`): expandida/compacta, filtros, tag
    4. [ ] Login obrigatório na jornada + janela de login sobre a tela desfocada; rotas
           `#/jornada/{id}`

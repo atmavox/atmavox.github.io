@@ -2,6 +2,8 @@ interface BrandMarkProps {
   className?: string
   /** Cada barra "fala" bem devagar, num ritmo diferente (parada com prefers-reduced-motion). */
   speaking?: boolean
+  /** "banner": barras claras, de uma cor só, por cima dos fundos desenhados dos produtos. */
+  tone?: 'brand' | 'banner'
 }
 
 /** Meias-alturas das barras em torno da linha do meio (viewBox 64), da esquerda para a direita. */
@@ -21,7 +23,13 @@ const SPEAK_DELAYS = ['-1.2s', '-2.8s', '0s', '-4.2s', '-5.8s'] as const
  * O símbolo da marca ("Forma de onda", o mesmo do favicon): cinco barras de áudio simétricas em torno do
  * centro, a do meio em âmbar. As cores são os tokens `logo` e `logo-center`, iguais às do favicon.
  */
-export function BrandMark({ className = '', speaking = false }: BrandMarkProps) {
+export function BrandMark({ className = '', speaking = false, tone = 'brand' }: BrandMarkProps) {
+  const strokeOf = (index: number) =>
+    tone === 'banner'
+      ? 'var(--banner-mark)'
+      : index === CENTER_INDEX
+        ? 'var(--logo-center)'
+        : 'var(--logo)'
   return (
     <svg viewBox="0 0 64 64" aria-hidden="true" className={`aspect-square ${className}`}>
       {BARS.map(({ x, h }, index) => (
@@ -31,7 +39,7 @@ export function BrandMark({ className = '', speaking = false }: BrandMarkProps) 
           fill="none"
           strokeLinecap="round"
           strokeWidth="6"
-          stroke={index === CENTER_INDEX ? 'var(--logo-center)' : 'var(--logo)'}
+          stroke={strokeOf(index)}
           className={
             speaking
               ? 'origin-center animate-[speak_8s_ease-in-out_infinite] [transform-box:fill-box]'

@@ -28,6 +28,37 @@
   /* Estados do editor: salvo (verde) e rascunho (laranja). */
   --ok: #2e6b3f;
   --draft: #9a4a0c;
+  /* "Ao vivo" dos encontros. */
+  --live: #74283a;
+  /*
+   * Fundos desenhados dos banners de produto, enquanto a Andreía não escolhe uma imagem (mock aprovado).
+   * São arte, iguais nos dois temas; as barras da logo por cima usam `--banner-mark`.
+   */
+  --banner-mark: #f3e9dc;
+  --tone-flame:
+    radial-gradient(
+      90% 120% at 80% 100%,
+      color-mix(in oklab, var(--accent) 70%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(135deg, #2b211a, #5b3416 55%, #a5600f);
+  --tone-gray:
+    radial-gradient(
+      80% 110% at 85% 90%,
+      color-mix(in oklab, var(--gold) 55%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(135deg, #4b4844, #77706a 55%, #b49456);
+  --tone-wine:
+    radial-gradient(
+      80% 110% at 85% 90%,
+      color-mix(in oklab, var(--accent) 50%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(135deg, #2a1418, #74283a 60%, #b06a3a);
+  --tone-dawn: linear-gradient(160deg, #d9c3a0, #c79a5a 50%, #8a510b);
+  --tone-dusk: linear-gradient(160deg, #3a3330, #6a5a4a 55%, #b8894a);
+  --tone-sea: linear-gradient(160deg, #31454a, #5d6f68 55%, #b8a06a);
 }
 
 :root[data-theme='dark'] {
@@ -50,6 +81,7 @@
   --admin-ink: #8cc0d0;
   --ok: #8fcf9c;
   --draft: #e8a45c;
+  --live: #e7a3b1;
 }
 
 /* `inline` faz as classes apontarem para as variáveis, então trocar o tema não exige recompilar. */
@@ -65,6 +97,7 @@
   --color-gold: var(--gold);
   --color-wine: var(--wine);
   --color-gray-state: var(--gray-state);
+  --color-live: var(--live);
   --color-line: var(--line);
   --color-admin: var(--admin);
   --color-admin-ink: var(--admin-ink);

@@ -15,12 +15,14 @@ function expectNoPlaceholders() {
 describe('navegação do hub', () => {
   it('lê a seção do caminho e cai no início quando não conhece', () => {
     expect(hubSectionFromPath('/')).toBe('inicio')
-    expect(hubSectionFromPath('/ouvir')).toBe('ouvir')
+    expect(hubSectionFromPath('/meditacoes')).toBe('meditacoes')
+    expect(hubSectionFromPath('/ouvir')).toBe('meditacoes')
     expect(hubSectionFromPath('/qualquer')).toBe('inicio')
   })
 
   it('no celular, "encontros" abre a aba Início (onde eles ficam)', () => {
     expect(tabOfSection('encontros')).toBe('inicio')
+    expect(tabOfSection('sobre')).toBe('contato')
     expect(tabOfSection('jornadas')).toBe('jornadas')
   })
 })
@@ -36,7 +38,10 @@ describe('hub no celular (abas)', () => {
       'aria-current',
       'page',
     )
-    expect(within(tabs).getByRole('link', { name: 'Ouvir' })).toHaveAttribute('href', '#/ouvir')
+    expect(within(tabs).getByRole('link', { name: 'Meditações' })).toHaveAttribute(
+      'href',
+      '#/meditacoes',
+    )
     expectNoPlaceholders()
   })
 
@@ -49,9 +54,19 @@ describe('hub no celular (abas)', () => {
     expect(screen.getByText(/Com Andreía Oliveirà\./)).toBeInTheDocument()
   })
 
-  it('sem horário definido, os encontros apontam para o Instagram', () => {
+  it('os encontros não têm horário: a faixa leva para o TikTok', () => {
     render(<HubPage path="/" />)
-    expect(screen.getAllByRole('link', { name: 'Horários no Instagram' })).toHaveLength(2)
+    expect(screen.getByRole('link', { name: 'Seguir no TikTok' })).toHaveAttribute(
+      'href',
+      'https://www.tiktok.com/@atmavox',
+    )
+    expect(screen.getByText(/Sem programação fixa/)).toBeInTheDocument()
+  })
+
+  it('a vitrine não mostra preço e não inventa depoimento', () => {
+    render(<HubPage path="/" />)
+    expect(document.body.textContent).not.toMatch(/R\$/)
+    expect(screen.queryByText('Quem já viveu')).toBeNull()
   })
 
   it('o áudio de boas-vindas toca no player do site, sem YouTube', () => {
@@ -60,25 +75,33 @@ describe('hub no celular (abas)', () => {
     setAudioPlayerForTests(player)
     render(<HubPage path="/" />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Ouvir Boas-vindas' }))
+    fireEvent.click(screen.getAllByRole('button', { name: 'Ouvir Boas-vindas' })[0]!)
 
     expect(audio.src).toBe('/audio/atmavox-boas-vindas.m4a')
     expect(player.getSnapshot()).toMatchObject({ status: 'playing' })
-    expect(screen.getByRole('button', { name: 'Pausar Boas-vindas' })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Pausar Boas-vindas' }).length).toBeGreaterThan(0)
     expect(document.querySelector('iframe')).toBeNull()
     setAudioPlayerForTests(null)
   })
 
-  it('a aba Jornadas leva à jornada e ao WhatsApp', () => {
+  it('a aba Jornadas mostra o catálogo: "Conhecer" abre a jornada e "Em breve" avisa pelo WhatsApp', () => {
     render(<HubPage path="/jornadas" />)
     expect(screen.getByRole('heading', { level: 1, name: 'Jornadas' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /A Chama Interna/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Conhecer A Chama Interna' })).toHaveAttribute(
       'href',
       '#/jornada',
     )
-    expect(screen.getByRole('link', { name: /Ritual Matinal/ }).getAttribute('href')).toContain(
-      'wa.me',
-    )
+    expect(
+      screen.getByRole('link', { name: 'Quero ser avisada: Ritual Matinal' }).getAttribute('href'),
+    ).toContain('wa.me')
+  })
+
+  it('a aba Meditações filtra por áudio e vídeo', () => {
+    render(<HubPage path="/meditacoes" />)
+    expect(screen.getByRole('heading', { level: 1, name: 'Meditações' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Vídeos' }))
+    expect(screen.queryByText('Boas-vindas')).toBeNull()
+    expect(screen.getByText('Retorne ao Seu Centro')).toBeInTheDocument()
   })
 
   it('a aba Contato mostra o nome oficial e a assinatura', () => {
@@ -102,10 +125,20 @@ describe('hub no computador (revista)', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'E se a vida estiver apresentando possibilidades',
     )
-    for (const name of ['Encontros ao vivo', 'Jornadas', 'Contato']) {
+    for (const name of [
+      'Caminhos para atravessar o Estado Cinza',
+      'Pausas guiadas para voltar ao centro',
+      'Encontros',
+      'Nas redes sociais',
+      'Andreía Oliveirà',
+    ]) {
       expect(screen.getByRole('heading', { level: 2, name })).toBeInTheDocument()
     }
-    expect(screen.queryByRole('heading', { name: 'Conversas em vídeo' })).toBeNull()
+    expect(screen.getByRole('link', { name: 'Conhecer as jornadas' })).toHaveAttribute(
+      'href',
+      '#/jornadas',
+    )
+    expect(document.body.textContent).not.toMatch(/R\$/)
     expectNoPlaceholders()
   })
 

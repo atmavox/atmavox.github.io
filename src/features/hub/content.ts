@@ -1,17 +1,23 @@
 // Textos e listas do hub (F1). O que ainda não existe fica `undefined` ou fora da lista: a tela esconde
 // ou mostra uma alternativa, nunca um marcador "[...]". Pendências com a Andreía: .ai/features.md (F1).
 import {
-  BRAND_FIRST_NAME,
   BRAND_PERSON,
   BRAND_SIGNATURE,
   BRAND_SLOGAN,
   brandLinks,
   whatsAppMessage,
 } from '../../shared/brand/links'
+import {
+  featuredProducts,
+  visibleProducts,
+  type JourneyProduct,
+  type Product,
+} from '../../shared/catalog/product'
+import { seedCatalog } from '../../shared/catalog/seedCatalog'
 
 export interface HubAudio {
   id: string
-  kind: 'audio' | 'encontro'
+  kind: 'audio' | 'video' | 'encontro'
   title: string
   meta: string
   /** MP3 em public/audio/. Sem ele, o item toca o vídeo do YouTube. */
@@ -24,19 +30,12 @@ export interface Encounter {
   name: string
   theme: string
   question: string
-  /** Ex.: "Domingos · 20h". Sem ele, a tela aponta para o Instagram. */
-  schedule?: string
 }
 
-export interface JourneyLink {
-  id: string
-  title: string
-  badge: string
-  description: string
-  cta: string
-  href: string
-  isExternal: boolean
-  tone: 'accent' | 'gold' | 'wine'
+export interface Testimonial {
+  text: string
+  /** Nome e cidade, como a pessoa autorizou. */
+  who: string
 }
 
 export interface HubVideo {
@@ -81,8 +80,28 @@ export const introAudio: HubAudio = {
   audioSrc: '/audio/atmavox-boas-vindas.m4a',
 }
 
-/** Tudo o que aparece em "Ouvir". Encontros gravados entram aqui quando forem publicados. */
-export const listenItems: readonly HubAudio[] = [introAudio]
+/**
+ * Meditações grátis da vitrine e da aba Meditações (mock aprovado em 2026-11-22). As pagas e o hub de
+ * meditações vêm do catálogo (ADR-019, Etapa D). Encontros gravados entram aqui quando forem publicados.
+ */
+export const listenItems: readonly HubAudio[] = [
+  introAudio,
+  {
+    id: 'retorne-ao-seu-centro',
+    kind: 'video',
+    title: 'Retorne ao Seu Centro',
+    meta: 'Vídeo · 5 min',
+    youtubeId: 'jKuKSAQUTCA',
+  },
+]
+
+export const meditationsIntro = {
+  title: 'Pausas guiadas para voltar ao centro',
+} as const
+
+export const journeysIntro = {
+  title: 'Caminhos para atravessar o Estado Cinza',
+} as const
 
 export const encounters: readonly Encounter[] = [
   {
@@ -100,39 +119,48 @@ export const encounters: readonly Encounter[] = [
   },
 ]
 
-export const encountersFallback = { label: 'Horários no Instagram', href: brandLinks.instagram }
+const isJourney = (product: Product): product is JourneyProduct => product.kind === 'journey'
 
-export const journeys: readonly JourneyLink[] = [
-  {
-    id: 'chama-interna',
-    title: 'A Chama Interna',
-    badge: '21 dias · grátis',
-    description: '21 dias de rituais, escrita e presença, no seu ritmo. Seu progresso fica salvo.',
-    cta: 'Começar a jornada',
-    href: '#/jornada',
-    isExternal: false,
-    tone: 'accent',
-  },
-  {
-    id: 'ritual-matinal',
-    title: 'Ritual Matinal',
-    badge: '7 dias · em breve',
-    description: 'Uma semana de manhãs com presença. Entre na lista de espera.',
-    cta: 'Entrar na lista de espera',
-    href: whatsAppMessage('Quero entrar na lista de espera do Ritual Matinal de 7 dias.'),
-    isExternal: true,
-    tone: 'gold',
-  },
-  {
-    id: 'sessao-individual',
-    title: 'Sessão individual',
-    badge: '45 min',
-    description: `Um encontro só seu com a ${BRAND_FIRST_NAME}.`,
-    cta: 'Conversar no WhatsApp',
-    href: whatsAppMessage('Quero saber mais sobre a sessão individual de 45 minutos.'),
-    isExternal: true,
-    tone: 'wine',
-  },
+/**
+ * Jornadas da vitrine (destaques) e da aba Jornadas, do catálogo do código por enquanto. A leitura do
+ * catálogo no Firestore entra junto com o Modo Andreía de produtos (Etapa D).
+ */
+export const showcaseJourneys = featuredProducts(seedCatalog).filter(isJourney)
+export const allJourneys = visibleProducts(seedCatalog).filter(isJourney)
+
+/** Os encontros não têm horário fixo: quando acontecem, são um quadro ao vivo no TikTok (ADR-021). */
+export const encountersInfo = {
+  note: 'Sem programação fixa: quando acontece, é um quadro ao vivo no TikTok.',
+  cta: 'Seguir no TikTok',
+  href: brandLinks.tiktok,
+} as const
+
+/**
+ * Depoimentos reais, com nome autorizado. Vazio: a seção "Quem já viveu" não aparece (o briefing pede
+ * não inventar depoimentos; o do mock era só exemplo).
+ */
+export const testimonials: readonly Testimonial[] = []
+
+/** "Quero ser avisada" enquanto não há conta para guardar o interesse: vai para o WhatsApp. */
+export function notifyMeHref(productTitle: string): string {
+  return whatsAppMessage(`Quero ser avisada quando ${productTitle} abrir.`)
+}
+
+export const individualSession = {
+  label: 'Ativação individual',
+  href: whatsAppMessage('Quero saber mais sobre a sessão individual de 45 minutos.'),
+} as const
+
+/** Práticas da Andreía (aparecem em "A Ativadora"). */
+export const specialties: readonly string[] = [
+  'Barras de Access',
+  'PNL',
+  'Metáforas Ericksonianas',
+  'Neurociência',
+  'Radiestesia',
+  'Reiki',
+  'Aromaterapia',
+  'Fitoenergética',
 ]
 
 /** Vídeos em destaque. Vazio: a seção não aparece. */

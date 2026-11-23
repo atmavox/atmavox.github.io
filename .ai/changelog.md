@@ -15,9 +15,21 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 - Catálogo de produtos em `shared/catalog` (ADR-019): tipos de jornada e meditação, leitura segura do
   catálogo vindo da nuvem (um produto quebrado não derruba os outros), regra única de tag e botão de cada
   produto (F9), prazo de acesso por meses de calendário, preço em reais e o catálogo inicial do código.
+- Página inicial como vitrine (mock aprovado, direção 4; ADR-021): botões "Conhecer as jornadas" e
+  "Ouvir uma meditação" no topo; fileira de jornadas do catálogo, sem preço, com "Em breve" e "Quero ser
+  avisada"; meditações ("Pausas guiadas para voltar ao centro"), incluindo o vídeo "Retorne ao Seu
+  Centro"; faixa dos encontros levando ao TikTok; frase da marca com a logo falando atrás; redes
+  sociais; A Ativadora com as práticas e o botão "Ativação individual". Fileiras sem barra de rolagem:
+  setas no computador (só quando sobra cartão), deslizar e pontinhos no celular.
+- "Quem já viveu" pronto para depoimentos reais (carrossel com mais de um); fica escondido enquanto não
+  houver nenhum.
 
 ### Alterado
 
+- Celular: abas Início · Jornadas · Meditações · Contato ("Ouvir" virou "Meditações"; `#/ouvir` continua
+  funcionando). Computador: menu Início, Jornadas, Meditações, Encontros, Sobre, Contato.
+- Encontros sem horário: a faixa diz que acontecem como quadro ao vivo no TikTok e leva para lá (antes,
+  "Horários no Instagram").
 - Propósito do site: a página inicial vira vitrine, nascem os hubs de jornadas e de meditações, e
   jornadas e meditações podem ser pagas; jornadas passam a pedir login (`purpose.md`).
 - Decisões registradas para o que vem: catálogo de produtos (ADR-019), login e acesso pago liberado por

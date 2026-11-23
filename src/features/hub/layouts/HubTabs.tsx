@@ -1,66 +1,126 @@
-import { CircleDot, Flame, Headphones, MessageCircle, type LucideIcon } from 'lucide-react'
+import {
+  ArrowRight,
+  CircleDot,
+  Flame,
+  Headphones,
+  MessageCircle,
+  type LucideIcon,
+} from 'lucide-react'
 import { useEffect, useState, type ComponentType } from 'react'
 import { SITE } from '../../../shared/brand/site'
-import { BrandMark } from '../../../shared/ui/BrandMark'
 import { MiniPlayer } from '../../../shared/media/MiniPlayer'
-import { YouTubeFacade } from '../../../shared/media/YouTubeFacade'
 import { ThemeToggle } from '../../../shared/theme/ThemeToggle'
+import { BrandMark } from '../../../shared/ui/BrandMark'
 import { AboutAndreia } from '../components/AboutAndreia'
 import { AudioItem } from '../components/AudioItem'
-import { EncounterCard } from '../components/EncounterCard'
-import { JourneyCard } from '../components/JourneyCard'
+import { CardRow } from '../components/CardRow'
+import { EncountersBand } from '../components/EncountersBand'
+import { MeditationCover } from '../components/MeditationCover'
+import { PhraseBand } from '../components/PhraseBand'
 import { Portrait } from '../components/Portrait'
+import { ShowcaseJourneyCard } from '../components/ShowcaseJourneyCard'
 import { SocialLinks } from '../components/SocialLinks'
+import { Testimonials } from '../components/Testimonials'
 import {
+  about,
+  allJourneys,
   contactCta,
-  encounters,
-  introAudio,
   hero,
-  journeys,
+  introAudio,
+  journeysIntro,
   listenItems,
+  meditationsIntro,
+  showcaseJourneys,
   signature,
-  videos,
+  specialties,
   type HubAudio,
 } from '../content'
 import { HUB_TABS, type HubTab } from '../navigation'
 
 const TAB_ICONS: Record<HubTab, LucideIcon> = {
   inicio: CircleDot,
-  ouvir: Headphones,
   jornadas: Flame,
+  meditacoes: Headphones,
   contato: MessageCircle,
 }
 
 const eyebrowClass = 'text-[0.7rem] font-semibold tracking-[0.22em] text-accent uppercase'
+const primaryButton =
+  'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 font-semibold text-bg hover:opacity-90'
 
 function InicioPanel() {
-  const featuredVideo = videos[0]
   return (
     <>
-      <section className="flex flex-col gap-4 pt-1">
+      <section className="flex flex-col gap-5 pt-1">
         <Portrait sizes="(max-width: 700px) 100vw, 600px" />
         <div className="flex flex-col items-center gap-3 text-center">
           <h1 className="font-display text-3xl leading-tight text-ink">{hero.slogan}</h1>
           <p className="leading-relaxed text-ink-muted">{hero.intro}</p>
         </div>
+        <a href="#/jornadas" className={primaryButton}>
+          Conhecer as jornadas
+          <ArrowRight aria-hidden size={18} />
+        </a>
+        <AudioItem item={introAudio} variant="card" eyebrow="Comece aqui" />
       </section>
-      <AudioItem item={introAudio} variant="card" eyebrow="Comece aqui" />
-      <section aria-labelledby="encontros-titulo" className="flex flex-col gap-3">
-        <h2 id="encontros-titulo" className={eyebrowClass}>
-          Encontros ao vivo
-        </h2>
-        {encounters.map((encounter) => (
-          <EncounterCard key={encounter.id} encounter={encounter} />
+
+      <CardRow
+        layout="narrow"
+        titleId="jornadas-titulo"
+        title="Jornadas"
+        more={{ label: 'Ver todas', href: '#/jornadas' }}
+      >
+        {showcaseJourneys.map((journey) => (
+          <ShowcaseJourneyCard key={journey.id} journey={journey} size="narrow" />
         ))}
+      </CardRow>
+
+      <CardRow
+        layout="narrow"
+        titleId="meditacoes-titulo"
+        title="Meditações"
+        more={{ label: 'Ver todas', href: '#/meditacoes' }}
+      >
+        {listenItems.map((item, index) => (
+          <MeditationCover key={item.id} item={item} index={index} />
+        ))}
+      </CardRow>
+
+      <EncountersBand layout="narrow" />
+      <PhraseBand layout="narrow" />
+      <Testimonials layout="narrow" />
+
+      <section aria-labelledby="redes-titulo" className="flex flex-col gap-3">
+        <h2 id="redes-titulo" className="font-display text-[1.35rem] text-ink">
+          Nas redes sociais
+        </h2>
+        <SocialLinks variant="icons" />
       </section>
-      {featuredVideo && (
-        <section aria-labelledby="video-titulo" className="flex flex-col gap-3">
-          <h2 id="video-titulo" className={eyebrowClass}>
-            Conversa em vídeo
-          </h2>
-          <YouTubeFacade videoId={featuredVideo.youtubeId} title={featuredVideo.title} />
-        </section>
-      )}
+
+      <section aria-labelledby="sobre-titulo" className="flex flex-col gap-4">
+        <p className={eyebrowClass}>A Ativadora</p>
+        <Portrait secondary sizes="(max-width: 700px) 100vw, 600px" />
+        <h2 id="sobre-titulo" className="font-display text-[1.9rem] text-ink">
+          {about.name}
+        </h2>
+        <p className="text-ink-muted">{about.role}</p>
+        <ul aria-label="Práticas" className="flex flex-wrap gap-1.5">
+          {specialties.map((item) => (
+            <li key={item} className="rounded-lg bg-gold/12 px-2.5 py-1 text-xs text-ink-muted">
+              {item}
+            </li>
+          ))}
+        </ul>
+        <a
+          href={contactCta.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={primaryButton}
+        >
+          <MessageCircle aria-hidden size={18} />
+          {contactCta.label}
+        </a>
+      </section>
     </>
   )
 }
@@ -68,10 +128,11 @@ function InicioPanel() {
 const FILTERS: readonly { id: 'tudo' | HubAudio['kind']; label: string }[] = [
   { id: 'tudo', label: 'Tudo' },
   { id: 'audio', label: 'Áudios' },
+  { id: 'video', label: 'Vídeos' },
   { id: 'encontro', label: 'Encontros gravados' },
 ]
 
-function OuvirPanel() {
+function MeditacoesPanel() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]['id']>('tudo')
   const available = FILTERS.filter(
     (f) => f.id === 'tudo' || listenItems.some((item) => item.kind === f.id),
@@ -81,8 +142,8 @@ function OuvirPanel() {
   return (
     <>
       <header>
-        <h1 className="font-display text-3xl text-ink">Ouvir</h1>
-        <p className="mt-1 text-ink-muted">Práticas de presença para qualquer hora do dia.</p>
+        <h1 className="font-display text-3xl text-ink">Meditações</h1>
+        <p className="mt-1 text-ink-muted">{meditationsIntro.title}</p>
       </header>
       {/* Só mostra filtros quando há mais de um tipo de conteúdo para filtrar. */}
       {available.length > 2 && (
@@ -120,13 +181,15 @@ function JornadasPanel() {
     <>
       <header>
         <h1 className="font-display text-3xl text-ink">Jornadas</h1>
-        <p className="mt-1 text-ink-muted">Caminhos no seu ritmo.</p>
+        <p className="mt-1 text-ink-muted">{journeysIntro.title}</p>
       </header>
-      <div className="flex flex-col gap-3">
-        {journeys.map((journey, index) => (
-          <JourneyCard key={journey.id} journey={journey} variant="card" index={index} />
+      <ul className="flex flex-col gap-4">
+        {allJourneys.map((journey) => (
+          <li key={journey.id}>
+            <ShowcaseJourneyCard journey={journey} size="full" />
+          </li>
         ))}
-      </div>
+      </ul>
     </>
   )
 }
@@ -152,8 +215,8 @@ function ContatoPanel() {
 
 const PANELS: Record<HubTab, ComponentType> = {
   inicio: InicioPanel,
-  ouvir: OuvirPanel,
   jornadas: JornadasPanel,
+  meditacoes: MeditacoesPanel,
   contato: ContatoPanel,
 }
 
@@ -166,7 +229,7 @@ export function HubTabs({ activeTab }: { activeTab: HubTab }) {
   }, [activeTab])
 
   return (
-    <div className="min-h-dvh pb-28">
+    <div className="min-h-dvh overflow-x-clip pb-28">
       <header className="sticky top-0 z-20 bg-bg/95 backdrop-blur">
         <div className="flex items-center justify-between px-5 pt-3 pb-2">
           <span className="flex items-center gap-2 font-display text-[0.95rem] tracking-[0.18em] text-gold uppercase">
@@ -178,7 +241,7 @@ export function HubTabs({ activeTab }: { activeTab: HubTab }) {
         <MiniPlayer />
       </header>
 
-      <main className="mx-auto flex max-w-xl flex-col gap-6 px-5 pt-2">
+      <main className="mx-auto flex max-w-xl flex-col gap-8 px-5 pt-2">
         <Panel />
       </main>
 

@@ -10,26 +10,32 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 **Objetivo:** substituir o atmavox.keepo.bio por uma página que apresenta o universo Atmavox
 (posicionamento novo: `purpose.md`) e leva a cada parte dele, pensada primeiro para o celular.
 
-**Layout (decidido em 2026-11 com protótipos clicáveis):** o mesmo conteúdo em duas estruturas (ADR-010):
+**Layout:** o mesmo conteúdo em duas estruturas (ADR-010). Desde 2026-11-22 a página inicial é a
+**vitrine** aprovada (`Downloads/atmavox-pagina-inicial.html`, direção 4; ADR-021, F9):
 
-- **Celular (< 700 px): "app com abas".** Barra fixa embaixo com Início · Ouvir · Jornadas · Contato.
-  - Início: retrato da Andreía + slogan + "Um espaço para perceber… Com Andreía Oliveirà."; cartão "Comece aqui" (áudio curto de boas-vindas,
-    `public/audio/atmavox-boas-vindas.m4a`, 48 s); próximos encontros; vídeo em destaque (quando houver).
-  - Ouvir: áudios e encontros gravados, com filtro (Tudo · Áudios · Encontros gravados).
-  - Jornadas: A Chama Interna (→ `#/jornada`), Ritual Matinal (lista de espera), Sessão individual.
+- **Celular (< 700 px): "app com abas".** Barra fixa embaixo com Início · Jornadas · Meditações · Contato.
+  - Início: retrato + slogan + "Um espaço para perceber… Com Andreía Oliveirà."; "Conhecer as jornadas";
+    cartão "Comece aqui" (áudio de boas-vindas, 48 s); fileiras de jornadas e de meditações (deslizar
+    com o dedo, pontinhos); faixa dos encontros (TikTok); frase da marca com "Ver as jornadas";
+    "Quem já viveu" (só com depoimento real); redes sociais; A Ativadora (retrato, práticas, WhatsApp).
+  - Jornadas: todas as jornadas do catálogo (`shared/catalog`), sem preço.
+  - Meditações: áudios e vídeos grátis, com filtro (Tudo · Áudios · Vídeos · Encontros gravados).
   - Contato: sobre a Andreía, botão do WhatsApp, redes, assinatura.
-- **Tablet e computador (≥ 700 px): "revista".** Página única com menu no topo: hero com pergunta
-  provocadora + anéis; Encontros (2 colunas); Conversas em vídeo (3 colunas, só se houver vídeos);
-  Jornadas (3 colunas); faixa com o princípio editorial; rodapé com redes e assinatura.
-- Rotas: `#/` (início), `#/ouvir`, `#/jornadas`, `#/contato`. No celular trocam a aba; no computador rolam
-  até a seção. Assim o mesmo link funciona nos dois.
-
-**Mídia (ADR-011):**
+- **Tablet e computador (≥ 700 px): "revista".** Página única com menu no topo (Início, Jornadas,
+  Meditações, Encontros, Sobre, Contato): topo com a pergunta, a logo falando no fundo, "Conhecer as
+  jornadas" e "Ouvir uma meditação"; fileira de jornadas (setas no cabeçalho só quando sobra cartão);
+  meditações em lista de duas colunas; faixa dos encontros; frase com a logo falando atrás; depoimentos;
+  redes sociais; A Ativadora; rodapé com assinatura e versão.
+- Cartões de jornada da vitrine **sem preço** (F9): "Conhecer" (por enquanto abre `#/jornada`) ou, se
+  "Em breve", "Quero ser avisada" (WhatsApp, até existir a lista de interesse com login).
+- Rotas: `#/` (início), `#/jornadas`, `#/meditacoes` (`#/ouvir` continua valendo), `#/encontros`,
+  `#/sobre`, `#/contato`. No celular trocam a aba; no computador rolam até a seção.
+  **Mídia (ADR-011):**
 
 - Áudio com **player próprio** (`<audio>` + arquivo MP3/M4A em `public/audio/`), com **mini player fino
   no topo, logo abaixo do cabeçalho fixo** (hub e jornada), que continua tocando ao trocar de aba, rolar
-  ou ir para a jornada. O cartão "Comece aqui" é só áudio: **vídeos não entram
-  na tela inicial** (pedido do cliente; eles ficam para a jornada). Um item de "Ouvir" sem arquivo ainda
+  ou ir para a jornada. O cartão "Comece aqui" é só áudio. "Retorne ao Seu Centro" (vídeo, 5 min) voltou para a lista de
+  meditações da vitrine, como no mock aprovado em 2026-11-22. Um item de "Ouvir" sem arquivo ainda
   pode abrir o YouTube como alternativa.
 - **Tratamento dos áudios** (feito no computador com ffmpeg, antes de entrar em `public/audio/`; o do
   áudio de boas-vindas foi escolhido de ouvido entre 7 versões). Em etapas separadas, porque o `arnndn` do
