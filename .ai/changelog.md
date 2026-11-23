@@ -10,6 +10,12 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.9.1] · 2026-11-23
+
+### Corrigido
+
+- A aba do navegador se chama "AtmaVox" em todas as páginas (vitrine, jornada e Modo Andreía).
+
 ## [1.9.0] · 2026-11-23
 
 ### Adicionado

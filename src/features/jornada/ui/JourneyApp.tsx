@@ -16,6 +16,7 @@ import { CoverPage } from './pages/CoverPage'
 import { ReviewsPage } from './pages/ReviewsPage'
 import { VictoriesPage } from './pages/VictoriesPage'
 import { WeekPage } from './pages/WeekPage'
+import { BRAND_TAB_TITLE } from '../../../shared/brand/links'
 import { seedCatalog } from '../../../shared/catalog/seedCatalog'
 import { useAccess } from '../../../shared/catalog/AccessContext'
 import { useNow } from '../../../shared/lib/useNow'
@@ -135,8 +136,7 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
   }, [userId, content])
 
   useEffect(() => {
-    const label = JOURNEY_TABS.find((t) => t.id === tab)?.label ?? 'Abertura'
-    document.title = `${label} · A Chama Interna · ATMAVOX`
+    document.title = BRAND_TAB_TITLE
     window.scrollTo({ top: 0 })
   }, [tab])
 

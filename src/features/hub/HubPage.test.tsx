@@ -45,6 +45,10 @@ describe('hub no celular (abas)', () => {
     expectNoPlaceholders()
   })
 
+  it('a aba do navegador se chama AtmaVox', () => {
+    render(<HubPage path="/" />)
+    expect(document.title).toBe('AtmaVox')
+  })
   it('abre com o retrato da Andreía e a mensagem com o nome dela', () => {
     render(<HubPage path="/" />)
     expect(screen.getByRole('img', { name: /Andreía Oliveirà sorrindo/ })).toHaveAttribute(

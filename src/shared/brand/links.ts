@@ -8,6 +8,9 @@ export const BRAND_FIRST_NAME = 'Andreía'
 export const BRAND_SLOGAN = 'Consciência, presença e expansão.'
 export const BRAND_SIGNATURE = `Com presença — ${BRAND_PERSON}`
 
+/** Nome na aba do navegador, igual em todas as páginas (pedido do cliente, 2026-11-23). */
+export const BRAND_TAB_TITLE = 'AtmaVox'
+
 export const WHATSAPP_PHONE = '5547991889442'
 
 export const brandLinks = {

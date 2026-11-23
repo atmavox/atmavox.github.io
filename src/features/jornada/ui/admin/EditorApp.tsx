@@ -1,3 +1,4 @@
+import { BRAND_TAB_TITLE } from '../../../../shared/brand/links'
 import { useCallback, useContext, useEffect, useState, useSyncExternalStore } from 'react'
 import type { JourneyEditor } from '../../application/JourneyEditor'
 import { allDays } from '../../domain/journey'
@@ -113,7 +114,7 @@ export function EditorApp() {
   const [editor] = useState(() => services?.createEditor?.() ?? null)
 
   useEffect(() => {
-    document.title = 'Modo Andreía · ATMAVOX'
+    document.title = BRAND_TAB_TITLE
   }, [])
 
   if (!editor || !isAdmin) {
