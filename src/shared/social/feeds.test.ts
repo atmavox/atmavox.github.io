@@ -3,6 +3,7 @@ import {
   parseInstagramMedia,
   parsePodcastFeed,
   parseSocialFeed,
+  parseSpotifyOembed,
   parseTikTokOembed,
   parseYouTubeFeed,
   relativeTime,
@@ -84,6 +85,21 @@ describe('última publicação de cada rede', () => {
       pinned: true,
       remoteImage: 'https://p16/capa.jpg',
     })
+  })
+
+  it('Spotify: o link escolhido (playlist), com nome e capa do oEmbed', () => {
+    const url = 'https://open.spotify.com/playlist/abc'
+    expect(
+      parseSpotifyOembed({ title: 'AtmaVox Songs', thumbnail_url: 'https://i.scdn/capa' }, url),
+    ).toEqual({
+      network: 'spotify',
+      url,
+      title: 'AtmaVox Songs',
+      kind: 'audio',
+      pinned: true,
+      remoteImage: 'https://i.scdn/capa',
+    })
+    expect(parseSpotifyOembed({}, url)?.title).toBe('No Spotify')
   })
 
   it('texto de XML sem CDATA nem entidades', () => {

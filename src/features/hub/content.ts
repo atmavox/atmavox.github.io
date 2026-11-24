@@ -155,6 +155,7 @@ export const socials: readonly SocialLink[] = [
   { id: 'instagram', name: 'Instagram', handle: '@atmavox', href: brandLinks.instagram },
   { id: 'youtube', name: 'YouTube', handle: '@atmavox', href: brandLinks.youtube },
   { id: 'tiktok', name: 'TikTok', handle: '@atmavox', href: brandLinks.tiktok },
+  { id: 'spotify', name: 'Spotify', handle: 'AtmaVox Songs', href: brandLinks.spotify },
   { id: 'facebook', name: 'Facebook', handle: 'atmavox', href: brandLinks.facebook },
   { id: 'whatsapp', name: 'WhatsApp', handle: 'Conversar', href: brandLinks.whatsapp },
 ]

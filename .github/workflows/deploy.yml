@@ -31,12 +31,14 @@ jobs:
       - run: npm run check
       - name: Buscar as últimas publicações das redes
         # Uma rede que falhar fica de fora; sem nenhuma, a página inicial mostra só os ícones (ADR-028).
-        # A chave do Instagram é secreta; o vídeo do TikTok e o feed do podcast são Variables.
+        # A chave do Instagram é secreta; o número da conta, o vídeo do TikTok e os links do Spotify são Variables.
         continue-on-error: true
         run: node scripts/fetch-social.ts
         env:
           INSTAGRAM_TOKEN: ${{ secrets.INSTAGRAM_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ vars.INSTAGRAM_USER_ID }}
           SOCIAL_TIKTOK_URL: ${{ vars.SOCIAL_TIKTOK_URL }}
+          SOCIAL_SPOTIFY_URL: ${{ vars.SOCIAL_SPOTIFY_URL }}
           SOCIAL_SPOTIFY_RSS: ${{ vars.SOCIAL_SPOTIFY_RSS }}
       - run: npm run build
         # Configuração web do Firebase (pública por natureza; a segurança está nas regras do Firestore).

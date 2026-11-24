@@ -212,10 +212,14 @@ Surgiu no caminho:
 - [x] **Última publicação das redes na página inicial** (ADR-028, mock `Downloads/atmavox-redes.html`,
       1.21.0): gerada no deploy a cada 6 horas; mural no computador, cartões que deslizam no celular.
       YouTube já funciona. Guia em `processos-manuais.md`, seção 1.
-  - [ ] **Desenvolvedor:** criar a Variable `SOCIAL_TIKTOK_URL` com o vídeo escolhido pela Andreía
-  - [ ] **Desenvolvedor + Andreía:** ligar o Instagram (conta profissional, app na Meta, secret
-        `INSTAGRAM_TOKEN`) e lembrar de renovar a chave a cada 60 dias (ou automatizar a renovação)
-  - [ ] Spotify: quando o podcast existir, a Variable `SOCIAL_SPOTIFY_RSS` (o Facebook sai do foco)
+  - [ ] **Desenvolvedor:** criar a Variable `SOCIAL_TIKTOK_URL` com o vídeo escolhido pela Andreía (link
+        recebido em 2026-11-23, no `.env.local`; o TikTok não manda mais capa nem título pela incorporação)
+  - [ ] **Desenvolvedor + Andreía:** ligar o Instagram (app `atmavox-app` e configuração do login unificado
+        prontos em 2026-11-24; falta a `@atmavox` como testadora, o secret `INSTAGRAM_TOKEN` e a variable
+        `INSTAGRAM_USER_ID`; o token do login unificado não vence)
+  - [x] Spotify por link escolhido (playlist "AtmaVox Songs", oEmbed público, 1.26.4), também no ícone
+        da lista de redes; o RSS do podcast continua como alternativa
+  - [ ] **Desenvolvedor:** criar a Variable `SOCIAL_SPOTIFY_URL` com o link da playlist (no `.env.local`)
 
 - [x] **Ativação individual paga** (F10, ADR-029; conversa com a Andreía em 2026-11-23): login
       obrigatório → anamnese (editável no Modo Andreía) → terapia (preços editáveis) → data de
@@ -266,15 +270,18 @@ Surgiu no caminho:
         mesmos que um robô usaria depois); celular com abas embaixo + botão redondo para o site.
         Aprovado em 2026-11-23: formulário de terapia no celular em seções que abrem (A); na janela
         do pedido, os dados ficam fixos à esquerda e só a anamnese rola
-  - [ ] Depois: robô oficial do WhatsApp (Cloud API pelo Worker, número em "coexistence" com o app
-        da Andreía), usando os mesmos textos de "Mensagens" e o mesmo "aprovar"
+  - [ ] Depois: robô oficial do WhatsApp (Cloud API pelo Worker), usando os mesmos textos de
+        "Mensagens" e o mesmo "aprovar". **Em pausa (2026-11-23):** a "coexistence" (mesmo número no
+        app e no robô) não aparece no painel da Meta; parece exigir um provedor parceiro. Decidir entre
+        ficar sem robô, um número só para o robô ou um provedor pago (`processos-manuais.md`, seção 3)
   - [ ] (histórico) Modo Andreía v2, aguardando escolha: como o
         pedido abre (gaveta, janela ou página), como marcar horário livre (arrastar na grade ou
         botão + formulário; grade com Semana e Mês), formulário de terapia (janela ou gaveta), menu
         do celular (abas embaixo, título com menu ou menu lateral) e como aprovar o horário (site,
         robô no Telegram, robô oficial no WhatsApp; sugestão: site + Telegram)
-  - [ ] Mercado Pago segue pendente (`processos-manuais.md`, seção 2): o desenvolvedor avisa quando
-        configurar com a Andreía; até lá o pagamento da ativação fica "em breve"
+  - [ ] Mercado Pago: aplicação `atmavox-app` com credenciais de teste (2026-11-23); falta o Worker
+        (conta de serviço, deploy, webhook), a compra de teste e as credenciais de produção
+        (`processos-manuais.md`, seção 2); até lá o pagamento da ativação fica "em breve"
 
 ## Depois
 

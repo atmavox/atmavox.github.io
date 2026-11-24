@@ -26,3 +26,6 @@ dist-ssr
 # Gerados no deploy pelo scripts/fetch-social.ts (ADR-028)
 public/social.json
 public/social/
+
+# Capturas de tela do desenvolvedor (podem ter dados de contas e chaves de teste)
+.ai/img*

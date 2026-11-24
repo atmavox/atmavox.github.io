@@ -10,6 +10,23 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.26.4] · 2026-11-23
+
+### Adicionado
+
+- Redes sociais: o Spotify aparece por um link escolhido (`SOCIAL_SPOTIFY_URL`, hoje a playlist "AtmaVox
+  Songs"), com capa e nome pela incorporação pública, sem chave; o ícone do Spotify entrou na lista de
+  redes e abre a playlist.
+- Instagram: o script das redes aceita o token do login unificado da Meta (`EAA…`, o único para apps
+  novos), lendo a conta pelo número em `INSTAGRAM_USER_ID`; o token antigo (`IG…`) continua aceito.
+
+### Documentação
+
+- `processos-manuais.md` reescrito depois da reunião com a Andreía: passo a passo do token do Instagram
+  (testador, convite pelo navegador, chave secreta não serve), Mercado Pago com credenciais de teste e
+  compra de teste, e o robô do WhatsApp em pausa (a coexistence não está no painel da Meta), com os
+  caminhos possíveis.
+
 ## [1.26.3] · 2026-11-23
 
 ### Alterado

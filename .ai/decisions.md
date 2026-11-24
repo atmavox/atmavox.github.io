@@ -451,7 +451,8 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Decisão:** `scripts/fetch-social.ts` roda no deploy (a cada push e por `schedule` a cada 6 horas),
   busca a última publicação de cada rede e grava `public/social.json` + as capas baixadas em
   `public/social/` (as do Instagram e do TikTok vencem em dias). O site lê o arquivo uma vez por visita.
-  YouTube pelo feed público do canal; podcast pelo RSS (`SOCIAL_SPOTIFY_RSS`); Instagram pela API
+  YouTube pelo feed público do canal; Spotify por um link escolhido (`SOCIAL_SPOTIFY_URL`, oEmbed público,
+  desde 1.26.4) ou, sem ele, pelo RSS do podcast (`SOCIAL_SPOTIFY_RSS`); Instagram pela API
   oficial com `INSTAGRAM_TOKEN` (secret); TikTok por um vídeo escolhido (`SOCIAL_TIKTOK_URL`) e o
   oEmbed público, porque o TikTok não entrega o último vídeo sem app aprovado. As leituras são funções
   puras em `src/shared/social/feeds.ts` (o Node 24 roda o TypeScript direto). Rede que falhar fica de

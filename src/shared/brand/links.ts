@@ -20,6 +20,8 @@ export const brandLinks = {
   facebook: 'https://facebook.com/atmavox',
   youtube: 'https://youtube.com/@atmavox',
   tiktok: 'https://www.tiktok.com/@atmavox',
+  /** Playlist "AtmaVox Songs" (2026-11-23). */
+  spotify: 'https://open.spotify.com/playlist/1nsEWI041MvQ6ErYEfoebF',
   whatsapp: buildWhatsAppLink(WHATSAPP_PHONE),
 } as const
 

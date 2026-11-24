@@ -5,12 +5,15 @@
 //
 // Configuração (Settings > Secrets and variables > Actions do repositório):
 // - SOCIAL_TIKTOK_URL (variable): link do vídeo do TikTok escolhido pela Andreía (fixado).
-// - SOCIAL_SPOTIFY_RSS (variable): feed RSS do podcast, quando existir.
+// - SOCIAL_SPOTIFY_URL (variable): link do Spotify escolhido pela Andreía (hoje, a playlist).
+// - SOCIAL_SPOTIFY_RSS (variable): feed RSS do podcast, quando existir (usado se não houver o link).
 // - INSTAGRAM_TOKEN (secret): chave da API do Instagram (guia em `.ai/processos-manuais.md`).
+// - INSTAGRAM_USER_ID (variable): número da conta do Instagram, para o token do login unificado (EAA…).
 import { mkdir, writeFile } from 'node:fs/promises'
 import {
   parseInstagramMedia,
   parsePodcastFeed,
+  parseSpotifyOembed,
   parseTikTokOembed,
   parseYouTubeFeed,
   type SocialFeed,
@@ -38,7 +41,18 @@ const SOURCES: { network: SocialNetwork; load: () => Promise<Found> }[] = [
       const token = process.env.INSTAGRAM_TOKEN
       if (!token) return null
       const fields = 'caption,media_type,media_url,thumbnail_url,permalink,timestamp'
-      const url = `https://graph.instagram.com/me/media?fields=${fields}&limit=1&access_token=${encodeURIComponent(token)}`
+      const query = `fields=${fields}&limit=1&access_token=${encodeURIComponent(token)}`
+      // Token "IG…" (login do Instagram) lê a própria conta; token "EAA…" (login unificado, usuário do
+      // sistema, o único disponível para apps novos desde 2026-11) precisa do número da conta.
+      if (token.startsWith('IG')) {
+        return parseInstagramMedia(
+          await (await get(`https://graph.instagram.com/me/media?${query}`)).json(),
+        )
+      }
+      const account = process.env.INSTAGRAM_USER_ID
+      if (!account)
+        throw new Error('falta a variable INSTAGRAM_USER_ID para o token do login unificado')
+      const url = `https://graph.facebook.com/${encodeURIComponent(account)}/media?${query}`
       return parseInstagramMedia(await (await get(url)).json())
     },
   },
@@ -54,6 +68,11 @@ const SOURCES: { network: SocialNetwork; load: () => Promise<Found> }[] = [
   {
     network: 'spotify',
     load: async () => {
+      const link = process.env.SOCIAL_SPOTIFY_URL
+      if (link) {
+        const oembed = `https://open.spotify.com/oembed?url=${encodeURIComponent(link)}`
+        return parseSpotifyOembed(await (await get(oembed)).json(), link)
+      }
       const rss = process.env.SOCIAL_SPOTIFY_RSS
       return rss ? parsePodcastFeed(await (await get(rss)).text()) : null
     },

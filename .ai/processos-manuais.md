@@ -2,19 +2,26 @@
 
 Configurações que só uma pessoa consegue fazer (contas, chaves, painéis). Todas são gratuitas. Ao
 terminar um item, marque `[x]` aqui e no `roadmap.md`. **Nenhuma chave vai para o repositório, para o
-WhatsApp ou para conversas**: elas são coladas direto nos segredos do GitHub ou do Worker.
+WhatsApp ou para conversas**: elas são coladas direto nos segredos do GitHub ou do Worker. No computador
+do desenvolvedor, os valores já recebidos ficam no `.env.local` (fora do git), num bloco "Para COPIAR".
 
 Onde ficam as configurações do GitHub: repositório `atmavox.github.io` → **Settings → Secrets and
 variables → Actions** (abas **Variables** e **Secrets**).
 
 ## Resumo
 
-- [ ] Redes sociais: TikTok (`SOCIAL_TIKTOK_URL`)
-- [ ] Redes sociais: Instagram (`INSTAGRAM_TOKEN`, renovar a cada 60 dias)
-- [ ] Redes sociais: Spotify (`SOCIAL_SPOTIFY_RSS`, quando o podcast existir)
-- [ ] Pagamentos: conta de serviço do Firebase + Mercado Pago + Worker + webhook + botão + compra de teste
+Reunião com a Andreía em 2026-11-23: vídeo do TikTok, playlist do Spotify e credenciais **de teste** do
+Mercado Pago recebidos. Instagram e WhatsApp travaram no painel da Meta (passos reescritos abaixo).
+
+- [ ] Redes sociais: TikTok: criar a variável `SOCIAL_TIKTOK_URL` (link já escolhido, no `.env.local`)
+- [ ] Redes sociais: Spotify: criar a variável `SOCIAL_SPOTIFY_URL` (playlist "AtmaVox Songs", no `.env.local`)
+- [ ] Redes sociais: Instagram: app, configuração e script prontos e testados com conta pessoal (2026-11-24);
+      falta a `@atmavox` aceitar ser testadora e gerar o `INSTAGRAM_TOKEN` + `INSTAGRAM_USER_ID` (seção 1)
+- [x] Pagamentos: app "atmavox-app" no Mercado Pago com credenciais de teste (2026-11-23)
+- [ ] Pagamentos: conta de serviço do Firebase + Worker + webhook + botão + compra de teste
+- [ ] Pagamentos: trocar para as credenciais de **produção** antes de vender
 - [x] Publicar as regras novas do Firestore (anamnese, pedidos e confirmação do horário da ativação individual, 1.24.0 a 1.26.0): seção 4 (feito em 2026-11-23)
-- [ ] Robô do WhatsApp (depois dos pagamentos): app na Meta + número em "coexistence" + token + webhook
+- [ ] Robô do WhatsApp: **em pausa**, falta decidir o caminho (seção 3, "Por que travou")
 
 ---
 
@@ -42,27 +49,68 @@ escolhe um vídeo e o site busca a capa e o título pelo serviço público de in
 
 O cartão aparece com "Em destaque". Para trocar o vídeo, é só editar a variável.
 
-### Spotify (quando o podcast existir)
+Limitação (2026-11-23): o TikTok parou de mandar a capa e o título pela incorporação pública. O cartão
+aparece sem capa e com o título "Vídeo no TikTok", mas abre o vídeo certo.
 
-1. No Spotify for Creators, em **Configurações → Distribuição**, copie o **link do feed RSS**.
-2. Em **Variables**, crie `SOCIAL_SPOTIFY_RSS` com esse link.
+### Spotify (playlist escolhida)
 
-### Instagram (configuração única, depois renovar a chave)
+Igual ao TikTok: a Andreía escolhe um link (playlist, álbum, programa ou episódio) e o site busca a capa
+e o nome pela incorporação pública do Spotify, sem chave. O ícone do Spotify na lista de redes já abre a
+playlist "AtmaVox Songs".
 
-O Instagram só entrega publicações pela API oficial da Meta. Feito uma vez, com a conta da Andreía:
+1. No Spotify, abra a playlist → **⋯ → Compartilhar → Copiar link da playlist**.
+2. Em **Variables** → **New repository variable**: `SOCIAL_SPOTIFY_URL` = esse link (sem o `?si=…` do
+   fim, se houver).
 
-1. **Conta profissional:** no app do Instagram, **Configurações → Tipo de conta e ferramentas → Mudar
-   para conta profissional** (Criador de conteúdo ou Empresa). Não custa nada.
-2. **App na Meta:** em <https://developers.facebook.com/apps>, **Criar app** → tipo **Empresa**. Dentro
-   do app, adicione o produto **Instagram** → "Configuração da API com login do Instagram".
-3. **Gerar o token:** em "Gerar tokens de acesso", adicione a conta `@atmavox`, entre com ela e copie o
-   token (é de longa duração: vale 60 dias).
-4. **Guardar no GitHub:** em **Secrets** (não Variables), crie `INSTAGRAM_TOKEN` com o token.
+Quando existir um podcast, dá para trocar pela última publicação: apague `SOCIAL_SPOTIFY_URL` e crie
+`SOCIAL_SPOTIFY_RSS` com o link do feed RSS (Spotify for Creators → **Configurações → Distribuição**).
 
-**Renovar a cada 60 dias:** antes de vencer, abra no navegador (trocando `TOKEN` pela chave atual)
-`https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=TOKEN`,
-copie o `access_token` novo da resposta e troque o secret. Se vencer, o cartão do Instagram some e o
-resto continua normal. (Dá para automatizar a renovação depois, com um workflow que atualiza o secret.)
+### Instagram (configuração única)
+
+O Instagram só entrega publicações pela API oficial da Meta. Desde 2026-11, apps novos só têm o **login
+unificado**: o token é de um "usuário do sistema" do app, começa com `EAA` e **não vence**. Ele só
+enxerga as contas do Instagram que são **ativos do portfólio "Atma Vox"**; por isso precisa ser gerado
+com a `@atmavox`, não com uma conta pessoal (testado em 2026-11-24: o token de uma conta pessoal não
+enxerga conta nenhuma). A **chave secreta do app** não serve para nada disso.
+
+Situação em 2026-11-24 (app **atmavox-app**):
+
+- [x] Caso de uso **Gerenciar mensagens e conteúdo no Instagram** adicionado.
+- [x] Configuração da Etapa 1 criada e **Selecionado**: "API do Instagram (login unificado)", token de
+      usuário do sistema, expiração Nunca, permissões `instagram_basic` e `instagram_manage_messages`
+      (esta última pode sair em **Editar permissões**; o site não usa), URL de redirecionamento
+      `https://atmavox.github.io/`.
+- [x] Caminho testado com a conta pessoal do desenvolvedor como testadora: o token sai (`EAA…`), é
+      válido, mas não enxerga conta nenhuma (não é ativo do portfólio). Esse token não vai para o GitHub.
+- [x] Script das redes pronto para esse token (`INSTAGRAM_USER_ID` no deploy, 1.26.4).
+- [ ] **Próximo:** entrar com a `@atmavox` e repetir o que foi feito com a conta pessoal (passos 1 a 6
+      abaixo): testadora, aceitar o convite, gerar o token, anotar o número e testar local.
+      Falta, logado com a `@atmavox` (no computador):
+
+1. **Conta profissional e pública:** no app do Instagram da `@atmavox`, **Configurações e atividade →
+   Tipo de conta e ferramentas**. Se ainda for pessoal, mudar para Criador de conteúdo ou Empresa.
+2. **Testadora:** <https://developers.facebook.com/apps> → **atmavox-app** → **Funções do app →
+   Funções** → **Testadores do Instagram** → adicionar `atmavox`.
+3. **Aceitar o convite** em <https://www.instagram.com/accounts/manage_access/> (logada como
+   `@atmavox`) → aba **Convites de testador** → **Aceitar**.
+4. **Gerar o token:** **Casos de uso** → **Personalizar** no cartão do Instagram → **API setup with
+   Unified login** → Etapa **2. Gerar tokens de acesso** → **Adicionar conta** (entrar com a
+   `@atmavox`) → **Gerar token**. Copiar na hora (só aparece uma vez). Se o painel pedir, deixe a conta
+   `@atmavox` como ativo do portfólio "Atma Vox".
+   - Erro "Selecione uma configuração na Etapa 1": a configuração da Etapa 1 precisa estar marcada como
+     **Selecionado**.
+5. **Anotar o número da conta**, que aparece em azul embaixo do nome na tabela da Etapa 2 (ex.:
+   `1784…`). Não é segredo.
+6. **GitHub:** em **Secrets**, `INSTAGRAM_TOKEN` = o token; em **Variables**, `INSTAGRAM_USER_ID` = o
+   número. Depois, **Actions → Checar e publicar → Run workflow**. No log do passo das redes deve
+   aparecer `- instagram: <começo da legenda do último post>`.
+
+Teste local antes do GitHub (desenvolvedor): pôr os dois valores no `.env.local` e rodar
+`node --env-file=.env.local scripts/fetch-social.ts`.
+
+Se um dia o token for do tipo antigo (`IG…`, login do Instagram), o script também aceita: nesse caso
+não precisa do `INSTAGRAM_USER_ID`, mas o token vence em 60 dias (renovar em
+`https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=TOKEN`).
 
 ---
 
@@ -85,10 +133,15 @@ Mercado Pago ──volta──▶ Worker /retorno ──▶ site #/pagamento/apr
 
 ### 2.2 Mercado Pago (conta da Andreía)
 
-1. Entrar em [Suas integrações](https://www.mercadopago.com.br/developers/panel/app) → **Criar
-   aplicação** → tipo "Pagamentos online", produto **Checkout Pro**.
-2. Conta pronta para receber: identidade verificada e uma **chave Pix** cadastrada no Mercado Pago.
-3. Em **Credenciais de produção**, copiar o **Access Token** (`APP_USR-…`), só para colar no passo 2.3.
+Feito em 2026-11-23: aplicação **atmavox-app** criada, com chave Pix cadastrada na conta. Até agora só
+temos as **credenciais de teste** (no `.env.local` do desenvolvedor).
+
+1. Em [Suas integrações](https://www.mercadopago.com.br/developers/panel/app) → **atmavox-app**.
+2. Para testar (seção 2.6): **Credenciais de teste** → **Access Token** (`APP_USR-…`). É o único valor
+   que o Worker usa. A **Public Key** não é usada (o pagamento acontece na página do Mercado Pago), e a
+   chave Pix fica só na conta do Mercado Pago, não no site.
+3. Para vender de verdade: **Credenciais de produção** → **Access Token**. O painel pode pedir para
+   ativar as credenciais de produção (dados do negócio e site `https://atmavox.github.io`).
 4. Webhooks: deixar para o passo 2.4 (precisa do endereço do Worker).
 
 ### 2.3 Worker na Cloudflare
@@ -127,10 +180,15 @@ Mercado Pago ──volta──▶ Worker /retorno ──▶ site #/pagamento/apr
 
 ### 2.6 Testar antes de vender
 
-1. Com as **credenciais de teste** e um **usuário de teste comprador** (painel → Contas de teste),
-   repetir os passos 2.3 e 2.4 num Worker de teste, ou trocar o `MP_ACCESS_TOKEN` temporariamente.
-2. Comprar um produto pago: deve voltar para "Pronto, … é sua" e aparecer "Sua" no hub.
-3. Voltar o `MP_ACCESS_TOKEN` de produção.
+1. Fazer os passos 2.3 a 2.5 com o **Access Token de teste** em `MP_ACCESS_TOKEN`.
+2. Numa **janela anônima** do navegador, entrar no site e comprar um produto pago. Na página do Mercado
+   Pago, entrar com o **usuário de teste** (painel → **Contas de teste**: usuário `TESTUSER…`, senha e
+   código de verificação aparecem lá) e pagar com o **cartão de teste** do painel, titular `APRO`
+   (pagamento aprovado).
+3. Deve voltar para "Pronto, … é sua" e aparecer "Sua" no hub. Na ativação individual, o pedido vira
+   "Paga".
+4. Antes de abrir as vendas: rodar de novo `npx wrangler@4 secret put MP_ACCESS_TOKEN` com o token de
+   **produção** e trocar o webhook (2.4) para o modo produção.
 
 ### Se algo der errado
 
@@ -150,6 +208,24 @@ do WhatsApp Business de sempre. A Andreía **já tem conta no Meta Business**, o
 Só a API oficial é segura. **Não use** Z-API, Evolution, Baileys ou similares (simulam o WhatsApp Web,
 violam os termos e o número pode ser banido).
 
+### Por que travou (2026-11-23) e o que decidir
+
+Na reunião, a opção de usar o **número do app WhatsApp Business** no robô ("coexistence", passo 3.2.3)
+não existia no menu. Motivo provável: a Meta só oferece a coexistence pelo cadastro de **parceiros**
+(provedores de WhatsApp, os "BSP"), e não pelo painel de desenvolvedor de um app próprio. Nada foi
+estragado: o número segue normal no celular da Andreía.
+
+Até decidir, o site continua como está: os avisos vão por links do WhatsApp (`wa.me`) que a pessoa ou a
+Andreía tocam, e as mensagens ficam na tela **Mensagens**. Caminhos possíveis:
+
+1. **Ficar sem robô por enquanto** (custo zero, nada a fazer). Recomendado até as vendas começarem.
+2. **Número só para o robô:** um chip novo, cadastrado direto na API (passo 3.2 sem a coexistence).
+   A Andreía segue usando o número de sempre no app; o robô fala por outro número. Tem o custo do chip.
+3. **Provedor parceiro da Meta com coexistence:** mantém o mesmo número no app e no robô, mas quase todos
+   cobram mensalidade, o que foge do custo zero. Só com decisão explícita.
+
+Os passos abaixo valem para o caminho 2 (ou para o 3, adaptando o 3.2 ao provedor).
+
 Antes de começar, confira na página oficial de preços da Meta
 (<https://developers.facebook.com/docs/whatsapp/pricing>): em outubro de 2026 a cobrança mudou. O
 esperado é custo zero no volume da Andreía para respostas dentro da conversa aberta pela pessoa; o
@@ -160,29 +236,31 @@ lembrete na véspera (modelo fora da janela de 24 h) pode ser pago e, nesse caso
 1. Em <https://business.facebook.com>, entrar com a conta da Andreía e conferir em **Configurações do
    negócio → Central de segurança** se o negócio está **verificado**. Se não estiver, iniciar a
    verificação (pede documentos do negócio ou da Andreía; pode levar alguns dias).
-2. Conferir se o número do WhatsApp Business dela está no app **WhatsApp Business** atualizado
-   (versão 2.24.17 ou mais nova). É ele que vai funcionar no app e no robô ao mesmo tempo
-   ("coexistence").
+2. Ter em mãos o número que o robô vai usar (caminho 2): ele **não pode** estar em nenhum WhatsApp
+   (nem no app comum nem no Business), e precisa receber SMS ou ligação para o código.
 
 ### 3.2 App na Meta
 
-1. Em <https://developers.facebook.com/apps>, **Criar app** → tipo **Empresa** → ligar ao portfólio
-   do negócio da Andreía.
-2. Adicionar o produto **WhatsApp** → **Configuração da API**.
-3. Em **Números de telefone**, **Adicionar número** → escolher **usar o número do app WhatsApp
-   Business** (coexistence) e seguir o passo a passo, que pede um código no celular da Andreía.
-   Se essa opção não aparecer, anote a mensagem e avise o desenvolvedor antes de seguir: sem
-   coexistence, o número sai do app e ela perde a conversa pelo celular.
+1. Em <https://developers.facebook.com/apps> → **Criar app** → caso de uso **Conectar-se com clientes
+   pelo WhatsApp** (_Connect with customers through WhatsApp_) → escolher o **portfólio empresarial** da
+   Andreía. (Pode ser o mesmo **atmavox-app**, adicionando esse caso de uso em **Casos de uso**.)
+2. No menu da esquerda: **WhatsApp → Configuração da API** (_API Setup_). A Meta mostra um **número de
+   teste** e um **token temporário** (vale menos de 24 h; não use no Worker).
+3. Na mesma tela, **Adicionar número de telefone** → preencher nome de exibição ("AtmaVox") e
+   categoria → digitar o número do robô → receber e digitar o código.
 4. Anotar o **ID do número de telefone** e o **ID da conta do WhatsApp Business** (aparecem na mesma
    tela). Não são segredos.
 
 ### 3.3 Token permanente (segredo)
 
-1. Em **Configurações do negócio → Usuários → Usuários do sistema**, criar um usuário do sistema
-   "atmavox-robo" (função Administrador) e dar a ele acesso ao app e à conta do WhatsApp.
-2. **Gerar token** com as permissões `whatsapp_business_messaging` e
-   `whatsapp_business_management`, sem validade.
-3. Colar direto no Worker (pasta `worker/`), sem passar por conversa nem arquivo:
+1. Em <https://business.facebook.com/settings> → **Usuários → Usuários do sistema** → **Adicionar**:
+   nome "atmavox-robo", função **Administrador**.
+2. Com ele selecionado, **Atribuir ativos**: o app (controle total) e a **conta do WhatsApp** (controle
+   total).
+3. **Gerar novo token** → escolher o app → validade **Nunca** (se só houver 60 dias, escolha e anote a
+   data para renovar) → marcar `whatsapp_business_messaging`, `whatsapp_business_management` e
+   `business_management` → gerar. Copie na hora: ele só aparece uma vez.
+4. Colar direto no Worker (pasta `worker/`), sem passar por conversa nem arquivo:
 
    ```bash
    npx wrangler@4 secret put WA_TOKEN          # o token do usuário do sistema

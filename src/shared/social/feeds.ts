@@ -141,6 +141,26 @@ export function parseTikTokOembed(
   }
 }
 
+/**
+ * O oEmbed público do Spotify (`open.spotify.com/oembed?url=…`) de um link escolhido pela Andreía
+ * (playlist, álbum, programa ou episódio): capa e nome, sem chave.
+ */
+export function parseSpotifyOembed(
+  json: unknown,
+  url: string,
+): (SocialPost & { remoteImage?: string }) | null {
+  if (!isObject(json)) return null
+  const remoteImage = str(json.thumbnail_url)
+  return {
+    network: 'spotify',
+    url,
+    title: shortText(str(json.title) ?? 'No Spotify'),
+    kind: 'audio',
+    pinned: true,
+    ...(remoteImage ? { remoteImage } : {}),
+  }
+}
+
 /** O `social.json` lido pelo site: o que vier quebrado fica de fora, na ordem das redes. */
 export function parseSocialFeed(raw: unknown): SocialPost[] {
   if (!isObject(raw) || !Array.isArray(raw.posts)) return []
