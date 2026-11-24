@@ -5,7 +5,7 @@ import { FakeAudio } from '../../shared/media/FakeAudio'
 import { setAudioPlayerForTests } from '../../shared/media/useAudioPlayer'
 import { setWideViewport } from '../../test/viewport'
 import { HubPage } from './HubPage'
-import { hubSectionFromPath, tabOfSection } from './navigation'
+import { hubSectionFromPath, tabOfSection, therapyFromPath } from './navigation'
 
 /** Nenhum marcador de conteúdo faltando ("[FOTO]", "[DIA · HORA]"…) pode chegar ao site publicado. */
 function expectNoPlaceholders() {
@@ -25,6 +25,14 @@ describe('navegação do hub', () => {
     expect(tabOfSection('sobre')).toBe('contato')
     expect(tabOfSection('jornadas')).toBe('jornadas')
   })
+
+  it('Ativações é um hub; o agendamento pode vir com a terapia escolhida', () => {
+    expect(hubSectionFromPath('/ativacoes')).toBe('ativacoes')
+    expect(tabOfSection('ativacoes')).toBe('ativacoes')
+    expect(therapyFromPath('/ativacao/terapia/reiki-a-distancia')).toBe('reiki-a-distancia')
+    expect(therapyFromPath('/ativacao')).toBeNull()
+    expect(therapyFromPath('/ativacao/confirmar/A7KX2Q')).toBeNull()
+  })
 })
 
 describe('hub no celular (abas)', () => {
@@ -42,7 +50,32 @@ describe('hub no celular (abas)', () => {
       'href',
       '#/meditacoes',
     )
+    expect(
+      within(tabs)
+        .getAllByRole('link')
+        .map((link) => link.textContent),
+    ).toEqual(['Início', 'Jornadas', 'Meditações', 'Ativações', 'Contato'])
     expectNoPlaceholders()
+  })
+
+  it('a aba Ativações abre o hub e fica marcada', async () => {
+    render(<HubPage path="/ativacoes" />)
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Um encontro só seu, com a Andreía' }),
+    ).toBeInTheDocument()
+    const tabs = screen.getByRole('navigation', { name: 'Seções' })
+    expect(within(tabs).getByRole('link', { name: 'Ativações' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+  })
+
+  it('o "Quero agendar" do Contato leva ao hub Ativações', () => {
+    render(<HubPage path="/contato" />)
+    expect(screen.getByRole('link', { name: 'Quero agendar' })).toHaveAttribute(
+      'href',
+      '#/ativacoes',
+    )
   })
 
   it('a aba do navegador se chama AtmaVox', () => {
@@ -189,6 +222,19 @@ describe('hub no computador (revista)', () => {
       'aria-current',
       'page',
     )
+  })
+
+  it('o cabeçalho dos hubs tem Ativações, marcada também com o agendamento aberto', async () => {
+    setWideViewport(true)
+    render(<HubPage path="/ativacao" />)
+    const menu = screen.getByRole('navigation', { name: 'Seções' })
+    expect(within(menu).getByRole('link', { name: 'Ativações' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Um encontro só seu, com a Andreía' }),
+    ).toBeInTheDocument()
   })
 
   it('Encontros, Sobre e Contato são trechos do início: "Início" continua marcado', () => {

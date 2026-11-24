@@ -63,6 +63,9 @@ function without(record: Record<string, string>, key: string): Record<string, st
   return next
 }
 
+/** O hub Ativações, que fica ao fundo da janela. */
+const HUB = '#/ativacoes'
+
 const goTo = (hash: string) => {
   window.location.hash = hash
 }
@@ -74,12 +77,13 @@ const ghost =
 
 /**
  * A ativação individual (mock aprovado, `atmavox-ativacao-pessoa-v3.html`): do login ao resumo, tudo
- * numa janela sobre o hub desfocado. Fechar antes de entrar volta ao início; depois, ao perfil.
+ * numa janela sobre o hub Ativações desfocado. Fechar antes de entrar volta ao hub; depois, ao perfil.
  */
 export function AtivacaoFlow({
   source: injected,
   orderReturn = null,
   confirmOrderId = null,
+  initialTherapyId = null,
   workerUrl = paymentsUrl(import.meta.env),
   redirect = (url) => window.location.assign(url),
 }: {
@@ -88,6 +92,8 @@ export function AtivacaoFlow({
   orderReturn?: OrderReturn | null
   /** O link de confirmação do horário (`#/ativacao/confirmar/{código}`). */
   confirmOrderId?: string | null
+  /** A terapia escolhida no hub ("Agendar esta"): já vem marcada na etapa Terapia. */
+  initialTherapyId?: string | null
   /** Endereço do Worker de pagamentos; sem ele, "Pagamento em breve". */
   workerUrl?: string | null
   redirect?: (url: string) => void
@@ -112,7 +118,7 @@ export function AtivacaoFlow({
   const [step, setStep] = useState<Step>(1)
   const [section, setSection] = useState(0)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [therapyId, setTherapyId] = useState<string | null>(null)
+  const [therapyId, setTherapyId] = useState<string | null>(initialTherapyId)
   const [extra, setExtra] = useState<Record<string, string>>({})
   const [preference, setPreference] = useState<Preference | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
@@ -181,7 +187,7 @@ export function AtivacaoFlow({
     setSection(0)
   }
 
-  const close = () => goTo(user ? '#/perfil/ativacoes' : '#/')
+  const close = () => goTo(user ? '#/perfil/ativacoes' : HUB)
 
   if (!state?.authChecked) return null
 
@@ -191,7 +197,7 @@ export function AtivacaoFlow({
       <LoginDialog
         account={session}
         variant="ativacao"
-        onClose={() => goTo('#/')}
+        onClose={() => goTo(HUB)}
         onSignedIn={() => {}}
         aside={
           <div className="flex flex-col gap-5">
@@ -208,7 +214,7 @@ export function AtivacaoFlow({
 
   // Conta criada com e-mail e ainda sem confirmar: a ativação (uma compra) espera a confirmação.
   if (needsEmailConfirmation(user)) {
-    return <EmailConfirmDialog onClose={() => goTo('#/')} />
+    return <EmailConfirmDialog onClose={() => goTo(HUB)} />
   }
   // E o cadastro completo (aba Conta), como antes de começar uma jornada ou comprar.
   if (!my.profile) return null
@@ -218,7 +224,7 @@ export function AtivacaoFlow({
       <ProfileGateDialog
         missing={missing}
         returnTo={{ href: '#/ativacao', title: 'a ativação individual' }}
-        onClose={() => goTo('#/')}
+        onClose={() => goTo(HUB)}
       />
     )
   }

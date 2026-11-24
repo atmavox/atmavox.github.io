@@ -10,6 +10,21 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.31.0] · 2026-11-24
+
+### Adicionado
+
+- Hub Ativações (`#/ativacoes`, mock `atmavox-hub-ativacao.html`, D, ADR-032): convite com o retrato
+  da Andreía sobre os anéis, as terapias ativas (sem preço) com "Agendar esta", Como funciona e a
+  dúvida pelo WhatsApp. Textos da página provisórios, para a Andreía ajustar.
+
+### Alterado
+
+- Ativações no cabeçalho dos hubs e na barra do celular (agora com 5 itens).
+- O agendamento abre sempre sobre o hub Ativações (também vindo do perfil); "Agendar esta" já traz a
+  terapia escolhida; fechar sem login volta ao hub.
+- O "Quero agendar" do Contato leva ao hub Ativações.
+
 ## [1.30.1] · 2026-11-24
 
 ### Alterado

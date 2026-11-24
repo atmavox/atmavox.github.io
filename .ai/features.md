@@ -459,9 +459,18 @@ no código, sempre pode.
 Mocks aprovados (2026-11-23): `Downloads/atmavox-ativacao-pessoa-v3.html` (pessoa) e
 `Downloads/atmavox-ativacao-andreia-v3.html` (Modo Andreía). Decisão: ADR-029.
 
-**Fluxo da pessoa** ✅ até o resumo (o pagamento e o aviso vêm nos passos 4 e 5): a aba **Contato** explica a ativação (sem item novo no menu) e leva
-a `#/ativacao`. Do login ao "Pagamento confirmado", tudo acontece numa **janela sobre o hub
-desfocado**; fechar antes do login volta ao início, depois do login leva ao perfil, aba **Ativações**.
+**Hub Ativações** (`#/ativacoes`, 1.31.0, mock `Downloads/atmavox-hub-ativacao.html`, D, ADR-032): ao
+lado de Jornadas e Meditações no cabeçalho dos hubs e na barra do celular (5 itens). Convite com o
+retrato da Andreía sobre os anéis parados (centro perto do canto de cima à esquerda), "Agendar minha
+ativação", as terapias ativas sem preço (duração e modalidade; "Agendar esta" abre
+`#/ativacao/terapia/{id}` com ela já marcada na etapa Terapia), Como funciona em 4 passos e a dúvida
+pelo WhatsApp. Sem terapia ativa, avisa que as práticas aparecem em breve. Textos provisórios em
+`hub/content.ts` (`activationsIntro`). O "Quero agendar" do Contato leva ao hub.
+
+**Fluxo da pessoa** ✅ até o resumo (o pagamento e o aviso vêm nos passos 4 e 5): `#/ativacao`. Do
+login ao "Pagamento confirmado", tudo acontece numa **janela sobre o hub Ativações desfocado** (venha
+a pessoa de onde vier, também do perfil); fechar antes do login volta ao hub, depois do login leva ao
+perfil, aba **Ativações**.
 
 1. Login obrigatório (etapas na vertical ao lado no computador; barra em partes no celular).
 2. Anamnese por etapas (as seções do Modo Andreía). Nome e telefone com WhatsApp sempre no começo.

@@ -535,6 +535,21 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   da confirmação) e a conferir de novo ao voltar para a aba. Contas de teste com e-mail precisam
   confirmar.
 
+## ADR-032 · Ativações como hub próprio, com o agendamento por cima
+
+- **Data:** 2026-11-24
+- **Contexto:** a ativação individual era só um cartão no Contato, e o agendamento abria por cima da
+  página inicial, mesmo quando a pessoa vinha do perfil. Pedido: um lugar convidativo, ao lado de
+  Jornadas e Meditações, e que fique ao fundo do agendamento.
+- **Decisão:** `#/ativacoes` (no plural, como `#/jornadas` e `#/meditacoes`) é o hub, no mock aprovado
+  `atmavox-hub-ativacao.html` (D: retrato da Andreía sobre os anéis parados da opção C, terapias ativas
+  sem preço, Como funciona e WhatsApp). `#/ativacao` continua sendo o agendamento (e os links de
+  confirmar e da volta do pagamento), agora sempre sobre o hub; `#/ativacao/terapia/{id}` abre já com a
+  terapia escolhida. Ativações entra no cabeçalho dos hubs e na barra do celular, que passa a ter 5
+  itens (conferido em 320 px). O hub é carregado sob demanda, como o agendamento (ADR-029).
+- **Consequências:** fechar o agendamento sem login volta ao hub (e não mais ao início); o "Quero
+  agendar" do Contato leva ao hub.
+
 ## ADR-00X · Título curto
 
 - **Status:** proposta | aceita | substituída por ADR-00Y · AAAA-MM-DD

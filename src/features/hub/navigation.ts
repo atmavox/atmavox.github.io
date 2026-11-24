@@ -2,7 +2,8 @@
 export const WIDE_LAYOUT_QUERY = '(min-width: 700px)'
 
 /** Seções do hub. No celular viram abas; no computador, âncoras da página (ADR-010). */
-export type HubSection = 'inicio' | 'jornadas' | 'meditacoes' | 'encontros' | 'sobre' | 'contato'
+export type HubSection =
+  'inicio' | 'jornadas' | 'meditacoes' | 'ativacoes' | 'encontros' | 'sobre' | 'contato'
 
 /** As abas do celular: "encontros" mora dentro de Início e "sobre" dentro de Contato. */
 export type HubTab = Exclude<HubSection, 'encontros' | 'sobre'>
@@ -11,6 +12,7 @@ export const HUB_TABS: readonly { id: HubTab; label: string; href: string }[] = 
   { id: 'inicio', label: 'Início', href: '#/' },
   { id: 'jornadas', label: 'Jornadas', href: '#/jornadas' },
   { id: 'meditacoes', label: 'Meditações', href: '#/meditacoes' },
+  { id: 'ativacoes', label: 'Ativações', href: '#/ativacoes' },
   { id: 'contato', label: 'Contato', href: '#/contato' },
 ]
 
@@ -27,6 +29,7 @@ const SECTIONS: readonly HubSection[] = [
   'inicio',
   'jornadas',
   'meditacoes',
+  'ativacoes',
   'encontros',
   'sobre',
   'contato',
@@ -54,13 +57,17 @@ export function tabOfSection(section: HubSection): HubTab {
   return section
 }
 
+/** Jornadas, Meditações e Ativações: os hubs, páginas próprias com o cabeçalho da área da conta. */
+export const isHubPage = (section: HubSection) =>
+  section === 'jornadas' || section === 'meditacoes' || section === 'ativacoes'
+
 /**
- * Item marcado no menu do computador: Jornadas e Meditações são páginas próprias e ficam marcadas;
- * Encontros, Sobre e Contato são trechos da página inicial, então "Início" continua marcado (o item
- * clicado só pisca).
+ * Item marcado no menu do computador: os hubs são páginas próprias e ficam marcados; Encontros,
+ * Sobre e Contato são trechos da página inicial, então "Início" continua marcado (o item clicado só
+ * pisca).
  */
 export function activeMenuItem(section: HubSection): HubSection {
-  return section === 'jornadas' || section === 'meditacoes' ? section : 'inicio'
+  return isHubPage(section) ? section : 'inicio'
 }
 
 export const isHomeAnchor = (section: HubSection) =>
@@ -83,18 +90,26 @@ export const HUB_AREA_MENU: readonly { id: HubTab; label: string; href: string }
   { id: 'inicio', label: 'Início', href: '#/' },
   { id: 'jornadas', label: 'Jornadas', href: '#/jornadas' },
   { id: 'meditacoes', label: 'Meditações', href: '#/meditacoes' },
+  { id: 'ativacoes', label: 'Ativações', href: '#/ativacoes' },
 ]
 
-/** Aba marcada no cabeçalho dos hubs: Jornadas ou Meditações (a volta do pagamento não marca nenhuma). */
+/** Aba marcada no cabeçalho dos hubs (a volta do pagamento não marca nenhuma). */
 export function hubAreaItem(section: HubSection): HubTab | null {
-  return section === 'jornadas' || section === 'meditacoes' ? section : null
+  return section === 'jornadas' || section === 'meditacoes' || section === 'ativacoes'
+    ? section
+    : null
 }
 
 /** "/perfil": a página de perfil, aberta pela bolinha da conta nos hubs (mock aprovado). */
 export const isProfilePath = (path: string) => /^\/perfil(\/(ativacoes|conta))?\/?$/.test(path)
 
-/** "/ativacao": a ativação individual, numa janela sobre o Contato (ADR-029). */
+/** "/ativacao": o agendamento da ativação individual, numa janela sobre o hub Ativações (ADR-029). */
 export const isActivationPath = (path: string) => /^\/ativacao(\/|$)/.test(path)
+
+/** "/ativacao/terapia/reiki-a-distancia": o agendamento já com a terapia escolhida no hub. */
+export function therapyFromPath(path: string): string | null {
+  return /^\/ativacao\/terapia\/([a-z0-9-]+)\/?$/.exec(path)?.[1] ?? null
+}
 
 export interface OrderReturn {
   orderId: string

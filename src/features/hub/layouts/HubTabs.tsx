@@ -4,9 +4,10 @@ import {
   Flame,
   Headphones,
   MessageCircle,
+  Sparkle,
   type LucideIcon,
 } from 'lucide-react'
-import { useEffect, type ComponentType } from 'react'
+import { lazy, Suspense, useEffect, type ComponentType } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { AccountMenu } from '../../../shared/auth/AccountMenu'
 import { EmailConfirmBanner } from '../../../shared/auth/EmailConfirmBanner'
@@ -38,10 +39,14 @@ import { meditationHref, toHubAudio } from '../meditations'
 import { HUB_TABS, type HubTab, type PaymentReturn } from '../navigation'
 import { coverToneAt } from '../../../shared/ui/bannerTones'
 
+// O hub de ativações só é baixado por quem abre a aba (como o agendamento, ADR-029).
+const ActivationsHub = lazy(() => import('../ativacao/ActivationsHub'))
+
 const TAB_ICONS: Record<HubTab, LucideIcon> = {
   inicio: CircleDot,
   jornadas: Flame,
   meditacoes: Headphones,
+  ativacoes: Sparkle,
   contato: MessageCircle,
 }
 
@@ -150,9 +155,18 @@ function ContatoPanel() {
   )
 }
 
+function AtivacoesPanel() {
+  return (
+    <Suspense fallback={null}>
+      <ActivationsHub layout="narrow" />
+    </Suspense>
+  )
+}
+
 const PANELS: Record<Exclude<HubTab, 'meditacoes'>, ComponentType> = {
   inicio: InicioPanel,
   jornadas: JornadasPanel,
+  ativacoes: AtivacoesPanel,
   contato: ContatoPanel,
 }
 
@@ -179,7 +193,11 @@ export function HubTabs({
 }) {
   const isAdmin = useIsAdmin()
   const isHubTab =
-    activeTab === 'jornadas' || activeTab === 'meditacoes' || payment !== null || isProfile
+    activeTab === 'jornadas' ||
+    activeTab === 'meditacoes' ||
+    activeTab === 'ativacoes' ||
+    payment !== null ||
+    isProfile
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -224,10 +242,10 @@ export function HubTabs({
 
       <nav
         aria-label="Seções"
-        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-line bg-bg/95 px-2 pt-1.5 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t border-line bg-bg/95 px-1 pt-1.5 backdrop-blur"
         style={{ paddingBottom: 'calc(6px + env(safe-area-inset-bottom))' }}
       >
-        {/* As mesmas quatro abas em todo o site, também nos hubs (pedido de 2026-11-24). No perfil e na
+        {/* As mesmas cinco abas em todo o site, também nos hubs (pedidos de 2026-11-24). No perfil e na
             volta do pagamento, nenhuma fica marcada. */}
         {HUB_TABS.map((tab) => {
           const Icon = TAB_ICONS[tab.id]
@@ -237,7 +255,7 @@ export function HubTabs({
               key={tab.id}
               href={tab.href}
               aria-current={isActive ? 'page' : undefined}
-              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl text-[0.7rem] ${
+              className={`flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl text-[0.7rem] whitespace-nowrap ${
                 isActive ? 'text-accent' : 'text-ink-faint hover:text-ink'
               }`}
             >

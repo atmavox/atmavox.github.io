@@ -1,5 +1,5 @@
 import { ArrowRight } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { AccountMenu } from '../../../shared/auth/AccountMenu'
 import { EmailConfirmBanner } from '../../../shared/auth/EmailConfirmBanner'
@@ -47,6 +47,9 @@ import {
   type HubSection,
   type PaymentReturn,
 } from '../navigation'
+
+// O hub de ativações só é baixado por quem abre #/ativacoes (como o agendamento, ADR-029).
+const ActivationsHub = lazy(() => import('../ativacao/ActivationsHub'))
 
 const wrap = 'mx-auto w-full max-w-6xl px-6 md:px-12'
 const eyebrow = 'text-xs font-semibold tracking-[0.24em] text-accent uppercase'
@@ -100,13 +103,15 @@ export function HubMagazine({
     ? 'perfil'
     : payment
       ? 'pagamento'
-      : section === 'jornadas'
-        ? 'jornadas'
-        : meditationId
-          ? 'meditacao'
-          : section === 'meditacoes'
-            ? 'meditacoes'
-            : null
+      : section === 'ativacoes'
+        ? 'ativacoes'
+        : section === 'jornadas'
+          ? 'jornadas'
+          : meditationId
+            ? 'meditacao'
+            : section === 'meditacoes'
+              ? 'meditacoes'
+              : null
 
   // O mesmo link (#/jornadas) que troca a aba no celular rola até a seção aqui.
   useEffect(() => {
@@ -124,8 +129,8 @@ export function HubMagazine({
       <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur">
         {page && isAdmin && <AdminStrip />}
         {page ? (
-          // Hubs: uma área própria (mock aprovado, opção 3): Início, Jornadas e Meditações em abas, e a
-          // conta à direita. A vitrine fica só para olhar, sem login.
+          // Hubs: uma área própria (mock aprovado, opção 3): Início, Jornadas, Meditações e Ativações em
+          // abas, e a conta à direita. A vitrine fica só para olhar, sem login.
           <div className={`${wrap} flex min-h-[62px] items-center gap-6`}>
             <a
               href="#/"
@@ -193,6 +198,11 @@ export function HubMagazine({
         <main key={`${page}-${meditationId ?? ''}`} className="animate-[page-in_400ms_ease-out]">
           {page === 'pagamento' && payment && <PaymentReturnPage payment={payment} layout="wide" />}
           {page === 'perfil' && <ProfilePage layout="wide" />}
+          {page === 'ativacoes' && (
+            <Suspense fallback={null}>
+              <ActivationsHub layout="wide" />
+            </Suspense>
+          )}
           {page === 'jornadas' && <JourneysHub layout="wide" />}
           {page === 'meditacoes' && <MeditationsHub layout="wide" />}
           {page === 'meditacao' && meditationId && (

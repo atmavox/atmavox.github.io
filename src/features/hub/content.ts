@@ -81,6 +81,28 @@ export const journeysIntro = {
   title: 'Caminhos para atravessar o Estado Cinza',
 } as const
 
+/**
+ * Hub de ativações (mock aprovado `atmavox-hub-ativacao.html`, D, 2026-11-24). Textos provisórios,
+ * para a Andreía ajustar; as terapias vêm do Modo Andreía.
+ */
+export const activationsIntro = {
+  eyebrow: 'Ativação individual',
+  titleStart: 'Um encontro ',
+  titleAccent: 'só seu',
+  titleEnd: ', com a Andreía',
+  intro:
+    'Presencial ou a distância, no seu tempo. Você escolhe a prática, ela prepara o encontro a partir do que você quer ativar agora.',
+  introShort: 'Presencial ou a distância, no seu tempo.',
+  cta: 'Agendar minha ativação',
+  steps: [
+    { title: 'Entre na sua conta', detail: 'Com o Google ou com e-mail e senha.' },
+    { title: 'Conte um pouco sobre você', detail: 'Algumas perguntas para a Andreía se preparar.' },
+    { title: 'Escolha a prática e o horário', detail: 'Nos horários livres da agenda dela.' },
+    { title: 'Pague e avise a Andreía', detail: 'Ela confirma o horário com você.' },
+  ],
+  empty: 'As práticas aparecem aqui em breve. Enquanto isso, fale com a Andreía pelo WhatsApp.',
+} as const
+
 export const encounters: readonly Encounter[] = [
   {
     id: 'zerando-o-dia',

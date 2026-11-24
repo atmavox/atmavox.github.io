@@ -58,7 +58,7 @@ describe('conta no cabeçalho dos hubs', () => {
 })
 
 describe('cabeçalho dos hubs (opção 3)', () => {
-  it('no computador: Início, Jornadas e Meditações, sem os itens da vitrine', () => {
+  it('no computador: Início, Jornadas, Meditações e Ativações, sem os itens da vitrine', () => {
     setWideViewport(true)
     renderHub(newSession(), '/meditacoes')
     const nav = screen.getByRole('navigation', { name: 'Seções' })
@@ -66,21 +66,21 @@ describe('cabeçalho dos hubs (opção 3)', () => {
       within(nav)
         .getAllByRole('link')
         .map((a) => a.textContent),
-    ).toEqual(['Início', 'Jornadas', 'Meditações'])
+    ).toEqual(['Início', 'Jornadas', 'Meditações', 'Ativações'])
     expect(within(nav).getByRole('link', { name: 'Meditações' })).toHaveAttribute(
       'aria-current',
       'page',
     )
   })
 
-  it('no celular, os hubs mantêm as quatro abas de sempre, com Jornadas marcada', () => {
+  it('no celular, os hubs mantêm as cinco abas de sempre, com Jornadas marcada', () => {
     renderHub(newSession(), '/jornadas')
     const nav = screen.getByRole('navigation', { name: 'Seções' })
     expect(
       within(nav)
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(['Início', 'Jornadas', 'Meditações', 'Contato'])
+    ).toEqual(['Início', 'Jornadas', 'Meditações', 'Ativações', 'Contato'])
     expect(within(nav).getByRole('link', { name: 'Jornadas' })).toHaveAttribute(
       'aria-current',
       'page',

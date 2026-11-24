@@ -80,7 +80,7 @@ function setup({ signedIn = true } = {}) {
 }
 
 describe('ativação individual', () => {
-  it('pede login primeiro; fechar sem entrar volta ao início', async () => {
+  it('pede login primeiro; fechar sem entrar volta ao hub Ativações', async () => {
     const { session, source } = setup({ signedIn: false })
     render(
       <AuthContext.Provider value={session}>
@@ -91,7 +91,7 @@ describe('ativação individual', () => {
     )
     expect(await screen.findByRole('dialog', { name: 'Entre para agendar' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Fechar' }))
-    expect(window.location.hash).toBe('#/')
+    expect(window.location.hash).toBe('#/ativacoes')
   })
 
   it('do login ao resumo: anamnese, terapia, data e o pagamento ainda em breve', async () => {
@@ -165,6 +165,32 @@ describe('ativação individual', () => {
     expect(screen.getByRole('button', { name: 'Pagamento em breve' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Editar terapia' }))
     expect(await screen.findByText('Qual terapia você quer?')).toBeInTheDocument()
+  })
+
+  it('"Agendar esta" no hub: a terapia escolhida já vem marcada', async () => {
+    const { session, source } = setup()
+    await session.signInWithGoogle()
+    render(
+      <AuthContext.Provider value={session}>
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} initialTherapyId="avaliacao-energetica-radiestesia" />
+        </WithCompleteProfile>
+      </AuthContext.Provider>,
+    )
+    fireEvent.change(await screen.findByLabelText('Telefone (WhatsApp)'), {
+      target: { value: '41998765432' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/ }))
+    fireEvent.change(await screen.findByLabelText('O que trouxe você até aqui agora?'), {
+      target: { value: 'Quero me conhecer.' },
+    })
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Enviar e escolher a terapia/ }))
+    })
+    const chosen = screen
+      .getAllByRole('button', { name: /Avaliação energética com radiestesia/ })
+      .find((b) => b.hasAttribute('aria-pressed'))
+    expect(chosen).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('logada, fechar leva ao perfil', async () => {

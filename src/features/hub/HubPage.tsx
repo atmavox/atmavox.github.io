@@ -12,6 +12,7 @@ import {
   isProfilePath,
   paymentReturnFromPath,
   tabOfSection,
+  therapyFromPath,
   WIDE_LAYOUT_QUERY,
 } from './navigation'
 
@@ -24,8 +25,8 @@ const AtivacaoFlow = lazy(() =>
 export function HubPage({ path }: { path: string }) {
   const isWide = useMediaQuery(WIDE_LAYOUT_QUERY)
   const isActivation = isActivationPath(path)
-  // Ao fundo da ativação fica o Contato, de onde ela foi aberta.
-  const section = isActivation ? 'contato' : hubSectionFromPath(path)
+  // Ao fundo do agendamento fica o hub Ativações, venha a pessoa de onde vier (também do perfil).
+  const section = isActivation ? 'ativacoes' : hubSectionFromPath(path)
   const meditationId = meditationIdFromPath(path)
   const payment = paymentReturnFromPath(path)
   const isProfile = isProfilePath(path)
@@ -58,6 +59,7 @@ export function HubPage({ path }: { path: string }) {
           <AtivacaoFlow
             orderReturn={orderReturnFromPath(path)}
             confirmOrderId={confirmOrderFromPath(path)}
+            initialTherapyId={therapyFromPath(path)}
           />
         </Suspense>
       )}

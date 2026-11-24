@@ -4,8 +4,8 @@ import { contactCta } from '../content'
 import { SocialIcon } from './SocialIcon'
 
 /**
- * Contato (mock aprovado, C): a ativação individual em destaque e a dúvida pelo WhatsApp ao lado, sem
- * item novo no menu. "Quero agendar" abre o fluxo em `#/ativacao`.
+ * Contato (mock aprovado, C): a ativação individual em destaque e a dúvida pelo WhatsApp ao lado.
+ * "Quero agendar" leva ao hub Ativações (`#/ativacoes`), de onde o agendamento abre.
  */
 export function ActivationCards({ layout }: { layout: 'wide' | 'narrow' }) {
   const isWide = layout === 'wide'
@@ -39,7 +39,7 @@ export function ActivationCards({ layout }: { layout: 'wide' | 'narrow' }) {
         )}
       </div>
       <a
-        href="#/ativacao"
+        href="#/ativacoes"
         className="inline-flex min-h-10 items-center justify-center rounded-full bg-accent px-5 text-sm font-semibold whitespace-nowrap text-bg transition-opacity hover:opacity-90"
       >
         Quero agendar
