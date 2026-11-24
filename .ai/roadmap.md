@@ -321,6 +321,7 @@ Surgiu no caminho:
     - [x] (1.31.1) Salvar terapias e agenda no Modo Andreía sem a tela pular (pedido de 2026-11-24)
     - [x] (1.31.2) "Salvo" com ícone do projeto e sumindo sozinho (Terapias e Agenda)
     - [x] (1.31.3) Etiqueta "Admin" em Acessos · Pessoas, admins fora da planilha + ícone de download
+    - [x] (1.31.4) Símbolo ao fundo do hub de meditações igual ao do hub de jornadas
     - [ ] **Desenvolvedor:** publicar as regras do Firestore (a admin lista `admins`, para marcar os
           outros admins)
     - [ ] Trocar o ✓ pelo ícone (e sumir sozinho) também em Produtos, Acessos, Anamnese, Mensagens e

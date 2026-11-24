@@ -10,6 +10,13 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.31.4] · 2026-11-24
+
+### Corrigido
+
+- Hub de meditações: o símbolo ao fundo tem o mesmo tamanho e a mesma posição do hub de jornadas
+  (grande, cortado pelo cabeçalho e pela borda direita).
+
 ## [1.31.3] · 2026-11-24
 
 ### Alterado

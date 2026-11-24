@@ -109,9 +109,16 @@ export function MeditationsHub({ layout }: { layout: 'wide' | 'narrow' }) {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-[radial-gradient(120%_80%_at_20%_0%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_60%)]">
-        <div className="pointer-events-none absolute top-1/2 right-16 w-[250px] -translate-y-1/2 opacity-20">
-          <BrandMark speaking className="w-full" />
+      <section className="relative bg-[radial-gradient(120%_80%_at_20%_0%,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_60%)]">
+        {/* Igual ao hub de jornadas: o símbolo falando, grande e cortado pelo cabeçalho e pela borda
+            direita da página. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[480px] overflow-hidden"
+        >
+          <div className="absolute -top-40 -right-44 w-[440px] opacity-[0.14] lg:w-[520px]">
+            <BrandMark speaking className="w-full" />
+          </div>
         </div>
         <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-3.5 px-6 pt-14 pb-9 md:px-12">
           <p className="text-xs font-semibold tracking-[0.24em] text-accent uppercase">
@@ -122,7 +129,8 @@ export function MeditationsHub({ layout }: { layout: 'wide' | 'narrow' }) {
           {chips}
         </div>
       </section>
-      <div className="mx-auto w-full max-w-6xl px-6 pb-16 md:px-12">{grid}</div>
+      {/* `relative`: os cartões ficam por cima do símbolo, que desce um pouco além do topo. */}
+      <div className="relative mx-auto w-full max-w-6xl px-6 pb-16 md:px-12">{grid}</div>
       {purchase.dialogs}
     </>
   )
