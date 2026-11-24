@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent } from 'react'
+import { REQUIRED_MARK } from '../../../../shared/ui/requiredMark'
 import { victoriesCopy } from '../../content/copy'
 import { VICTORIES_STEP } from '../../domain/access'
 import { allDays, structureOf } from '../../domain/journey'
@@ -141,7 +142,7 @@ export function VictoriesPage() {
           )}
         </div>
         <div className="mb-4">
-          <label htmlFor={ids.action} className={labelClass}>
+          <label htmlFor={ids.action} className={`${labelClass} ${REQUIRED_MARK}`}>
             {victoriesCopy.actionLabel}
           </label>
           <input
@@ -150,6 +151,7 @@ export function VictoriesPage() {
             placeholder={victoriesCopy.actionPlaceholder}
             value={draft.action}
             onChange={(e) => update('action')(e.target.value)}
+            aria-required="true"
             aria-invalid={errors.includes('action-required')}
             className={inputClass}
           />

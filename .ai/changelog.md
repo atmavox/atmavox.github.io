@@ -10,6 +10,31 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.26.6] · 2026-11-24
+
+### Corrigido
+
+- Janelas (Modo Andreía, login e preço): o cursor saía do campo a cada tecla (por exemplo, no preço
+  da terapia). O foco no primeiro campo rodava a cada atualização da tela; agora só ao abrir
+  (`shared/lib/useLatest.ts`, com teste).
+- Janelas (preço e começar das jornadas e meditações, login, ativação individual, "Um pouco sobre mim" e
+  Modo Andreía): fechar agora também é suave (a janela desce e esmaece, como entra); com "reduzir
+  movimento", fecha na hora (`shared/ui/useClosing.ts`).
+- Redes sociais: o convite do cartão segue o tipo da publicação (vídeo "Assistir", áudio "Ouvir", foto
+  "Ver"); o reels do Instagram mostrava "Ver".
+
+### Alterado
+
+- Ativação individual: a pessoa vê "Um pouco sobre mim" no lugar de "Anamnese" (etapas, resumo e
+  perfil, com "Ver minhas respostas"); o termo "anamnese" fica só no Modo Andreía.
+- Ativação individual: a concordância em compartilhar as respostas com a Andreía já vem marcada.
+- Ativação individual: "Voltar" na primeira pergunta leva de novo à etapa "Entrar", que mostra a conta
+  em uso com "Continuar com esta conta" e "Entrar com outra conta".
+- Formulários da pessoa (ativação, login e vitórias da jornada): campo obrigatório com * vermelho ao lado
+  do rótulo (token `required` nos dois temas) e `aria-required` no campo.
+- Ativação individual: rótulos "Telefone (WhatsApp)" e "Como prefere ser chamado(a)?" (testes
+  atualizados).
+
 ## [1.26.5] · 2026-11-24
 
 ### Adicionado

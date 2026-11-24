@@ -1,3 +1,4 @@
+import { CLOSING_BACKDROP, CLOSING_DIALOG, useClosing } from '../../../shared/ui/useClosing'
 import { ArrowLeft, ArrowRight, Check, Clock, Lock, ShieldCheck, X } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -50,7 +51,7 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
     if (result.kind === 'already-owned') {
       // Já tinha acesso (outro aparelho, liberação manual): atualiza e fecha.
       await access.refresh()
-      onClose()
+      requestClose()
     } else if (result.kind === 'login') {
       setError('Sua sessão expirou. Entre de novo para continuar.')
     } else {
@@ -61,13 +62,14 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
   const pricing = product.pricing
   const isJourney = product.kind === 'journey'
 
+  const { isClosing, requestClose } = useClosing(onClose)
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null
     const appRoot = document.getElementById('root')
     appRoot?.setAttribute('inert', '')
     dialogRef.current?.querySelector<HTMLElement>('button')?.focus()
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') requestClose()
     }
     document.addEventListener('keydown', onKey)
     return () => {
@@ -75,7 +77,7 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
       appRoot?.removeAttribute('inert')
       previouslyFocused?.focus()
     }
-  }, [onClose])
+  }, [requestClose])
 
   if (pricing.type !== 'paid') return null
 
@@ -92,12 +94,14 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
       ]
 
   return createPortal(
-    <div className="fixed inset-0 z-40 grid animate-[fade-in_250ms_ease-out] place-items-end bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.35))] sm:place-items-center">
+    <div
+      className={`fixed inset-0 z-40 grid ${isClosing ? CLOSING_BACKDROP : 'animate-[fade-in_250ms_ease-out]'} place-items-end bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.35))] sm:place-items-center`}
+    >
       <button
         type="button"
         aria-hidden="true"
         tabIndex={-1}
-        onClick={onClose}
+        onClick={requestClose}
         className="absolute inset-0 cursor-default"
       />
       <div
@@ -105,11 +109,11 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative flex max-h-dvh w-full max-w-[520px] animate-[dialog-in_320ms_ease-out] flex-col gap-4 overflow-y-auto rounded-t-3xl border border-line bg-bg p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-[0_30px_80px_rgb(20_14_10/0.35)] sm:rounded-3xl sm:p-7"
+        className={`relative flex max-h-dvh w-full max-w-[520px] ${isClosing ? CLOSING_DIALOG : 'animate-[dialog-in_320ms_ease-out]'} flex-col gap-4 overflow-y-auto rounded-t-3xl border border-line bg-bg p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-[0_30px_80px_rgb(20_14_10/0.35)] sm:rounded-3xl sm:p-7`}
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={requestClose}
           aria-label="Fechar"
           className="absolute top-4 right-4 z-10 grid size-9 place-items-center rounded-full border border-line bg-bg text-ink-muted hover:text-accent"
         >
@@ -178,7 +182,7 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
         )}
         <button
           type="button"
-          onClick={onClose}
+          onClick={requestClose}
           className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full font-semibold text-ink-muted hover:text-accent"
         >
           <ArrowLeft aria-hidden size={18} />

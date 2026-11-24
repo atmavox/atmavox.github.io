@@ -60,7 +60,7 @@ export const FIXED_QUESTIONS: readonly AnamnesisQuestion[] = [
   { id: 'nome', label: 'Nome completo', hint: '', type: 'short', options: [], required: true },
   {
     id: 'telefone',
-    label: 'Telefone com WhatsApp',
+    label: 'Telefone (WhatsApp)',
     hint: 'É por ele que a Andreía fala com você.',
     type: 'phone',
     options: [],
@@ -93,7 +93,7 @@ export const DEFAULT_ANAMNESIS: AnamnesisForm = {
       title: 'Seus dados',
       questions: [
         ...FIXED_QUESTIONS,
-        q('apelido', 'Como prefere ser chamada?', 'short', { required: false }),
+        q('apelido', 'Como prefere ser chamado (a)?', 'short', { required: false }),
         q('nascimento', 'Data de nascimento', 'date', {
           hint: 'Usada na radiestesia e em leituras energéticas.',
         }),

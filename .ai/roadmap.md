@@ -283,6 +283,29 @@ Surgiu no caminho:
         (conta de serviço, deploy, webhook), a compra de teste e as credenciais de produção
         (`processos-manuais.md`, seção 2); até lá o pagamento da ativação fica "em breve"
 
+- [ ] **Cadastro completo e e-mail confirmado** (pedido de 2026-11-24; plano aprovado, falta o mock):
+  - Decidido:
+    - **Meditações grátis sem login: só as da página inicial.** O resto dos hubs (jornadas grátis ou
+      pagas, meditações do hub, compras) pede conta com **e-mail confirmado** e **cadastro completo**.
+    - **Cadastro completo:** nome, apelido, celular (WhatsApp) e data de nascimento, todos obrigatórios;
+      foto opcional (reduzida no navegador e guardada no Firestore, sem Storage pago; Google traz a dele).
+    - **Novidades pelo WhatsApp:** caixinha no perfil, **marcada por padrão** (decisão do
+      desenvolvedor, avisado de que a LGPD pede consentimento ativo; texto claro e fácil de desmarcar).
+    - **Contas antigas** (hoje só as de teste e a da Andreía) completam o cadastro no próximo acesso.
+    - **Login com e-mail sem conta (A):** "E-mail ou senha incorretos. Ainda não tem conta?" + botão
+      "Criar conta" com o e-mail preenchido. A proteção contra enumeração de e-mails do Firebase fica
+      ligada.
+    - **Ver a senha:** ícone de olho no cadastro e no login.
+  - Etapas: 0. [ ] Mocks (PC e celular, alguns estilos): "Meus dados" no perfil, "Confirme seu e-mail", janela
+    "Complete seu cadastro" ao comprar ou começar, login com "Ainda não tem conta?" e o olho da senha
+    1. [ ] Dados do perfil (validação com testes; `users/{uid}`) + aba "Meus dados" com foto
+    2. [ ] Confirmação de e-mail (envio no cadastro, aviso, reenviar; trava também nas regras do
+           Firestore e no Worker)
+    3. [ ] Trava do cadastro completo antes de comprar ou abrir material dos hubs (a ativação passa a usar
+           os mesmos dados) + meditações grátis só na página inicial
+    4. [ ] Modo Andreía · Acessos: dados da pessoa e lista de quem aceitou novidades; regras novas do
+           Firestore (publicar no console)
+
 ## Depois
 
 - [ ] Validar textos e experiência com a Andreia e com 2 ou 3 pessoas reais

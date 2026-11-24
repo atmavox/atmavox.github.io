@@ -1,3 +1,4 @@
+import { useLatest } from '../../../shared/lib/useLatest'
 import { ArrowLeft, Plus } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -120,14 +121,15 @@ function PreviewDialog({
 }) {
   const titleId = useId()
   const ref = useRef<HTMLDivElement>(null)
+  const back = useLatest(onBack)
   useEffect(() => {
     ref.current?.querySelector<HTMLElement>('button')?.focus()
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onBack()
+      if (event.key === 'Escape') back.current()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onBack])
+  }, [back])
 
   return createPortal(
     <div className="fixed inset-0 z-40 grid animate-[fade-in_250ms_ease-out] place-items-center bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.4))] p-6">

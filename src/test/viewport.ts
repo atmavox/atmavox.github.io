@@ -8,7 +8,8 @@ export function setWideViewport(wide: boolean) {
 export function installMatchMedia() {
   window.matchMedia = (query: string) =>
     ({
-      matches: query.includes('min-width') ? isWide : false,
+      // Testes rodam como "reduzir movimento": as janelas fecham na hora, sem esperar a animação.
+      matches: query.includes('min-width') ? isWide : query.includes('reduced-motion'),
       media: query,
       onchange: null,
       addEventListener: () => {},

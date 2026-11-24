@@ -5,11 +5,18 @@ import { useSocialPosts } from '../../../shared/social/useSocialPosts'
 import { SocialIcon } from './SocialIcon'
 import { useTrackScroll } from './useTrackScroll'
 
-const NETWORK: Record<SocialNetwork, { name: string; action: string }> = {
-  instagram: { name: 'Instagram', action: 'Ver' },
-  youtube: { name: 'YouTube', action: 'Assistir' },
-  spotify: { name: 'Spotify', action: 'Ouvir' },
-  tiktok: { name: 'TikTok', action: 'Assistir' },
+const NETWORK_NAME: Record<SocialNetwork, string> = {
+  instagram: 'Instagram',
+  youtube: 'YouTube',
+  spotify: 'Spotify',
+  tiktok: 'TikTok',
+}
+
+/** O convite segue o tipo da publicação, não a rede: um reels do Instagram também é "Assistir". */
+const ACTION: Record<SocialPost['kind'], string> = {
+  video: 'Assistir',
+  audio: 'Ouvir',
+  image: 'Ver',
 }
 
 /** Um cartão: a capa da publicação, a rede, o começo do texto e quando foi (mock aprovado). */
@@ -22,7 +29,8 @@ function PostCard({
   now: number
   imageClass: string
 }) {
-  const { name, action } = NETWORK[post.network]
+  const name = NETWORK_NAME[post.network]
+  const action = ACTION[post.kind]
   const when = post.pinned
     ? 'Em destaque'
     : post.publishedAt

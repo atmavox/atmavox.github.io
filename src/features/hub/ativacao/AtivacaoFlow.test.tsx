@@ -105,13 +105,16 @@ describe('ativação individual', () => {
     expect(await screen.findByLabelText('Nome completo')).toHaveValue('Maria')
     fireEvent.click(screen.getByRole('button', { name: /Continuar/ }))
     expect(screen.getByText('Responda esta pergunta para seguir.')).toBeInTheDocument()
-    fireEvent.change(screen.getByLabelText('Telefone com WhatsApp'), {
+    fireEvent.change(screen.getByLabelText('Telefone (WhatsApp)'), {
       target: { value: '41998765432' },
     })
     fireEvent.click(screen.getByRole('button', { name: /Continuar/ }))
     fireEvent.change(await screen.findByLabelText('O que trouxe você até aqui agora?'), {
       target: { value: 'Quero sair do automático.' },
     })
+    // A concordância já vem marcada; desmarcada, não segue.
+    expect(screen.getByRole('checkbox')).toBeChecked()
+    fireEvent.click(screen.getByRole('checkbox'))
     fireEvent.click(screen.getByRole('button', { name: /Enviar e escolher a terapia/ }))
     expect(screen.getByText('Marque para seguir.')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('checkbox'))
@@ -183,7 +186,28 @@ describe('ativação individual', () => {
       </AuthContext.Provider>,
     )
     expect(await screen.findByLabelText('Nome completo')).toHaveValue('Maria Souza')
-    expect(screen.getByLabelText('Telefone com WhatsApp')).toHaveValue('(41) 9 9876-5432')
+    expect(screen.getByLabelText('Telefone (WhatsApp)')).toHaveValue('(41) 9 9876-5432')
+  })
+
+  it('já logada, "Voltar" na primeira pergunta leva ao "Entrar" para trocar de conta', async () => {
+    const { session, source } = setup()
+    await session.signInWithGoogle()
+    render(
+      <AuthContext.Provider value={session}>
+        <AtivacaoFlow source={source} />
+      </AuthContext.Provider>,
+    )
+    await screen.findByLabelText('Nome completo')
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar' }))
+    expect(await screen.findByText('Você está na sua conta')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Continuar com esta conta/ }))
+    expect(await screen.findByLabelText('Nome completo')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar' }))
+    await act(async () => {
+      fireEvent.click(await screen.findByRole('button', { name: 'Entrar com outra conta' }))
+    })
+    expect(await screen.findByRole('dialog', { name: 'Entre para agendar' })).toBeInTheDocument()
   })
 })
 
@@ -357,7 +381,7 @@ describe('confirmar o horário e acompanhar no perfil', () => {
       'href',
       `#/ativacao/confirmar/${id}`,
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Ver minha anamnese' }))
-    expect(screen.getByRole('dialog', { name: 'Minha anamnese' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Ver minhas respostas' }))
+    expect(screen.getByRole('dialog', { name: 'Um pouco sobre mim' })).toBeInTheDocument()
   })
 })

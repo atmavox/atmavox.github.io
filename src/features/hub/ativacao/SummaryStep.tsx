@@ -59,7 +59,7 @@ export function SummaryStep({
     <div className="flex flex-col gap-3">
       <Block
         icon={icon('file')}
-        label="Anamnese"
+        label="Um pouco sobre mim"
         value={`${answered} respostas`}
         onEdit={() => onEdit(1)}
       />

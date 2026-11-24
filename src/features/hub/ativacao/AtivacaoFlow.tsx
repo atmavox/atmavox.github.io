@@ -24,6 +24,7 @@ import { readFirebaseConfig } from '../../../shared/firebase/config'
 import { useMediaQuery } from '../../../shared/lib/useMediaQuery'
 import { useNow } from '../../../shared/lib/useNow'
 import { UiIcon } from '../../../shared/ui/UiIcon'
+import { REQUIRED_MARK } from '../../../shared/ui/requiredMark'
 import { SocialIcon } from '../components/SocialIcon'
 import { WIDE_LAYOUT_QUERY, type OrderReturn } from '../navigation'
 import { AnswerField } from './AnswerField'
@@ -101,7 +102,8 @@ export function AtivacaoFlow({
 
   const [loaded, setLoaded] = useState<Loaded | null>(null)
   const [answers, setAnswers] = useState<Answers | null>(null)
-  const [consent, setConsent] = useState(false)
+  // Já vem marcada (pedido de 2026-11-24); a pessoa pode desmarcar, mas sem ela não segue.
+  const [consent, setConsent] = useState(true)
   const [step, setStep] = useState<Step>(1)
   const [section, setSection] = useState(0)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -111,6 +113,9 @@ export function AtivacaoFlow({
   const [notice, setNotice] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isPaying, setIsPaying] = useState(false)
+  /** De volta à etapa "Entrar" já logada: conferir a conta ou trocar (pedido de 2026-11-24). */
+  const [isAtLogin, setIsAtLogin] = useState(false)
+  const [isSwitching, setIsSwitching] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -140,12 +145,22 @@ export function AtivacaoFlow({
       .then((saved) => {
         if (cancelled) return
         setAnswers(initialAnswers(saved, displayName))
-        setConsent(saved?.consent ?? false)
+        setConsent(saved?.consent ?? true)
       })
     return () => {
       cancelled = true
     }
   }, [uid, displayName, source])
+
+  // Trocou de conta: volta para a primeira pergunta com as respostas da conta nova (ajuste durante a
+  // renderização, como a documentação do React recomenda para estado que depende de outro valor).
+  const [flowUid, setFlowUid] = useState(uid)
+  if (uid !== flowUid) {
+    setFlowUid(uid)
+    setIsAtLogin(false)
+    setStep(1)
+    setSection(0)
+  }
 
   const close = () => goTo(user ? '#/perfil/ativacoes' : '#/')
 
@@ -181,6 +196,61 @@ export function AtivacaoFlow({
     })
     if (result.kind === 'redirect') redirect(result.url)
     else setNotice('Não deu para abrir o pagamento agora. Tente de novo em instantes.')
+  }
+
+  if (isAtLogin) {
+    const switchAccount = async () => {
+      setIsSwitching(true)
+      try {
+        await session.signOut()
+      } finally {
+        setIsSwitching(false)
+      }
+    }
+    return (
+      <FlowShell
+        isWide={isWide}
+        current={0}
+        bodyKey="entrar"
+        footer={
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => void switchAccount()}
+              disabled={isSwitching}
+              className={ghost}
+            >
+              {isSwitching ? 'Saindo…' : 'Entrar com outra conta'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsAtLogin(false)}
+              className={`${primary} ${isWide ? '' : 'flex-1'}`}
+            >
+              Continuar com esta conta
+              {isWide && <UiIcon name="next" size={16} />}
+            </button>
+          </div>
+        }
+        onClose={close}
+      >
+        <div className="flex flex-col gap-2">
+          <h3 className="font-display text-[1.9rem] text-ink">Você está na sua conta</h3>
+          <p className="text-ink-muted">
+            {user.displayName ? (
+              <>
+                <b className="font-semibold text-ink">{user.displayName}</b> ·{' '}
+              </>
+            ) : null}
+            {user.email}
+          </p>
+          <p className="text-sm text-ink-faint">
+            Quer usar outra conta? Saia desta e entre com a outra; suas respostas ficam guardadas em
+            cada conta.
+          </p>
+        </div>
+      </FlowShell>
+    )
   }
 
   if (confirmOrderId) {
@@ -284,6 +354,7 @@ export function AtivacaoFlow({
     setErrors({})
     if (step === 1) {
       if (section > 0) setSection(section - 1)
+      else setIsAtLogin(true)
       return
     }
     if (step === 2) {
@@ -345,6 +416,7 @@ export function AtivacaoFlow({
             <label className="flex cursor-pointer gap-3 rounded-2xl bg-accent/9 px-4 py-3.5 text-sm text-ink-muted">
               <input
                 type="checkbox"
+                aria-required="true"
                 checked={consent}
                 onChange={(e) => {
                   setConsent(e.target.checked)
@@ -353,7 +425,7 @@ export function AtivacaoFlow({
                 className="mt-0.5 size-4 shrink-0 accent-[var(--accent)]"
               />
               <span>
-                {form.consent}
+                <span className={REQUIRED_MARK}>{form.consent}</span>
                 {errors.consent && <span className="mt-1 block text-accent">{errors.consent}</span>}
               </span>
             </label>
@@ -422,7 +494,7 @@ export function AtivacaoFlow({
       : step === 2
         ? 'Escolher a data'
         : 'Revisar e pagar'
-  const canGoBack = step > 1 || section > 0
+  const canGoBack = true
   const combine =
     therapy && preference
       ? whatsAppMessage(

@@ -1,3 +1,9 @@
+import {
+  CLOSING_BACKDROP,
+  CLOSING_DIALOG,
+  CLOSING_SHEET,
+  useClosing,
+} from '../../../shared/ui/useClosing'
 import { useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { DEFAULT_ANAMNESIS, type AnamnesisForm } from '../../../shared/ativacao/anamnesis'
@@ -89,19 +95,20 @@ function AnamnesisDialog({
   onClose: () => void
 }) {
   const titleId = useId()
+  const { isClosing, requestClose } = useClosing(onClose)
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') requestClose()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [requestClose])
   const rows = form.sections
     .flatMap((s) => s.questions)
     .filter((q) => saved?.answers[q.id] !== undefined)
   return createPortal(
     <div
-      className={`fixed inset-0 z-40 animate-[fade-in_250ms_ease-out] bg-black/45 ${isWide ? 'grid place-items-center p-6' : ''}`}
+      className={`fixed inset-0 z-40 ${isClosing ? CLOSING_BACKDROP : 'animate-[fade-in_250ms_ease-out]'} bg-black/45 ${isWide ? 'grid place-items-center p-6' : ''}`}
     >
       <div
         role="dialog"
@@ -109,8 +116,8 @@ function AnamnesisDialog({
         aria-labelledby={titleId}
         className={`flex flex-col gap-4 overflow-y-auto border border-line bg-surface p-6 ${
           isWide
-            ? 'max-h-[88dvh] w-full max-w-[560px] animate-[dialog-in_320ms_ease-out] rounded-3xl'
-            : 'absolute inset-x-0 bottom-0 max-h-[88dvh] animate-[sheet-up_360ms_ease-out] rounded-t-[26px]'
+            ? `max-h-[88dvh] w-full max-w-[560px] ${isClosing ? CLOSING_DIALOG : 'animate-[dialog-in_320ms_ease-out]'} rounded-3xl`
+            : `absolute inset-x-0 bottom-0 max-h-[88dvh] ${isClosing ? CLOSING_SHEET : 'animate-[sheet-up_360ms_ease-out]'} rounded-t-[26px]`
         }`}
       >
         <div className="flex items-start justify-between gap-3">
@@ -119,7 +126,7 @@ function AnamnesisDialog({
               id={titleId}
               className="text-xs font-semibold tracking-[0.24em] text-accent uppercase"
             >
-              Minha anamnese
+              Um pouco sobre mim
             </h2>
             {saved?.updatedAt ? (
               <p className="text-sm text-ink-faint">Respondida em {when(saved.updatedAt)}</p>
@@ -127,7 +134,7 @@ function AnamnesisDialog({
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={requestClose}
             aria-label="Fechar"
             className="grid size-9 place-items-center rounded-full bg-field text-ink-muted hover:text-ink"
           >
@@ -144,7 +151,9 @@ function AnamnesisDialog({
             </div>
           ))
         ) : (
-          <p className="text-ink-muted">Você ainda não respondeu a anamnese.</p>
+          <p className="text-ink-muted">
+            Você ainda não respondeu às perguntas de "Um pouco sobre mim".
+          </p>
         )}
         <a
           href="#/ativacao"
@@ -161,7 +170,7 @@ function AnamnesisDialog({
 
 /**
  * Perfil · Ativações (mock aprovado, A): um cartão por pedido; clicar abre as etapas na vertical e os
- * detalhes. "Ver minha anamnese" em cada cartão e a próxima ação (pagar, avisar, confirmar, conversar).
+ * detalhes. "Ver minhas respostas" em cada cartão e a próxima ação (pagar, avisar, confirmar, conversar).
  */
 export default function ActivationsTab({
   isWide,
@@ -473,7 +482,7 @@ export default function ActivationsTab({
                 className="inline-flex items-center gap-1.5 text-sm text-ink-muted hover:text-ink"
               >
                 <UiIcon name="file" size={15} />
-                Ver minha anamnese
+                Ver minhas respostas
               </button>
               {action(order)}
             </div>

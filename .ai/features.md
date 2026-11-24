@@ -439,7 +439,7 @@ o pedido some. A data escolhida é **preferência**: o horário só sai da agend
 a pessoa confirma pelo link (reservado por 24 h).
 
 **Perfil · Ativações:** um cartão por pedido (ícone, terapia, pedido e data, status, próxima ação);
-clicar abre embaixo as etapas na vertical e os detalhes. "Ver minha anamnese" em cada cartão.
+clicar abre embaixo as etapas na vertical e os detalhes. "Ver minhas respostas" em cada cartão (a pessoa vê "Um pouco sobre mim"; "anamnese" só no Modo Andreía).
 
 **Modo Andreía (`#/admin/ativacoes/…`):** abas Agenda, Terapias e Anamnese (passos 1 e 2); Pedidos e
 Mensagens. No computador, as seções logo abaixo da faixa azul, no estilo do menu do site; no celular,

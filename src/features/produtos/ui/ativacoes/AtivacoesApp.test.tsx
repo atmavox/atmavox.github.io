@@ -108,7 +108,7 @@ describe('Modo Andreía · anamnese', () => {
         section="anamnese"
       />,
     )
-    fireEvent.click(await screen.findByRole('button', { name: /Telefone com WhatsApp/ }))
+    fireEvent.click(await screen.findByRole('button', { name: /Telefone \(WhatsApp\)/ }))
     expect(screen.getByText(/Nome e telefone são fixos/)).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Tipo de resposta' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Tirar do formulário' })).not.toBeInTheDocument()

@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import type { AnamnesisQuestion } from '../../../shared/ativacao/anamnesis'
 import { formatPhone, type Answer } from '../../../shared/ativacao/answers'
+import { REQUIRED_MARK } from '../../../shared/ui/requiredMark'
 import { UiIcon } from '../../../shared/ui/UiIcon'
 
 export const fieldClass =
@@ -33,6 +34,9 @@ export function AnswerField({
     'aria-describedby': describedBy || undefined,
     'aria-invalid': error ? (true as const) : undefined,
   }
+  // Só nos campos de texto e nas escolhas únicas: um grupo de botões (várias escolhas) não aceita.
+  const ariaRequired = { 'aria-required': question.required ? (true as const) : undefined }
+  const labelClass = `font-medium text-ink ${question.required ? REQUIRED_MARK : ''}`
   const text = typeof value === 'string' ? value : ''
   const list = Array.isArray(value) ? value : []
   const isGroup = ['single', 'multi', 'scale', 'yesno'].includes(question.type)
@@ -53,6 +57,7 @@ export function AnswerField({
         <textarea
           id={id}
           {...aria}
+          {...ariaRequired}
           rows={3}
           value={text}
           placeholder="Escreva no seu tempo…"
@@ -66,6 +71,7 @@ export function AnswerField({
         <input
           id={id}
           {...aria}
+          {...ariaRequired}
           type="date"
           value={text}
           onChange={(e) => onChange(e.target.value)}
@@ -78,6 +84,7 @@ export function AnswerField({
         <input
           id={id}
           {...aria}
+          {...ariaRequired}
           type="tel"
           inputMode="tel"
           autoComplete="tel"
@@ -95,6 +102,7 @@ export function AnswerField({
           role="radiogroup"
           aria-labelledby={`${id}-rotulo`}
           {...aria}
+          {...ariaRequired}
           className="flex flex-wrap gap-2"
         >
           {question.options.map((option) => (
@@ -145,6 +153,7 @@ export function AnswerField({
             role="radiogroup"
             aria-labelledby={`${id}-rotulo`}
             {...aria}
+            {...ariaRequired}
             className="grid grid-cols-11 gap-1"
           >
             {Array.from({ length: 11 }, (_, n) => (
@@ -177,6 +186,7 @@ export function AnswerField({
           role="radiogroup"
           aria-labelledby={`${id}-rotulo`}
           {...aria}
+          {...ariaRequired}
           className="inline-flex rounded-full border border-line bg-field p-[3px]"
         >
           {(
@@ -206,6 +216,7 @@ export function AnswerField({
         <input
           id={id}
           {...aria}
+          {...ariaRequired}
           value={text}
           placeholder="Sua resposta"
           onChange={(e) => onChange(e.target.value)}
@@ -217,11 +228,11 @@ export function AnswerField({
   return (
     <div className="flex flex-col gap-2">
       {isGroup ? (
-        <span id={`${id}-rotulo`} className="font-medium text-ink">
+        <span id={`${id}-rotulo`} className={labelClass}>
           {label}
         </span>
       ) : (
-        <label htmlFor={id} className="font-medium text-ink">
+        <label htmlFor={id} className={labelClass}>
           {label}
         </label>
       )}

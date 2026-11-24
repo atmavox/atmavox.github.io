@@ -19,6 +19,13 @@ const FEED = {
       kind: 'video',
       pinned: true,
     },
+    {
+      network: 'instagram',
+      url: 'https://www.instagram.com/atmavox/reel/x/',
+      title: 'Práticas simples',
+      kind: 'video',
+      pinned: true,
+    },
   ],
 }
 
@@ -41,7 +48,14 @@ describe('últimas publicações das redes', () => {
     const youtube = await screen.findByRole('link', { name: /Zerando o Dia \(YouTube/ })
     expect(youtube).toHaveAttribute('href', FEED.posts[0]!.url)
     expect(youtube).toHaveAttribute('target', '_blank')
-    expect(screen.getByText('Em destaque')).toBeInTheDocument()
+    expect(screen.getAllByText('Em destaque')).toHaveLength(2)
+  })
+
+  it('o convite segue o tipo: um reels do Instagram também é "Assistir"', async () => {
+    await renderPosts('wide', new Response(JSON.stringify(FEED)))
+    const reels = await screen.findByRole('link', { name: /Práticas simples \(Instagram/ })
+    expect(reels).toHaveTextContent('Assistir')
+    expect(reels).not.toHaveTextContent(/\bVer\b/)
   })
 
   it('sem o arquivo, não mostra nada (ficam só os ícones)', async () => {

@@ -1,3 +1,9 @@
+import {
+  CLOSING_BACKDROP,
+  CLOSING_DIALOG,
+  CLOSING_SHEET,
+  useClosing,
+} from '../../../../shared/ui/useClosing'
 import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { UiIcon } from '../../../../shared/ui/UiIcon'
@@ -24,22 +30,23 @@ export function Overlay({
 }) {
   const titleId = useId()
   const ref = useRef<HTMLDivElement>(null)
+  const { isClosing, requestClose } = useClosing(onClose)
   useEffect(() => {
     ref.current?.querySelector<HTMLElement>('input, textarea, button:not([data-close])')?.focus()
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') requestClose()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [requestClose])
 
   const box = isWide
-    ? `max-h-[90dvh] w-full ${wide ? 'max-w-[860px]' : 'max-w-[560px]'} animate-[dialog-in_320ms_ease-out] rounded-3xl`
-    : 'absolute inset-x-0 bottom-0 max-h-[92dvh] animate-[sheet-up_360ms_cubic-bezier(.2,.8,.2,1)] rounded-t-[26px]'
+    ? `max-h-[90dvh] w-full ${wide ? 'max-w-[860px]' : 'max-w-[560px]'} ${isClosing ? CLOSING_DIALOG : 'animate-[dialog-in_320ms_ease-out]'} rounded-3xl`
+    : `absolute inset-x-0 bottom-0 max-h-[92dvh] ${isClosing ? CLOSING_SHEET : 'animate-[sheet-up_360ms_cubic-bezier(.2,.8,.2,1)]'} rounded-t-[26px]`
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-50 animate-[fade-in_250ms_ease-out] bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.45))] ${
+      className={`fixed inset-0 z-50 ${isClosing ? CLOSING_BACKDROP : 'animate-[fade-in_250ms_ease-out]'} bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.45))] ${
         isWide ? 'grid place-items-center p-6' : ''
       }`}
     >
@@ -57,7 +64,7 @@ export function Overlay({
           <button
             type="button"
             data-close
-            onClick={onClose}
+            onClick={requestClose}
             aria-label="Fechar"
             className="grid size-9 place-items-center rounded-full bg-field text-ink-muted hover:text-ink"
           >

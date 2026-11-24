@@ -1,6 +1,12 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { UiIcon } from '../../../shared/ui/UiIcon'
+import {
+  CLOSING_BACKDROP,
+  CLOSING_DIALOG,
+  CLOSING_SHEET,
+  useClosing,
+} from '../../../shared/ui/useClosing'
 import { StepBar, StepDots } from './FlowSteps'
 
 /** A barra da anamnese (só no computador; no celular ela entra na barra das etapas). */
@@ -38,29 +44,32 @@ export function FlowShell({
 }) {
   const titleId = useId()
   const bodyRef = useRef<HTMLDivElement>(null)
+  const { isClosing, requestClose } = useClosing(onClose)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') requestClose()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [requestClose])
 
   useEffect(() => {
     bodyRef.current?.scrollTo?.({ top: 0 })
   }, [bodyKey])
 
   return createPortal(
-    <div className="fixed inset-0 z-40 grid animate-[fade-in_250ms_ease-out] place-items-center bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.4))] backdrop-blur-[5px] sm:p-6">
+    <div
+      className={`fixed inset-0 z-40 grid ${isClosing ? CLOSING_BACKDROP : 'animate-[fade-in_250ms_ease-out]'} place-items-center bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.4))] backdrop-blur-[5px] sm:p-6`}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         className={`flex flex-col overflow-hidden border-line bg-surface shadow-[0_30px_80px_rgb(20_14_10/0.35)] ${
           isWide
-            ? 'h-[min(760px,92dvh)] w-full max-w-[820px] animate-[dialog-in_320ms_ease-out] rounded-3xl border'
-            : 'fixed inset-0 animate-[sheet-up_360ms_cubic-bezier(.2,.8,.2,1)]'
+            ? `h-[min(760px,92dvh)] w-full max-w-[820px] ${isClosing ? CLOSING_DIALOG : 'animate-[dialog-in_320ms_ease-out]'} rounded-3xl border`
+            : `fixed inset-0 ${isClosing ? CLOSING_SHEET : 'animate-[sheet-up_360ms_cubic-bezier(.2,.8,.2,1)]'}`
         }`}
       >
         <div className="flex flex-col gap-4 border-b border-line px-6 pt-4.5 pb-4">
@@ -77,7 +86,7 @@ export function FlowShell({
             </h2>
             <button
               type="button"
-              onClick={onClose}
+              onClick={requestClose}
               aria-label="Fechar e ir para o meu perfil"
               title="Fechar e ir para o meu perfil"
               className="grid size-9 place-items-center rounded-full bg-field text-ink-muted hover:text-ink"

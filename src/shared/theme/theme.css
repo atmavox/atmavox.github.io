@@ -28,6 +28,8 @@
   /* Estados do editor: salvo (verde) e rascunho (laranja). */
   --ok: #2e6b3f;
   --draft: #9a4a0c;
+  /* O * vermelho dos campos obrigatórios. */
+  --required: #b3261e;
   /* "Ao vivo" dos encontros. */
   --live: #74283a;
   /*
@@ -81,6 +83,7 @@
   --admin-ink: #8cc0d0;
   --ok: #8fcf9c;
   --draft: #e8a45c;
+  --required: #ff8f85;
   --live: #e7a3b1;
 }
 
@@ -104,6 +107,7 @@
   --color-on-admin: var(--on-admin);
   --color-ok: var(--ok);
   --color-draft: var(--draft);
+  --color-required: var(--required);
 
   --font-sans: 'Jost Variable', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Playfair Display Variable', ui-serif, Georgia, serif;
@@ -195,6 +199,26 @@
 }
 
 /* Passo seguinte (desliza da direita) e voltar (desliza da esquerda), como num app de celular. */
+/* Saída das janelas (useClosing): o caminho de volta da entrada. */
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes dialog-out {
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@keyframes sheet-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+
 @keyframes step-in {
   from {
     opacity: 0;

@@ -38,6 +38,8 @@
   `draft` (rascunho). Telas com protótipo aprovado seguem o protótipo de perto.
 - Mobile-first: comece pelo layout de celular e adicione `sm:`/`md:` depois.
 - Respeite `prefers-reduced-motion`.
+- **Campo obrigatório** nos formulários da pessoa: * vermelho ao lado do rótulo com `REQUIRED_MARK`
+  (`shared/ui/requiredMark.ts`, vem do CSS e não entra no nome do campo) e `aria-required` no campo.
 - **Sem emoji** (🔒, 🔥, 🌕…) no site, nos mocks e nas mensagens da interface: cada aparelho desenha emoji de
   um jeito e eles fogem da identidade da marca. Use **ícones SVG desenhados para o projeto** (traço fino,
   `currentColor`, `aria-hidden` quando forem decorativos), no padrão do `EditorIcon`. Sinais tipográficos

@@ -1,4 +1,6 @@
+import { CLOSING_BACKDROP, CLOSING_DIALOG, useClosing } from '../ui/useClosing'
 import { X } from 'lucide-react'
+import { REQUIRED_MARK } from '../ui/requiredMark'
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { GoogleLogo } from '../ui/GoogleLogo'
@@ -81,6 +83,7 @@ export function LoginDialog({
   const dialogRef = useRef<HTMLDivElement>(null)
   const ids = { title: useId(), email: useId(), password: useId() }
 
+  const { isClosing, requestClose } = useClosing(onClose)
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null
     // A página por trás fica inerte: teclado e leitor de tela só alcançam a janela.
@@ -88,7 +91,7 @@ export function LoginDialog({
     appRoot?.setAttribute('inert', '')
     dialogRef.current?.querySelector<HTMLElement>('button, input')?.focus()
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') requestClose()
     }
     document.addEventListener('keydown', onKey)
     return () => {
@@ -96,7 +99,7 @@ export function LoginDialog({
       appRoot?.removeAttribute('inert')
       previouslyFocused?.focus()
     }
-  }, [onClose])
+  }, [requestClose])
 
   function switchMode(next: Mode) {
     setMode(next)
@@ -135,7 +138,7 @@ export function LoginDialog({
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-40 grid animate-[fade-in_250ms_ease-out] place-items-end sm:place-items-center ${
+      className={`fixed inset-0 z-40 grid place-items-end sm:place-items-center ${isClosing ? CLOSING_BACKDROP : 'animate-[fade-in_250ms_ease-out]'} ${
         isGate ? 'bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.35))]' : 'bg-black/55'
       }`}
     >
@@ -144,7 +147,7 @@ export function LoginDialog({
         type="button"
         aria-hidden="true"
         tabIndex={-1}
-        onClick={onClose}
+        onClick={requestClose}
         className="absolute inset-0 cursor-default"
       />
       <div
@@ -152,7 +155,7 @@ export function LoginDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby={ids.title}
-        className={`relative w-full animate-[dialog-in_320ms_ease-out] overflow-hidden rounded-t-3xl border border-line bg-surface sm:rounded-3xl ${
+        className={`relative w-full ${isClosing ? CLOSING_DIALOG : 'animate-[dialog-in_320ms_ease-out]'} overflow-hidden rounded-t-3xl border border-line bg-surface sm:rounded-3xl ${
           aside ? 'max-w-[720px] sm:grid sm:grid-cols-[1fr_1.15fr]' : 'max-w-md'
         }`}
       >
@@ -172,7 +175,7 @@ export function LoginDialog({
             </div>
             <button
               type="button"
-              onClick={onClose}
+              onClick={requestClose}
               aria-label="Fechar"
               className="grid size-10 shrink-0 place-items-center rounded-full text-ink-faint hover:text-accent"
             >
@@ -236,7 +239,10 @@ export function LoginDialog({
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3" noValidate>
             <div>
-              <label htmlFor={ids.email} className="mb-1 block text-sm text-ink-muted">
+              <label
+                htmlFor={ids.email}
+                className={`mb-1 block text-sm text-ink-muted ${REQUIRED_MARK}`}
+              >
                 E-mail
               </label>
               <input
@@ -252,7 +258,10 @@ export function LoginDialog({
             </div>
             {mode !== 'recuperar' && (
               <div>
-                <label htmlFor={ids.password} className="mb-1 block text-sm text-ink-muted">
+                <label
+                  htmlFor={ids.password}
+                  className={`mb-1 block text-sm text-ink-muted ${REQUIRED_MARK}`}
+                >
                   Senha
                 </label>
                 <input
