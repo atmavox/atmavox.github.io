@@ -10,6 +10,15 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.27.0] · 2026-11-24
+
+### Adicionado
+
+- Perfil · Conta · "Meus dados" (mock `atmavox-cadastro.html`, C): nome completo, apelido, celular
+  (WhatsApp) e data de nascimento, com "Editar" por linha e validação; foto do perfil reduzida no
+  navegador; caixinha pequena de novidades pelo WhatsApp (marcada por padrão). O topo do perfil mostra o
+  apelido e a foto. Dados em `users/{uid}` (ADR-030); regras do Firestore novas (publicar no console).
+
 ## [1.26.6] · 2026-11-24
 
 ### Corrigido

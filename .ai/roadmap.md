@@ -296,9 +296,14 @@ Surgiu no caminho:
       "Criar conta" com o e-mail preenchido. A proteção contra enumeração de e-mails do Firebase fica
       ligada.
     - **Ver a senha:** ícone de olho no cadastro e no login.
-  - Etapas: 0. [ ] Mocks (PC e celular, alguns estilos): "Meus dados" no perfil, "Confirme seu e-mail", janela
-    "Complete seu cadastro" ao comprar ou começar, login com "Ainda não tem conta?" e o olho da senha
-    1. [ ] Dados do perfil (validação com testes; `users/{uid}`) + aba "Meus dados" com foto
+  - Etapas: 0. [x] Mock aprovado em 2026-11-24 (`Downloads/atmavox-cadastro.html`): Conta · Meus dados **C**
+    (lista para ler com "Editar" por linha; caixinha de novidades pequena no fim do cartão); Confirme
+    seu e-mail **A** (faixa no topo dos hubs + janela ao tocar numa jornada; no celular, os dois botões
+    lado a lado); Complete seu cadastro **C** (aviso com a barra do cadastro que leva ao perfil e depois
+    volta para onde a pessoa ia); Login **A** ("E-mail ou senha incorretos. Ainda não tem conta?" +
+    "Criar conta com este e-mail"; olho da senha no login e no cadastro)
+    1. [x] Dados do perfil (validação com testes; `users/{uid}`, ADR-030) + aba Conta com "Meus dados"
+           e foto (1.27.0; falta publicar as regras do Firestore)
     2. [ ] Confirmação de e-mail (envio no cadastro, aviso, reenviar; trava também nas regras do
            Firestore e no Worker)
     3. [ ] Trava do cadastro completo antes de comprar ou abrir material dos hubs (a ativação passa a usar

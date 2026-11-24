@@ -50,14 +50,17 @@ service cloud.firestore {
 
     // Acessos de cada pessoa: ela só lê os próprios. Quem grava é a admin (liberação manual) ou o
     // servidor do pagamento, com credencial de serviço (que não passa por estas regras).
-    // Perfil mínimo (e-mail e nome), gravado pela própria pessoa ao entrar: é como a Andreía acha
-    // alguém para liberar um acesso à mão. A pessoa lê o próprio; a admin lê e busca todos.
+    // Perfil da pessoa: e-mail e nome (gravados ao entrar; é como a Andreía acha alguém para liberar um
+    // acesso à mão) e os dados da aba Conta (nome completo, apelido, celular, nascimento, novidades e a
+    // foto já reduzida no navegador). A pessoa lê e grava o próprio; a admin lê e busca todos.
     match /users/{uid} {
       allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
       allow write: if request.auth != null
         && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['email', 'name', 'lastSeenAt'])
-        && request.resource.size() < 2 * 1024;
+        && request.resource.data.keys().hasOnly(['email', 'name', 'lastSeenAt', 'fullName',
+          'nickname', 'phone', 'birthDate', 'news', 'photo', 'profileUpdatedAt'])
+        && request.resource.data.get('photo', '').size() < 70 * 1024
+        && request.resource.size() < 90 * 1024;
     }
 
     // Anamnese da ativação individual (ADR-029): só a própria pessoa grava; ela e a Andreía leem.

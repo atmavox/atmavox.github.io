@@ -5,6 +5,8 @@ import { InMemoryAuth } from '../../../shared/auth/InMemoryAuth'
 import { createAuthSession, type AuthSession } from '../../../shared/auth/session'
 import type { JourneyProduct } from '../../../shared/catalog/product'
 import type { ProgressLoader } from '../../../shared/progress/progressSummary'
+import { EMPTY_PROFILE } from '../../../shared/profile/profile'
+import { createInMemoryProfileSource } from '../../../shared/profile/profileSource'
 import { AccessPill, ProfilePage } from './ProfilePage'
 
 async function loggedSession(): Promise<AuthSession> {
@@ -55,8 +57,28 @@ describe('perfil (mock aprovado)', () => {
     expect(screen.queryByRole('link', { name: /Continuar no dia 8/ })).toBeNull()
 
     fireEvent.click(screen.getByRole('tab', { name: 'Conta' }))
-    expect(within(screen.getByRole('tabpanel')).getByText('maria@exemplo.com')).toBeInTheDocument()
+    expect(
+      await within(screen.getByRole('tabpanel')).findByText('maria@exemplo.com'),
+    ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Sair da conta' })).toBeInTheDocument()
+  })
+
+  it('o topo mostra o apelido e a foto que a pessoa escolheu', async () => {
+    const session = await loggedSession()
+    const uid = session.getSnapshot().user!.uid
+    render(
+      <AuthContext.Provider value={session}>
+        <ProfilePage
+          layout="wide"
+          progressLoader={sevenDays}
+          profileSource={createInMemoryProfileSource({
+            [uid]: { ...EMPTY_PROFILE, nickname: 'Mari', photo: 'data:image/webp;base64,AA' },
+          })}
+        />
+      </AuthContext.Provider>,
+    )
+    expect(await screen.findByRole('heading', { name: 'Mari' })).toBeInTheDocument()
+    expect(document.querySelector('header img')).toHaveAttribute('src', 'data:image/webp;base64,AA')
   })
 
   it('quem ainda não começou vê o convite para as jornadas', async () => {

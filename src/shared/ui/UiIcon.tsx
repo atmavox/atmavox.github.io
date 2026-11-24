@@ -73,6 +73,12 @@ const PATHS = {
       <path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20" />
     </>
   ),
+  camera: (
+    <>
+      <path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3V19H4z" />
+      <circle cx="12" cy="13.5" r="3.3" />
+    </>
+  ),
   file: (
     <>
       <path d="M7 3.5h7l4 4V20.5H6V3.5z" />

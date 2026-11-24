@@ -370,6 +370,13 @@ e play; filtros Todas, Áudio, Vídeo, Com e-book (logada: Grátis e Minhas). Gr
 seguem o mesmo fluxo das jornadas, com "Pagar e ouvir". Com acesso, a meditação mostra o play e "Baixar
 e-book".
 
+**Perfil · Conta · Meus dados (mock `atmavox-cadastro.html`, C, 1.27.0):** lista para conferir nome
+completo, apelido, celular (WhatsApp) e data de nascimento (todos com * vermelho), cada um com "Editar"
+que abre o campo na própria linha (valida, formata o celular, mostra a data por extenso); "Pôr uma
+foto" / "Trocar foto" (reduzida no navegador) e "Remover foto"; o e-mail da conta; e, no fim, a
+caixinha pequena "Receber novidades da Andreía pelo WhatsApp" (marcada por padrão). O topo do perfil
+mostra o apelido e a foto. Dados em `users/{uid}` (ADR-030).
+
 **Cabeçalho dos hubs e perfil (mocks aprovados em 2026-11-23):** nos hubs, abas Início · Jornadas ·
 Meditações e a conta ("Entrar" ou a bolinha com "Meu perfil" e "Sair da conta"); a página inicial fica
 sem login. O perfil (`#/perfil`) tem abas Visão geral, Jornadas, Meditações e Conta, com a trilha de

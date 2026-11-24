@@ -505,6 +505,21 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 ## Modelo
 
 ```md
+## ADR-030 · Dados da pessoa e foto do perfil em `users/{uid}`
+
+- **Data:** 2026-11-24
+- **Contexto:** a Andreía precisa do celular (WhatsApp), do nome, do apelido e da data de nascimento de
+  quem começa uma jornada ou compra, e a pessoa pode pôr uma foto. O Firebase Storage não está no plano
+  grátis para projetos novos (exige o Blaze), o que fere o custo zero.
+- **Decisão:** os dados ficam em `users/{uid}` (o documento que o login já grava), lidos e gravados pela
+  API REST com o token da pessoa (`shared/profile/`). A foto é reduzida no navegador para 320 px (~40 kB
+  de `data:`) e vai no mesmo documento, como as imagens da jornada (ADR-014). Novidades pelo WhatsApp
+  (`news`) vêm marcadas; a pessoa desmarca na aba Conta. O nome da conta (`name`, do login) fica separado
+  do nome completo (`fullName`), para o login não sobrescrever o que a pessoa escreveu.
+- **Consequências:** regras do Firestore aceitam esses campos (foto até 70 kB, documento até 90 kB);
+  a lista de pessoas do Modo Andreía traz a foto junto (aceitável no volume atual). Se a lista crescer
+  muito, a foto pode ir para um documento à parte.
+
 ## ADR-00X · Título curto
 
 - **Status:** proposta | aceita | substituída por ADR-00Y · AAAA-MM-DD

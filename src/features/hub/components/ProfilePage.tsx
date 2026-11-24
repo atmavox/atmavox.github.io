@@ -16,6 +16,11 @@ import { coverToneAt } from '../../../shared/ui/bannerTones'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import { formatDuration, mediaLabel, meditationHref } from '../meditations'
 import { useCatalog } from '../../../shared/catalog/CatalogContext'
+import { localDate } from '../../../shared/ativacao/availability'
+import type { ProfileSource } from '../../../shared/profile/profileSource'
+import { useMyProfile } from '../../../shared/profile/useMyProfile'
+import { LoadingNote } from '../../../shared/ui/LoadingNote'
+import { MyDataCard } from './MyDataCard'
 
 // A aba Ativações só é baixada por quem abre (ADR-029).
 const ActivationsTab = lazy(() => import('../ativacao/ActivationsTab'))
@@ -177,14 +182,18 @@ function JourneyTrailCard({
 export function ProfilePage({
   layout,
   progressLoader,
+  profileSource,
 }: {
   layout: 'wide' | 'narrow'
   /** Para os testes; no site, lê do Firestore com o login. */
   progressLoader?: ProgressLoader
+  /** Para os testes; no site, `users/{uid}` no Firestore. */
+  profileSource?: ProfileSource
 }) {
   const { session, state } = useAuthSession()
   const access = useAccess()
   const now = useNow()
+  const my = useMyProfile(profileSource)
   // "#/perfil/ativacoes" (para onde a janela da ativação leva ao fechar) abre direto na aba.
   const [tab, setTab] = useState<Tab>(() =>
     window.location.hash.startsWith('#/perfil/ativacoes') ? 'ativacoes' : 'geral',
@@ -253,7 +262,8 @@ export function ProfilePage({
     }),
     { days: 0, reflections: 0, victories: 0 },
   )
-  const initial = (user.displayName ?? user.email ?? '?').trim().charAt(0).toUpperCase()
+  const shownName = my.profile?.nickname || user.displayName
+  const initial = (shownName ?? user.email ?? '?').trim().charAt(0).toUpperCase()
   const pillOf = (product: Product) => (
     <AccessPill product={product} access={access.accessOf(product.id)} now={now} />
   )
@@ -351,45 +361,56 @@ export function ProfilePage({
       </Suspense>
     ),
     conta: (
-      <section className="flex flex-col gap-3 rounded-[22px] border border-line bg-surface p-5">
-        <p className="text-ink">{user.email ?? user.displayName}</p>
-        <p className="text-sm text-ink-faint">Suas reflexões ficam guardadas só para você.</p>
-        {isConfirmingExit ? (
-          <div className="flex flex-col gap-3 border-t border-line pt-3">
-            <p className="text-sm text-ink-muted">
-              Suas respostas continuam na sua conta e são apagadas deste aparelho.
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() =>
-                  void session.signOut().then(() => {
-                    window.location.hash = '#/'
-                  })
-                }
-                className="min-h-10 flex-1 rounded-full bg-accent text-sm font-semibold text-bg"
-              >
-                Sair
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsConfirmingExit(false)}
-                className="min-h-10 flex-1 rounded-full border border-line text-sm text-ink-muted"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
+      <>
+        {my.profile ? (
+          <MyDataCard
+            profile={my.profile}
+            email={user.email}
+            today={localDate(now)}
+            onSave={my.save}
+          />
         ) : (
-          <button
-            type="button"
-            onClick={() => setIsConfirmingExit(true)}
-            className="min-h-10 self-start rounded-full border border-line px-5 text-sm text-ink-muted hover:border-accent hover:text-accent"
-          >
-            Sair da conta
-          </button>
+          <LoadingNote className="text-ink-muted" />
         )}
-      </section>
+        <section className="flex flex-col gap-3 rounded-[22px] border border-line bg-surface p-5">
+          <p className="text-sm text-ink-faint">Suas reflexões ficam guardadas só para você.</p>
+          {isConfirmingExit ? (
+            <div className="flex flex-col gap-3 border-t border-line pt-3">
+              <p className="text-sm text-ink-muted">
+                Suas respostas continuam na sua conta e são apagadas deste aparelho.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    void session.signOut().then(() => {
+                      window.location.hash = '#/'
+                    })
+                  }
+                  className="min-h-10 flex-1 rounded-full bg-accent text-sm font-semibold text-bg"
+                >
+                  Sair
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmingExit(false)}
+                  className="min-h-10 flex-1 rounded-full border border-line text-sm text-ink-muted"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsConfirmingExit(true)}
+              className="min-h-10 self-start rounded-full border border-line px-5 text-sm text-ink-muted hover:border-accent hover:text-accent"
+            >
+              Sair da conta
+            </button>
+          )}
+        </section>
+      </>
     ),
   }
 
@@ -398,13 +419,17 @@ export function ProfilePage({
       <header className="flex items-center gap-4">
         <span
           aria-hidden="true"
-          className={`grid shrink-0 place-items-center rounded-full bg-accent/20 font-display text-accent ${isWide ? 'size-[72px] text-3xl' : 'size-14 text-2xl'}`}
+          className={`grid shrink-0 place-items-center overflow-hidden rounded-full bg-accent/20 font-display text-accent ${isWide ? 'size-[72px] text-3xl' : 'size-14 text-2xl'}`}
         >
-          {initial}
+          {my.profile?.photo ? (
+            <img src={my.profile.photo} alt="" className="size-full object-cover" />
+          ) : (
+            initial
+          )}
         </span>
         <div className="min-w-0">
           <h1 className={`font-display text-ink ${isWide ? 'text-[2.2rem]' : 'text-[1.7rem]'}`}>
-            {user.displayName ?? 'Seu perfil'}
+            {shownName ?? 'Seu perfil'}
           </h1>
           <p className="truncate text-ink-faint">{user.email}</p>
         </div>
