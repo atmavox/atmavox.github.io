@@ -114,7 +114,15 @@ describe('token de login do Firebase', () => {
       exp: now + 3600,
     }
     const valid = await signedToken(keys.privateKey, claims)
-    expect(await verifyFirebaseIdToken(valid, 'atmavox', loadKeys, now)).toBe('uid-ana')
+    expect(await verifyFirebaseIdToken(valid, 'atmavox', loadKeys, now)).toEqual({
+      uid: 'uid-ana',
+      emailVerified: false,
+    })
+    const confirmed = await signedToken(keys.privateKey, { ...claims, email_verified: true })
+    expect(await verifyFirebaseIdToken(confirmed, 'atmavox', loadKeys, now)).toEqual({
+      uid: 'uid-ana',
+      emailVerified: true,
+    })
 
     const otherProject = await signedToken(keys.privateKey, { ...claims, aud: 'outro' })
     expect(await verifyFirebaseIdToken(otherProject, 'atmavox', loadKeys, now)).toBeNull()
@@ -210,7 +218,10 @@ function setup(payment: Partial<Payment> = {}, signed = true) {
   const createPreference = vi.fn(async () => 'https://mp.example/checkout')
   const deps: AppDeps = {
     firestore: store.client,
-    verifyUser: async (token) => (token === 'bom' ? 'uid-ana' : null),
+    verifyUser: async (token) =>
+      token === 'bom' || token === 'sem-confirmar'
+        ? { uid: 'uid-ana', emailVerified: token === 'bom' }
+        : null,
     createPreference,
     getPayment: async (id) => ({
       id,
@@ -243,6 +254,9 @@ describe('rota /checkout', () => {
   it('exige login e só cobra produto pago, com o preço do catálogo', async () => {
     const { handle, createPreference } = setup()
     expect((await handle(checkoutRequest('raizes', 'ruim'))).status).toBe(401)
+    const unconfirmed = await handle(checkoutRequest('raizes', 'sem-confirmar'))
+    expect(unconfirmed.status).toBe(403)
+    expect(await unconfirmed.json()).toEqual({ error: 'email' })
     expect((await handle(checkoutRequest('livre'))).status).toBe(400)
     expect((await handle(checkoutRequest('nao-existe'))).status).toBe(400)
 

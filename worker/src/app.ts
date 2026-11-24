@@ -3,13 +3,14 @@
 import { ORDER_ID } from '../../src/shared/ativacao/order'
 import { accessExpiresAt, hasValidAccess } from '../../src/shared/catalog/offer'
 import type { Product } from '../../src/shared/catalog/product'
+import type { VerifiedUser } from './firebaseToken'
 import type { FirestoreClient } from './firestore'
 import { parseExternalReference, type Payment, type PreferenceInput } from './mercadoPago'
 
 export interface AppDeps {
   firestore: FirestoreClient
-  /** Uid do token de login do Firebase, ou `null` se não for válido. */
-  verifyUser: (idToken: string) => Promise<string | null>
+  /** Quem é, pelo token de login do Firebase, ou `null` se não for válido. */
+  verifyUser: (idToken: string) => Promise<VerifiedUser | null>
   createPreference: (input: PreferenceInput) => Promise<string>
   getPayment: (paymentId: string) => Promise<Payment | null>
   verifySignature: (args: {
@@ -59,8 +60,11 @@ export function createApp(deps: AppDeps) {
     const cors = corsHeaders(request, deps.siteUrl)
     const auth = request.headers.get('Authorization') ?? ''
     const idToken = auth.startsWith('Bearer ') ? auth.slice(7) : ''
-    const uid = idToken ? await deps.verifyUser(idToken) : null
-    if (!uid) return json({ error: 'login' }, 401, cors)
+    const user = idToken ? await deps.verifyUser(idToken) : null
+    if (!user) return json({ error: 'login' }, 401, cors)
+    // Conta criada com e-mail e sem confirmar: o site já pede a confirmação; aqui é a garantia.
+    if (!user.emailVerified) return json({ error: 'email' }, 403, cors)
+    const { uid } = user
 
     let productId: unknown
     let orderId: unknown

@@ -23,6 +23,8 @@ export interface LoginActions {
 export interface AuthSession extends LoginActions {
   getSnapshot(): AuthSessionState
   subscribe(listener: () => void): () => void
+  sendEmailVerification(): Promise<void>
+  refreshUser(): Promise<void>
   signOut(): Promise<void>
   /** Token do login atual (para ler conteúdo pago); `null` sem login. */
   getIdToken(): Promise<string | null>
@@ -91,6 +93,8 @@ export function createAuthSession({ loadAuth, hint, onSignedOut }: AuthSessionDe
     signInWithEmail: (email, password) => withAuth((auth) => auth.signInWithEmail(email, password)),
     signUpWithEmail: (email, password) => withAuth((auth) => auth.signUpWithEmail(email, password)),
     sendPasswordReset: (email) => withAuth((auth) => auth.sendPasswordReset(email)),
+    sendEmailVerification: () => withAuth((auth) => auth.sendEmailVerification()),
+    refreshUser: () => withAuth((auth) => auth.refreshUser()),
     async signOut() {
       if (!authPromise) return
       const auth = await authPromise

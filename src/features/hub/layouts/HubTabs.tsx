@@ -9,6 +9,7 @@ import {
 import { useEffect, type ComponentType } from 'react'
 import { SITE } from '../../../shared/brand/site'
 import { AccountMenu } from '../../../shared/auth/AccountMenu'
+import { EmailConfirmBanner } from '../../../shared/auth/EmailConfirmBanner'
 import { useIsAdmin } from '../../../shared/auth/useIsAdmin'
 import { AdminStrip } from '../../../shared/ui/AdminStrip'
 import { useCatalog } from '../../../shared/catalog/CatalogContext'
@@ -199,6 +200,7 @@ export function HubTabs({
             <ThemeToggle />
           </span>
         </div>
+        {isHubTab && <EmailConfirmBanner />}
         <MiniPlayer />
       </header>
 

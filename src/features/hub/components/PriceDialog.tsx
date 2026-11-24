@@ -52,6 +52,8 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
       // Já tinha acesso (outro aparelho, liberação manual): atualiza e fecha.
       await access.refresh()
       requestClose()
+    } else if (result.kind === 'email') {
+      setError('Confirme seu e-mail antes de pagar: abra o link que enviamos e tente de novo.')
     } else if (result.kind === 'login') {
       setError('Sua sessão expirou. Entre de novo para continuar.')
     } else {

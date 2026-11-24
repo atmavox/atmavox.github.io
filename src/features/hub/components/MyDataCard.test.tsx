@@ -16,6 +16,7 @@ function setup(profile: PersonProfile = EMPTY_PROFILE, ok = true) {
     <MyDataCard
       profile={profile}
       email="carol@exemplo.com"
+      emailVerified
       today={TODAY}
       onSave={onSave}
       compress={compress}

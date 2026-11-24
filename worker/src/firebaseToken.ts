@@ -27,13 +27,19 @@ export function createJwksLoader(fetchFn: typeof fetch = fetch): JwksLoader {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
 
-/** Devolve o uid se o token é válido para este projeto; `null` em qualquer outro caso. */
+export interface VerifiedUser {
+  uid: string
+  /** E-mail confirmado (`email_verified` do token): só assim a pessoa compra (2026-11-24). */
+  emailVerified: boolean
+}
+
+/** Devolve quem é, se o token é válido para este projeto; `null` em qualquer outro caso. */
 export async function verifyFirebaseIdToken(
   token: string,
   projectId: string,
   loadKeys: JwksLoader,
   nowSeconds: number,
-): Promise<string | null> {
+): Promise<VerifiedUser | null> {
   const parts = token.split('.')
   if (parts.length !== 3) return null
   const [headerPart, payloadPart, signaturePart] = parts as [string, string, string]
@@ -68,5 +74,7 @@ export async function verifyFirebaseIdToken(
     base64UrlDecode(signaturePart),
     new TextEncoder().encode(`${headerPart}.${payloadPart}`),
   )
-  return valid ? (payload.sub as string) : null
+  return valid
+    ? { uid: payload.sub as string, emailVerified: payload.email_verified === true }
+    : null
 }

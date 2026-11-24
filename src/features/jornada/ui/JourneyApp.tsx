@@ -9,6 +9,8 @@ import {
   type JourneyTabId,
 } from '../application/navigation'
 import { LoginGate } from './account/LoginGate'
+import { EmailConfirmDialog } from '../../../shared/auth/EmailConfirmDialog'
+import { needsEmailConfirmation } from '../../../shared/auth/emailConfirmation'
 import { furthestUnlockedTab, isTabUnlocked } from '../application/tabAccess'
 import { JourneyHeader } from './JourneyHeader'
 import { ClosingPage } from './pages/ClosingPage'
@@ -170,6 +172,25 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
       )
     }
     return <LoginGate account={account} journeyId={journeyId} background={loginBackground} />
+  }
+  // Conta criada com e-mail e ainda sem confirmar (pedido de 2026-11-24): a janela pede a confirmação;
+  // confirmado, a jornada aparece no lugar.
+  if (state && needsEmailConfirmation(state.user) && !isAdmin) {
+    return (
+      <>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none min-h-dvh blur-[7px] saturate-90 select-none"
+        >
+          {loginBackground}
+        </div>
+        <EmailConfirmDialog
+          onClose={() => {
+            window.location.hash = '#/jornadas'
+          }}
+        />
+      </>
+    )
   }
   if (product?.pricing.type === 'paid' && !isAdmin && !access.owns(product.id, now)) {
     if (access.status === 'loading') {

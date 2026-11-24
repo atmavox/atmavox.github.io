@@ -25,8 +25,7 @@ const paid: JourneyProduct = {
   ],
 }
 
-function newSession(): AuthSession {
-  const auth = new InMemoryAuth()
+function newSession(auth = new InMemoryAuth()): AuthSession {
   return createAuthSession({
     loadAuth: async () => auth,
     hint: { get: () => false, set: () => {} },
@@ -50,7 +49,9 @@ const renderWith = (session: AuthSession, ui: React.ReactNode) =>
 
 describe('compra de um produto pago no hub (F9)', () => {
   it('sem login, pede para entrar mostrando o produto; depois do login, mostra o preço', async () => {
-    renderWith(newSession(), <Harness />)
+    const auth = new InMemoryAuth()
+    auth.confirmEmail('ana@exemplo.com')
+    renderWith(newSession(auth), <Harness />)
     fireEvent.click(screen.getByRole('button', { name: 'Comprar Raízes' }))
 
     const login = screen.getByRole('dialog', { name: 'Entre para guardar sua jornada' })
@@ -75,6 +76,29 @@ describe('compra de um produto pago no hub (F9)', () => {
     expect(screen.getByRole('dialog', { name: 'Raízes' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /Voltar para as jornadas/ }))
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+})
+
+describe('compra com e-mail ainda sem confirmar (2026-11-24)', () => {
+  it('antes do preço, pede para confirmar o e-mail; confirmado, segue para o preço', async () => {
+    const auth = new InMemoryAuth()
+    const session = newSession(auth)
+    await session.signUpWithEmail('bia@exemplo.com', 'certa')
+    expect(auth.sentConfirmations).toBe(1)
+    renderWith(session, <Harness />)
+    fireEvent.click(screen.getByRole('button', { name: 'Comprar Raízes' }))
+
+    const ask = screen.getByRole('dialog', { name: 'Falta confirmar seu e-mail' })
+    expect(within(ask).getByText('bia@exemplo.com')).toBeInTheDocument()
+    fireEvent.click(within(ask).getByRole('button', { name: /Reenviar/ }))
+    await waitFor(() => expect(auth.sentConfirmations).toBe(2))
+
+    fireEvent.click(within(ask).getByRole('button', { name: 'Já confirmei' }))
+    expect(await within(ask).findByText(/Ainda não aparece como confirmado/)).toBeInTheDocument()
+
+    auth.confirmEmail('bia@exemplo.com')
+    fireEvent.click(within(ask).getByRole('button', { name: 'Já confirmei' }))
+    expect(await screen.findByRole('dialog', { name: 'Raízes' })).toBeInTheDocument()
   })
 })
 

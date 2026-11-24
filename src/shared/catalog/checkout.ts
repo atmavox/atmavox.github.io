@@ -5,6 +5,8 @@ export type CheckoutResult =
   | { kind: 'redirect'; url: string }
   | { kind: 'already-owned' }
   | { kind: 'login' }
+  /** Conta criada com e-mail e ainda sem confirmar. */
+  | { kind: 'email' }
   | { kind: 'error' }
 
 /** Endereço do Worker de pagamentos, sem barra no fim; `null` se não configurado. */
@@ -35,6 +37,7 @@ export async function requestCheckout({
       body: JSON.stringify(orderId ? { orderId } : { productId }),
     })
     if (response.status === 401) return { kind: 'login' }
+    if (response.status === 403) return { kind: 'email' }
     if (response.status === 409) return { kind: 'already-owned' }
     if (!response.ok) return { kind: 'error' }
     const body = (await response.json()) as { url?: unknown }

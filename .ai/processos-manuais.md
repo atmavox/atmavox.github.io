@@ -21,7 +21,12 @@ Mercado Pago recebidos. Instagram e WhatsApp travaram no painel da Meta (passos 
 - [ ] Pagamentos: conta de serviço do Firebase + Worker + webhook + botão + compra de teste
 - [ ] Pagamentos: trocar para as credenciais de **produção** antes de vender
 - [x] Publicar as regras novas do Firestore (anamnese, pedidos e confirmação do horário da ativação individual, 1.24.0 a 1.26.0): seção 4 (feito em 2026-11-23)
-- [ ] Publicar as regras novas do Firestore (dados do perfil na aba Conta, 1.27.0): seção 4
+- [ ] Publicar as regras novas do Firestore (dados do perfil na aba Conta, 1.27.0; e-mail confirmado,
+      1.28.0): seção 4
+- [ ] Contas de teste criadas com e-mail e senha: confirmar o e-mail (link no e-mail, ou marcar como
+      confirmado em Firebase Console → Authentication → Usuários), senão a jornada pede a confirmação
+- [ ] (Opcional) Firebase Console → Authentication → Modelos → "Verificação de endereço de e-mail":
+      nome do remetente "AtmaVox" (o texto já sai em português: o site pede o idioma pt-BR)
 - [ ] Robô do WhatsApp: **em pausa**, falta decidir o caminho (seção 3, "Por que travou")
 
 ---
@@ -310,6 +315,9 @@ As regras ficam no repositório (`firestore.rules`) mas só valem depois de publ
 
 A publicar:
 
+- (1.28.0) Jornada (progresso), "Um pouco sobre mim" e pedidos da ativação só gravam com o e-mail
+  confirmado (`email_verified` do token; quem entra pelo Google já vem confirmado). Contas de teste
+  com e-mail e senha precisam confirmar o e-mail antes.
 - (1.27.0) `users/{uid}` aceita os dados da aba Conta (nome completo, apelido, celular, nascimento,
   novidades e foto). Sem publicar, "Salvar" na aba Conta avisa que não deu para salvar.
 

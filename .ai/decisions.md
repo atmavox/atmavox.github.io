@@ -520,6 +520,21 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   a lista de pessoas do Modo Andreía traz a foto junto (aceitável no volume atual). Se a lista crescer
   muito, a foto pode ir para um documento à parte.
 
+## ADR-031 · Confirmação de e-mail antes de jornadas e compras
+
+- **Data:** 2026-11-24
+- **Contexto:** quem cria conta com e-mail e senha pode digitar um e-mail errado ou de outra pessoa; a
+  Andreía precisa de contatos reais. Quem entra pelo Google já chega com o e-mail confirmado.
+- **Decisão:** ao criar a conta, o Firebase manda o link de confirmação (em português, voltando para
+  `#/jornadas`). Enquanto não confirmar, a pessoa olha os hubs à vontade, com a faixa "Confirme seu
+  e-mail" no topo; ao abrir uma jornada, pagar ou pedir a ativação, abre "Falta confirmar seu e-mail"
+  (mock `atmavox-cadastro.html`, A), com "Reenviar" e "Já confirmei" (recarrega o login e renova o
+  token). A garantia não fica só na tela: as regras do Firestore exigem `email_verified` para gravar
+  progresso, anamnese e pedidos, e o Worker recusa o checkout (403 `email`).
+- **Consequências:** o login passa a ouvir `onIdTokenChanged` (para a tela sair sozinha do aviso depois
+  da confirmação) e a conferir de novo ao voltar para a aba. Contas de teste com e-mail precisam
+  confirmar.
+
 ## ADR-00X · Título curto
 
 - **Status:** proposta | aceita | substituída por ADR-00Y · AAAA-MM-DD

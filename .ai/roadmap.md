@@ -304,7 +304,7 @@ Surgiu no caminho:
     "Criar conta com este e-mail"; olho da senha no login e no cadastro)
     1. [x] Dados do perfil (validação com testes; `users/{uid}`, ADR-030) + aba Conta com "Meus dados"
            e foto (1.27.0; falta publicar as regras do Firestore)
-    2. [ ] Confirmação de e-mail (envio no cadastro, aviso, reenviar; trava também nas regras do
+    2. [x] Confirmação de e-mail (1.28.0, ADR-031) (envio no cadastro, aviso, reenviar; trava também nas regras do
            Firestore e no Worker)
     3. [ ] Trava do cadastro completo antes de comprar ou abrir material dos hubs (a ativação passa a usar
            os mesmos dados) + meditações grátis só na página inicial

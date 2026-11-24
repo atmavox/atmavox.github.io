@@ -3,13 +3,15 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   GoogleAuthProvider,
-  onAuthStateChanged,
+  onIdTokenChanged,
+  sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signInWithRedirect,
   signOut,
   type Auth,
+  type User,
 } from 'firebase/auth'
 import type { FirebaseConfig } from '../firebase/config'
 import { getFirebaseApp } from '../firebase/firebaseApp'
@@ -30,6 +32,18 @@ async function translated(action: () => Promise<unknown>): Promise<void> {
   }
 }
 
+/** O link do e-mail de confirmação volta para o hub de jornadas do próprio site. */
+function confirmationLink() {
+  return { url: `${window.location.origin}${window.location.pathname}#/jornadas` }
+}
+
+const toAuthUser = (user: User): AuthUser => ({
+  uid: user.uid,
+  displayName: user.displayName,
+  email: user.email,
+  emailVerified: user.emailVerified,
+})
+
 class FirebaseAuthService implements AuthService {
   private readonly auth: Auth
 
@@ -38,9 +52,9 @@ class FirebaseAuthService implements AuthService {
   }
 
   onChange(listener: (user: AuthUser | null) => void) {
-    return onAuthStateChanged(this.auth, (user) =>
-      listener(user ? { uid: user.uid, displayName: user.displayName, email: user.email } : null),
-    )
+    // "onIdTokenChanged" (e não "onAuthStateChanged"): também avisa quando o token é renovado depois
+    // de confirmar o e-mail (refreshUser), e a tela sai do "Confirme seu e-mail" sozinha.
+    return onIdTokenChanged(this.auth, (user) => listener(user ? toAuthUser(user) : null))
   }
 
   signInWithGoogle() {
@@ -61,7 +75,25 @@ class FirebaseAuthService implements AuthService {
   }
 
   signUpWithEmail(email: string, password: string) {
-    return translated(() => createUserWithEmailAndPassword(this.auth, email.trim(), password))
+    return translated(async () => {
+      const { user } = await createUserWithEmailAndPassword(this.auth, email.trim(), password)
+      await sendEmailVerification(user, confirmationLink())
+    })
+  }
+
+  sendEmailVerification() {
+    return translated(async () => {
+      const user = this.auth.currentUser
+      if (user && !user.emailVerified) await sendEmailVerification(user, confirmationLink())
+    })
+  }
+
+  async refreshUser() {
+    const user = this.auth.currentUser
+    if (!user) return
+    await user.reload()
+    // O token novo traz "email_verified" (as regras e o Worker leem dele) e dispara "onChange".
+    await user.getIdToken(true)
   }
 
   sendPasswordReset(email: string) {

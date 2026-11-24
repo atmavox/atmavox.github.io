@@ -4,6 +4,10 @@ import { AuthFailure, type AuthService, type AuthUser } from './ports'
 export class InMemoryAuth implements AuthService {
   private user: AuthUser | null = null
   private readonly listeners = new Set<(user: AuthUser | null) => void>()
+  /** E-mails que já clicaram no link de confirmação. */
+  private readonly confirmed = new Set<string>()
+  /** Quantos links de confirmação foram enviados (para os testes conferirem). */
+  sentConfirmations = 0
 
   onChange(listener: (user: AuthUser | null) => void) {
     this.listeners.add(listener)
@@ -17,19 +21,45 @@ export class InMemoryAuth implements AuthService {
   }
 
   async signInWithGoogle() {
-    this.setUser({ uid: 'google-uid', displayName: 'Maria', email: 'maria@exemplo.com' })
+    this.setUser({
+      uid: 'google-uid',
+      displayName: 'Maria',
+      email: 'maria@exemplo.com',
+      emailVerified: true,
+    })
   }
 
   async signInWithEmail(email: string, password: string) {
     if (password !== 'certa') throw new AuthFailure('E-mail ou senha incorretos.')
-    this.setUser({ uid: `uid-${email}`, displayName: null, email })
+    this.setUser({
+      uid: `uid-${email}`,
+      displayName: null,
+      email,
+      emailVerified: this.confirmed.has(email),
+    })
   }
 
   async signUpWithEmail(email: string, password: string) {
     await this.signInWithEmail(email, password)
+    this.sentConfirmations += 1
   }
 
   async sendPasswordReset() {}
+
+  async sendEmailVerification() {
+    if (this.user && !this.user.emailVerified) this.sentConfirmations += 1
+  }
+
+  /** Nos testes: a pessoa clicou no link do e-mail (a tela só vê depois de `refreshUser`). */
+  confirmEmail(email: string) {
+    this.confirmed.add(email)
+  }
+
+  async refreshUser() {
+    if (this.user?.email) {
+      this.setUser({ ...this.user, emailVerified: this.confirmed.has(this.user.email) })
+    }
+  }
 
   async signOut() {
     this.setUser(null)

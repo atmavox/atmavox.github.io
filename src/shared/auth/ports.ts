@@ -4,6 +4,9 @@ export interface AuthUser {
   uid: string
   displayName: string | null
   email: string | null
+  /** E-mail confirmado. Quem entra pelo Google já chega confirmado; quem cria conta com e-mail e
+   * senha confirma pelo link enviado (pedido de 2026-11-24). */
+  emailVerified: boolean
 }
 
 /** Erro de login já com a mensagem pronta para mostrar à pessoa, em português. */
@@ -18,6 +21,10 @@ export interface AuthService {
   signInWithEmail(email: string, password: string): Promise<void>
   signUpWithEmail(email: string, password: string): Promise<void>
   sendPasswordReset(email: string): Promise<void>
+  /** Manda (de novo) o link de confirmação para o e-mail de quem está logado. */
+  sendEmailVerification(): Promise<void>
+  /** Busca o login de novo (depois de confirmar o e-mail em outra aba ou no celular). */
+  refreshUser(): Promise<void>
   signOut(): Promise<void>
   /** Token de identidade, para ler o que exige login pela API REST do Firestore. */
   getIdToken(): Promise<string | null>

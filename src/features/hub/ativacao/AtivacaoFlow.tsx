@@ -17,6 +17,8 @@ import {
 import type { Therapy } from '../../../shared/ativacao/therapy'
 import { useAuthSession } from '../../../shared/auth/AuthContext'
 import { LoginDialog } from '../../../shared/auth/LoginDialog'
+import { EmailConfirmDialog } from '../../../shared/auth/EmailConfirmDialog'
+import { needsEmailConfirmation } from '../../../shared/auth/emailConfirmation'
 import { whatsAppMessage } from '../../../shared/brand/links'
 import { paymentsUrl, requestCheckout } from '../../../shared/catalog/checkout'
 import { formatPrice } from '../../../shared/catalog/offer'
@@ -185,6 +187,11 @@ export function AtivacaoFlow({
         header={<StepBar current={0} />}
       />
     )
+  }
+
+  // Conta criada com e-mail e ainda sem confirmar: a ativação (uma compra) espera a confirmação.
+  if (needsEmailConfirmation(user)) {
+    return <EmailConfirmDialog onClose={() => goTo('#/')} />
   }
 
   async function checkout(orderId: string) {

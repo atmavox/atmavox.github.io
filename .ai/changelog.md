@@ -10,6 +10,17 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.28.0] · 2026-11-24
+
+### Adicionado
+
+- Confirmação de e-mail (mock `atmavox-cadastro.html`, A; ADR-031): a conta criada com e-mail e senha
+  recebe o link; até confirmar, faixa no topo dos hubs e do perfil com "Reenviar", e a janela "Falta
+  confirmar seu e-mail" ao abrir uma jornada, ver o preço ou pedir a ativação. Na aba Conta, o e-mail
+  mostra "Confirmado" ou "Falta confirmar".
+- Regras do Firestore e Worker de pagamentos exigem e-mail confirmado para gravar progresso, anamnese e
+  pedidos e para pagar (publicar as regras e o Worker de novo).
+
 ## [1.27.0] · 2026-11-24
 
 ### Adicionado

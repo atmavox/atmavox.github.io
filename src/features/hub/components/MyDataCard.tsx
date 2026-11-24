@@ -33,12 +33,15 @@ function shown(field: ProfileField, value: string): string {
 export function MyDataCard({
   profile,
   email,
+  emailVerified,
   today,
   onSave,
   compress = compressAvatarInBrowser,
 }: {
   profile: PersonProfile
   email: string | null
+  /** Sem confirmar: a faixa do topo explica e oferece "Reenviar". */
+  emailVerified: boolean
   /** `AAAA-MM-DD`, para não aceitar nascimento no futuro. */
   today: string
   onSave: (change: Partial<PersonProfile>) => Promise<boolean>
@@ -230,7 +233,19 @@ export function MyDataCard({
         })}
         <li className="flex flex-col py-3">
           <span className="text-sm text-ink-faint">E-mail</span>
-          <span className="break-all text-ink">{email ?? '—'}</span>
+          <span className="flex flex-wrap items-center gap-2">
+            <span className="break-all text-ink">{email ?? '—'}</span>
+            {emailVerified ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-ok/14 px-2.5 py-0.5 text-xs font-semibold text-ok">
+                <UiIcon name="check" size={13} />
+                Confirmado
+              </span>
+            ) : (
+              <span className="inline-flex items-center rounded-full bg-accent/13 px-2.5 py-0.5 text-xs font-semibold text-accent">
+                Falta confirmar
+              </span>
+            )}
+          </span>
         </li>
       </ul>
 

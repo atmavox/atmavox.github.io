@@ -366,6 +366,7 @@ export function ProfilePage({
           <MyDataCard
             profile={my.profile}
             email={user.email}
+            emailVerified={user.emailVerified}
             today={localDate(now)}
             onSave={my.save}
           />

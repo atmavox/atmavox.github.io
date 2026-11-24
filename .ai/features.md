@@ -370,6 +370,14 @@ e play; filtros Todas, Áudio, Vídeo, Com e-book (logada: Grátis e Minhas). Gr
 seguem o mesmo fluxo das jornadas, com "Pagar e ouvir". Com acesso, a meditação mostra o play e "Baixar
 e-book".
 
+**Confirmação de e-mail (mock `atmavox-cadastro.html`, A, 1.28.0, ADR-031):** conta criada com e-mail
+e senha recebe o link de confirmação. Até confirmar: faixa "Confirme seu e-mail para começar as jornadas"
+no topo dos hubs e do perfil (com "Reenviar"; some sozinha ao voltar para a aba já confirmada); abrir
+uma jornada, "Ver e começar" de uma paga ou a ativação individual abre "Falta confirmar seu e-mail"
+("Reenviar" e "Já confirmei", lado a lado no celular), que segue o caminho depois de confirmar. Na
+aba Conta, o e-mail aparece com "Confirmado" ou "Falta confirmar". Quem entra pelo Google não vê nada
+disso.
+
 **Perfil · Conta · Meus dados (mock `atmavox-cadastro.html`, C, 1.27.0):** lista para conferir nome
 completo, apelido, celular (WhatsApp) e data de nascimento (todos com * vermelho), cada um com "Editar"
 que abre o campo na própria linha (valida, formata o celular, mostra a data por extenso); "Pôr uma

@@ -73,6 +73,15 @@ const PATHS = {
       <path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20" />
     </>
   ),
+  mail: (
+    <>
+      <rect x="3.5" y="5.5" width="17" height="13" rx="2.5" />
+      <path d="M4 7l8 6 8-6" />
+    </>
+  ),
+  refresh: (
+    <path d="M20 11.5A8 8 0 0 0 6 6.3L4 8.5M4 4v4.5h4.5M4 12.5a8 8 0 0 0 14 5.2l2-2.2M20 20v-4.5h-4.5" />
+  ),
   camera: (
     <>
       <path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3V19H4z" />
