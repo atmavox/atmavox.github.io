@@ -91,7 +91,7 @@ export function hubAreaItem(section: HubSection): HubTab | null {
 }
 
 /** "/perfil": a página de perfil, aberta pela bolinha da conta nos hubs (mock aprovado). */
-export const isProfilePath = (path: string) => /^\/perfil(\/ativacoes)?\/?$/.test(path)
+export const isProfilePath = (path: string) => /^\/perfil(\/(ativacoes|conta))?\/?$/.test(path)
 
 /** "/ativacao": a ativação individual, numa janela sobre o Contato (ADR-029). */
 export const isActivationPath = (path: string) => /^\/ativacao(\/|$)/.test(path)

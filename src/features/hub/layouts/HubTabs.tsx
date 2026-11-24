@@ -35,7 +35,7 @@ import { SocialPosts } from '../components/SocialPosts'
 import { Testimonials } from '../components/Testimonials'
 import { about, contactCta, hero, introAudio, signature, specialties } from '../content'
 import { meditationHref, toHubAudio } from '../meditations'
-import { HUB_AREA_MENU, HUB_TABS, type HubTab, type PaymentReturn } from '../navigation'
+import { HUB_TABS, type HubTab, type PaymentReturn } from '../navigation'
 import { coverToneAt } from '../../../shared/ui/bannerTones'
 
 const TAB_ICONS: Record<HubTab, LucideIcon> = {
@@ -224,13 +224,14 @@ export function HubTabs({
 
       <nav
         aria-label="Seções"
-        className={`fixed inset-x-0 bottom-0 z-20 grid border-t border-line bg-bg/95 px-2 pt-1.5 backdrop-blur ${isHubTab ? 'grid-cols-3' : 'grid-cols-4'}`}
+        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-line bg-bg/95 px-2 pt-1.5 backdrop-blur"
         style={{ paddingBottom: 'calc(6px + env(safe-area-inset-bottom))' }}
       >
-        {/* Nos hubs, a barra é da área da conta: Início, Jornadas, Meditações (mock, opção 3). */}
-        {(isHubTab ? HUB_AREA_MENU : HUB_TABS).map((tab) => {
+        {/* As mesmas quatro abas em todo o site, também nos hubs (pedido de 2026-11-24). No perfil e na
+            volta do pagamento, nenhuma fica marcada. */}
+        {HUB_TABS.map((tab) => {
           const Icon = TAB_ICONS[tab.id]
-          const isActive = tab.id === activeTab
+          const isActive = tab.id === activeTab && !isProfile && !payment
           return (
             <a
               key={tab.id}

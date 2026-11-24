@@ -52,7 +52,11 @@ export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'n
     )
   }
 
-  const freeMedia = FREE_MEDIA[meditation.id]
+  // Grátis sem login só as da página inicial (em destaque); as outras pedem conta, e-mail confirmado e
+  // cadastro completo (pedido de 2026-11-24).
+  const isLockedFree =
+    meditation.pricing.type === 'free' && !meditation.featured && !purchase.passes
+  const freeMedia = isLockedFree ? undefined : FREE_MEDIA[meditation.id]
   const productAccess = access.accessOf(meditation.id)
   const offer = productOffer(meditation, {
     place: 'hub',
@@ -111,6 +115,22 @@ export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'n
             ? 'Carregando…'
             : 'Não foi possível abrir agora. Verifique sua internet e tente de novo.'}
         </p>
+      )}
+      {isLockedFree && (
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-surface p-5">
+          <p className="text-ink-muted">
+            {purchase.isLogged
+              ? 'Falta pouco para ouvir: confira seu cadastro.'
+              : 'Entre na sua conta para ouvir esta meditação.'}
+          </p>
+          <button
+            type="button"
+            onClick={() => purchase.unlock(meditation)}
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-6 font-semibold text-bg hover:opacity-90"
+          >
+            {purchase.isLogged ? 'Ouvir' : 'Entrar para ouvir'}
+          </button>
+        </div>
       )}
       {!media && !isOwned && meditation.pricing.type === 'paid' && (
         // Paga: o conteúdo só chega com acesso (ADR-020). Sem login, entra; depois, o preço.

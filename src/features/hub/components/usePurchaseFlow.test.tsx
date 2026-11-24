@@ -1,3 +1,8 @@
+import { createInMemoryProfileSource } from '../../../shared/profile/profileSource'
+import { ProfileSourceContext } from '../../../shared/profile/ProfileSourceContext'
+import { clearReturnTarget, readReturnTarget } from '../../../shared/profile/returnTo'
+import { COMPLETE_PROFILE } from '../../../test/completeProfile'
+import { WithCompleteProfile } from '../../../test/profile'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { AuthContext } from '../../../shared/auth/AuthContext'
@@ -45,7 +50,11 @@ function Harness() {
 }
 
 const renderWith = (session: AuthSession, ui: React.ReactNode) =>
-  render(<AuthContext.Provider value={session}>{ui}</AuthContext.Provider>)
+  render(
+    <AuthContext.Provider value={session}>
+      <WithCompleteProfile>{ui}</WithCompleteProfile>
+    </AuthContext.Provider>,
+  )
 
 describe('compra de um produto pago no hub (F9)', () => {
   it('sem login, pede para entrar mostrando o produto; depois do login, mostra o preço', async () => {
@@ -73,7 +82,7 @@ describe('compra de um produto pago no hub (F9)', () => {
     await session.signInWithGoogle()
     renderWith(session, <Harness />)
     fireEvent.click(screen.getByRole('button', { name: 'Comprar Raízes' }))
-    expect(screen.getByRole('dialog', { name: 'Raízes' })).toBeInTheDocument()
+    expect(await screen.findByRole('dialog', { name: 'Raízes' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /Voltar para as jornadas/ }))
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
@@ -99,6 +108,32 @@ describe('compra com e-mail ainda sem confirmar (2026-11-24)', () => {
     auth.confirmEmail('bia@exemplo.com')
     fireEvent.click(within(ask).getByRole('button', { name: 'Já confirmei' }))
     expect(await screen.findByRole('dialog', { name: 'Raízes' })).toBeInTheDocument()
+  })
+})
+
+describe('compra com cadastro incompleto (2026-11-24)', () => {
+  it('antes do preço, mostra o que falta e leva à aba Conta lembrando a volta', async () => {
+    const session = newSession()
+    await session.signInWithGoogle()
+    render(
+      <AuthContext.Provider value={session}>
+        <ProfileSourceContext.Provider
+          value={createInMemoryProfileSource({}, { ...COMPLETE_PROFILE, phone: '', birthDate: '' })}
+        >
+          <Harness />
+        </ProfileSourceContext.Provider>
+      </AuthContext.Provider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Comprar Raízes' }))
+    const ask = await screen.findByRole('dialog', { name: 'Seu cadastro está quase pronto' })
+    expect(within(ask).getByText('2 de 4 dados preenchidos')).toBeInTheDocument()
+    expect(within(ask).getByText('Celular (WhatsApp)')).toBeInTheDocument()
+    expect(within(ask).getByText('Data de nascimento')).toBeInTheDocument()
+
+    fireEvent.click(within(ask).getByRole('button', { name: /Completar no meu perfil/ }))
+    expect(window.location.hash).toBe('#/perfil/conta')
+    expect(readReturnTarget()).toEqual({ href: '#/jornadas', title: 'Raízes' })
+    clearReturnTarget()
   })
 })
 

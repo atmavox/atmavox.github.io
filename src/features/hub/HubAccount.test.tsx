@@ -73,9 +73,17 @@ describe('cabeçalho dos hubs (opção 3)', () => {
     )
   })
 
-  it('no celular, a barra de baixo vira Início, Jornadas e Meditações', () => {
+  it('no celular, os hubs mantêm as quatro abas de sempre, com Jornadas marcada', () => {
     renderHub(newSession(), '/jornadas')
     const nav = screen.getByRole('navigation', { name: 'Seções' })
-    expect(within(nav).getAllByRole('link')).toHaveLength(3)
+    expect(
+      within(nav)
+        .getAllByRole('link')
+        .map((link) => link.textContent),
+    ).toEqual(['Início', 'Jornadas', 'Meditações', 'Contato'])
+    expect(within(nav).getByRole('link', { name: 'Jornadas' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
   })
 })

@@ -31,9 +31,22 @@ export function parseSavedAnamnesis(raw: unknown): SavedAnamnesis | null {
   }
 }
 
-/** O que já se sabe da pessoa entra preenchido (o nome da conta), sem apagar o que ela respondeu. */
-export function initialAnswers(saved: SavedAnamnesis | null, displayName: string | null): Answers {
+/** Os dados do perfil (aba Conta) que a anamnese reaproveita, pelo id da pergunta. */
+export type KnownAnswers = Partial<Record<'nome' | 'telefone' | 'apelido' | 'nascimento', string>>
+
+/**
+ * O que já se sabe da pessoa entra preenchido (os dados do perfil e, sem eles, o nome da conta), sem
+ * apagar o que ela já respondeu.
+ */
+export function initialAnswers(
+  saved: SavedAnamnesis | null,
+  displayName: string | null,
+  known: KnownAnswers = {},
+): Answers {
   const answers = { ...(saved?.answers ?? {}) }
+  for (const [id, value] of Object.entries(known)) {
+    if (!answers[id] && value?.trim()) answers[id] = value.trim()
+  }
   if (!answers.nome && displayName?.trim()) answers.nome = displayName.trim()
   return answers
 }

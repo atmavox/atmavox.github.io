@@ -1,3 +1,4 @@
+import { WithCompleteProfile } from '../../../../test/profile'
 import { AuthContext } from '../../../../shared/auth/AuthContext'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
@@ -22,11 +23,13 @@ function renderWithAccount({ withAccount = true, hint = false, confirmed = true 
   // Como em `app/`: a sessão de login do site inteiro fica em volta da jornada (ADR-022).
   render(
     <AuthContext.Provider value={test?.session ?? null}>
-      <JourneyContext.Provider
-        value={{ content: createJourneyContent({ fallback: chamaInterna21 }), store, account }}
-      >
-        <JourneyApp path="/jornada" />
-      </JourneyContext.Provider>
+      <WithCompleteProfile>
+        <JourneyContext.Provider
+          value={{ content: createJourneyContent({ fallback: chamaInterna21 }), store, account }}
+        >
+          <JourneyApp path="/jornada" />
+        </JourneyContext.Provider>
+      </WithCompleteProfile>
     </AuthContext.Provider>,
   )
   return { backend, store, local }

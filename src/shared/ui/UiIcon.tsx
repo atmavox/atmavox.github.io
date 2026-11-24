@@ -73,6 +73,12 @@ const PATHS = {
       <path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20" />
     </>
   ),
+  user: (
+    <>
+      <circle cx="12" cy="8.5" r="3.8" />
+      <path d="M4.5 20c1-4 4-6 7.5-6s6.5 2 7.5 6" />
+    </>
+  ),
   mail: (
     <>
       <rect x="3.5" y="5.5" width="17" height="13" rx="2.5" />

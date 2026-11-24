@@ -10,6 +10,22 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.29.0] · 2026-11-24
+
+### Adicionado
+
+- "Seu cadastro está quase pronto" (mock `atmavox-cadastro.html`, C) antes de pagar, abrir uma
+  jornada, pedir a ativação individual ou ouvir uma meditação grátis fora da página inicial: mostra o
+  que falta e leva à aba Conta (`#/perfil/conta`); completo, o perfil oferece "Voltar para…".
+- Login com e-mail (mock A): "Ainda não tem conta? Criar conta com este e-mail" no aviso de e-mail ou
+  senha incorretos; olho para mostrar a senha no login e no cadastro.
+
+### Alterado
+
+- Meditações grátis sem login: só as em destaque na página inicial.
+- Ativação individual: "Seus dados" vem preenchido com o cadastro da aba Conta.
+- Celular: as abas de baixo continuam Início, Jornadas, Meditações e Contato também nos hubs.
+
 ## [1.28.0] · 2026-11-24
 
 ### Adicionado

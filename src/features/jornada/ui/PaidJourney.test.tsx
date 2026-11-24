@@ -1,3 +1,5 @@
+import { AuthContext } from '../../../shared/auth/AuthContext'
+import { WithCompleteProfile } from '../../../test/profile'
 import { render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { AccessContext } from '../../../shared/catalog/AccessContext'
@@ -32,16 +34,21 @@ function accessStore(list: ProductAccess[]): AccessStore {
 async function renderPaidJourney(list: ProductAccess[]) {
   const local = new InMemoryProgressRepository()
   const store = createJourneyStore({ repository: local })
-  const { account } = createTestAccount({ store, local })
+  const { account, session } = createTestAccount({ store, local })
   await account.signInWithGoogle()
+  // Como em `app/`: a sessão do site inteiro em volta; a pessoa já tem o cadastro completo.
   render(
-    <AccessContext.Provider value={accessStore(list)}>
-      <JourneyContext.Provider
-        value={{ content: createJourneyContent({ fallback: chamaInterna21 }), store, account }}
-      >
-        <JourneyApp path="/jornada/chama-interna-21" />
-      </JourneyContext.Provider>
-    </AccessContext.Provider>,
+    <AuthContext.Provider value={session}>
+      <WithCompleteProfile>
+        <AccessContext.Provider value={accessStore(list)}>
+          <JourneyContext.Provider
+            value={{ content: createJourneyContent({ fallback: chamaInterna21 }), store, account }}
+          >
+            <JourneyApp path="/jornada/chama-interna-21" />
+          </JourneyContext.Provider>
+        </AccessContext.Provider>
+      </WithCompleteProfile>
+    </AuthContext.Provider>,
   )
 }
 

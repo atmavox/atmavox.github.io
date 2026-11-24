@@ -1,70 +1,39 @@
-import { useCallback, useState, type ReactNode } from 'react'
-import { useAuthSession } from '../../../shared/auth/AuthContext'
-import { EmailConfirmDialog } from '../../../shared/auth/EmailConfirmDialog'
-import { needsEmailConfirmation } from '../../../shared/auth/emailConfirmation'
-import { LoginDialog } from '../../../shared/auth/LoginDialog'
+import { useState, type ReactNode } from 'react'
 import type { Product } from '../../../shared/catalog/product'
 import { PriceDialog } from './PriceDialog'
+import { useAccessGate } from './useAccessGate'
 
-type Step = { kind: 'login' | 'email' | 'price'; product: Product } | null
+const hrefOf = (product: Product) =>
+  product.kind === 'journey' ? '#/jornadas' : `#/meditacao/${product.id}`
 
 /**
- * Fluxo de um produto pago no hub (F9, ADR-020): sem login, a janela de login (mostrando o produto);
- * depois do login, a janela de preço. Conta criada com e-mail e ainda sem confirmar: antes do preço,
- * "Falta confirmar seu e-mail". Grátis não passa por aqui: o botão já leva ao produto.
+ * Fluxo de um produto pago no hub (F9, ADR-020): antes do preço, as travas (entrar, confirmar o e-mail
+ * e completar o cadastro: `useAccessGate`); depois, a janela de preço. Grátis não passa por aqui.
  */
 export function usePurchaseFlow(): {
   isLogged: boolean
+  /** Já passa pelas travas (entrou, confirmou o e-mail e completou o cadastro). */
+  passes: boolean
   start: (product: Product) => void
+  /** Grátis que pede as travas (meditação fora da página inicial): só as travas, sem preço. */
+  unlock: (product: Product) => void
   dialogs: ReactNode
 } {
-  const { session, state } = useAuthSession()
-  const [step, setStep] = useState<Step>(null)
-  const isLogged = !!state?.user
-  const close = useCallback(() => setStep(null), [])
+  const gate = useAccessGate()
+  const [priced, setPriced] = useState<Product | null>(null)
+  const close = () => setPriced(null)
+  const start = (product: Product) => gate.start(product, hrefOf(product), () => setPriced(product))
 
-  // Depois do login a sessão já tem o usuário: decide entre confirmar o e-mail e ver o preço.
-  const afterLogin = useCallback(
-    (product: Product) =>
-      setStep({
-        kind: needsEmailConfirmation(session?.getSnapshot().user) ? 'email' : 'price',
-        product,
-      }),
-    [session],
-  )
-
-  const start = useCallback(
-    (product: Product) => {
-      if (isLogged || !session) afterLogin(product)
-      else setStep({ kind: 'login', product })
-    },
-    [isLogged, session, afterLogin],
-  )
-
-  let dialogs: ReactNode = null
-  if (step?.kind === 'login' && session) {
-    const { product } = step
-    dialogs = (
-      <LoginDialog
-        account={session}
-        variant="gate"
-        chosen={{
-          title: product.title,
-          territory: product.territory,
-          mediaId: product.bannerMediaId,
-        }}
-        onClose={close}
-        onSignedIn={() => afterLogin(product)}
-      />
-    )
-  } else if (step?.kind === 'email') {
-    const { product } = step
-    dialogs = (
-      <EmailConfirmDialog onClose={close} onConfirmed={() => setStep({ kind: 'price', product })} />
-    )
-  } else if (step?.kind === 'price') {
-    dialogs = <PriceDialog product={step.product} onClose={close} />
+  return {
+    isLogged: gate.isLogged,
+    passes: gate.passes,
+    start,
+    unlock: (product: Product) => gate.start(product, hrefOf(product), () => {}),
+    dialogs: (
+      <>
+        {gate.dialogs}
+        {priced && <PriceDialog product={priced} onClose={close} />}
+      </>
+    ),
   }
-
-  return { isLogged, start, dialogs }
 }

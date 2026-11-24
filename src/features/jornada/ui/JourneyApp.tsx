@@ -11,6 +11,10 @@ import {
 import { LoginGate } from './account/LoginGate'
 import { EmailConfirmDialog } from '../../../shared/auth/EmailConfirmDialog'
 import { needsEmailConfirmation } from '../../../shared/auth/emailConfirmation'
+import { localDate } from '../../../shared/ativacao/availability'
+import { missingProfileFields } from '../../../shared/profile/profile'
+import { ProfileGateDialog } from '../../../shared/profile/ProfileGateDialog'
+import { useMyProfile } from '../../../shared/profile/useMyProfile'
 import { furthestUnlockedTab, isTabUnlocked } from '../application/tabAccess'
 import { JourneyHeader } from './JourneyHeader'
 import { ClosingPage } from './pages/ClosingPage'
@@ -138,6 +142,7 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
   const access = useAccess()
   const now = useNow()
   const product = useCatalog().find(journeyId)
+  const my = useMyProfile()
   const userId = state?.user?.uid
 
   // Quem acabou de entrar pode ter acesso a uma jornada paga: busca de novo, agora com o login.
@@ -191,6 +196,36 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
         />
       </>
     )
+  }
+  // Cadastro completo (nome, apelido, celular e nascimento) antes de começar (pedido de 2026-11-24).
+  if (account && state?.user && !isAdmin) {
+    if (!my.profile) {
+      return (
+        <p aria-busy="true" className="py-20 text-center text-ink-muted">
+          Carregando…
+        </p>
+      )
+    }
+    const missing = missingProfileFields(my.profile, localDate(now))
+    if (missing.length > 0) {
+      return (
+        <>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none min-h-dvh blur-[7px] saturate-90 select-none"
+          >
+            {loginBackground}
+          </div>
+          <ProfileGateDialog
+            missing={missing}
+            returnTo={{ href: `#/jornada/${journeyId}`, title: product?.title ?? 'a jornada' }}
+            onClose={() => {
+              window.location.hash = '#/jornadas'
+            }}
+          />
+        </>
+      )
+    }
   }
   if (product?.pricing.type === 'paid' && !isAdmin && !access.owns(product.id, now)) {
     if (access.status === 'loading') {

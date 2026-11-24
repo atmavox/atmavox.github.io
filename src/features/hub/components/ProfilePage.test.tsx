@@ -1,3 +1,5 @@
+import { readReturnTarget, saveReturnTarget } from '../../../shared/profile/returnTo'
+import { COMPLETE_PROFILE } from '../../../test/completeProfile'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { AuthContext } from '../../../shared/auth/AuthContext'
@@ -79,6 +81,27 @@ describe('perfil (mock aprovado)', () => {
     )
     expect(await screen.findByRole('heading', { name: 'Mari' })).toBeInTheDocument()
     expect(document.querySelector('header img')).toHaveAttribute('src', 'data:image/webp;base64,AA')
+  })
+
+  it('veio do "Complete seu cadastro": com tudo preenchido, oferece voltar para onde ia', async () => {
+    saveReturnTarget({ href: '#/jornada/raizes', title: 'Raízes' })
+    window.location.hash = '#/perfil/conta'
+    const session = await loggedSession()
+    render(
+      <AuthContext.Provider value={session}>
+        <ProfilePage
+          layout="wide"
+          progressLoader={sevenDays}
+          profileSource={createInMemoryProfileSource({}, COMPLETE_PROFILE)}
+        />
+      </AuthContext.Provider>,
+    )
+    expect(screen.getByRole('tab', { name: 'Conta' })).toHaveAttribute('aria-selected', 'true')
+    const back = await screen.findByRole('link', { name: /Voltar para Raízes/ })
+    expect(back).toHaveAttribute('href', '#/jornada/raizes')
+    fireEvent.click(back)
+    expect(readReturnTarget()).toBeNull()
+    window.location.hash = ''
   })
 
   it('quem ainda não começou vê o convite para as jornadas', async () => {

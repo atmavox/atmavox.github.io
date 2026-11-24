@@ -1,3 +1,4 @@
+import { WRONG_CREDENTIALS } from './authErrors'
 import { AuthFailure, type AuthService, type AuthUser } from './ports'
 
 /** Login de mentira para testes: aceita qualquer e-mail com a senha "certa". */
@@ -30,7 +31,7 @@ export class InMemoryAuth implements AuthService {
   }
 
   async signInWithEmail(email: string, password: string) {
-    if (password !== 'certa') throw new AuthFailure('E-mail ou senha incorretos.')
+    if (password !== 'certa') throw new AuthFailure(WRONG_CREDENTIALS)
     this.setUser({
       uid: `uid-${email}`,
       displayName: null,

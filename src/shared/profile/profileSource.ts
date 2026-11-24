@@ -69,15 +69,17 @@ export function createRestProfileSource(
 /** Para os testes e para o site sem Firebase configurado. */
 export function createInMemoryProfileSource(
   initial: Record<string, PersonProfile> = {},
+  /** O perfil de quem não está em `initial` (nos testes, um cadastro já completo). */
+  fallback: PersonProfile = EMPTY_PROFILE,
 ): ProfileSource & { saved: Record<string, PersonProfile> } {
   const saved = { ...initial }
   return {
     saved,
     async load(uid) {
-      return saved[uid] ?? EMPTY_PROFILE
+      return saved[uid] ?? fallback
     },
     async save(uid, change) {
-      saved[uid] = { ...(saved[uid] ?? EMPTY_PROFILE), ...change }
+      saved[uid] = { ...(saved[uid] ?? fallback), ...change }
     },
   }
 }

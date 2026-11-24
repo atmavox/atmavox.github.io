@@ -21,6 +21,12 @@ import type { ProfileSource } from '../../../shared/profile/profileSource'
 import { useMyProfile } from '../../../shared/profile/useMyProfile'
 import { LoadingNote } from '../../../shared/ui/LoadingNote'
 import { MyDataCard } from './MyDataCard'
+import { isProfileComplete } from '../../../shared/profile/profile'
+import {
+  clearReturnTarget,
+  readReturnTarget,
+  type ReturnTarget,
+} from '../../../shared/profile/returnTo'
 
 // A aba Ativações só é baixada por quem abre (ADR-029).
 const ActivationsTab = lazy(() => import('../ativacao/ActivationsTab'))
@@ -178,6 +184,33 @@ function JourneyTrailCard({
   )
 }
 
+/**
+ * Veio do "Complete seu cadastro": enquanto falta dado, lembra para onde volta; pronto, oferece voltar
+ * (mock aprovado, Complete seu cadastro C).
+ */
+function ReturnNote({ target, isComplete }: { target: ReturnTarget; isComplete: boolean }) {
+  if (!isComplete) {
+    return (
+      <p className="rounded-2xl bg-accent/10 px-4 py-3 text-sm text-ink-muted">
+        Complete os dados abaixo para voltar para <b className="text-ink">{target.title}</b>.
+      </p>
+    )
+  }
+  return (
+    <div className="flex animate-[fade-in_300ms_ease-out] flex-wrap items-center justify-between gap-3 rounded-2xl border border-ok/40 bg-ok/10 px-4 py-3">
+      <p className="text-ink">Pronto! Seu cadastro está completo.</p>
+      <a
+        href={target.href}
+        onClick={clearReturnTarget}
+        className="inline-flex min-h-10 items-center gap-2 rounded-full bg-accent px-5 font-semibold text-bg hover:opacity-90"
+      >
+        Voltar para {target.title}
+        <ArrowRight aria-hidden size={16} />
+      </a>
+    </div>
+  )
+}
+
 /** Perfil (`#/perfil`, mock aprovado): abas Visão geral, Jornadas, Meditações e Conta. */
 export function ProfilePage({
   layout,
@@ -194,10 +227,16 @@ export function ProfilePage({
   const access = useAccess()
   const now = useNow()
   const my = useMyProfile(profileSource)
-  // "#/perfil/ativacoes" (para onde a janela da ativação leva ao fechar) abre direto na aba.
+  // "#/perfil/ativacoes" (para onde a janela da ativação leva ao fechar) e "#/perfil/conta" (o
+  // "Complete seu cadastro") abrem direto na aba.
   const [tab, setTab] = useState<Tab>(() =>
-    window.location.hash.startsWith('#/perfil/ativacoes') ? 'ativacoes' : 'geral',
+    window.location.hash.startsWith('#/perfil/ativacoes')
+      ? 'ativacoes'
+      : window.location.hash.startsWith('#/perfil/conta')
+        ? 'conta'
+        : 'geral',
   )
+  const [returnTo] = useState(readReturnTarget)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isConfirmingExit, setIsConfirmingExit] = useState(false)
   const { journeys: allJourneys, meditations: allMeditations } = useCatalog()
@@ -362,6 +401,12 @@ export function ProfilePage({
     ),
     conta: (
       <>
+        {returnTo && my.profile && (
+          <ReturnNote
+            target={returnTo}
+            isComplete={isProfileComplete(my.profile, localDate(now))}
+          />
+        )}
         {my.profile ? (
           <MyDataCard
             profile={my.profile}

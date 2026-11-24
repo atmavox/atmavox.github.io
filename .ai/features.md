@@ -370,6 +370,17 @@ e play; filtros Todas, Áudio, Vídeo, Com e-book (logada: Grátis e Minhas). Gr
 seguem o mesmo fluxo das jornadas, com "Pagar e ouvir". Com acesso, a meditação mostra o play e "Baixar
 e-book".
 
+**Travas antes de jornadas, meditações dos hubs e compras (1.29.0, pedido de 2026-11-24):** entrar →
+confirmar o e-mail (ADR-031) → cadastro completo (nome, apelido, celular e nascimento, ADR-030). Faltando
+dado, "Seu cadastro está quase pronto" (mock `atmavox-cadastro.html`, C): barra do cadastro, o que
+falta e "Completar no meu perfil", que abre a aba Conta (`#/perfil/conta`) lembrando para onde a
+pessoa ia; com tudo preenchido, "Voltar para {título}". Vale para "Ver e começar" (pagas), para
+abrir qualquer jornada (rota `#/jornada/…`), para a ativação individual (que passa a vir com "Seus
+dados" preenchidos pelo perfil) e para as **meditações grátis que não estão na página inicial** (as em
+destaque na página inicial continuam livres, sem login). Login com e-mail (mock A): "E-mail ou senha
+incorretos. Ainda não tem conta? Criar conta com este e-mail" e o olho para mostrar a senha. No
+celular, as abas de baixo são sempre Início · Jornadas · Meditações · Contato.
+
 **Confirmação de e-mail (mock `atmavox-cadastro.html`, A, 1.28.0, ADR-031):** conta criada com e-mail
 e senha recebe o link de confirmação. Até confirmar: faixa "Confirme seu e-mail para começar as jornadas"
 no topo dos hubs e do perfil (com "Reenviar"; some sozinha ao voltar para a aba já confirmada); abrir

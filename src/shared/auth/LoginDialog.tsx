@@ -1,5 +1,5 @@
 import { CLOSING_BACKDROP, CLOSING_DIALOG, useClosing } from '../ui/useClosing'
-import { X } from 'lucide-react'
+import { CircleAlert, Eye, EyeOff, X } from 'lucide-react'
 import { REQUIRED_MARK } from '../ui/requiredMark'
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
@@ -7,6 +7,7 @@ import { GoogleLogo } from '../ui/GoogleLogo'
 import { ProductBanner } from '../ui/ProductBanner'
 import type { LoginActions } from './session'
 import { AuthFailure } from './ports'
+import { WRONG_CREDENTIALS } from './authErrors'
 
 type Mode = 'entrar' | 'criar' | 'recuperar'
 
@@ -80,6 +81,7 @@ export function LoginDialog({
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [isBusy, setIsBusy] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const dialogRef = useRef<HTMLDivElement>(null)
   const ids = { title: useId(), email: useId(), password: useId() }
 
@@ -264,26 +266,64 @@ export function LoginDialog({
                 >
                   Senha
                 </label>
-                <input
-                  id={ids.password}
-                  type="password"
-                  autoComplete={mode === 'criar' ? 'new-password' : 'current-password'}
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={inputClass}
-                />
+                {/* O olho mostra a senha enquanto se digita (pedido de 2026-11-24, mock A). */}
+                <div className="relative">
+                  <input
+                    id={ids.password}
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete={mode === 'criar' ? 'new-password' : 'current-password'}
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`${inputClass} pr-12`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((shown) => !shown)}
+                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    aria-pressed={showPassword}
+                    className="absolute inset-y-0 right-1 grid w-10 place-items-center rounded-full text-ink-faint hover:text-accent"
+                  >
+                    {showPassword ? (
+                      <EyeOff aria-hidden size={19} />
+                    ) : (
+                      <Eye aria-hidden size={19} />
+                    )}
+                  </button>
+                </div>
                 {mode === 'criar' && (
                   <p className="mt-1 text-xs text-ink-faint">Pelo menos 6 caracteres.</p>
                 )}
               </div>
             )}
 
-            {error && (
-              <p role="alert" className="text-sm text-accent">
-                {error}
-              </p>
+            {error === WRONG_CREDENTIALS && mode === 'entrar' ? (
+              // O Firebase não diz se o e-mail tem conta: o aviso já oferece criar (mock A).
+              <div
+                role="alert"
+                className="flex gap-2.5 rounded-xl bg-required/10 px-3.5 py-3 text-sm text-ink"
+              >
+                <CircleAlert aria-hidden size={18} className="mt-0.5 shrink-0 text-required" />
+                <p>
+                  <b className="font-semibold">{WRONG_CREDENTIALS}</b>
+                  <br />
+                  <span className="text-ink-muted">Ainda não tem conta?</span>{' '}
+                  <button
+                    type="button"
+                    onClick={() => switchMode('criar')}
+                    className="font-medium text-accent underline underline-offset-2"
+                  >
+                    Criar conta com este e-mail
+                  </button>
+                </p>
+              </div>
+            ) : (
+              error && (
+                <p role="alert" className="text-sm text-accent">
+                  {error}
+                </p>
+              )
             )}
             {notice && (
               <p role="status" className="text-sm text-ink-muted">

@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useAuthSession } from '../auth/AuthContext'
 import { readFirebaseConfig } from '../firebase/config'
 import { EMPTY_PROFILE, type PersonProfile } from './profile'
+import { ProfileSourceContext } from './ProfileSourceContext'
 import {
   createInMemoryProfileSource,
   createRestProfileSource,
@@ -18,12 +19,14 @@ export type MyProfile =
 export function useMyProfile(injected?: ProfileSource) {
   const { session, state } = useAuthSession()
   const uid = state?.user?.uid ?? null
+  const fromContext = useContext(ProfileSourceContext)
   const source = useMemo<ProfileSource>(() => {
     if (injected) return injected
+    if (fromContext) return fromContext
     const config = readFirebaseConfig(import.meta.env)
     if (!config || !session) return createInMemoryProfileSource()
     return createRestProfileSource(config, () => session.getIdToken())
-  }, [injected, session])
+  }, [injected, fromContext, session])
 
   const [loaded, setLoaded] = useState<{ uid: string; value: MyProfile } | null>(null)
 

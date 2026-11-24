@@ -1,9 +1,15 @@
 const GENERIC = 'Não foi possível entrar agora. Tente de novo em instantes.'
 
+/**
+ * O Firebase não diz se o e-mail tem conta (proteção contra enumeração ligada, decisão de 2026-11-24):
+ * a janela de login mostra esta mensagem com "Ainda não tem conta? Criar conta com este e-mail".
+ */
+export const WRONG_CREDENTIALS = 'E-mail ou senha incorretos.'
+
 const MESSAGES: Record<string, string | null> = {
-  'auth/invalid-credential': 'E-mail ou senha incorretos.',
-  'auth/wrong-password': 'E-mail ou senha incorretos.',
-  'auth/user-not-found': 'E-mail ou senha incorretos.',
+  'auth/invalid-credential': WRONG_CREDENTIALS,
+  'auth/wrong-password': WRONG_CREDENTIALS,
+  'auth/user-not-found': WRONG_CREDENTIALS,
   'auth/invalid-email': 'Este e-mail não parece válido. Confira e tente de novo.',
   'auth/missing-password': 'Digite a sua senha.',
   'auth/email-already-in-use': 'Já existe uma conta com este e-mail. Tente entrar.',

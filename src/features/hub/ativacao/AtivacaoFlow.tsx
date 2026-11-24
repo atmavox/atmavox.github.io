@@ -19,6 +19,9 @@ import { useAuthSession } from '../../../shared/auth/AuthContext'
 import { LoginDialog } from '../../../shared/auth/LoginDialog'
 import { EmailConfirmDialog } from '../../../shared/auth/EmailConfirmDialog'
 import { needsEmailConfirmation } from '../../../shared/auth/emailConfirmation'
+import { missingProfileFields } from '../../../shared/profile/profile'
+import { ProfileGateDialog } from '../../../shared/profile/ProfileGateDialog'
+import { useMyProfile } from '../../../shared/profile/useMyProfile'
 import { whatsAppMessage } from '../../../shared/brand/links'
 import { paymentsUrl, requestCheckout } from '../../../shared/catalog/checkout'
 import { formatPrice } from '../../../shared/catalog/offer'
@@ -138,6 +141,13 @@ export function AtivacaoFlow({
   // As respostas de antes voltam preenchidas (para conferir); o nome da conta entra se faltar.
   const uid = user?.uid ?? null
   const displayName = user?.displayName ?? null
+  // Os dados da aba Conta entram em "Seus dados" (pedido de 2026-11-24: um cadastro só).
+  const my = useMyProfile()
+  const known = my.profile
+  const fullName = known?.fullName ?? ''
+  const phone = known?.phone ?? ''
+  const nickname = known?.nickname ?? ''
+  const birthDate = known?.birthDate ?? ''
   useEffect(() => {
     if (!uid) return
     let cancelled = false
@@ -146,13 +156,20 @@ export function AtivacaoFlow({
       .catch(() => null)
       .then((saved) => {
         if (cancelled) return
-        setAnswers(initialAnswers(saved, displayName))
+        setAnswers(
+          initialAnswers(saved, displayName, {
+            nome: fullName,
+            telefone: phone,
+            apelido: nickname,
+            nascimento: birthDate,
+          }),
+        )
         setConsent(saved?.consent ?? true)
       })
     return () => {
       cancelled = true
     }
-  }, [uid, displayName, source])
+  }, [uid, displayName, source, fullName, phone, nickname, birthDate])
 
   // Trocou de conta: volta para a primeira pergunta com as respostas da conta nova (ajuste durante a
   // renderização, como a documentação do React recomenda para estado que depende de outro valor).
@@ -192,6 +209,18 @@ export function AtivacaoFlow({
   // Conta criada com e-mail e ainda sem confirmar: a ativação (uma compra) espera a confirmação.
   if (needsEmailConfirmation(user)) {
     return <EmailConfirmDialog onClose={() => goTo('#/')} />
+  }
+  // E o cadastro completo (aba Conta), como antes de começar uma jornada ou comprar.
+  if (!my.profile) return null
+  const missing = missingProfileFields(my.profile, today)
+  if (missing.length > 0) {
+    return (
+      <ProfileGateDialog
+        missing={missing}
+        returnTo={{ href: '#/ativacao', title: 'a ativação individual' }}
+        onClose={() => goTo('#/')}
+      />
+    )
   }
 
   async function checkout(orderId: string) {

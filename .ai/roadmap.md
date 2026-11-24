@@ -306,8 +306,10 @@ Surgiu no caminho:
            e foto (1.27.0; falta publicar as regras do Firestore)
     2. [x] Confirmação de e-mail (1.28.0, ADR-031) (envio no cadastro, aviso, reenviar; trava também nas regras do
            Firestore e no Worker)
-    3. [ ] Trava do cadastro completo antes de comprar ou abrir material dos hubs (a ativação passa a usar
+    3. [x] (1.29.0) Trava do cadastro completo antes de comprar ou abrir material dos hubs (a ativação passa a usar
            os mesmos dados) + meditações grátis só na página inicial
+    - [x] No celular, as abas de baixo ficam Início · Jornadas · Meditações · Contato também nos hubs
+          (pedido de 2026-11-24)
     4. [ ] Modo Andreía · Acessos: dados da pessoa e lista de quem aceitou novidades; regras novas do
            Firestore (publicar no console)
 

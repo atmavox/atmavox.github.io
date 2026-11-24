@@ -1,4 +1,5 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import { WithCompleteProfile } from '../../../test/profile'
+import { act, waitFor, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AnamnesisForm } from '../../../shared/ativacao/anamnesis'
 import { FIXED_QUESTIONS } from '../../../shared/ativacao/anamnesis'
@@ -83,7 +84,9 @@ describe('ativação individual', () => {
     const { session, source } = setup({ signedIn: false })
     render(
       <AuthContext.Provider value={session}>
-        <AtivacaoFlow source={source} />
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     expect(await screen.findByRole('dialog', { name: 'Entre para agendar' })).toBeInTheDocument()
@@ -96,13 +99,17 @@ describe('ativação individual', () => {
     const { session, source } = setup({ signedIn: false })
     render(
       <AuthContext.Provider value={session}>
-        <AtivacaoFlow source={source} />
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     fireEvent.click(await screen.findByRole('button', { name: 'Continuar com o Google' }))
 
-    // Anamnese: o nome da conta já vem; telefone com DDD é obrigatório.
-    expect(await screen.findByLabelText('Nome completo')).toHaveValue('Maria')
+    // "Seus dados" já vem com o cadastro da aba Conta; telefone continua obrigatório.
+    await waitFor(() => expect(screen.getByLabelText('Nome completo')).toHaveValue('Maria Souza'))
+    expect(screen.getByLabelText('Telefone (WhatsApp)')).toHaveValue('(41) 9 9876-5432')
+    fireEvent.change(screen.getByLabelText('Telefone (WhatsApp)'), { target: { value: '' } })
     fireEvent.click(screen.getByRole('button', { name: /Continuar/ }))
     expect(screen.getByText('Responda esta pergunta para seguir.')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('Telefone (WhatsApp)'), {
@@ -122,7 +129,7 @@ describe('ativação individual', () => {
       fireEvent.click(screen.getByRole('button', { name: /Enviar e escolher a terapia/ }))
     })
     expect(source.mine['google-uid']?.answers).toMatchObject({
-      nome: 'Maria',
+      nome: 'Maria Souza',
       telefone: '41998765432',
       motivo: 'Quero sair do automático.',
     })
@@ -165,7 +172,9 @@ describe('ativação individual', () => {
     await session.signInWithGoogle()
     render(
       <AuthContext.Provider value={session}>
-        <AtivacaoFlow source={source} />
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     fireEvent.click(await screen.findByRole('button', { name: 'Fechar e ir para o meu perfil' }))
@@ -182,7 +191,9 @@ describe('ativação individual', () => {
     await session.signInWithGoogle()
     render(
       <AuthContext.Provider value={session}>
-        <AtivacaoFlow source={source} />
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     expect(await screen.findByLabelText('Nome completo')).toHaveValue('Maria Souza')
@@ -194,7 +205,9 @@ describe('ativação individual', () => {
     await session.signInWithGoogle()
     render(
       <AuthContext.Provider value={session}>
-        <AtivacaoFlow source={source} />
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     await screen.findByLabelText('Nome completo')
@@ -229,7 +242,9 @@ describe('pagamento da ativação', () => {
       )
     render(
       <AuthContext.Provider value={session}>
-        <AtivacaoFlow source={source} workerUrl="https://pag.example" redirect={redirect} />
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} workerUrl="https://pag.example" redirect={redirect} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     fireEvent.click(await screen.findByRole('button', { name: /Continuar/ }))
@@ -276,7 +291,9 @@ describe('pagamento da ativação', () => {
     source.orders[0]!.status = 'paid'
     render(
       <AuthContext.Provider value={session}>
-        <AtivacaoFlow source={source} orderReturn={{ orderId: id, status: 'aprovado' }} />
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} orderReturn={{ orderId: id, status: 'aprovado' }} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     expect(await screen.findByText('Pagamento confirmado')).toBeInTheDocument()
@@ -303,7 +320,9 @@ describe('pagamento da ativação', () => {
     })
     render(
       <AuthContext.Provider value={session}>
-        <AtivacaoFlow source={source} orderReturn={{ orderId: id, status: 'recusado' }} />
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} orderReturn={{ orderId: id, status: 'recusado' }} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     expect(await screen.findByText('O pagamento não foi aprovado')).toBeInTheDocument()
@@ -337,7 +356,9 @@ describe('confirmar o horário e acompanhar no perfil', () => {
     const id = await orderWithProposal(source, Date.now())
     render(
       <AuthContext.Provider value={session}>
-        <AtivacaoFlow source={source} confirmOrderId={id} />
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} confirmOrderId={id} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     expect(await screen.findByText('A Andreía aprovou o seu horário')).toBeInTheDocument()
@@ -359,7 +380,9 @@ describe('confirmar o horário e acompanhar no perfil', () => {
     const id = await orderWithProposal(source, Date.now() - 25 * 3600000)
     render(
       <AuthContext.Provider value={session}>
-        <AtivacaoFlow source={source} confirmOrderId={id} />
+        <WithCompleteProfile>
+          <AtivacaoFlow source={source} confirmOrderId={id} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     expect(await screen.findByText(/A reserva venceu/)).toBeInTheDocument()
@@ -373,7 +396,9 @@ describe('confirmar o horário e acompanhar no perfil', () => {
     const id = await orderWithProposal(source, Date.now())
     render(
       <AuthContext.Provider value={session}>
-        <ActivationsTab isWide source={source} />
+        <WithCompleteProfile>
+          <ActivationsTab isWide source={source} />
+        </WithCompleteProfile>
       </AuthContext.Provider>,
     )
     expect(await screen.findByText(/A Andreía aprovou um horário/)).toBeInTheDocument()
