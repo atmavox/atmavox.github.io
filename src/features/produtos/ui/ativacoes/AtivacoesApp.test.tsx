@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import { DEFAULT_ANAMNESIS } from '../../../../shared/ativacao/anamnesis'
 import { DEFAULT_THERAPIES } from '../../../../shared/ativacao/therapy'
@@ -45,6 +45,48 @@ describe('Modo Andreía · terapias', () => {
       active: true,
     })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('ligar e desligar na tabela não faz a tela pular: o aviso fica no mesmo lugar e a chave muda na hora', async () => {
+    setWideViewport(true)
+    const priced = DEFAULT_THERAPIES.map((t) => ({ ...t, priceCents: 12000 }))
+    const backend = createInMemoryAtivacoesBackend({ therapies: priced })
+    let finishSave = () => {}
+    const save = backend.saveTherapies.bind(backend)
+    backend.saveTherapies = (list) =>
+      new Promise<void>((resolve) => {
+        finishSave = () => void save(list).then(resolve)
+      })
+    render(<AtivacoesApp backend={backend} section="terapias" />)
+    const status = await screen.findByRole('status')
+    const reiki = screen.getByRole('switch', { name: 'Reiki a distância ativa' })
+
+    fireEvent.click(reiki)
+    expect(reiki).toBeChecked()
+    expect(screen.getByRole('status')).toBe(status)
+    await act(async () => finishSave())
+    expect(status).toHaveTextContent('Salvo ✓')
+
+    fireEvent.click(reiki)
+    // Durante o segundo salvamento o aviso anterior continua (sumir e voltar fazia a tela pular).
+    expect(status).toHaveTextContent('Salvo ✓')
+    expect(reiki).not.toBeChecked()
+    await act(async () => finishSave())
+    expect(backend.therapies?.[0]).toMatchObject({ id: 'reiki-a-distancia', active: false })
+  })
+
+  it('se não der para salvar, a chave volta e o aviso explica', async () => {
+    setWideViewport(true)
+    const priced = DEFAULT_THERAPIES.map((t) => ({ ...t, priceCents: 12000 }))
+    const backend = createInMemoryAtivacoesBackend({ therapies: priced })
+    backend.saveTherapies = () => Promise.reject(new Error('offline'))
+    render(<AtivacoesApp backend={backend} section="terapias" />)
+    const reiki = await screen.findByRole('switch', { name: 'Reiki a distância ativa' })
+    await act(async () => {
+      fireEvent.click(reiki)
+    })
+    expect(reiki).not.toBeChecked()
+    expect(screen.getByRole('status')).toHaveTextContent('Não deu para salvar')
   })
 
   it('cria uma terapia nova, conferindo os campos antes', async () => {

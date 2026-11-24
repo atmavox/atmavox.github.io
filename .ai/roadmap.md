@@ -318,6 +318,7 @@ Surgiu no caminho:
           2026-11-24; o celular o Google não entrega)
     - [x] (1.31.0) Hub Ativações ao lado de Jornadas e Meditações (mock `Downloads/atmavox-hub-ativacao.html`,
           D com os anéis parados; ADR-032), com o agendamento por cima e 5 itens na barra do celular
+    - [x] (1.31.1) Salvar terapias e agenda no Modo Andreía sem a tela pular (pedido de 2026-11-24)
     - [ ] **Andreía:** ajustar os textos provisórios do hub Ativações (título, convite, Como funciona)
     - [ ] **Desenvolvedor:** confirmar o e-mail das contas de teste criadas com e-mail e senha
     - [ ] **Desenvolvedor:** preencher o cadastro da conta da Andreía (ela também passa pela trava ao

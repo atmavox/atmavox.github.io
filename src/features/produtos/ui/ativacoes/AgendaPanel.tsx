@@ -138,9 +138,9 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     }
   }
 
+  /** Grava a agenda. O aviso anterior fica até chegar o novo (sumir e voltar fazia a grade pular). */
   async function persist(next: Availability, message = 'Salvo ✓'): Promise<boolean> {
     setIsSaving(true)
-    setNotice(null)
     try {
       await backend.saveAvailability(next)
       setAvailability(next)
@@ -215,8 +215,14 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     dragOrigin.current = null
   }
 
-  const noticeLine = notice && (
-    <p role="status" className={`text-sm ${notice.endsWith('✓') ? 'text-ok' : 'text-accent'}`}>
+  // Sempre montado, na ponta de uma linha que já existe: aparecer ou mudar não empurra a grade.
+  const noticeLine = (
+    <p
+      role="status"
+      className={`ml-auto text-right text-sm transition-opacity duration-300 ${
+        notice?.endsWith('✓') ? 'text-ok' : 'text-accent'
+      } ${notice ? 'opacity-100' : 'opacity-0'}`}
+    >
       {notice}
     </p>
   )
@@ -441,8 +447,10 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
             </button>
           </span>
         </div>
-        {legend}
-        {noticeLine}
+        <div className="flex items-center gap-3">
+          {legend}
+          {noticeLine}
+        </div>
 
         {view === 'semana' ? (
           // A semana no estilo do site (mock aprovado, A): cada dia é um cartão claro, com o nome do
@@ -734,8 +742,10 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
           )
         })}
       </div>
-      <h2 className="font-display text-xl text-ink">{longDate(day)}</h2>
-      {noticeLine}
+      <div className="flex items-baseline gap-3">
+        <h2 className="font-display text-xl text-ink">{longDate(day)}</h2>
+        {noticeLine}
+      </div>
       <div className="flex flex-col gap-2">
         {hours.map((hour) => {
           const starting = occurrences.filter(

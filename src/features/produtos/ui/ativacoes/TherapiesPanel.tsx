@@ -60,9 +60,18 @@ export function TherapiesPanel({
     }
   }, [backend])
 
-  async function persist(next: readonly Therapy[], message = 'Salvo ✓'): Promise<boolean> {
+  /**
+   * Grava a lista. O aviso anterior fica até chegar o novo (sumir e voltar fazia a tela pular). Com
+   * `optimistic`, a lista muda antes de o Firebase responder e volta se não der para salvar.
+   */
+  async function persist(
+    next: readonly Therapy[],
+    message = 'Salvo ✓',
+    optimistic = false,
+  ): Promise<boolean> {
+    const before = list
     setIsSaving(true)
-    setNotice(null)
+    if (optimistic) setList(next)
     try {
       await backend.saveTherapies(next)
       setList(next)
@@ -70,6 +79,7 @@ export function TherapiesPanel({
       setNotice(message)
       return true
     } catch {
+      if (optimistic) setList(before)
       setNotice(SAVE_ERROR)
       return false
     } finally {
@@ -79,7 +89,7 @@ export function TherapiesPanel({
 
   const sortable = useSortable({
     ids: (list ?? []).map((t) => t.id),
-    onMove: (from, to) => list && void persist(moveTherapy(list, from, to), 'Ordem salva ✓'),
+    onMove: (from, to) => list && void persist(moveTherapy(list, from, to), 'Ordem salva ✓', true),
     disabled: isSaving,
   })
 
@@ -94,7 +104,7 @@ export function TherapiesPanel({
 
   function toggle(therapy: Therapy) {
     const next = toggleTherapy(list!, therapy.id)
-    if (next) void persist(next)
+    if (next) void persist(next, 'Salvo ✓', true)
     else openForm(therapy, { price: 'Para ativar, a terapia precisa de preço.' })
   }
 
@@ -122,17 +132,23 @@ export function TherapiesPanel({
     }
   }
 
-  const noticeLine = notice && (
-    <p role="status" className={`text-sm ${notice.endsWith('✓') ? 'text-ok' : 'text-accent'}`}>
-      {notice}
-    </p>
-  )
+  const noticeColor = notice?.endsWith('✓') ? 'text-ok' : 'text-accent'
+  const noticeLine = notice && <p className={`text-sm ${noticeColor}`}>{notice}</p>
 
+  // O aviso mora na linha do título, sempre montado: aparecer ou mudar não empurra a tabela.
   const header = (
-    <div className="flex items-center justify-between gap-3">
+    <div className="flex items-center gap-3">
       <h1 className={`font-display text-ink ${isWide ? 'text-[2rem]' : 'text-[1.6rem]'}`}>
         Terapias
       </h1>
+      <p
+        role="status"
+        className={`min-w-0 flex-1 text-right text-sm transition-opacity duration-300 ${noticeColor} ${
+          notice ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        {notice}
+      </p>
       <button type="button" onClick={() => openForm(null)} className={adminButton}>
         <UiIcon name="plus" size={16} />
         {isWide ? 'Nova terapia' : 'Nova'}
@@ -276,7 +292,6 @@ export function TherapiesPanel({
     >
       {header}
       {modelNote}
-      {noticeLine}
       {isWide ? (
         <div className="overflow-hidden rounded-[18px] border border-line bg-surface">
           <div className="grid grid-cols-[28px_minmax(0,2.4fr)_1.3fr_0.8fr_0.8fr_auto_auto] gap-3 border-b border-line px-3 py-2 text-xs text-ink-faint">

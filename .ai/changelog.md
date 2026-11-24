@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.31.1] · 2026-11-24
+
+### Corrigido
+
+- Modo Andreía · Terapias e Agenda: salvar não faz mais a tela pular. O aviso "Salvo ✓" fica fixo na
+  linha do título (Terapias) ou da legenda (Agenda) e não some no meio do salvamento; ligar, desligar
+  e reordenar uma terapia mudam na hora e voltam se não der para salvar.
+
 ## [1.31.0] · 2026-11-24
 
 ### Adicionado
