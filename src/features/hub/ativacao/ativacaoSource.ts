@@ -14,6 +14,7 @@ import {
   newOrderId,
   orderFromFields,
   orderUpdateFields,
+  TEST_PAYMENT_REF,
   type OrderDetails,
   type SessionOrder,
 } from '../../../shared/ativacao/order'
@@ -49,6 +50,11 @@ export interface AtivacaoSource {
   getOrder(uid: string, orderId: string): Promise<SessionOrder | null>
   /** Paga → Solicitada: a pessoa avisou a Andreía no WhatsApp. */
   markRequested(uid: string, orderId: string): Promise<void>
+  /**
+   * Pagamento simulado (ADR-033): o pedido vira Paga sem cobrança, marcado como teste. Só admins
+   * (as regras do Firestore recusam os outros).
+   */
+  markTestPaid(uid: string, orderId: string): Promise<void>
   /** Os pedidos da pessoa (perfil, aba Ativações). */
   listMyOrders(uid: string): Promise<SessionOrder[]>
   /** Confirma o horário que a Andreía aprovou (o pedido vira Agendada). */
@@ -162,6 +168,19 @@ export function createRestAtivacaoSource(
         fetchFn,
       )
     },
+    async markTestPaid(uid, orderId) {
+      await patchDocument(
+        config,
+        `users/${uid}/sessions/${orderId}`,
+        orderUpdateFields({
+          status: 'paid',
+          paidAt: Date.now(),
+          paymentRef: TEST_PAYMENT_REF,
+        }) as Record<string, RestValue>,
+        await token(),
+        fetchFn,
+      )
+    },
   }
 }
 
@@ -216,6 +235,13 @@ export function createInMemoryAtivacaoSource(
       if (!order || order.status !== 'paid') throw new Error('Só um pedido pago vira Solicitada.')
       order.status = 'req'
       order.requestedAt = Date.now()
+    },
+    async markTestPaid(uid, id) {
+      const order = find(uid, id)
+      if (!order || order.status !== 'wait') throw new Error('Só um pedido novo vira pago.')
+      order.status = 'paid'
+      order.paidAt = Date.now()
+      order.paymentRef = TEST_PAYMENT_REF
     },
   }
 }

@@ -406,6 +406,13 @@ Meditações e a conta ("Entrar" ou a bolinha com "Meu perfil" e "Sair da conta"
 sem login. O perfil (`#/perfil`) tem abas Visão geral, Jornadas, Meditações e Conta, com a trilha de
 cada jornada e a etiqueta do tipo de acesso ("Grátis", "Para sempre", "Até dd/mm/aaaa").
 
+**Simular pagamento (1.32.0, ADR-033):** para admins, a janela de preço e o resumo da ativação têm a
+caixinha "Simular pagamento (teste)". Marcada, o botão vira "Simular pagamento" (azul do Modo Andreía) e
+o fluxo segue como se o Mercado Pago tivesse aprovado: o acesso vai para a conta da admin com
+`source: 'test'` (mesmo prazo do produto) e abre a volta do pagamento; o pedido da ativação vira Paga
+com `paymentRef: 'teste'` e segue para "Avisar a Andreía". Funciona mesmo com "Pagamento em breve".
+No Modo Andreía, aparecem com a etiqueta "Teste" (Acessos e Pedidos).
+
 **Modo Andreía (Etapa D):** criar e editar produtos do catálogo (tipo, estrutura, grátis/paga, preço,
 prazo de acesso, banner, frase, temas, território, destaque, ordem, status) e liberar acesso à mão.
 Uma jornada só pode ficar **Publicada** depois que o conteúdo dela for publicado no editor

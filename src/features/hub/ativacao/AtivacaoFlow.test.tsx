@@ -163,6 +163,8 @@ describe('ativação individual', () => {
     expect(screen.getByText('Sexta, 4 de dezembro, às 19h')).toBeInTheDocument()
     expect(screen.getByText('3 respostas')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Pagamento em breve' })).toBeDisabled()
+    // Quem não é admin não vê a simulação.
+    expect(screen.queryByRole('checkbox', { name: /Simular pagamento/ })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Editar terapia' }))
     expect(await screen.findByText('Qual terapia você quer?')).toBeInTheDocument()
   })
@@ -191,6 +193,50 @@ describe('ativação individual', () => {
       .getAllByRole('button', { name: /Avaliação energética com radiestesia/ })
       .find((b) => b.hasAttribute('aria-pressed'))
     expect(chosen).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('a admin simula o pagamento: o pedido vira Paga (teste) e segue para avisar a Andreía', async () => {
+    setWideViewport(true)
+    const { session, source } = setup()
+    await session.signInWithGoogle()
+    render(
+      <AuthContext.Provider value={session}>
+        <WithCompleteProfile>
+          <AtivacaoFlow
+            source={source}
+            initialTherapyId="reiki-a-distancia"
+            workerUrl={null}
+            canSimulate
+          />
+        </WithCompleteProfile>
+      </AuthContext.Provider>,
+    )
+    fireEvent.change(await screen.findByLabelText('Telefone (WhatsApp)'), {
+      target: { value: '41998765432' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/ }))
+    fireEvent.change(await screen.findByLabelText('O que trouxe você até aqui agora?'), {
+      target: { value: 'Testando o fluxo.' },
+    })
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Enviar e escolher a terapia/ }))
+    })
+    fireEvent.click(screen.getByRole('radio', { name: 'Em casa' }))
+    fireEvent.click(screen.getByRole('button', { name: /Escolher a data/ }))
+    const horarios = await screen.findByRole('radiogroup', { name: 'Horário' })
+    fireEvent.click(within(horarios).getByRole('radio', { name: '18h' }))
+    fireEvent.click(screen.getByRole('button', { name: /Revisar e pagar/ }))
+    expect(await screen.findByText('Revise o seu pedido')).toBeInTheDocument()
+
+    // Sem o Mercado Pago configurado, só a simulação deixa seguir.
+    expect(screen.getByRole('button', { name: 'Pagamento em breve' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('checkbox', { name: /Simular pagamento/ }))
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Simular pagamento' }))
+    })
+    const order = source.orders[0]!
+    expect(order).toMatchObject({ status: 'paid', paymentRef: 'teste' })
+    expect(window.location.hash).toBe(`#/ativacao/pedido/${order.id}/aprovado`)
   })
 
   it('logada, fechar leva ao perfil', async () => {
@@ -269,7 +315,12 @@ describe('pagamento da ativação', () => {
     render(
       <AuthContext.Provider value={session}>
         <WithCompleteProfile>
-          <AtivacaoFlow source={source} workerUrl="https://pag.example" redirect={redirect} />
+          <AtivacaoFlow
+            source={source}
+            workerUrl="https://pag.example"
+            redirect={redirect}
+            canSimulate={false}
+          />
         </WithCompleteProfile>
       </AuthContext.Provider>,
     )

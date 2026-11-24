@@ -3,6 +3,11 @@ import { ArrowLeft, ArrowRight, Check, Clock, Lock, ShieldCheck, X } from 'lucid
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuthSession } from '../../../shared/auth/AuthContext'
+import type { AuthSession } from '../../../shared/auth/session'
+import { useIsAdmin } from '../../../shared/auth/useIsAdmin'
+import { grantTestAccess } from '../../../shared/catalog/simulatedPayment'
+import { readFirebaseConfig } from '../../../shared/firebase/config'
+import { SimulatePaymentToggle } from '../../../shared/ui/SimulatePaymentToggle'
 import { useAccess } from '../../../shared/catalog/AccessContext'
 import { paymentsUrl, requestCheckout } from '../../../shared/catalog/checkout'
 import { formatPrice } from '../../../shared/catalog/offer'
@@ -14,6 +19,25 @@ import { formatDuration, mediaLabel } from '../meditations'
 interface PriceDialogProps {
   product: Product
   onClose: () => void
+  /** Nos testes: quem pode simular e como o acesso de teste é gravado. */
+  canSimulate?: boolean
+  simulate?: (product: Product) => Promise<void>
+}
+
+const goTo = (hash: string) => {
+  window.location.hash = hash
+}
+
+/** O acesso de teste vai direto para a conta da admin logada (ADR-033). */
+async function grantTestAccessForSession(
+  session: AuthSession | null,
+  product: Product,
+): Promise<void> {
+  const config = readFirebaseConfig(import.meta.env)
+  const uid = session?.getSnapshot().user?.uid
+  const token = session ? await session.getIdToken() : null
+  if (!config || !uid || !token) throw new Error('Sem login.')
+  await grantTestAccess({ config, uid, token, product })
 }
 
 const pill =
@@ -27,13 +51,31 @@ function accessText(months: number | null): string {
 /**
  * Preço de um produto pago, depois do login (mock aprovado, F·2). "Pagar" abre o Mercado Pago pelo
  */
-export function PriceDialog({ product, onClose }: PriceDialogProps) {
+export function PriceDialog({ product, onClose, canSimulate, simulate }: PriceDialogProps) {
   const titleId = useId()
   const { session } = useAuthSession()
   const access = useAccess()
   const [isBusy, setIsBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const workerUrl = paymentsUrl(import.meta.env)
+  const isAdmin = useIsAdmin(canSimulate === undefined)
+  const showSimulate = canSimulate ?? isAdmin
+  const [isSimulating, setIsSimulating] = useState(false)
+
+  /** Pagamento simulado: grava o acesso de teste e abre a mesma tela da volta do Mercado Pago. */
+  async function simulatePayment() {
+    setIsBusy(true)
+    setError(null)
+    try {
+      await (simulate ?? ((p: Product) => grantTestAccessForSession(session, p)))(product)
+      await access.refresh()
+      goTo(`#/pagamento/aprovado/${product.id}`)
+      requestClose()
+    } catch {
+      setIsBusy(false)
+      setError('Não deu para simular o pagamento agora. Confira a internet e tente de novo.')
+    }
+  }
 
   async function pay(url: string) {
     setIsBusy(true)
@@ -162,7 +204,20 @@ export function PriceDialog({ product, onClose }: PriceDialogProps) {
             {error}
           </p>
         )}
-        {workerUrl ? (
+        {showSimulate && (
+          <SimulatePaymentToggle checked={isSimulating} onChange={setIsSimulating} />
+        )}
+        {showSimulate && isSimulating ? (
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() => void simulatePayment()}
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-admin font-semibold text-on-admin hover:opacity-90 disabled:opacity-60"
+          >
+            {isBusy ? 'Simulando…' : 'Simular pagamento'}
+            {!isBusy && <ArrowRight aria-hidden size={18} />}
+          </button>
+        ) : workerUrl ? (
           <button
             type="button"
             disabled={isBusy}

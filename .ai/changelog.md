@@ -10,6 +10,15 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.32.0] · 2026-11-24
+
+### Adicionado
+
+- Simular pagamento, só para admins (ADR-033): a caixinha "Simular pagamento (teste)" na janela de
+  preço das jornadas e meditações e no resumo da ativação individual segue o fluxo como se o pagamento
+  fosse aprovado, sem cobrar. Acessos e pedidos de teste aparecem com a etiqueta "Teste" em Acessos e
+  em Pedidos do Modo Andreía.
+
 ## [1.31.4] · 2026-11-24
 
 ### Corrigido

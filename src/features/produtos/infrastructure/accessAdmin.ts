@@ -14,6 +14,7 @@ import {
   type FetchFn,
   type RestConfig,
 } from '../../../shared/firebase/firestoreRest'
+import { ACCESS_SOURCES, type AccessSource } from '../../../shared/catalog/offer'
 import type { PersonProfile } from '../../../shared/profile/profile'
 import { markAdmins } from '../domain/people'
 import { profileFromFields } from '../../../shared/profile/profileSource'
@@ -34,7 +35,7 @@ export interface GrantedAccess {
   productId: string
   grantedAt: number
   expiresAt: number | null
-  source: 'manual' | 'payment'
+  source: AccessSource
 }
 
 export interface AccessAdmin {
@@ -63,14 +64,14 @@ export function accessOf(document: unknown): GrantedAccess | null {
   if (!match || !fields) return null
   const grantedAt = numberField(fields, 'grantedAt')
   const expiresAt = isNullField(fields, 'expiresAt') ? null : numberField(fields, 'expiresAt')
-  const source = stringField(fields, 'source')
+  const source = ACCESS_SOURCES.find((s) => s === stringField(fields, 'source')) ?? 'manual'
   if (grantedAt === undefined || expiresAt === undefined) return null
   return {
     uid: decodeURIComponent(match[1]!),
     productId: decodeURIComponent(match[2]!),
     grantedAt,
     expiresAt,
-    source: source === 'payment' ? 'payment' : 'manual',
+    source,
   }
 }
 

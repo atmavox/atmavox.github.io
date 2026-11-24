@@ -28,10 +28,13 @@ export function checkAdmin(session: AuthSession, uid: string): Promise<boolean> 
   return pending
 }
 
-/** A pessoa logada é a Andreía (admin)? Fora do Firebase ou sem login, não. */
-export function useIsAdmin(): boolean {
+/**
+ * A pessoa logada é a Andreía (admin)? Fora do Firebase ou sem login, não. Com `enabled: false` (quem
+ * chama já sabe a resposta, como nos testes), não consulta nada.
+ */
+export function useIsAdmin(enabled = true): boolean {
   const { session, state } = useAuthSession()
-  const uid = state?.user?.uid ?? null
+  const uid = enabled ? (state?.user?.uid ?? null) : null
   const [result, setResult] = useState<{ uid: string; isAdmin: boolean } | null>(null)
   useEffect(() => {
     if (!session || !uid) return

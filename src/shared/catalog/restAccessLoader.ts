@@ -10,7 +10,7 @@ import {
   type RestConfig,
 } from '../firebase/firestoreRest'
 import type { AccessLoader } from './accessStore'
-import type { ProductAccess } from './offer'
+import { ACCESS_SOURCES, type ProductAccess } from './offer'
 
 /** Um documento de acesso vindo do REST; com forma errada, fica de fora. */
 export function parseAccessDocument(document: unknown): ProductAccess | null {
@@ -19,9 +19,9 @@ export function parseAccessDocument(document: unknown): ProductAccess | null {
   if (!productId || !fields) return null
   const grantedAt = numberField(fields, 'grantedAt')
   const expiresAt = isNullField(fields, 'expiresAt') ? null : numberField(fields, 'expiresAt')
-  const source = stringField(fields, 'source')
+  const source = ACCESS_SOURCES.find((s) => s === stringField(fields, 'source'))
   if (grantedAt === undefined || expiresAt === undefined) return null
-  if (source !== 'manual' && source !== 'payment') return null
+  if (!source) return null
   const ref = stringField(fields, 'ref')
   return { productId, grantedAt, expiresAt, source, ...(ref ? { ref } : {}) }
 }

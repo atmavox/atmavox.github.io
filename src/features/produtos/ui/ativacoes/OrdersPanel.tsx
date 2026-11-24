@@ -24,6 +24,7 @@ import {
 import { DEFAULT_MESSAGES, fillMessage, type Messages } from '../../../../shared/ativacao/messages'
 import {
   HOLD_MS,
+  isTestOrder,
   proposalExpired,
   proposalOpen,
   STATUS_FLOW,
@@ -33,6 +34,7 @@ import {
   type OrderStatus,
   type SessionOrder,
 } from '../../../../shared/ativacao/order'
+import { TestTag } from '../TestTag'
 import { DEFAULT_THERAPIES, type Therapy } from '../../../../shared/ativacao/therapy'
 import { formatPrice } from '../../../../shared/catalog/offer'
 import { useNow } from '../../../../shared/lib/useNow'
@@ -308,7 +310,10 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
         onClick={() => openOrder(order)}
         className="flex w-full flex-col gap-1.5 rounded-xl border border-line bg-surface p-3 text-left text-[13px] transition-colors hover:border-admin-ink/50"
       >
-        <b className="text-sm text-ink">{order.name || 'Sem nome'}</b>
+        <span className="flex items-center justify-between gap-2">
+          <b className="text-sm text-ink">{order.name || 'Sem nome'}</b>
+          {isTestOrder(order) && <TestTag />}
+        </span>
         <span className="flex items-center gap-2 text-ink-muted">
           {t && <TherapyBadge icon={t.icon} tone={t.tone} size={18} />}
           <span className="truncate">{order.therapyName}</span>
@@ -516,6 +521,7 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <StatusPill status={open.status} />
+          {isTestOrder(open) && <TestTag />}
           <span className="text-sm text-ink-faint">{STATUS_HINT[open.status]}</span>
         </div>
         {info}
@@ -529,7 +535,7 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
           </p>
         )}
         {cancelControl}
-        {open.status !== 'cancel' && open.paymentRef && (
+        {open.status !== 'cancel' && open.paymentRef && !isTestOrder(open) && (
           <p className="text-xs text-ink-faint">
             Se precisar devolver o dinheiro, o estorno é feito no painel do Mercado Pago.
           </p>
@@ -657,7 +663,10 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
                 </span>
                 <span className="flex items-center justify-between gap-3 text-sm text-ink-faint">
                   <span className="truncate">{order.therapyName}</span>
-                  <StatusPill status={order.status} />
+                  <span className="flex items-center gap-1.5">
+                    {isTestOrder(order) && <TestTag />}
+                    <StatusPill status={order.status} />
+                  </span>
                 </span>
               </button>
             ))}

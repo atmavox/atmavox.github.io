@@ -8,9 +8,13 @@ export interface ProductAccess {
   grantedAt: number
   /** `null` = para sempre. */
   expiresAt: number | null
-  source: 'manual' | 'payment'
+  /** `test`: pagamento simulado por uma admin (ADR-033), sem cobrança. */
+  source: AccessSource
   ref?: string
 }
+
+export const ACCESS_SOURCES = ['manual', 'payment', 'test'] as const
+export type AccessSource = (typeof ACCESS_SOURCES)[number]
 
 export type OfferTag =
   | { kind: 'soon' }

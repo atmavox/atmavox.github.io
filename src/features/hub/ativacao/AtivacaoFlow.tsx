@@ -16,6 +16,8 @@ import {
 } from '../../../shared/ativacao/availability'
 import type { Therapy } from '../../../shared/ativacao/therapy'
 import { useAuthSession } from '../../../shared/auth/AuthContext'
+import { useIsAdmin } from '../../../shared/auth/useIsAdmin'
+import { SimulatePaymentToggle } from '../../../shared/ui/SimulatePaymentToggle'
 import { LoginDialog } from '../../../shared/auth/LoginDialog'
 import { EmailConfirmDialog } from '../../../shared/auth/EmailConfirmDialog'
 import { needsEmailConfirmation } from '../../../shared/auth/emailConfirmation'
@@ -86,7 +88,10 @@ export function AtivacaoFlow({
   initialTherapyId = null,
   workerUrl = paymentsUrl(import.meta.env),
   redirect = (url) => window.location.assign(url),
+  canSimulate,
 }: {
+  /** Nos testes: quem pode simular o pagamento (no site, quem tem `admins/{uid}`). */
+  canSimulate?: boolean
   source?: AtivacaoSource
   /** A volta do Mercado Pago (`#/ativacao/pedido/{código}/{resultado}`). */
   orderReturn?: OrderReturn | null
@@ -127,6 +132,10 @@ export function AtivacaoFlow({
   /** De volta à etapa "Entrar" já logada: conferir a conta ou trocar (pedido de 2026-11-24). */
   const [isAtLogin, setIsAtLogin] = useState(false)
   const [isSwitching, setIsSwitching] = useState(false)
+  // Pagamento simulado (ADR-033): só admins veem a caixinha.
+  const isAdmin = useIsAdmin(canSimulate === undefined)
+  const showSimulate = canSimulate ?? isAdmin
+  const [isSimulating, setIsSimulating] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -423,6 +432,12 @@ export function AtivacaoFlow({
         name: String(answers.nome ?? displayName ?? ''),
         phone: String(answers.telefone ?? ''),
       })
+      if (showSimulate && isSimulating) {
+        // Como a volta do Mercado Pago: o pedido fica Paga (teste) e segue para "Avisar a Andreía".
+        await source.markTestPaid(uid, orderId)
+        goTo(`#/ativacao/pedido/${orderId}/aprovado`)
+        return
+      }
       await checkout(orderId)
     } catch {
       setNotice('Não deu para criar o pedido agora. Confira a internet e tente de novo.')
@@ -547,6 +562,9 @@ export function AtivacaoFlow({
   const footer =
     step === 4 && therapy ? (
       <div className="flex flex-col gap-2.5">
+        {showSimulate && (
+          <SimulatePaymentToggle checked={isSimulating} onChange={setIsSimulating} />
+        )}
         <div className="flex flex-wrap items-center justify-between gap-3">
           {isWide ? (
             <button type="button" onClick={back} className={ghost}>
@@ -561,7 +579,16 @@ export function AtivacaoFlow({
               </b>
             </span>
           )}
-          {workerUrl ? (
+          {showSimulate && isSimulating ? (
+            <button
+              type="button"
+              onClick={() => void pay()}
+              disabled={isPaying}
+              className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-admin px-6 font-semibold text-on-admin transition-opacity hover:opacity-90 disabled:opacity-50 ${isWide ? '' : 'flex-1'}`}
+            >
+              {isPaying ? 'Simulando…' : 'Simular pagamento'}
+            </button>
+          ) : workerUrl ? (
             <button
               type="button"
               onClick={() => void pay()}
@@ -577,7 +604,7 @@ export function AtivacaoFlow({
             </button>
           )}
         </div>
-        {!workerUrl && (
+        {!workerUrl && !(showSimulate && isSimulating) && (
           <p className="text-[13px] text-ink-faint">
             O pagamento pelo site abre em breve.{' '}
             {combine && (

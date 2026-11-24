@@ -550,6 +550,25 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** fechar o agendamento sem login volta ao hub (e não mais ao início); o "Quero
   agendar" do Contato leva ao hub.
 
+## ADR-033 · Admins simulam o pagamento para testar os fluxos
+
+- **Data:** 2026-11-24
+- **Contexto:** testar a compra de jornadas, meditações e a ativação individual de ponta a ponta exigia
+  pagar de verdade (ou esperar o Mercado Pago ficar pronto). O desenvolvedor e a Andreía querem testar
+  só o fluxo, mantendo a opção de testar o pagamento real quando ele existir.
+- **Decisão:** para quem tem `admins/{uid}`, a janela de preço e o resumo da ativação mostram a caixinha
+  "Simular pagamento (teste)", nas cores do Modo Andreía. Marcada, o site faz o que o Worker faria depois
+  de um pagamento aprovado, sem cobrar: grava `users/{uid}/access/{produto}` com `source: 'test'` (mesmo
+  prazo do produto) e abre `#/pagamento/aprovado/{produto}`; na ativação, cria o pedido e o marca como
+  Paga com `paymentRef: 'teste'`, abrindo `#/ativacao/pedido/{código}/aprovado`. Desmarcada, o pagamento
+  real segue igual.
+- **Alternativas consideradas:** modo sandbox do Mercado Pago (exige credenciais de teste e o Worker no
+  ar; continua possível desmarcando a caixinha); um botão escondido por URL (qualquer um acharia).
+- **Consequências:** ➕ sem regra nova: as regras do Firestore já só deixam admins gravarem acessos e
+  mudarem pedidos, então esconder a caixinha não é a única proteção. Acessos e pedidos de teste aparecem
+  com a etiqueta "Teste" no Modo Andreía (revogar ou cancelar como os outros). ➖ testes na conta da
+  admin ficam guardados até alguém revogá-los.
+
 ## ADR-00X · Título curto
 
 - **Status:** proposta | aceita | substituída por ADR-00Y · AAAA-MM-DD

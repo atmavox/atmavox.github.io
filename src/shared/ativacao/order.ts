@@ -16,6 +16,12 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
 /** A ordem do caminho (Cancelada fica de fora). */
 export const STATUS_FLOW: readonly OrderStatus[] = ['wait', 'paid', 'req', 'sched', 'done']
 
+/** `paymentRef` de um pedido pago por simulação de uma admin (ADR-033): sem cobrança. */
+export const TEST_PAYMENT_REF = 'teste'
+
+export const isTestOrder = (order: Pick<SessionOrder, 'paymentRef'>) =>
+  order.paymentRef === TEST_PAYMENT_REF
+
 /** Sem pagamento em 2 dias, o pedido some. */
 export const ORDER_TTL_MS = 2 * 24 * 60 * 60 * 1000
 

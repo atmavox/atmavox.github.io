@@ -322,6 +322,9 @@ Surgiu no caminho:
     - [x] (1.31.2) "Salvo" com ícone do projeto e sumindo sozinho (Terapias e Agenda)
     - [x] (1.31.3) Etiqueta "Admin" em Acessos · Pessoas, admins fora da planilha + ícone de download
     - [x] (1.31.4) Símbolo ao fundo do hub de meditações igual ao do hub de jornadas
+    - [x] (1.32.0) Admins simulam o pagamento para testar os fluxos de compra e da ativação (ADR-033)
+    - [ ] Simular também no "Pagar" de um pedido da ativação aguardando pagamento (aba Ativações do
+          perfil), se fizer falta
     - [ ] **Desenvolvedor:** publicar as regras do Firestore (a admin lista `admins`, para marcar os
           outros admins)
     - [ ] Trocar o ✓ pelo ícone (e sumir sozinho) também em Produtos, Acessos, Anamnese, Mensagens e
