@@ -103,6 +103,11 @@ export function numberField(fields: Fields, name: string): number | undefined {
   return typeof field.doubleValue === 'number' ? field.doubleValue : undefined
 }
 
+export function booleanField(fields: Fields, name: string): boolean | undefined {
+  const field = fields[name]
+  return isObject(field) && typeof field.booleanValue === 'boolean' ? field.booleanValue : undefined
+}
+
 export function isNullField(fields: Fields, name: string): boolean {
   const field = fields[name]
   return isObject(field) && 'nullValue' in field

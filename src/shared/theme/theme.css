@@ -199,6 +199,19 @@
 }
 
 /* Passo seguinte (desliza da direita) e voltar (desliza da esquerda), como num app de celular. */
+/* Ficha que entra pela direita (Modo Andreía · Acessos · Pessoas) e o caminho de volta. */
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes drawer-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 /* Saída das janelas (useClosing): o caminho de volta da entrada. */
 @keyframes fade-out {
   to {

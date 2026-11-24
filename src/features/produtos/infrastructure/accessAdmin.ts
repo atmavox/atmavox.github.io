@@ -14,11 +14,16 @@ import {
   type FetchFn,
   type RestConfig,
 } from '../../../shared/firebase/firestoreRest'
+import type { PersonProfile } from '../../../shared/profile/profile'
+import { profileFromFields } from '../../../shared/profile/profileSource'
 
 export interface Person {
   uid: string
   email: string
+  /** Nome da conta (do login). */
   name: string
+  /** Os dados da aba Conta (ADR-030); vazio para quem ainda não preencheu. */
+  profile?: PersonProfile
 }
 
 export interface GrantedAccess {
@@ -41,7 +46,9 @@ const personOf = (document: unknown): Person | null => {
   const uid = documentId(document)
   const fields = fieldsOf(document)
   const email = fields ? stringField(fields, 'email') : undefined
-  return uid && fields && email ? { uid, email, name: stringField(fields, 'name') ?? '' } : null
+  return uid && fields && email
+    ? { uid, email, name: stringField(fields, 'name') ?? '', profile: profileFromFields(fields) }
+    : null
 }
 
 /** `projects/…/documents/users/{uid}/access/{produto}` → uid e produto. */

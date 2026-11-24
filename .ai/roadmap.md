@@ -310,7 +310,9 @@ Surgiu no caminho:
            os mesmos dados) + meditações grátis só na página inicial
     - [x] No celular, as abas de baixo ficam Início · Jornadas · Meditações · Contato também nos hubs
           (pedido de 2026-11-24)
-    4. [ ] Modo Andreía · Acessos: dados da pessoa e lista de quem aceitou novidades; regras novas do
+    4. [x] (1.30.0) Modo Andreía · Acessos (mocks enviados em 2026-11-24: `Downloads/atmavox-acessos-pessoas.html`,
+           A seção "Pessoas", B abas, C lista + ficha; escolhido **C** com busca também no celular): dados da pessoa e lista de quem
+           aceitou novidades; regras novas do
            Firestore (publicar no console)
 
 ## Depois

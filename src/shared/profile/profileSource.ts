@@ -1,6 +1,7 @@
 // Onde os dados da pessoa ficam: `users/{uid}` (o mesmo documento com o e-mail que o login grava). Só
 // ela grava os próprios dados; ela e a Andreía leem (firestore.rules).
 import {
+  booleanField,
   documentsUrl,
   fieldsOf,
   getJson,
@@ -23,11 +24,16 @@ export interface ProfileSource {
 
 const FIELDS = ['fullName', 'nickname', 'phone', 'birthDate', 'news', 'photo'] as const
 
-function booleanField(fields: Record<string, unknown>, name: string): boolean | undefined {
-  const field = fields[name]
-  return typeof field === 'object' && field !== null && 'booleanValue' in field
-    ? Boolean((field as { booleanValue: unknown }).booleanValue)
-    : undefined
+/** Os campos REST de `users/{uid}` → perfil (também usado pela lista de pessoas do Modo Andreía). */
+export function profileFromFields(fields: Record<string, unknown>): PersonProfile {
+  return profileFromValues({
+    fullName: stringField(fields, 'fullName'),
+    nickname: stringField(fields, 'nickname'),
+    phone: stringField(fields, 'phone'),
+    birthDate: stringField(fields, 'birthDate'),
+    news: booleanField(fields, 'news'),
+    photo: stringField(fields, 'photo'),
+  })
 }
 
 export function createRestProfileSource(
@@ -44,15 +50,7 @@ export function createRestProfileSource(
         fetchFn,
       )
       const fields = fieldsOf(body)
-      if (!fields) return EMPTY_PROFILE
-      return profileFromValues({
-        fullName: stringField(fields, 'fullName'),
-        nickname: stringField(fields, 'nickname'),
-        phone: stringField(fields, 'phone'),
-        birthDate: stringField(fields, 'birthDate'),
-        news: booleanField(fields, 'news'),
-        photo: stringField(fields, 'photo'),
-      })
+      return fields ? profileFromFields(fields) : EMPTY_PROFILE
     },
     async save(uid, change) {
       const token = await getToken()

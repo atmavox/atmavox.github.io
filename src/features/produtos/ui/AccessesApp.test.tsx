@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import type { JourneyProduct } from '../../../shared/catalog/product'
 import { seedCatalog } from '../../../shared/catalog/seedCatalog'
+import { EMPTY_PROFILE } from '../../../shared/profile/profile'
 import { patchDocument } from '../../../shared/firebase/firestoreRest'
 import { expiresAtFor, termLabel } from '../domain/accessGrant'
 import { accessOf, createInMemoryAccessAdmin } from '../infrastructure/accessAdmin'
@@ -114,5 +115,53 @@ describe('tela de Acessos', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }))
     await waitFor(() => expect(admin.accesses).toHaveLength(0))
+  })
+})
+
+describe('Acessos · Pessoas (mock aprovado atmavox-acessos-pessoas.html, C)', () => {
+  const carol = {
+    uid: 'uid-carol',
+    email: 'carol@exemplo.com',
+    name: '',
+    profile: {
+      ...EMPTY_PROFILE,
+      fullName: 'Carolina Rocha',
+      nickname: 'Carol',
+      phone: '(41) 9 9876-5432',
+      birthDate: '1988-03-14',
+    },
+  }
+  const bia = { uid: 'uid-bia', email: 'bia@exemplo.com', name: '' }
+
+  it('lista com busca e filtros; a ficha mostra os dados e preenche "Liberar"', async () => {
+    const admin = createInMemoryAccessAdmin([carol, bia])
+    render(<AccessesApp admin={admin} products={[paid]} />)
+    await screen.findByRole('button', { name: 'Abrir a ficha de Carolina Rocha' })
+    expect(screen.getByRole('button', { name: 'Abrir a ficha de bia@exemplo.com' })).toBeVisible()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cadastro incompleto · 1' }))
+    expect(screen.queryByRole('button', { name: 'Abrir a ficha de Carolina Rocha' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Todas · 2' }))
+    fireEvent.change(screen.getByLabelText('Buscar pessoa'), { target: { value: '9876' } })
+    expect(screen.queryByRole('button', { name: 'Abrir a ficha de bia@exemplo.com' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir a ficha de Carolina Rocha' }))
+    const sheet = screen.getByRole('dialog', { name: 'Carolina Rocha' })
+    expect(within(sheet).getByText('14/03/1988 · 38 anos')).toBeInTheDocument()
+    expect(within(sheet).getByRole('link', { name: /Conversar no WhatsApp/ })).toHaveAttribute(
+      'href',
+      'https://wa.me/5541998765432',
+    )
+    fireEvent.click(within(sheet).getByRole('button', { name: 'Liberar acesso para Carol' }))
+    expect(screen.getByLabelText('E-mail da pessoa')).toHaveValue('carol@exemplo.com')
+  })
+
+  it('copia os celulares de quem aceitou novidades', async () => {
+    const writeText = vi.fn(async () => {})
+    Object.assign(navigator, { clipboard: { writeText } })
+    render(<AccessesApp admin={createInMemoryAccessAdmin([carol, bia])} products={[paid]} />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Copiar celulares (1)' }))
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith('(41) 9 9876-5432'))
+    expect(await screen.findByText(/1 celular copiado/)).toBeInTheDocument()
   })
 })

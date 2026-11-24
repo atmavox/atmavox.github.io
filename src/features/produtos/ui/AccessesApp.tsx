@@ -6,6 +6,8 @@ import type { AccessAdmin, GrantedAccess, Person } from '../infrastructure/acces
 import { Field, Section } from './fields'
 import { inputClass } from './styles'
 import { LoadingNote } from '../../../shared/ui/LoadingNote'
+import { useMediaQuery } from '../../../shared/lib/useMediaQuery'
+import { PeopleSection } from './PeopleSection'
 
 const adminButton =
   'inline-flex min-h-[42px] items-center justify-center rounded-full bg-admin px-5 text-sm font-semibold whitespace-nowrap text-on-admin hover:opacity-90 disabled:opacity-60'
@@ -30,29 +32,33 @@ export function AccessesApp({
   const [until, setUntil] = useState('')
   const [person, setPerson] = useState<Person | null | 'unknown'>('unknown')
   const [rows, setRows] = useState<Row[] | null>(null)
+  const [people, setPeople] = useState<Person[] | null>(null)
+  const isWide = useMediaQuery('(min-width: 900px)')
   const [notice, setNotice] = useState<string | null>(null)
   const [isBusy, setIsBusy] = useState(false)
   const [confirming, setConfirming] = useState<string | null>(null)
 
-  /** Busca os acessos já com o e-mail e o nome do produto; `null` se não deu para carregar. */
-  const fetchRows = useCallback(async (): Promise<Row[] | null> => {
+  /** Busca as pessoas e os acessos (já com o e-mail e o nome do produto); `null` se não deu. */
+  const fetchRows = useCallback(async (): Promise<{ rows: Row[]; people: Person[] } | null> => {
     try {
       const [people, accesses] = await Promise.all([admin.listPeople(), admin.listAccesses()])
       const emails = new Map(people.map((p) => [p.uid, p.email]))
-      return accesses
+      const rows = accesses
         .map((a) => ({
           ...a,
           email: emails.get(a.uid) ?? a.uid,
           title: products.find((p) => p.id === a.productId)?.title ?? a.productId,
         }))
         .sort((a, b) => b.grantedAt - a.grantedAt)
+      return { rows, people }
     } catch {
       return null
     }
   }, [admin, products])
 
-  const showRows = useCallback((result: Row[] | null) => {
-    setRows(result ?? [])
+  const showRows = useCallback((result: { rows: Row[]; people: Person[] } | null) => {
+    setRows(result?.rows ?? [])
+    setPeople(result?.people ?? [])
     if (!result) setNotice('Não foi possível carregar os acessos. Verifique sua internet.')
   }, [])
 
@@ -289,6 +295,26 @@ export function AccessesApp({
           </ul>
         )}
       </Section>
+
+      <PeopleSection
+        people={people}
+        isWide={isWide}
+        accessesOf={(uid) =>
+          (rows ?? [])
+            .filter((row) => row.uid === uid)
+            .map((row) => ({
+              key: row.productId,
+              title: row.title,
+              term: termLabel(row.expiresAt, now),
+            }))
+        }
+        onGrant={(found) => {
+          setEmail(found.email)
+          setPerson(found)
+          setNotice('Escolha o produto e o prazo e toque em "Liberar".')
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }}
+      />
     </div>
   )
 }

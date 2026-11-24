@@ -435,6 +435,20 @@ no código, sempre pode.
 - Criar grava na hora e já escolhe; o produto muda só no "Salvar". Nome repetido não passa.
 - No hub, um território criado entra depois dos 4 da marca e só aparece no filtro quando tem jornada.
 
+**Acessos · Pessoas** (mock `atmavox-acessos-pessoas.html`, estilo C): quem tem conta, no Modo Andreía.
+
+- **Lista:** foto ou inicial, nome, e-mail e as etiquetas "Cadastro incompleto" e "Aceita novidades",
+  em ordem alfabética (quem não tem nome vai para o fim).
+- **Busca e filtros:** a busca acha nome, apelido, e-mail ou um pedaço do celular, ignorando acentos
+  (também no celular). Filtros Todas, Aceitam novidades e Cadastro incompleto, com a contagem de cada um.
+- **Ficha da pessoa:** entra pela direita no computador e sobe de baixo no celular. Mostra e-mail,
+  celular, nascimento com a idade, a escolha sobre novidades, "Conversar no WhatsApp", os acessos dela e
+  "Liberar acesso para ela" (preenche o e-mail no formulário de liberar acesso).
+- **Copiar celulares:** um por linha e sem repetir, só de quem aceitou novidades e tem celular válido,
+  prontos para colar numa lista de transmissão do WhatsApp.
+- **Baixar planilha:** CSV da lista filtrada, com ";" e BOM do UTF-8, para abrir no Excel em colunas e
+  com os acentos certos.
+
 ## F10 · Ativação individual paga ✅ (código pronto; falta configurar Mercado Pago e publicar as regras)
 
 Mocks aprovados (2026-11-23): `Downloads/atmavox-ativacao-pessoa-v3.html` (pessoa) e

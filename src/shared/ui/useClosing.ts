@@ -8,6 +8,7 @@ export const CLOSING_BACKDROP = 'pointer-events-none animate-[fade-out_220ms_eas
 /** A janela saindo: desce e esmaece (no celular, a folha desce inteira). */
 export const CLOSING_DIALOG = 'animate-[dialog-out_220ms_ease-in_forwards]'
 export const CLOSING_SHEET = 'animate-[sheet-down_220ms_ease-in_forwards]'
+export const CLOSING_DRAWER = 'animate-[drawer-out_220ms_ease-in_forwards]'
 
 /**
  * Fechar com suavidade (pedido de 2026-11-24: as janelas abriam animadas e sumiam de uma vez). A

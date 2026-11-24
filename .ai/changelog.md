@@ -10,6 +10,15 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.30.0] · 2026-11-24
+
+### Adicionado
+
+- Modo Andreía · Acessos · Pessoas (mock `atmavox-acessos-pessoas.html`, C): lista com busca (nome,
+  e-mail ou celular) e filtros (Todas, Aceitam novidades, Cadastro incompleto); ficha de cada pessoa com
+  os dados, "Conversar no WhatsApp", os acessos e "Liberar acesso para ela"; "Copiar celulares" (de quem
+  aceitou novidades) e "Baixar planilha" (CSV).
+
 ## [1.29.0] · 2026-11-24
 
 ### Adicionado
