@@ -49,7 +49,7 @@ describe('Modo Andreía · agenda no computador', () => {
     fireEvent.click(within(popover).getByRole('switch', { name: 'Repetir toda semana' }))
     fireEvent.click(within(popover).getByRole('button', { name: 'Salvar' }))
 
-    expect(await screen.findByText('Salvo ✓')).toBeInTheDocument()
+    expect(await screen.findByText('Salvo')).toBeInTheDocument()
     expect(backend.availability.windows).toEqual([
       expect.objectContaining({
         date: '2026-12-02',
@@ -89,7 +89,7 @@ describe('Modo Andreía · agenda no computador', () => {
     render(<AtivacoesApp backend={backend} section="agenda" />)
     fireEvent.click(await screen.findByRole('button', { name: /Livre Quarta, 2 de dezembro/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Tirar só este dia' }))
-    expect(await screen.findByText('Tirado só deste dia ✓')).toBeInTheDocument()
+    expect(await screen.findByText('Tirado só deste dia')).toBeInTheDocument()
     expect(backend.availability.windows[0]?.skip).toEqual(['2026-12-02'])
   })
 
@@ -118,7 +118,7 @@ describe('Modo Andreía · agenda no celular', () => {
     const sheet = screen.getByRole('dialog', { name: 'Novo horário livre' })
     expect(within(sheet).getByLabelText('Das')).toHaveValue('18:00')
     fireEvent.click(within(sheet).getByRole('button', { name: 'Salvar' }))
-    expect(await screen.findByText('Salvo ✓')).toBeInTheDocument()
+    expect(await screen.findByText('Salvo')).toBeInTheDocument()
     expect(backend.availability.windows[0]).toMatchObject({
       date: '2026-12-03',
       start: '18:00',

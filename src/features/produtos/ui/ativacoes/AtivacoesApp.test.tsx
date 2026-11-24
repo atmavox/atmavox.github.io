@@ -38,7 +38,7 @@ describe('Modo Andreía · terapias', () => {
     fireEvent.change(within(dialog).getByLabelText('Preço (R$)'), { target: { value: '120' } })
     fireEvent.click(within(dialog).getByRole('switch', { name: 'Ativa' }))
     fireEvent.click(within(dialog).getByRole('button', { name: 'Salvar' }))
-    expect(await screen.findByText('Salvo ✓')).toBeInTheDocument()
+    expect(await screen.findByText('Salvo')).toBeInTheDocument()
     expect(backend.therapies?.[0]).toMatchObject({
       id: 'reiki-a-distancia',
       priceCents: 12000,
@@ -65,11 +65,14 @@ describe('Modo Andreía · terapias', () => {
     expect(reiki).toBeChecked()
     expect(screen.getByRole('status')).toBe(status)
     await act(async () => finishSave())
-    expect(status).toHaveTextContent('Salvo ✓')
+    expect(status).toHaveTextContent('Salvo')
+    // O sinal de salvo é o ícone do projeto, não um caractere ✓.
+    expect(status.textContent).not.toContain('✓')
+    expect(status.querySelector('svg')).not.toBeNull()
 
     fireEvent.click(reiki)
     // Durante o segundo salvamento o aviso anterior continua (sumir e voltar fazia a tela pular).
-    expect(status).toHaveTextContent('Salvo ✓')
+    expect(status).toHaveTextContent('Salvo')
     expect(reiki).not.toBeChecked()
     await act(async () => finishSave())
     expect(backend.therapies?.[0]).toMatchObject({ id: 'reiki-a-distancia', active: false })
@@ -106,7 +109,7 @@ describe('Modo Andreía · terapias', () => {
     })
     fireEvent.click(within(dialog).getByRole('radio', { name: 'Folha' }))
     fireEvent.click(within(dialog).getByRole('button', { name: 'Criar terapia' }))
-    expect(await screen.findByText('Salvo ✓')).toBeInTheDocument()
+    expect(await screen.findByText('Salvo')).toBeInTheDocument()
     expect(backend.therapies).toEqual([
       expect.objectContaining({ id: 'aromaterapia-a-distancia', icon: 'leaf', active: false }),
     ])

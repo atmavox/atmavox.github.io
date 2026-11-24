@@ -23,6 +23,8 @@ import {
 } from '../../domain/therapyForm'
 import type { AtivacoesBackend } from '../../infrastructure/ativacoesBackend'
 import { adminButton, ghostButton } from '../styles'
+import { SaveStatus } from '../SaveStatus'
+import { useSaveNotice } from '../useSaveNotice'
 import { Overlay } from './Overlay'
 import { Switch, TherapyFields } from './TherapyFields'
 import { LoadingNote } from '../../../../shared/ui/LoadingNote'
@@ -41,7 +43,7 @@ export function TherapiesPanel({
   const [isFromModel, setIsFromModel] = useState(false)
   const [form, setForm] = useState<TherapyForm | null>(null)
   const [errors, setErrors] = useState<TherapyErrors>({})
-  const [notice, setNotice] = useState<string | null>(null)
+  const saveNotice = useSaveNotice()
   const [isSaving, setIsSaving] = useState(false)
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 
@@ -66,7 +68,7 @@ export function TherapiesPanel({
    */
   async function persist(
     next: readonly Therapy[],
-    message = 'Salvo ✓',
+    message = 'Salvo',
     optimistic = false,
   ): Promise<boolean> {
     const before = list
@@ -76,11 +78,11 @@ export function TherapiesPanel({
       await backend.saveTherapies(next)
       setList(next)
       setIsFromModel(false)
-      setNotice(message)
+      saveNotice.show({ kind: 'ok', text: message })
       return true
     } catch {
       if (optimistic) setList(before)
-      setNotice(SAVE_ERROR)
+      saveNotice.show({ kind: 'error', text: SAVE_ERROR })
       return false
     } finally {
       setIsSaving(false)
@@ -89,14 +91,14 @@ export function TherapiesPanel({
 
   const sortable = useSortable({
     ids: (list ?? []).map((t) => t.id),
-    onMove: (from, to) => list && void persist(moveTherapy(list, from, to), 'Ordem salva ✓', true),
+    onMove: (from, to) => list && void persist(moveTherapy(list, from, to), 'Ordem salva', true),
     disabled: isSaving,
   })
 
   if (!list) return <LoadingNote text="Carregando as terapias…" />
 
   function openForm(therapy: Therapy | null, startErrors: TherapyErrors = {}) {
-    setNotice(null)
+    saveNotice.hide()
     setIsConfirmingDelete(false)
     setErrors(startErrors)
     setForm(therapy ? formFromTherapy(therapy) : emptyTherapyForm())
@@ -104,7 +106,7 @@ export function TherapiesPanel({
 
   function toggle(therapy: Therapy) {
     const next = toggleTherapy(list!, therapy.id)
-    if (next) void persist(next, 'Salvo ✓', true)
+    if (next) void persist(next, 'Salvo', true)
     else openForm(therapy, { price: 'Para ativar, a terapia precisa de preço.' })
   }
 
@@ -132,23 +134,21 @@ export function TherapiesPanel({
     }
   }
 
-  const noticeColor = notice?.endsWith('✓') ? 'text-ok' : 'text-accent'
-  const noticeLine = notice && <p className={`text-sm ${noticeColor}`}>{notice}</p>
+  const saveError = saveNotice.notice?.kind === 'error' && saveNotice.isVisible
 
-  // O aviso mora na linha do título, sempre montado: aparecer ou mudar não empurra a tabela.
+  // O aviso mora na linha do título: aparecer, mudar ou sumir não empurra a tabela.
   const header = (
     <div className="flex items-center gap-3">
       <h1 className={`font-display text-ink ${isWide ? 'text-[2rem]' : 'text-[1.6rem]'}`}>
         Terapias
       </h1>
-      <p
-        role="status"
-        className={`min-w-0 flex-1 text-right text-sm transition-opacity duration-300 ${noticeColor} ${
-          notice ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        {notice}
-      </p>
+      <span className="flex min-w-0 flex-1 justify-end">
+        <SaveStatus
+          notice={saveNotice.notice}
+          isVisible={saveNotice.isVisible && !form}
+          className="text-right"
+        />
+      </span>
       <button type="button" onClick={() => openForm(null)} className={adminButton}>
         <UiIcon name="plus" size={16} />
         {isWide ? 'Nova terapia' : 'Nova'}
@@ -327,7 +327,7 @@ export function TherapiesPanel({
             onChange={(change) => setForm((f) => (f ? { ...f, ...change } : f))}
             layout={isWide ? 'all' : 'accordion'}
           />
-          {notice && !notice.endsWith('✓') && <div className="mt-3">{noticeLine}</div>}
+          {saveError && <p className="mt-3 text-sm text-accent">{saveNotice.notice?.text}</p>}
         </Overlay>
       )}
     </div>

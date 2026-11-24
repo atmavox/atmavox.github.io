@@ -10,6 +10,13 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.31.2] · 2026-11-24
+
+### Alterado
+
+- Modo Andreía · Terapias e Agenda: o "Salvo" vem com o ícone de check do projeto (sem o caractere ✓)
+  e some sozinho depois de 2,5 s, esmaecendo no lugar; o aviso de erro continua à vista.
+
 ## [1.31.1] · 2026-11-24
 
 ### Corrigido

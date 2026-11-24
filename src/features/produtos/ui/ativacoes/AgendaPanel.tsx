@@ -27,6 +27,8 @@ import { UiIcon } from '../../../../shared/ui/UiIcon'
 import type { AtivacoesBackend } from '../../infrastructure/ativacoesBackend'
 import { Segmented } from '../fields'
 import { adminButton, ghostButton } from '../styles'
+import { SaveStatus } from '../SaveStatus'
+import { useSaveNotice } from '../useSaveNotice'
 import { Overlay } from './Overlay'
 import { Switch } from './TherapyFields'
 import { TherapyChecks, ToneDot, WindowForm } from './WindowForm'
@@ -88,7 +90,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   const [editing, setEditing] = useState<Editing | null>(null)
   const [quick, setQuick] = useState<Quick | null>(null)
   const [errors, setErrors] = useState<WindowErrors>({})
-  const [notice, setNotice] = useState<string | null>(null)
+  const saveNotice = useSaveNotice()
   const [isSaving, setIsSaving] = useState(false)
   const [drag, setDrag] = useState<{ date: string; from: number; to: number } | null>(null)
   const dragOrigin = useRef<number | null>(null)
@@ -139,15 +141,18 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   }
 
   /** Grava a agenda. O aviso anterior fica até chegar o novo (sumir e voltar fazia a grade pular). */
-  async function persist(next: Availability, message = 'Salvo ✓'): Promise<boolean> {
+  async function persist(next: Availability, message = 'Salvo'): Promise<boolean> {
     setIsSaving(true)
     try {
       await backend.saveAvailability(next)
       setAvailability(next)
-      setNotice(message)
+      saveNotice.show({ kind: 'ok', text: message })
       return true
     } catch {
-      setNotice('Não deu para salvar. Confira a internet e tente de novo.')
+      saveNotice.show({
+        kind: 'error',
+        text: 'Não deu para salvar. Confira a internet e tente de novo.',
+      })
       return false
     } finally {
       setIsSaving(false)
@@ -215,16 +220,13 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     dragOrigin.current = null
   }
 
-  // Sempre montado, na ponta de uma linha que já existe: aparecer ou mudar não empurra a grade.
+  // Na ponta de uma linha que já existe: aparecer, mudar ou sumir não empurra a grade.
   const noticeLine = (
-    <p
-      role="status"
-      className={`ml-auto text-right text-sm transition-opacity duration-300 ${
-        notice?.endsWith('✓') ? 'text-ok' : 'text-accent'
-      } ${notice ? 'opacity-100' : 'opacity-0'}`}
-    >
-      {notice}
-    </p>
+    <SaveStatus
+      notice={saveNotice.notice}
+      isVisible={saveNotice.isVisible}
+      className="ml-auto text-right"
+    />
   )
 
   const nav = (step: number, label: string) => (
@@ -350,7 +352,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
                   onClick={() =>
                     void persist(
                       skipOccurrence(availability, editing.window.id, editing.occurrence!),
-                      'Tirado só deste dia ✓',
+                      'Tirado só deste dia',
                     ).then((ok) => ok && setEditing(null))
                   }
                   className="inline-flex items-center gap-1.5 text-ink-faint hover:text-wine"
@@ -365,7 +367,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
                 onClick={() =>
                   void persist(
                     removeWindow(availability, editing.window.id),
-                    'Horário tirado ✓',
+                    'Horário tirado',
                   ).then((ok) => ok && setEditing(null))
                 }
                 className="inline-flex items-center gap-1.5 text-ink-faint hover:text-wine"
