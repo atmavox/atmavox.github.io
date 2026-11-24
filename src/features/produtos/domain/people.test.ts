@@ -4,9 +4,11 @@ import {
   ageOn,
   countByFilter,
   filterPeople,
+  markAdmins,
   newsPhones,
   peopleCsv,
   personName,
+  spreadsheetPeople,
   type PersonRow,
 } from './people'
 
@@ -80,5 +82,19 @@ describe('pessoas no Modo Andreía', () => {
       'Carolina Mendes Rocha;Carol;carolina.rocha@email.com;(41) 9 9876-5432;14/03/1988;Sim;Sim',
     )
     expect(second).toBe('"Bia; a ""Lima""";;bia.lima@hotmail.com;;;Sim;Não')
+  })
+
+  it('marca os admins pela lista, sem mexer em quem não é', () => {
+    const [a, c] = markAdmins([andreia, carol], ['a'])
+    expect(a?.isAdmin).toBe(true)
+    expect(c?.isAdmin).toBeUndefined()
+    expect(c).toBe(carol)
+  })
+
+  it('a planilha deixa os admins de fora (a Andreía não entra na própria lista)', () => {
+    const csv = peopleCsv(markAdmins([andreia, carol], ['a']), TODAY)
+    expect(csv).not.toContain('andreia@email.com')
+    expect(csv).toContain('carolina.rocha@email.com')
+    expect(spreadsheetPeople(markAdmins([andreia], ['a']))).toEqual([])
   })
 })

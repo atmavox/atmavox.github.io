@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Product } from '../../../shared/catalog/product'
+import { useAuthSession } from '../../../shared/auth/AuthContext'
 import { useNow } from '../../../shared/lib/useNow'
+import { markAdmins } from '../domain/people'
 import { expiresAtFor, isEmail, termLabel, type TermChoice } from '../domain/accessGrant'
 import type { AccessAdmin, GrantedAccess, Person } from '../infrastructure/accessAdmin'
 import { Field, Section } from './fields'
@@ -26,6 +28,8 @@ export function AccessesApp({
   products: readonly Product[]
 }) {
   const now = useNow()
+  // Quem usa o Modo Andreía é admin: aparece marcada mesmo antes de as regras deixarem listar `admins`.
+  const myUid = useAuthSession().state?.user?.uid ?? null
   const [email, setEmail] = useState('')
   const [productId, setProductId] = useState(products[0]?.id ?? '')
   const [term, setTerm] = useState<TermChoice>('produto')
@@ -297,7 +301,7 @@ export function AccessesApp({
       </Section>
 
       <PeopleSection
-        people={people}
+        people={people && markAdmins(people, myUid ? [myUid] : [])}
         isWide={isWide}
         accessesOf={(uid) =>
           (rows ?? [])

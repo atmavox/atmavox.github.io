@@ -11,6 +11,7 @@ import {
   useClosing,
 } from '../../../shared/ui/useClosing'
 import { ageOn, personName, shortDate, type PersonRow } from '../domain/people'
+import { AdminTag } from './AdminTag'
 
 export interface PersonAccess {
   key: string
@@ -95,8 +96,9 @@ export function PersonDrawer({
               )}
             </span>
             <div className="min-w-0">
-              <h2 id={titleId} className="font-display text-xl text-ink">
+              <h2 id={titleId} className="flex items-center gap-2 font-display text-xl text-ink">
                 {name}
+                {person.isAdmin && <AdminTag />}
               </h2>
               {profile.nickname && <p className="text-sm text-ink-faint">{profile.nickname}</p>}
             </div>

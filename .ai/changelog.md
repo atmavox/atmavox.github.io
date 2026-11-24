@@ -10,6 +10,15 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.31.3] · 2026-11-24
+
+### Alterado
+
+- Modo Andreía · Acessos · Pessoas: quem é admin (a Andreía e outros, `admins/{uid}`) aparece com a
+  etiqueta "Admin" na lista e na ficha, e fica fora da planilha. A admin logada é marcada sempre; os
+  outros admins, depois de publicar as regras novas (a admin passa a poder listar `admins`).
+- "Baixar planilha" ganhou o ícone de download do projeto.
+
 ## [1.31.2] · 2026-11-24
 
 ### Alterado

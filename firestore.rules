@@ -26,8 +26,9 @@ service cloud.firestore {
         && request.auth.token.email_verified == true;
     }
 
+    // Cada pessoa confere o próprio; a admin lista todos, para marcar "Admin" em Acessos · Pessoas.
     match /admins/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
+      allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
       allow write: if false;
     }
 

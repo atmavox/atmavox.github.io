@@ -15,6 +15,7 @@ import {
   type RestConfig,
 } from '../../../shared/firebase/firestoreRest'
 import type { PersonProfile } from '../../../shared/profile/profile'
+import { markAdmins } from '../domain/people'
 import { profileFromFields } from '../../../shared/profile/profileSource'
 
 export interface Person {
@@ -24,6 +25,8 @@ export interface Person {
   name: string
   /** Os dados da aba Conta (ADR-030); vazio para quem ainda não preencheu. */
   profile?: PersonProfile
+  /** Tem `admins/{uid}`. */
+  isAdmin?: boolean
 }
 
 export interface GrantedAccess {
@@ -113,8 +116,17 @@ export function createAccessAdmin(
       return documents.map(personOf).find((p) => p !== null) ?? null
     },
     async listPeople() {
-      const documents = await runQuery({ from: [{ collectionId: 'users' }] })
-      return documents.flatMap((d) => personOf(d) ?? [])
+      const [documents, admins] = await Promise.all([
+        runQuery({ from: [{ collectionId: 'users' }] }),
+        // Com as regras antigas a admin só lê o próprio `admins/{uid}`: aí segue sem a lista, e a tela
+        // marca ao menos quem está usando o Modo Andreía.
+        runQuery({ from: [{ collectionId: 'admins' }] }).catch(() => []),
+      ])
+      const adminUids = admins.flatMap((d) => documentId(d) ?? [])
+      return markAdmins(
+        documents.flatMap((d) => personOf(d) ?? []),
+        adminUids,
+      )
     },
     async listAccesses() {
       const documents = await runQuery({ from: [{ collectionId: 'access', allDescendants: true }] })

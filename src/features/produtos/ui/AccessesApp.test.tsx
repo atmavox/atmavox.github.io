@@ -5,7 +5,14 @@ import { seedCatalog } from '../../../shared/catalog/seedCatalog'
 import { EMPTY_PROFILE } from '../../../shared/profile/profile'
 import { patchDocument } from '../../../shared/firebase/firestoreRest'
 import { expiresAtFor, termLabel } from '../domain/accessGrant'
-import { accessOf, createInMemoryAccessAdmin } from '../infrastructure/accessAdmin'
+import { AuthContext } from '../../../shared/auth/AuthContext'
+import { InMemoryAuth } from '../../../shared/auth/InMemoryAuth'
+import { createAuthSession } from '../../../shared/auth/session'
+import {
+  accessOf,
+  createAccessAdmin,
+  createInMemoryAccessAdmin,
+} from '../infrastructure/accessAdmin'
 import { AccessesApp } from './AccessesApp'
 
 const NOW = Date.UTC(2026, 10, 23, 15)
@@ -154,6 +161,80 @@ describe('Acessos · Pessoas (mock aprovado atmavox-acessos-pessoas.html, C)', (
     )
     fireEvent.click(within(sheet).getByRole('button', { name: 'Liberar acesso para Carol' }))
     expect(screen.getByLabelText('E-mail da pessoa')).toHaveValue('carol@exemplo.com')
+  })
+
+  it('quem é admin aparece com a etiqueta, também na ficha', async () => {
+    const admin = createInMemoryAccessAdmin([carol, { ...bia, isAdmin: true }])
+    render(<AccessesApp admin={admin} products={[paid]} />)
+    const row = await screen.findByRole('button', { name: 'Abrir a ficha de bia@exemplo.com' })
+    expect(within(row).getByText('Admin')).toBeInTheDocument()
+    const carolRow = screen.getByRole('button', { name: 'Abrir a ficha de Carolina Rocha' })
+    expect(within(carolRow).queryByText('Admin')).toBeNull()
+    fireEvent.click(row)
+    expect(within(screen.getByRole('dialog')).getByText('Admin')).toBeInTheDocument()
+  })
+
+  it('a própria admin logada aparece marcada, mesmo sem a lista de admins', async () => {
+    const auth = new InMemoryAuth()
+    const session = createAuthSession({
+      loadAuth: async () => auth,
+      hint: { get: () => true, set: () => {} },
+    })
+    await session.signInWithGoogle()
+    const me = { uid: 'google-uid', email: 'maria@exemplo.com', name: 'Maria' }
+    render(
+      <AuthContext.Provider value={session}>
+        <AccessesApp admin={createInMemoryAccessAdmin([carol, me])} products={[paid]} />
+      </AuthContext.Provider>,
+    )
+    const row = await screen.findByRole('button', { name: 'Abrir a ficha de Maria' })
+    expect(within(row).getByText('Admin')).toBeInTheDocument()
+  })
+
+  it('a lista do Firestore marca quem está em admins; sem permissão, segue sem marcar', async () => {
+    const users = [
+      {
+        document: {
+          name: 'projects/p/databases/(default)/documents/users/uid-ana',
+          fields: { email: { stringValue: 'ana@exemplo.com' } },
+        },
+      },
+      {
+        document: {
+          name: 'projects/p/databases/(default)/documents/users/uid-dea',
+          fields: { email: { stringValue: 'dea@exemplo.com' } },
+        },
+      },
+    ]
+    const admins = [
+      { document: { name: 'projects/p/databases/(default)/documents/admins/uid-dea' } },
+    ]
+    const respond = (adminsOk: boolean) =>
+      vi.fn(async (_url: string, init?: RequestInit) => {
+        const body = String(init?.body)
+        if (body.includes('"admins"')) {
+          return adminsOk
+            ? new Response(JSON.stringify(admins))
+            : new Response('{}', { status: 403 })
+        }
+        return new Response(JSON.stringify(users))
+      })
+
+    const withList = createAccessAdmin(
+      { projectId: 'p', apiKey: 'k' },
+      async () => 't',
+      respond(true),
+    )
+    expect((await withList.listPeople()).map((p) => [p.email, !!p.isAdmin])).toEqual([
+      ['ana@exemplo.com', false],
+      ['dea@exemplo.com', true],
+    ])
+    const without = createAccessAdmin(
+      { projectId: 'p', apiKey: 'k' },
+      async () => 't',
+      respond(false),
+    )
+    expect((await without.listPeople()).every((p) => !p.isAdmin)).toBe(true)
   })
 
   it('copia os celulares de quem aceitou novidades', async () => {

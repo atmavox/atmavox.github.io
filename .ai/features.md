@@ -452,7 +452,9 @@ no código, sempre pode.
 - **Copiar celulares:** um por linha e sem repetir, só de quem aceitou novidades e tem celular válido,
   prontos para colar numa lista de transmissão do WhatsApp.
 - **Baixar planilha:** CSV da lista filtrada, com ";" e BOM do UTF-8, para abrir no Excel em colunas e
-  com os acentos certos.
+  com os acentos certos. Os admins ficam de fora.
+- **Admins:** quem tem `admins/{uid}` aparece com a etiqueta "Admin" na lista e na ficha (a admin
+  logada sempre; as outras, lidas de `admins`, que só a admin lista).
 
 ## F10 · Ativação individual paga ✅ (código pronto; falta configurar Mercado Pago e publicar as regras)
 

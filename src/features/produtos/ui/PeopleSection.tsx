@@ -10,9 +10,11 @@ import {
   newsPhones,
   peopleCsv,
   personName,
+  spreadsheetPeople,
   type PeopleFilter,
   type PersonRow,
 } from '../domain/people'
+import { AdminTag } from './AdminTag'
 import { Section } from './fields'
 import { inputClass } from './styles'
 import { PersonDrawer, type PersonAccess } from './PersonDrawer'
@@ -119,9 +121,10 @@ export function PeopleSection({
         <button
           type="button"
           onClick={() => download(peopleCsv(shown, today), today)}
-          disabled={shown.length === 0}
+          disabled={spreadsheetPeople(shown).length === 0}
           className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line px-4 text-sm text-ink-muted hover:border-admin-ink hover:text-admin-ink disabled:opacity-50"
         >
+          <UiIcon name="download" size={15} />
           Baixar planilha
         </button>
       </div>
@@ -169,6 +172,7 @@ export function PeopleSection({
                     </span>
                   </span>
                   <span className="flex shrink-0 items-center gap-1.5">
+                    {person.isAdmin && <AdminTag />}
                     {!complete && (
                       <span className="rounded-full bg-accent/13 px-2.5 py-0.5 text-xs font-semibold text-accent">
                         {isWide ? 'Cadastro incompleto' : 'Incompleto'}

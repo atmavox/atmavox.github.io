@@ -13,7 +13,24 @@ export interface PersonRow {
   /** Nome da conta (do login), usado quando a pessoa ainda não escreveu o nome completo. */
   name: string
   profile?: PersonProfile
+  /** Quem cuida do site (`admins/{uid}`): aparece com a etiqueta "Admin" e fica fora da planilha. */
+  isAdmin?: boolean
 }
+
+/** Marca como admin quem está na lista (a de `admins` e quem está usando o Modo Andreía). */
+export function markAdmins<T extends PersonRow>(
+  people: readonly T[],
+  adminUids: Iterable<string>,
+): T[] {
+  const admins = new Set(adminUids)
+  return people.map((person) =>
+    admins.has(person.uid) && !person.isAdmin ? { ...person, isAdmin: true } : person,
+  )
+}
+
+/** A planilha é das pessoas atendidas: quem cuida do site fica de fora (pedido de 2026-11-24). */
+export const spreadsheetPeople = (people: readonly PersonRow[]) =>
+  people.filter((person) => !person.isAdmin)
 
 export type PeopleFilter = 'todas' | 'novidades' | 'incompleto'
 
@@ -108,8 +125,8 @@ export const shortDate = (iso: string) => (iso ? iso.split('-').reverse().join('
 const csvCell = (value: string) => (/[;"\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value)
 
 /**
- * A planilha (CSV com ";", que o Excel em português abre direto em colunas). Quem chama acrescenta o
- * BOM do UTF-8 ao baixar, para os acentos aparecerem certos.
+ * A planilha (CSV com ";", que o Excel em português abre direto em colunas), sem os admins. Quem
+ * chama acrescenta o BOM do UTF-8 ao baixar, para os acentos aparecerem certos.
  */
 export function peopleCsv(people: readonly PersonRow[], today: string): string {
   const header = [
@@ -121,7 +138,7 @@ export function peopleCsv(people: readonly PersonRow[], today: string): string {
     'Novidades',
     'Cadastro completo',
   ]
-  const rows = people.map((person) => {
+  const rows = spreadsheetPeople(people).map((person) => {
     const profile = profileOf(person)
     return [
       personName(person) === 'Sem nome' ? '' : personName(person),
