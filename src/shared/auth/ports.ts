@@ -3,6 +3,8 @@
 export interface AuthUser {
   uid: string
   displayName: string | null
+  /** Foto da conta (Google); `null` em quem entra com e-mail e senha. */
+  photoUrl: string | null
   email: string | null
   /** E-mail confirmado. Quem entra pelo Google já chega confirmado; quem cria conta com e-mail e
    * senha confirma pelo link enviado (pedido de 2026-11-24). */

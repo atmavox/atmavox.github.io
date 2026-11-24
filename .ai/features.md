@@ -396,6 +396,11 @@ foto" / "Trocar foto" (reduzida no navegador) e "Remover foto"; o e-mail da cont
 caixinha pequena "Receber novidades da Andreía pelo WhatsApp" (marcada por padrão). O topo do perfil
 mostra o apelido e a foto. Dados em `users/{uid}` (ADR-030).
 
+**Nome e foto do Google (1.30.1):** quem entra pelo Google já chega com o nome completo e a foto da
+conta no cadastro (a foto é baixada em 320 px e reduzida como as outras). Só acontece antes de a
+pessoa gravar os dados pela primeira vez (`profileUpdatedAt` ausente) e só nos campos vazios, então
+uma foto removida não volta. Se a foto não baixar, entra só o nome. O celular continua sendo digitado.
+
 **Cabeçalho dos hubs e perfil (mocks aprovados em 2026-11-23):** nos hubs, abas Início · Jornadas ·
 Meditações e a conta ("Entrar" ou a bolinha com "Meu perfil" e "Sair da conta"); a página inicial fica
 sem login. O perfil (`#/perfil`) tem abas Visão geral, Jornadas, Meditações e Conta, com a trilha de

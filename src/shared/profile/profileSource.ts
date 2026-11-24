@@ -16,13 +16,28 @@ import {
 } from '../firebase/firestoreRest'
 import { EMPTY_PROFILE, profileFromValues, type PersonProfile } from './profile'
 
+export interface StoredProfile {
+  profile: PersonProfile
+  /** A pessoa já gravou os dados alguma vez (`profileUpdatedAt`). Antes disso, vale puxar o nome e a
+   * foto da conta Google; depois, não, para não trazer de volta uma foto que ela removeu. */
+  savedBefore: boolean
+}
+
 export interface ProfileSource {
-  load(uid: string): Promise<PersonProfile>
+  load(uid: string): Promise<StoredProfile>
   /** Grava só o que mudou. */
   save(uid: string, change: Partial<PersonProfile>): Promise<void>
 }
 
-const FIELDS = ['fullName', 'nickname', 'phone', 'birthDate', 'news', 'photo'] as const
+const FIELDS = [
+  'fullName',
+  'nickname',
+  'phone',
+  'birthDate',
+  'news',
+  'photo',
+  'profileUpdatedAt',
+] as const
 
 /** Os campos REST de `users/{uid}` → perfil (também usado pela lista de pessoas do Modo Andreía). */
 export function profileFromFields(fields: Record<string, unknown>): PersonProfile {
@@ -50,7 +65,9 @@ export function createRestProfileSource(
         fetchFn,
       )
       const fields = fieldsOf(body)
-      return fields ? profileFromFields(fields) : EMPTY_PROFILE
+      return fields
+        ? { profile: profileFromFields(fields), savedBefore: 'profileUpdatedAt' in fields }
+        : { profile: EMPTY_PROFILE, savedBefore: false }
     },
     async save(uid, change) {
       const token = await getToken()
@@ -74,7 +91,10 @@ export function createInMemoryProfileSource(
   return {
     saved,
     async load(uid) {
-      return saved[uid] ?? fallback
+      const profile = saved[uid]
+      return profile
+        ? { profile, savedBefore: true }
+        : { profile: fallback, savedBefore: fallback !== EMPTY_PROFILE }
     },
     async save(uid, change) {
       saved[uid] = { ...(saved[uid] ?? fallback), ...change }

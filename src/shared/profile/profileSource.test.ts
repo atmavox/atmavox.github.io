@@ -15,6 +15,7 @@ describe('dados do perfil no Firestore', () => {
               fullName: { stringValue: 'Carolina Rocha' },
               phone: { stringValue: '(41) 9 9876-5432' },
               news: { booleanValue: false },
+              profileUpdatedAt: { integerValue: '42' },
             },
           }),
         ),
@@ -22,13 +23,26 @@ describe('dados do perfil no Firestore', () => {
       .mockResolvedValueOnce(new Response('', { status: 404 }))
     const source = createRestProfileSource(config, async () => 't', fetchFn)
     expect(await source.load('u1')).toEqual({
-      ...EMPTY_PROFILE,
-      fullName: 'Carolina Rocha',
-      phone: '(41) 9 9876-5432',
-      news: false,
+      profile: {
+        ...EMPTY_PROFILE,
+        fullName: 'Carolina Rocha',
+        phone: '(41) 9 9876-5432',
+        news: false,
+      },
+      savedBefore: true,
     })
     expect(String(fetchFn.mock.calls[0]?.[0])).toContain('documents/users/u1?')
-    expect(await source.load('u2')).toEqual(EMPTY_PROFILE)
+    expect(await source.load('u2')).toEqual({ profile: EMPTY_PROFILE, savedBefore: false })
+  })
+
+  it('documento só com o e-mail do login: ainda não gravou os dados', async () => {
+    const fetchFn = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ fields: { email: { stringValue: 'a@b.c' } } })),
+      )
+    const source = createRestProfileSource(config, async () => 't', fetchFn)
+    expect((await source.load('u1')).savedBefore).toBe(false)
   })
 
   it('grava só o que mudou, com a data da mudança', async () => {

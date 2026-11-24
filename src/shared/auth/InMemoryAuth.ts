@@ -25,6 +25,7 @@ export class InMemoryAuth implements AuthService {
     this.setUser({
       uid: 'google-uid',
       displayName: 'Maria',
+      photoUrl: null,
       email: 'maria@exemplo.com',
       emailVerified: true,
     })
@@ -35,6 +36,7 @@ export class InMemoryAuth implements AuthService {
     this.setUser({
       uid: `uid-${email}`,
       displayName: null,
+      photoUrl: null,
       email,
       emailVerified: this.confirmed.has(email),
     })

@@ -10,6 +10,14 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.30.1] · 2026-11-24
+
+### Alterado
+
+- Quem entra pelo Google já chega com o nome completo e a foto da conta no cadastro (só na primeira
+  vez e só nos campos vazios; a pessoa edita depois). O celular continua sendo digitado: o Google não o
+  entrega sem uma permissão sensível.
+
 ## [1.30.0] · 2026-11-24
 
 ### Adicionado

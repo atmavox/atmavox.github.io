@@ -303,7 +303,7 @@ Surgiu no caminho:
     volta para onde a pessoa ia); Login **A** ("E-mail ou senha incorretos. Ainda não tem conta?" +
     "Criar conta com este e-mail"; olho da senha no login e no cadastro)
     1. [x] Dados do perfil (validação com testes; `users/{uid}`, ADR-030) + aba Conta com "Meus dados"
-           e foto (1.27.0; falta publicar as regras do Firestore)
+           e foto (1.27.0; regras do Firestore publicadas em 2026-11-24)
     2. [x] Confirmação de e-mail (1.28.0, ADR-031) (envio no cadastro, aviso, reenviar; trava também nas regras do
            Firestore e no Worker)
     3. [x] (1.29.0) Trava do cadastro completo antes de comprar ou abrir material dos hubs (a ativação passa a usar
@@ -313,7 +313,12 @@ Surgiu no caminho:
     4. [x] (1.30.0) Modo Andreía · Acessos (mocks enviados em 2026-11-24: `Downloads/atmavox-acessos-pessoas.html`,
            A seção "Pessoas", B abas, C lista + ficha; escolhido **C** com busca também no celular): dados da pessoa e lista de quem
            aceitou novidades; regras novas do
-           Firestore (publicar no console)
+           Firestore (publicadas no console em 2026-11-24)
+    - [x] (1.30.1) Login com Google preenche o nome completo e a foto no primeiro cadastro (pedido de
+          2026-11-24; o celular o Google não entrega)
+    - [ ] **Desenvolvedor:** confirmar o e-mail das contas de teste criadas com e-mail e senha
+    - [ ] **Desenvolvedor:** preencher o cadastro da conta da Andreía (ela também passa pela trava ao
+          pagar ou agendar)
 
 ## Depois
 

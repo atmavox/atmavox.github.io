@@ -40,6 +40,7 @@ function confirmationLink() {
 const toAuthUser = (user: User): AuthUser => ({
   uid: user.uid,
   displayName: user.displayName,
+  photoUrl: user.photoURL,
   email: user.email,
   emailVerified: user.emailVerified,
 })
