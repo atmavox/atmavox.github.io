@@ -10,9 +10,25 @@ import { inputClass } from './styles'
 import { LoadingNote } from '../../../shared/ui/LoadingNote'
 import { useMediaQuery } from '../../../shared/lib/useMediaQuery'
 import { PeopleSection } from './PeopleSection'
+import { TestTag } from './TestTag'
 
 const adminButton =
   'inline-flex min-h-[42px] items-center justify-center rounded-full bg-admin px-5 text-sm font-semibold whitespace-nowrap text-on-admin hover:opacity-90 disabled:opacity-60'
+
+/** A largura dos botões da linha e do título "Ações", centrado em cima deles (a coluna de Ações). */
+const ACTION_WIDTH = 'sm:w-24'
+
+/** Botões da linha de um acesso: com cara de botão (contorno, hover e um leve afundar ao tocar). */
+const rowButton = `inline-flex min-h-8 cursor-pointer items-center justify-center rounded-full border px-3.5 ${ACTION_WIDTH} sm:px-0 text-[13px] font-medium transition-[background-color,color,border-color,opacity,transform] duration-200 motion-safe:active:scale-[0.97]`
+
+/**
+ * As colunas de Liberados, iguais no cabeçalho e nas linhas (a partir de `sm`). E-mail e produto
+ * dividem o espaço; Prazo, Origem e Ações têm só o necessário (dois botões ficam um sobre o outro).
+ */
+const LIBERADOS_COLUMNS = 'sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_8.5rem_6rem_6rem] sm:gap-3'
+
+/** O nome do dado ao lado do valor, só no celular (no computador, o cabeçalho diz). */
+const cellLabel = 'text-ink-faint sm:sr-only'
 
 interface Row extends GrantedAccess {
   email: string
@@ -238,65 +254,97 @@ export function AccessesApp({
         ) : rows.length === 0 ? (
           <p className="text-ink-muted">Nenhum acesso liberado ainda.</p>
         ) : (
-          <ul className="flex flex-col">
-            {rows.map((row) => {
-              const key = `${row.uid}/${row.productId}`
-              const expired = row.expiresAt !== null && row.expiresAt <= now
-              return (
-                <li
-                  key={key}
-                  className="grid gap-1 border-b border-line py-3 text-sm sm:grid-cols-[1.3fr_1fr_auto_auto_auto] sm:items-center sm:gap-3"
-                >
-                  <span className="truncate text-ink">{row.email}</span>
-                  <span className="text-ink-muted">{row.title}</span>
-                  <span className={expired ? 'text-accent' : 'text-ink-muted'}>
-                    {termLabel(row.expiresAt, now)}
-                  </span>
-                  <span className="text-ink-faint">
-                    {row.source === 'payment' ? 'Pagamento' : 'À mão'}
-                  </span>
-                  <span className="flex gap-3">
-                    {expired && (
-                      <button
-                        type="button"
-                        onClick={() => renew(row)}
-                        className="font-medium text-admin-ink hover:underline"
-                      >
-                        Renovar
-                      </button>
-                    )}
-                    {confirming === key ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => void revoke(row)}
-                          className="font-semibold text-accent hover:underline"
-                        >
-                          Confirmar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setConfirming(null)}
-                          className="text-ink-faint"
-                        >
-                          Cancelar
-                        </button>
-                      </>
+          <div className="flex flex-col">
+            {/* Larguras fixas: o cabeçalho e as linhas ficam alinhados. No celular, cada dado leva o
+                nome ao lado. */}
+            <div
+              aria-hidden="true"
+              className={`hidden border-b border-line pb-2 text-xs font-medium text-ink-faint sm:grid ${LIBERADOS_COLUMNS}`}
+            >
+              <span>Pessoa</span>
+              <span>Produto</span>
+              <span>Prazo</span>
+              <span>Origem</span>
+              {/* Centrado em cima do Revogar, que tem a mesma largura e fica na ponta direita. */}
+              <span className="flex justify-end">
+                <span className={`${ACTION_WIDTH} text-center`}>Ações</span>
+              </span>
+            </div>
+            <ul className="flex flex-col">
+              {rows.map((row) => {
+                const key = `${row.uid}/${row.productId}`
+                const expired = row.expiresAt !== null && row.expiresAt <= now
+                return (
+                  <li
+                    key={key}
+                    className={`grid gap-1 border-b border-line py-3 text-sm sm:items-center ${LIBERADOS_COLUMNS}`}
+                  >
+                    <span className="truncate text-ink">
+                      <span className="sr-only">Pessoa: </span>
+                      {row.email}
+                    </span>
+                    <span className="text-ink-muted">
+                      <span className={cellLabel}>Produto: </span>
+                      {row.title}
+                    </span>
+                    <span className={expired ? 'text-accent' : 'text-ink-muted'}>
+                      <span className={cellLabel}>Prazo: </span>
+                      {termLabel(row.expiresAt, now)}
+                    </span>
+                    {row.source === 'test' ? (
+                      <span>
+                        <span className={cellLabel}>Origem: </span>
+                        <TestTag />
+                      </span>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => setConfirming(key)}
-                        aria-label={`Revogar ${row.title} de ${row.email}`}
-                        className="text-ink-faint hover:text-accent"
-                      >
-                        Revogar
-                      </button>
+                      <span className="text-ink-faint">
+                        <span className={cellLabel}>Origem: </span>
+                        {row.source === 'payment' ? 'Pagamento' : 'À mão'}
+                      </span>
                     )}
-                  </span>
-                </li>
-              )
-            })}
-          </ul>
+                    <span className="flex flex-wrap gap-2 pt-1 sm:justify-end sm:pt-0">
+                      {expired && (
+                        <button
+                          type="button"
+                          onClick={() => renew(row)}
+                          className={`${rowButton} border-admin-ink/40 text-admin-ink hover:bg-admin/12`}
+                        >
+                          Renovar
+                        </button>
+                      )}
+                      {confirming === key ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => void revoke(row)}
+                            className={`${rowButton} border-wine bg-wine font-semibold text-on-admin hover:opacity-90`}
+                          >
+                            Confirmar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirming(null)}
+                            className={`${rowButton} border-line text-ink-muted hover:bg-field hover:text-ink`}
+                          >
+                            Cancelar
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setConfirming(key)}
+                          aria-label={`Revogar ${row.title} de ${row.email}`}
+                          className={`${rowButton} border-line text-ink-muted hover:border-wine/50 hover:bg-wine/10 hover:text-wine`}
+                        >
+                          Revogar
+                        </button>
+                      )}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
         )}
       </Section>
 

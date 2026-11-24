@@ -323,6 +323,7 @@ Surgiu no caminho:
     - [x] (1.31.3) Etiqueta "Admin" em Acessos · Pessoas, admins fora da planilha + ícone de download
     - [x] (1.31.4) Símbolo ao fundo do hub de meditações igual ao do hub de jornadas
     - [x] (1.32.0) Admins simulam o pagamento para testar os fluxos de compra e da ativação (ADR-033)
+    - [x] (1.32.1) Acessos · Liberados com títulos das colunas e botões com hover de botão
     - [ ] Simular também no "Pagar" de um pedido da ativação aguardando pagamento (aba Ativações do
           perfil), se fizer falta
     - [ ] **Desenvolvedor:** publicar as regras do Firestore (a admin lista `admins`, para marcar os

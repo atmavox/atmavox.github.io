@@ -10,6 +10,15 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.32.1] · 2026-11-24
+
+### Alterado
+
+- Modo Andreía · Acessos · Liberados: colunas com título (Pessoa, Produto, Prazo, Origem e Ações; no
+  celular, o nome de cada dado ao lado do valor). E-mail e produto dividem o espaço; Prazo, Origem e
+  Ações têm só o necessário. Os botões da linha têm cara de botão (contorno, hover, um leve afundar ao
+  tocar; Revogar fica vinho no hover), a mesma largura, e "Ações" fica centrado em cima deles.
+
 ## [1.32.0] · 2026-11-24
 
 ### Adicionado
