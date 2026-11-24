@@ -10,6 +10,27 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.26.5] · 2026-11-24
+
+### Adicionado
+
+- Redes sociais: enquanto a última publicação do Instagram não puder ser lida (sem token ou com erro),
+  o cartão do Instagram mostra um reels fixado escolhido pela Andreía, com capa e título guardados no
+  projeto (`scripts/pinned/`).
+
+### Alterado
+
+- Redes sociais: os cartões seguem a ordem YouTube, TikTok, Instagram, Spotify (o YouTube, que traz a
+  última publicação, vem primeiro). A ordem ideal, para quando todas trouxerem a última, ficou anotada
+  no ADR-028.
+- Redes sociais: o cartão do Spotify mostra "Playlist: AtmaVox Songs" quando o link é de uma playlist.
+
+### Corrigido
+
+- Redes sociais: o cartão do TikTok voltou a ter capa e título. O TikTok parou de mandá-los pela
+  incorporação pública, então a capa e o título do vídeo fixado ficam no projeto (`scripts/pinned/`),
+  presos ao número do vídeo.
+
 ## [1.26.4] · 2026-11-23
 
 ### Adicionado

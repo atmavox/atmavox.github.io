@@ -13,8 +13,8 @@ variables → Actions** (abas **Variables** e **Secrets**).
 Reunião com a Andreía em 2026-11-23: vídeo do TikTok, playlist do Spotify e credenciais **de teste** do
 Mercado Pago recebidos. Instagram e WhatsApp travaram no painel da Meta (passos reescritos abaixo).
 
-- [ ] Redes sociais: TikTok: criar a variável `SOCIAL_TIKTOK_URL` (link já escolhido, no `.env.local`)
-- [ ] Redes sociais: Spotify: criar a variável `SOCIAL_SPOTIFY_URL` (playlist "AtmaVox Songs", no `.env.local`)
+- [x] Redes sociais: TikTok: variável `SOCIAL_TIKTOK_URL` criada (2026-11-24); capa fixa no projeto
+- [x] Redes sociais: Spotify: variável `SOCIAL_SPOTIFY_URL` criada (2026-11-24)
 - [ ] Redes sociais: Instagram: app, configuração e script prontos e testados com conta pessoal (2026-11-24);
       falta a `@atmavox` aceitar ser testadora e gerar o `INSTAGRAM_TOKEN` + `INSTAGRAM_USER_ID` (seção 1)
 - [x] Pagamentos: app "atmavox-app" no Mercado Pago com credenciais de teste (2026-11-23)
@@ -49,8 +49,11 @@ escolhe um vídeo e o site busca a capa e o título pelo serviço público de in
 
 O cartão aparece com "Em destaque". Para trocar o vídeo, é só editar a variável.
 
-Limitação (2026-11-23): o TikTok parou de mandar a capa e o título pela incorporação pública. O cartão
-aparece sem capa e com o título "Vídeo no TikTok", mas abre o vídeo certo.
+O TikTok parou de mandar a capa e o título pela incorporação pública (2026-11-23) e bloqueia quem lê a
+página do vídeo. Por isso a **capa e o título do vídeo fixado ficam no projeto**: ao trocar o vídeo,
+a Andreía manda ao desenvolvedor um print da capa e o título, e ele põe a imagem em `scripts/pinned/` e
+uma linha em `TIKTOK_PINNED` (`scripts/fetch-social.ts`). Sem isso, o cartão aparece sem capa e com o
+título "Vídeo no TikTok", mas abre o vídeo certo.
 
 ### Spotify (playlist escolhida)
 
@@ -66,6 +69,11 @@ Quando existir um podcast, dá para trocar pela última publicação: apague `SO
 `SOCIAL_SPOTIFY_RSS` com o link do feed RSS (Spotify for Creators → **Configurações → Distribuição**).
 
 ### Instagram (configuração única)
+
+Enquanto o token não estiver pronto (ou se a API falhar), o site mostra um **reels fixado** escolhido
+pela Andreía (`INSTAGRAM_PINNED` em `scripts/fetch-social.ts`, capa em `scripts/pinned/`). Para trocar,
+ela manda ao desenvolvedor o link, um print da capa e o título. Com o token funcionando, a última
+publicação toma o lugar sozinha.
 
 O Instagram só entrega publicações pela API oficial da Meta. Desde 2026-11, apps novos só têm o **login
 unificado**: o token é de um "usuário do sistema" do app, começa com `EAA` e **não vence**. Ele só

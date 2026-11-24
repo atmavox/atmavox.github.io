@@ -2,7 +2,13 @@
 // (`scripts/fetch-social.ts`) busca e chama estas leituras; o site lê o resultado (`social.json`).
 // Sem imports: o mesmo arquivo roda no Node do deploy e no navegador.
 
-export const SOCIAL_NETWORKS = ['instagram', 'youtube', 'spotify', 'tiktok'] as const
+/**
+ * Ordem dos cartões na página inicial (pedido de 2026-11-24): primeiro o YouTube, a única rede que traz
+ * a última publicação sozinha; TikTok e Instagram são fixados; o Spotify é a playlist fixa.
+ * Ordem ideal, quando TikTok e Instagram também trouxerem a última publicação: TikTok, Instagram,
+ * YouTube, Spotify.
+ */
+export const SOCIAL_NETWORKS = ['youtube', 'tiktok', 'instagram', 'spotify'] as const
 export type SocialNetwork = (typeof SOCIAL_NETWORKS)[number]
 
 export interface SocialPost {
@@ -124,6 +130,11 @@ export function parseInstagramMedia(json: unknown): (SocialPost & { remoteImage?
   }
 }
 
+/** O número do vídeo num link do TikTok (`…/video/7652…`), para achar a capa guardada no projeto. */
+export function tiktokVideoId(url: string): string | null {
+  return /\/video\/(\d+)/.exec(url)?.[1] ?? null
+}
+
 /** O oEmbed público do TikTok (`/oembed?url=…`) de um vídeo escolhido (fixado). */
 export function parseTikTokOembed(
   json: unknown,
@@ -154,7 +165,10 @@ export function parseSpotifyOembed(
   return {
     network: 'spotify',
     url,
-    title: shortText(str(json.title) ?? 'No Spotify'),
+    // "Playlist: AtmaVox Songs" (pedido de 2026-11-24): o nome sozinho não diz que é uma playlist.
+    title: shortText(
+      `${url.includes('/playlist/') ? 'Playlist: ' : ''}${str(json.title) ?? 'No Spotify'}`,
+    ),
     kind: 'audio',
     pinned: true,
     ...(remoteImage ? { remoteImage } : {}),

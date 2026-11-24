@@ -9,12 +9,13 @@
 // - SOCIAL_SPOTIFY_RSS (variable): feed RSS do podcast, quando existir (usado se não houver o link).
 // - INSTAGRAM_TOKEN (secret): chave da API do Instagram (guia em `.ai/processos-manuais.md`).
 // - INSTAGRAM_USER_ID (variable): número da conta do Instagram, para o token do login unificado (EAA…).
-import { mkdir, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, writeFile } from 'node:fs/promises'
 import {
   parseInstagramMedia,
   parsePodcastFeed,
   parseSpotifyOembed,
   parseTikTokOembed,
+  tiktokVideoId,
   parseYouTubeFeed,
   type SocialFeed,
   type SocialNetwork,
@@ -26,7 +27,54 @@ const YOUTUBE_CHANNEL_ID = process.env.SOCIAL_YOUTUBE_CHANNEL || 'UCHASefs-qyG_f
 const PUBLIC_DIR = new URL('../public/', import.meta.url)
 const TIMEOUT_MS = 15_000
 
-type Found = (SocialPost & { remoteImage?: string }) | null
+/** Capa vinda da rede (baixada no deploy) ou guardada no projeto, em `scripts/pinned/`. */
+type Found = (SocialPost & { remoteImage?: string; localImage?: string }) | null
+
+/**
+ * Capa e título dos vídeos fixados do TikTok, pelo número do vídeo: o TikTok parou de mandar a capa
+ * pela incorporação pública (2026-11) e bloqueia quem lê a página. Trocou o vídeo em
+ * `SOCIAL_TIKTOK_URL`? Ponha a capa nova em `scripts/pinned/` e uma linha aqui; sem linha, o cartão
+ * aparece sem capa.
+ */
+const TIKTOK_PINNED: Record<string, { title: string; cover: string }> = {
+  '7652054784832228616': {
+    title: 'Empatia sem limite vira autodestruição.',
+    cover: 'tiktok-7652054784832228616.png',
+  },
+}
+
+/**
+ * Publicação fixada do Instagram, enquanto a última não puder ser lida (sem `INSTAGRAM_TOKEN` ou com
+ * erro): um reels escolhido pela Andreía (2026-11-24), com a capa guardada no projeto.
+ */
+const INSTAGRAM_PINNED: NonNullable<Found> = {
+  network: 'instagram',
+  url: 'https://www.instagram.com/atmavox/reel/DbKClL_xgrJ/',
+  title: 'Práticas (simples) que adotei desde que saí do Estado Cinza',
+  kind: 'video',
+  pinned: true,
+  localImage: 'instagram-DbKClL_xgrJ.png',
+}
+
+/** A última publicação pela API oficial da Meta (`null` sem token). */
+async function loadInstagramLatest(): Promise<Found> {
+  const token = process.env.INSTAGRAM_TOKEN
+  if (!token) return null
+  const fields = 'caption,media_type,media_url,thumbnail_url,permalink,timestamp'
+  const query = `fields=${fields}&limit=1&access_token=${encodeURIComponent(token)}`
+  // Token "IG…" (login do Instagram) lê a própria conta; token "EAA…" (login unificado, usuário do
+  // sistema, o único disponível para apps novos desde 2026-11) precisa do número da conta.
+  if (token.startsWith('IG')) {
+    return parseInstagramMedia(
+      await (await get(`https://graph.instagram.com/me/media?${query}`)).json(),
+    )
+  }
+  const account = process.env.INSTAGRAM_USER_ID
+  if (!account)
+    throw new Error('falta a variable INSTAGRAM_USER_ID para o token do login unificado')
+  const url = `https://graph.facebook.com/${encodeURIComponent(account)}/media?${query}`
+  return parseInstagramMedia(await (await get(url)).json())
+}
 
 async function get(url: string): Promise<Response> {
   const response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) })
@@ -38,22 +86,13 @@ const SOURCES: { network: SocialNetwork; load: () => Promise<Found> }[] = [
   {
     network: 'instagram',
     load: async () => {
-      const token = process.env.INSTAGRAM_TOKEN
-      if (!token) return null
-      const fields = 'caption,media_type,media_url,thumbnail_url,permalink,timestamp'
-      const query = `fields=${fields}&limit=1&access_token=${encodeURIComponent(token)}`
-      // Token "IG…" (login do Instagram) lê a própria conta; token "EAA…" (login unificado, usuário do
-      // sistema, o único disponível para apps novos desde 2026-11) precisa do número da conta.
-      if (token.startsWith('IG')) {
-        return parseInstagramMedia(
-          await (await get(`https://graph.instagram.com/me/media?${query}`)).json(),
-        )
+      try {
+        const latest = await loadInstagramLatest()
+        if (latest) return latest
+      } catch (error) {
+        console.warn(`  instagram: última publicação falhou (${String(error)}); usando a fixada`)
       }
-      const account = process.env.INSTAGRAM_USER_ID
-      if (!account)
-        throw new Error('falta a variable INSTAGRAM_USER_ID para o token do login unificado')
-      const url = `https://graph.facebook.com/${encodeURIComponent(account)}/media?${query}`
-      return parseInstagramMedia(await (await get(url)).json())
+      return INSTAGRAM_PINNED
     },
   },
   {
@@ -82,8 +121,17 @@ const SOURCES: { network: SocialNetwork; load: () => Promise<Found> }[] = [
     load: async () => {
       const video = process.env.SOCIAL_TIKTOK_URL
       if (!video) return null
+      const pinned = TIKTOK_PINNED[tiktokVideoId(video) ?? '']
       const oembed = `https://www.tiktok.com/oembed?url=${encodeURIComponent(video)}`
-      return parseTikTokOembed(await (await get(oembed)).json(), video)
+      const found = await get(oembed)
+        .then((response) => response.json())
+        .then((json) => parseTikTokOembed(json, video))
+        .catch((error: unknown) => {
+          if (!pinned) throw error
+          return parseTikTokOembed({}, video)
+        })
+      if (!found || !pinned || found.remoteImage) return found
+      return { ...found, title: pinned.title, localImage: pinned.cover }
     },
   },
 ]
@@ -109,6 +157,20 @@ async function saveImage(network: SocialNetwork, remote: string): Promise<string
   }
 }
 
+/** Copia uma capa guardada no projeto (`scripts/pinned/`) para o site. */
+async function copyPinned(name: string): Promise<string | undefined> {
+  try {
+    await copyFile(
+      new URL(`pinned/${name}`, import.meta.url),
+      new URL(`social/${name}`, PUBLIC_DIR),
+    )
+    return `social/${name}`
+  } catch (error) {
+    console.warn(`  capa ${name} não copiou: ${String(error)}`)
+    return undefined
+  }
+}
+
 async function main() {
   await mkdir(new URL('social/', PUBLIC_DIR), { recursive: true })
   const posts: SocialPost[] = []
@@ -119,8 +181,12 @@ async function main() {
         console.log(`- ${network}: nada configurado ou nada publicado`)
         continue
       }
-      const { remoteImage, ...post } = found
-      const image = remoteImage ? await saveImage(network, remoteImage) : undefined
+      const { remoteImage, localImage, ...post } = found
+      const image = remoteImage
+        ? await saveImage(network, remoteImage)
+        : localImage
+          ? await copyPinned(localImage)
+          : undefined
       posts.push({ ...post, ...(image ? { image } : {}) })
       console.log(`- ${network}: ${post.title}`)
     } catch (error) {

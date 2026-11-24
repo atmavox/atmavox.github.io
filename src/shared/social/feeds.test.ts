@@ -5,6 +5,7 @@ import {
   parseSocialFeed,
   parseSpotifyOembed,
   parseTikTokOembed,
+  tiktokVideoId,
   parseYouTubeFeed,
   relativeTime,
   shortText,
@@ -94,12 +95,19 @@ describe('última publicação de cada rede', () => {
     ).toEqual({
       network: 'spotify',
       url,
-      title: 'AtmaVox Songs',
+      title: 'Playlist: AtmaVox Songs',
       kind: 'audio',
       pinned: true,
       remoteImage: 'https://i.scdn/capa',
     })
-    expect(parseSpotifyOembed({}, url)?.title).toBe('No Spotify')
+    expect(parseSpotifyOembed({}, 'https://open.spotify.com/episode/abc')?.title).toBe('No Spotify')
+  })
+
+  it('TikTok: acha o número do vídeo no link (para a capa guardada no projeto)', () => {
+    expect(tiktokVideoId('https://www.tiktok.com/@atmavox/video/7652054784832228616?lang=pt')).toBe(
+      '7652054784832228616',
+    )
+    expect(tiktokVideoId('https://www.tiktok.com/@atmavox')).toBeNull()
   })
 
   it('texto de XML sem CDATA nem entidades', () => {
@@ -131,8 +139,8 @@ describe('social.json no site', () => {
         },
       ],
     })
-    expect(posts.map((p) => p.network)).toEqual(['instagram', 'youtube', 'spotify'])
-    expect(posts[1]?.image).toBe('social/youtube.jpg')
+    expect(posts.map((p) => p.network)).toEqual(['youtube', 'instagram', 'spotify'])
+    expect(posts[0]?.image).toBe('social/youtube.jpg')
     expect(posts[2]).not.toHaveProperty('image')
     expect(parseSocialFeed(null)).toEqual([])
   })

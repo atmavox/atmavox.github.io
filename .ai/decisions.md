@@ -453,7 +453,9 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   `public/social/` (as do Instagram e do TikTok vencem em dias). O site lê o arquivo uma vez por visita.
   YouTube pelo feed público do canal; Spotify por um link escolhido (`SOCIAL_SPOTIFY_URL`, oEmbed público,
   desde 1.26.4) ou, sem ele, pelo RSS do podcast (`SOCIAL_SPOTIFY_RSS`); Instagram pela API
-  oficial com `INSTAGRAM_TOKEN` (secret); TikTok por um vídeo escolhido (`SOCIAL_TIKTOK_URL`) e o
+  oficial com `INSTAGRAM_TOKEN` (secret; sem ele, um reels fixado com capa no projeto, desde 1.26.5); TikTok por um vídeo escolhido (`SOCIAL_TIKTOK_URL`), com capa e título
+  guardados no projeto (`scripts/pinned/`, desde 1.26.5: o oEmbed parou de mandar a capa e a página do
+  vídeo tem verificação anti-robô) e o
   oEmbed público, porque o TikTok não entrega o último vídeo sem app aprovado. As leituras são funções
   puras em `src/shared/social/feeds.ts` (o Node 24 roda o TypeScript direto). Rede que falhar fica de
   fora; sem nenhuma, só os ícones. Guia em `processos-manuais.md` (antes `redes-sociais.md`).
@@ -462,6 +464,11 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   fora da marca).
 - **Consequências:** ➕ grátis, rápido (arquivo estático) e sem chave no site. ➖ a publicação nova
   aparece em até 6 horas; a chave do Instagram precisa ser renovada a cada 60 dias.
+
+- **Ordem dos cartões (2026-11-24):** YouTube, TikTok, Instagram, Spotify, porque o YouTube é a única
+  rede que traz a última publicação sozinha (TikTok e Instagram estão fixados; o Spotify é a playlist
+  fixa). Ordem ideal, quando TikTok e Instagram também trouxerem a última publicação: TikTok,
+  Instagram, YouTube, Spotify. Fica em `SOCIAL_NETWORKS` (`src/shared/social/feeds.ts`).
 
 ## ADR-029 · Ativação individual: terapias, anamnese, pedidos e agenda
 

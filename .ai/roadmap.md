@@ -212,14 +212,14 @@ Surgiu no caminho:
 - [x] **Última publicação das redes na página inicial** (ADR-028, mock `Downloads/atmavox-redes.html`,
       1.21.0): gerada no deploy a cada 6 horas; mural no computador, cartões que deslizam no celular.
       YouTube já funciona. Guia em `processos-manuais.md`, seção 1.
-  - [ ] **Desenvolvedor:** criar a Variable `SOCIAL_TIKTOK_URL` com o vídeo escolhido pela Andreía (link
-        recebido em 2026-11-23, no `.env.local`; o TikTok não manda mais capa nem título pela incorporação)
+  - [x] Variables `SOCIAL_TIKTOK_URL` e `SOCIAL_SPOTIFY_URL` criadas e publicadas (2026-11-24)
+  - [x] Capa e título do vídeo fixado do TikTok guardados no projeto (`scripts/pinned/`, 1.26.5)
+  - [x] Reels fixado do Instagram enquanto não houver token (`scripts/pinned/`, 1.26.5)
   - [ ] **Desenvolvedor + Andreía:** ligar o Instagram (app `atmavox-app` e configuração do login unificado
         prontos em 2026-11-24; falta a `@atmavox` como testadora, o secret `INSTAGRAM_TOKEN` e a variable
         `INSTAGRAM_USER_ID`; o token do login unificado não vence)
   - [x] Spotify por link escolhido (playlist "AtmaVox Songs", oEmbed público, 1.26.4), também no ícone
         da lista de redes; o RSS do podcast continua como alternativa
-  - [ ] **Desenvolvedor:** criar a Variable `SOCIAL_SPOTIFY_URL` com o link da playlist (no `.env.local`)
 
 - [x] **Ativação individual paga** (F10, ADR-029; conversa com a Andreía em 2026-11-23): login
       obrigatório → anamnese (editável no Modo Andreía) → terapia (preços editáveis) → data de
