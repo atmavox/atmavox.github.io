@@ -189,11 +189,14 @@ export function parseJourney(raw: unknown): Journey | null {
   const reviews = every(raw.reviews, parseReview)
   const closingQuestions = every(raw.closingQuestions, parseQuestion)
   if (!id || !weeks || weeks.length === 0 || !reviews || !closingQuestions) return null
-  const retiredDays = Array.isArray(raw.retiredDays)
-    ? raw.retiredDays.filter(
-        (day): day is number => typeof day === 'number' && Number.isInteger(day) && day >= 1,
-      )
-    : []
+  const dayNumbers = (value: unknown): number[] =>
+    Array.isArray(value)
+      ? value.filter(
+          (day): day is number => typeof day === 'number' && Number.isInteger(day) && day >= 1,
+        )
+      : []
+  const retiredDays = dayNumbers(raw.retiredDays)
+  const unconfirmedDays = dayNumbers(raw.unconfirmedDays)
   const structure = JOURNEY_STRUCTURES.find((s) => s === raw.structure)
   const journey: Journey = {
     id,
@@ -205,6 +208,7 @@ export function parseJourney(raw: unknown): Journey | null {
     reviews,
     closingQuestions,
     ...(retiredDays.length > 0 ? { retiredDays } : {}),
+    ...(unconfirmedDays.length > 0 ? { unconfirmedDays } : {}),
   }
   return hasUniqueIds(journey) ? journey : null
 }

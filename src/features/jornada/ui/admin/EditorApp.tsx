@@ -1,3 +1,4 @@
+import { useCatalog } from '../../../../shared/catalog/CatalogContext'
 import { BRAND_TAB_TITLE } from '../../../../shared/brand/links'
 import { useCallback, useContext, useEffect, useState, useSyncExternalStore } from 'react'
 import type { JourneyEditor } from '../../application/JourneyEditor'
@@ -111,19 +112,26 @@ function Editor({ editor }: { editor: JourneyEditor }) {
 /** Modo Andreía: só para a admin (as regras da nuvem também recusam qualquer outra pessoa). */
 export function EditorApp() {
   const services = useContext(JourneyContext)
-  const { isAdmin } = useJourney()
+  const { isAdmin, journey } = useJourney()
   const [editor] = useState(() => services?.createEditor?.() ?? null)
+  // Produto Indisponível não se edita (pedido de 2026-11-25): primeiro, "Publicar de novo".
+  const isRetired = useCatalog().find(journey.id)?.status === 'retired'
 
   useEffect(() => {
     document.title = BRAND_TAB_TITLE
   }, [])
 
-  if (!editor || !isAdmin) {
+  if (!editor || !isAdmin || isRetired) {
     return (
       <div className="min-h-dvh">
         <AdminBar />
         <main className="mx-auto max-w-3xl px-4">
-          {!editor ? (
+          {isRetired && editor && isAdmin ? (
+            <Notice
+              title="Jornada indisponível"
+              text="Uma jornada Indisponível não se edita. Para mudar algo, publique de novo em Produtos."
+            />
+          ) : !editor ? (
             <Notice title="Edição indisponível" text="O login não está configurado neste site." />
           ) : (
             <Notice

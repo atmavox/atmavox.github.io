@@ -20,8 +20,10 @@ export type AccessTerm = 'forever' | '1' | '3' | '6' | '12'
 export interface JourneySeed {
   /** Títulos dos dias guardados no rascunho; null se não há. */
   dayTitles: string[] | null
-  /** A jornada já tem conteúdo no editor: a estrutura só muda lá. */
+  /** A estrutura só muda no editor da jornada (já publicada, ou com conteúdo e fora de Rascunho). */
   locked: boolean
+  /** O editor já salvou conteúdo: mudar a estrutura aqui reorganiza os dias dele. */
+  hasContent?: boolean
 }
 
 export interface ProductForm extends StructureForm {
@@ -33,6 +35,8 @@ export interface ProductForm extends StructureForm {
   bannerMediaId: string
   territory: TerritoryId
   status: ProductStatus
+  /** Quando ficou Indisponível: passa intacto do catálogo para o catálogo. */
+  retiredAt?: number
   featured: boolean
   order: number
   paid: boolean
@@ -44,6 +48,8 @@ export interface ProductForm extends StructureForm {
   previewDays: string[]
   /** A jornada já tem conteúdo no editor: duração, divisões e nomes só mudam lá (ADR-025). */
   structureLocked: boolean
+  /** A jornada tem conteúdo salvo no editor (ao mudar a estrutura em Rascunho, os dias se reorganizam). */
+  hasEditorContent: boolean
   // Meditação
   media: 'audio' | 'video'
   /** Minutos, em texto ("15"). */
@@ -87,6 +93,7 @@ export function emptyForm(kind: ProductForm['kind'], order: number): ProductForm
     dayTitles: [],
     previewDays: [],
     structureLocked: false,
+    hasEditorContent: false,
     media: 'audio',
     minutes: '',
     group: '',
@@ -148,6 +155,7 @@ export function formFromProduct(
     bannerMediaId: product.bannerMediaId ?? '',
     territory: product.territory,
     status: product.status,
+    ...(product.retiredAt !== undefined ? { retiredAt: product.retiredAt } : {}),
     featured: product.featured,
     paid: pricing.type === 'paid',
     price: pricing.type === 'paid' ? formatPriceInput(pricing.priceCents) : '',
@@ -178,6 +186,7 @@ export function formFromProduct(
       dayTitles: (seed?.dayTitles ?? []).map((title) => listItem(title)),
       previewDays: [...(product.previewDays ?? [])],
       structureLocked: seed?.locked ?? false,
+      hasEditorContent: seed?.hasContent ?? false,
     })
   }
   return {
@@ -266,8 +275,12 @@ export function productFromForm(form: ProductForm): Product {
           accessMonths: form.access === 'forever' ? null : Number(form.access),
         }
       : { type: 'free' as const },
-    featured: form.featured,
+    // Rascunho e Indisponível não aparecem no site, então também não ficam em destaque.
+    featured: form.status !== 'draft' && form.status !== 'retired' && form.featured,
     order: form.order,
+    ...(form.status === 'retired' && form.retiredAt !== undefined
+      ? { retiredAt: form.retiredAt }
+      : {}),
   }
   if (form.kind === 'journey') {
     const structure = structureOf(form)

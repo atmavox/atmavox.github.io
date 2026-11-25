@@ -337,7 +337,14 @@ Surgiu no caminho:
           do Contato e do hub Ativações com o botão na largura toda
     - [x] (1.33.0) Clicar fora fecha balões e janelas; X pequeno no canto do balão; jornada nova com os
           dias criados sozinhos como Rascunho; Anamnese sem o aviso do mock; "← Produtos" com hover
-    - [ ] **Histórico da agenda de ativações** (ideia de 2026-11-25, aguardando escolha do mock):
+    - [x] (1.34.0) Duplicar jornada ou meditação no editor do produto (ADR-034)
+    - [ ] Conferir no site publicado: duplicar a Chama Interna e uma meditação, abrir a cópia no editor
+    - [x] (1.35.0) Inativar produto (ADR-035): cartão Disponível com quem tem acesso, confirmação,
+          Indisponível com "Publicar de novo", grupo recolhido na lista, faixa "Em recolhimento" no
+          perfil e aviso "… saiu do ar" no link antigo
+    - [ ] **Ler minhas reflexões** depois que o acesso a um produto Indisponível vence (só leitura;
+          precisa de regra nova no Firestore para entregar o conteúdo a quem já teve acesso)
+    - [ ] Conferir no site publicado: inativar uma meditação de teste, ver o perfil e o link antigo - [ ] **Histórico da agenda de ativações** (ideia de 2026-11-25, aguardando escolha do mock):
           "Movimentações recentes" com o que mudou (pedido novo, pago, reservado, confirmado, vencido,
           cancelado, faixa livre criada/mudada/tirada); ver a proposta na conversa de 2026-11-25
     - [ ] Conferir no computador de verdade o resumo ao passar o mouse e o balão perto das bordas

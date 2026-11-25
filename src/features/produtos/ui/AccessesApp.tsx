@@ -1,6 +1,6 @@
 import { UiIcon } from '../../../shared/ui/UiIcon'
 import { useCallback, useEffect, useState } from 'react'
-import type { Product } from '../../../shared/catalog/product'
+import { wasPublished, type Product } from '../../../shared/catalog/product'
 import { useAuthSession } from '../../../shared/auth/AuthContext'
 import { useNow } from '../../../shared/lib/useNow'
 import { markAdmins } from '../domain/people'
@@ -48,7 +48,9 @@ export function AccessesApp({
   // Quem usa o Modo Andreía é admin: aparece marcada mesmo antes de as regras deixarem listar `admins`.
   const myUid = useAuthSession().state?.user?.uid ?? null
   const [email, setEmail] = useState('')
-  const [productId, setProductId] = useState(products[0]?.id ?? '')
+  // Só se libera o que já foi ao ar: ninguém tem acesso a Rascunho ou Em breve (pedido de 2026-11-25).
+  const grantable = products.filter((p) => wasPublished(p.status))
+  const [productId, setProductId] = useState(grantable[0]?.id ?? '')
   const [term, setTerm] = useState<TermChoice>('produto')
   const [until, setUntil] = useState('')
   const [person, setPerson] = useState<Person | null | 'unknown'>('unknown')
@@ -103,7 +105,7 @@ export function AccessesApp({
   }
 
   async function grant() {
-    const product = products.find((p) => p.id === productId)
+    const product = grantable.find((p) => p.id === productId)
     if (!product) return
     if (!isEmail(email)) {
       setNotice('Digite um e-mail válido.')
@@ -185,7 +187,7 @@ export function AccessesApp({
                 onChange={(e) => setProductId(e.target.value)}
                 className={inputClass}
               >
-                {products.map((p) => (
+                {grantable.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.title}
                   </option>

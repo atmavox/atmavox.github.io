@@ -6,7 +6,10 @@ import { useAccess } from '../../../shared/catalog/AccessContext'
 import type { ProductAccess } from '../../../shared/catalog/offer'
 import type { JourneyProduct, Product } from '../../../shared/catalog/product'
 import { useNow } from '../../../shared/lib/useNow'
+import { canStillUse, retiredNote, type RetiredNote } from '../../../shared/catalog/retired'
+import { UiIcon } from '../../../shared/ui/UiIcon'
 import {
+  hasStarted,
   journeyTrail,
   type ProgressLoader,
   type Trail,
@@ -79,7 +82,12 @@ export function AccessPill({
   )
 }
 
+/**
+ * Para onde vai o botão da trilha: quem ainda não concluiu nenhum dia começa sempre pela Abertura;
+ * quem já começou continua de onde parou (pedido de 2026-11-25).
+ */
 function continueHref(journey: JourneyProduct, trail: Trail): string {
+  if (trail.doneDays === 0) return `#/jornada/${journey.id}`
   const tab = { weeks: 'semana', parts: 'parte', themes: 'tema', days: null }[journey.structure]
   if (tab && trail.nextStep) return `#/jornada/${journey.id}/${tab}-${trail.nextStep}`
   if (journey.structure === 'days' && trail.nextDay) return `#/jornada/${journey.id}/dias`
@@ -92,94 +100,118 @@ function JourneyTrailCard({
   trail,
   pill,
   compact,
+  note = null,
+  canContinue = true,
 }: {
   journey: JourneyProduct
   trail: Trail
   pill: ReactNode
   compact: boolean
+  /** Jornada Indisponível: a faixa no topo (mock aprovado, perfil B). */
+  note?: RetiredNote | null
+  /** Sem acesso (Indisponível e vencida): a trilha fica, sem "Continuar". */
+  canContinue?: boolean
 }) {
   const finished = trail.nextDay === null
   const percent = trail.totalDays > 0 ? Math.round((trail.doneDays / trail.totalDays) * 100) : 0
   return (
-    <section
-      className={`flex flex-col gap-3.5 rounded-[22px] border border-line bg-surface ${compact ? 'p-[18px]' : 'p-6'}`}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold tracking-[0.24em] text-accent uppercase">
-            {finished ? 'Jornada concluída' : 'Continue de onde parou'}
-          </p>
-          <h2 className={`font-display text-ink ${compact ? 'text-[1.45rem]' : 'text-[1.7rem]'}`}>
-            {journey.title}
-          </h2>
+    <section className="flex flex-col overflow-hidden rounded-[22px] border border-line bg-surface">
+      {note && (
+        <p className="flex items-start gap-2.5 bg-gray-state/12 px-4 py-2.5 text-sm text-ink-muted">
+          <span className="mt-0.5 text-ink-faint">
+            <UiIcon name="moonset" size={18} />
+          </span>
+          <span>
+            <b className="font-semibold text-ink">{note.lead}.</b> {note.text}
+          </span>
+        </p>
+      )}
+      <div className={`flex flex-col gap-3.5 ${compact ? 'p-[18px]' : 'p-6'}`}>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.24em] text-accent uppercase">
+              {finished
+                ? 'Jornada concluída'
+                : canContinue
+                  ? 'Continue de onde parou'
+                  : 'O que você viveu'}
+            </p>
+            <h2 className={`font-display text-ink ${compact ? 'text-[1.45rem]' : 'text-[1.7rem]'}`}>
+              {journey.title}
+            </h2>
+          </div>
+          {pill}
         </div>
-        {pill}
-      </div>
-      <div
-        role="progressbar"
-        aria-label={`Progresso em ${journey.title}`}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={percent}
-        className="h-2 overflow-hidden rounded-full bg-line"
-      >
-        <span
-          className="block h-full rounded-full bg-linear-to-r from-gray-state to-accent"
-          style={{ width: `${percent}%` }}
-        />
-      </div>
-      <ol className="flex flex-col">
-        {trail.steps.map((step, index) => {
-          const isLast = index === trail.steps.length - 1
-          return (
-            <li
-              key={`${step.label}-${step.title}`}
-              className="relative grid grid-cols-[14px_1fr] gap-3.5 pb-[18px] last:pb-0"
-            >
-              {!isLast && (
+        <div
+          role="progressbar"
+          aria-label={`Progresso em ${journey.title}`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={percent}
+          className="h-2 overflow-hidden rounded-full bg-line"
+        >
+          <span
+            className="block h-full rounded-full bg-linear-to-r from-gray-state to-accent"
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+        <ol className="flex flex-col">
+          {trail.steps.map((step, index) => {
+            const isLast = index === trail.steps.length - 1
+            return (
+              <li
+                key={`${step.label}-${step.title}`}
+                className="relative grid grid-cols-[14px_1fr] gap-3.5 pb-[18px] last:pb-0"
+              >
+                {!isLast && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-4 bottom-0 left-1.5 w-0.5 bg-line"
+                  />
+                )}
                 <span
                   aria-hidden="true"
-                  className="absolute top-4 bottom-0 left-1.5 w-0.5 bg-line"
+                  className={`mt-1 size-3.5 rounded-full border-2 border-accent ${step.state === 'done' ? 'bg-accent' : 'bg-bg'} ${step.state === 'later' ? 'opacity-40' : ''}`}
                 />
-              )}
-              <span
-                aria-hidden="true"
-                className={`mt-1 size-3.5 rounded-full border-2 border-accent ${step.state === 'done' ? 'bg-accent' : 'bg-bg'} ${step.state === 'later' ? 'opacity-40' : ''}`}
-              />
-              <div className={step.state === 'later' ? 'text-ink-faint' : ''}>
-                <b className="font-semibold">
-                  {compact || !step.label ? step.title : `${step.label} · ${step.title}`}
-                </b>
-                <span className="sr-only">
-                  {step.state === 'done'
-                    ? ', feito'
-                    : step.state === 'next'
-                      ? ', em andamento'
-                      : ', a seguir'}
-                </span>
-                {step.state === 'done' && (
-                  <p className="text-sm text-ink-faint">
-                    {step.lastDay - step.firstDay + 1} dias feitos
-                  </p>
-                )}
-                {step.state === 'next' && trail.nextDay && (
-                  <>
-                    <p className="text-sm text-ink-faint">Próximo: dia {trail.nextDay}</p>
-                    <a
-                      href={continueHref(journey, trail)}
-                      className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 font-semibold text-bg hover:opacity-90"
-                    >
-                      {compact ? 'Continuar' : `Continuar no dia ${trail.nextDay}`}
-                      <ArrowRight aria-hidden size={18} />
-                    </a>
-                  </>
-                )}
-              </div>
-            </li>
-          )
-        })}
-      </ol>
-      {finished && <p className="text-sm text-ink-faint">Jornada concluída ✦</p>}
+                <div className={step.state === 'later' ? 'text-ink-faint' : ''}>
+                  <b className="font-semibold">
+                    {compact || !step.label ? step.title : `${step.label} · ${step.title}`}
+                  </b>
+                  <span className="sr-only">
+                    {step.state === 'done'
+                      ? ', feito'
+                      : step.state === 'next'
+                        ? ', em andamento'
+                        : ', a seguir'}
+                  </span>
+                  {step.state === 'done' && (
+                    <p className="text-sm text-ink-faint">
+                      {step.lastDay - step.firstDay + 1} dias feitos
+                    </p>
+                  )}
+                  {step.state === 'next' && trail.nextDay && canContinue && (
+                    <>
+                      <p className="text-sm text-ink-faint">Próximo: dia {trail.nextDay}</p>
+                      <a
+                        href={continueHref(journey, trail)}
+                        className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 font-semibold text-bg hover:opacity-90"
+                      >
+                        {trail.doneDays === 0
+                          ? 'Começar pela Abertura'
+                          : compact
+                            ? 'Continuar'
+                            : `Continuar no dia ${trail.nextDay}`}
+                        <ArrowRight aria-hidden size={18} />
+                      </a>
+                    </>
+                  )}
+                </div>
+              </li>
+            )
+          })}
+        </ol>
+        {finished && <p className="text-sm text-ink-faint">Jornada concluída ✦</p>}
+      </div>
     </section>
   )
 }
@@ -239,7 +271,7 @@ export function ProfilePage({
   const [returnTo] = useState(readReturnTarget)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isConfirmingExit, setIsConfirmingExit] = useState(false)
-  const { journeys: allJourneys, meditations: allMeditations } = useCatalog()
+  const { profileJourneys: allJourneys, profileMeditations: allMeditations } = useCatalog()
   const progress = useProgressSummaries(
     allJourneys.map((j) => j.id),
     progressLoader,
@@ -285,13 +317,23 @@ export function ProfilePage({
       journey,
       summary ?? { completedDays: [], reflections: 0, victories: 0 },
     )
-    return [{ journey, trail, summary }]
+    const productAccess = access.accessOf(journey.id)
+    const canContinue = canStillUse(journey, {
+      access: productAccess,
+      hasProgress: hasStarted(summary),
+      now,
+    })
+    const note = retiredNote(journey, { access: productAccess, now })
+    return [{ journey, trail, summary, canContinue, note }]
   })
   const current =
-    journeys.find((j) => j.trail.nextDay !== null && j.trail.doneDays > 0) ??
-    journeys.find((j) => j.trail.nextDay !== null)
+    journeys.find((j) => j.canContinue && j.trail.nextDay !== null && j.trail.doneDays > 0) ??
+    journeys.find((j) => j.canContinue && j.trail.nextDay !== null)
+  // Grátis no site para todo mundo; as outras (Indisponível, Rascunho) só para quem tem ou teve acesso.
   const meditations = allMeditations.filter(
-    (m) => m.pricing.type === 'free' || access.accessOf(m.id) !== undefined,
+    (m) =>
+      (m.pricing.type === 'free' && (m.status === 'published' || m.status === 'soon')) ||
+      access.accessOf(m.id) !== undefined,
   )
   const totals = journeys.reduce(
     (sum, j) => ({
@@ -330,6 +372,7 @@ export function ProfilePage({
             trail={current.trail}
             pill={pillOf(current.journey)}
             compact={compact}
+            note={current.note}
           />
         ) : (
           emptyJourneys
@@ -357,13 +400,15 @@ export function ProfilePage({
       emptyJourneys
     ) : (
       <div className={`grid gap-5 ${isWide ? 'grid-cols-2' : ''}`}>
-        {journeys.map(({ journey, trail }) => (
+        {journeys.map(({ journey, trail, note, canContinue }) => (
           <JourneyTrailCard
             key={journey.id}
             journey={journey}
             trail={trail}
             pill={pillOf(journey)}
             compact={compact}
+            note={note}
+            canContinue={canContinue}
           />
         ))}
       </div>
@@ -387,6 +432,8 @@ export function ProfilePage({
               <p className="text-sm text-ink-faint">
                 {mediaLabel(m)} · {formatDuration(m.durationSec)}
                 {m.ebook ? ' · com e-book' : ''}
+                {m.status === 'retired' &&
+                  ` · ${retiredNote(m, { access: access.accessOf(m.id), now })?.lead ?? ''}`}
               </p>
             </div>
             {pillOf(m)}

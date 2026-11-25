@@ -9,8 +9,17 @@ export type Pricing =
   /** `accessMonths: null` = acesso para sempre. Preço em centavos, para não arredondar errado. */
   | { type: 'paid'; priceCents: number; accessMonths: number | null }
 
-/** `draft` não aparece no site; `soon` aparece como "Em breve". */
-export type ProductStatus = 'draft' | 'soon' | 'published'
+/**
+ * `draft` não aparece no site; `soon` aparece como "Em breve". `retired` ("Indisponível", ADR-035):
+ * saiu do ar depois de publicado. Some da vitrine, dos hubs e da busca e ninguém mais compra, mas quem
+ * tem acesso continua até o prazo e o perfil guarda o que a pessoa viveu nele.
+ */
+export type ProductStatus = 'draft' | 'soon' | 'published' | 'retired'
+
+/** Já foi ao ar (Publicada ou Indisponível): não volta a Rascunho ou Em breve nem é apagado. */
+export function wasPublished(status: ProductStatus): boolean {
+  return status === 'published' || status === 'retired'
+}
 
 interface ProductBase {
   /** Slug imutável: chave do progresso, do acesso e das rotas. Renomear muda só o `title`. */
@@ -26,6 +35,8 @@ interface ProductBase {
   /** Aparece na página inicial. */
   featured: boolean
   order: number
+  /** Quando ficou Indisponível (ms). Só existe enquanto o status é `retired`. */
+  retiredAt?: number
 }
 
 /**
@@ -71,9 +82,19 @@ export interface MeditationProduct extends ProductBase {
 
 export type Product = JourneyProduct | MeditationProduct
 
-/** Produtos que aparecem no site (sem rascunhos), na ordem escolhida pela Andreía. */
+/** Produtos que aparecem no site (sem rascunhos nem indisponíveis), na ordem escolhida pela Andreía. */
 export function visibleProducts<P extends Product>(products: readonly P[]): P[] {
-  return products.filter((p) => p.status !== 'draft').sort((a, b) => a.order - b.order)
+  return products
+    .filter((p) => p.status !== 'draft' && p.status !== 'retired')
+    .sort((a, b) => a.order - b.order)
+}
+
+/**
+ * O que pode estar no perfil de alguém: o que está no ar e o que já saiu dele. Rascunho e Em breve
+ * nunca: ninguém tem acesso a eles (pedido de 2026-11-25).
+ */
+export function profileProducts<P extends Product>(products: readonly P[]): P[] {
+  return products.filter((p) => wasPublished(p.status)).sort((a, b) => a.order - b.order)
 }
 
 /** Os destaques da página inicial. */

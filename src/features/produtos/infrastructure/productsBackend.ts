@@ -46,6 +46,10 @@ export interface ProductsBackend {
   saveDayTitles(productId: string, titles: readonly string[]): Promise<void>
   /** Apaga o rascunho da jornada (`drafts/{id}`), ao apagar um produto que nunca foi publicado. */
   deleteJourneyDraft(productId: string): Promise<void>
+  /** O conteúdo da jornada em JSON: o rascunho do editor ou, sem ele, o publicado; nenhum, `null`. */
+  loadJourneyContent(productId: string): Promise<string | null>
+  /** Grava o conteúdo como rascunho do editor (`drafts/{id}`), como o "Salvar" do editor. */
+  saveJourneyDraft(productId: string, json: string): Promise<void>
   saveMeditationContent(productId: string, content: MeditationContent, free: boolean): Promise<void>
   /** Guarda a imagem do banner em `media/{id}` (ADR-014) e devolve o id. */
   saveImage(image: CompressedImage): Promise<string>
@@ -163,6 +167,27 @@ export function createProductsBackend(
     async deleteJourneyDraft(productId) {
       await deleteDocument(config, `drafts/${productId}`, await token(), fetchFn)
     },
+    async loadJourneyContent(productId) {
+      const contentAt = async (path: string) => {
+        const body = await getJson(
+          documentsUrl(config, path, '&mask.fieldPaths=content'),
+          await token(),
+          fetchFn,
+        )
+        const fields = fieldsOf(body)
+        return (fields && stringField(fields, 'content')) || null
+      }
+      return (await contentAt(`drafts/${productId}`)) ?? (await contentAt(`published/${productId}`))
+    },
+    async saveJourneyDraft(productId, json) {
+      await patchDocument(
+        config,
+        `drafts/${productId}`,
+        { content: restString(json), updatedAt: restInteger(now()) },
+        await token(),
+        fetchFn,
+      )
+    },
     async saveMeditationContent(productId, content, free) {
       await patchDocument(
         config,
@@ -210,6 +235,9 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
   dayTitles: Map<string, string[]>
   /** Jornadas com rascunho salvo no editor. */
   draftJourneys: Set<string>
+  /** O conteúdo (JSON) do rascunho e do publicado de cada jornada. */
+  journeyDrafts: Map<string, string>
+  journeyPublished: Map<string, string>
   territories: Territory[] | null
 } {
   const state = {
@@ -221,6 +249,8 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
     publishedJourneys: new Set<string>(),
     dayTitles: new Map<string, string[]>(),
     draftJourneys: new Set<string>(),
+    journeyDrafts: new Map<string, string>(),
+    journeyPublished: new Map<string, string>(),
   }
   return Object.assign(state, {
     isAdmin: async () => admin,
@@ -242,6 +272,13 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
     deleteJourneyDraft: async (id: string) => {
       state.dayTitles.delete(id)
       state.draftJourneys.delete(id)
+      state.journeyDrafts.delete(id)
+    },
+    loadJourneyContent: async (id: string) =>
+      state.journeyDrafts.get(id) ?? state.journeyPublished.get(id) ?? null,
+    saveJourneyDraft: async (id: string, json: string) => {
+      state.journeyDrafts.set(id, json)
+      state.draftJourneys.add(id)
     },
     saveDayTitles: async (id: string, titles: readonly string[]) => {
       state.dayTitles.set(

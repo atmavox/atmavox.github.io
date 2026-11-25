@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { chamaInterna21 } from '../content/chama-interna-21'
 import { allDays } from '../domain/journey'
 import { dayProblems, findDay } from '../domain/journeyEditing'
+import { journeyCopy } from '../domain/journeyCopy'
 import { createJourneySkeleton } from '../domain/journeySkeleton'
 import { InMemoryEditorBackend } from '../infrastructure/InMemoryCloudBackend'
 import { createJourneyContent } from './JourneyContent'
@@ -208,5 +209,25 @@ describe('JourneyEditor de uma jornada nova', () => {
     backend.dayTitles.set('florescer', ['Chegada'])
     const first = allDays((await setupNew(backend)).getSnapshot().saved)[0]
     expect(first?.title).toBe('Dia 1')
+  })
+})
+
+describe('jornada duplicada', () => {
+  it('os dias da cópia ficam em rascunho até a Andreía rever e salvar cada um', async () => {
+    const backend = new InMemoryEditorBackend()
+    // A cópia leva o id da Chama aqui só para o editor de teste aceitar o rascunho.
+    backend.drafts.set(
+      chamaInterna21.id,
+      JSON.stringify(journeyCopy(chamaInterna21, chamaInterna21.id)),
+    )
+    const { editor } = await setup({ backend })
+    const days = allDays(chamaInterna21).length
+    expect(dayStatus(editor.getSnapshot(), 1)).toBe('draft')
+    expect(draftDayCount(editor.getSnapshot())).toBe(days)
+
+    await editor.saveDay(1)
+    expect(dayStatus(editor.getSnapshot(), 1)).not.toBe('draft')
+    expect(draftDayCount(editor.getSnapshot())).toBe(days - 1)
+    expect(JSON.parse(backend.drafts.get(chamaInterna21.id)!).unconfirmedDays).not.toContain(1)
   })
 })

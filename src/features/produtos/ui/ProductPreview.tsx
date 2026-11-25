@@ -78,6 +78,11 @@ export function ProductPreview({ product }: { product: Product }) {
       {product.status === 'draft' && (
         <p className="text-sm text-ink-faint">Rascunho: ainda não aparece no site.</p>
       )}
+      {product.status === 'retired' && (
+        <p className="text-sm text-ink-faint">
+          Indisponível: não aparece no site. Só quem ainda tem acesso continua entrando.
+        </p>
+      )}
     </div>
   )
 }

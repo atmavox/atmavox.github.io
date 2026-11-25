@@ -195,10 +195,6 @@ function DayTitles({
       </button>
       {isOpen && (
         <div id={panelId} className="mt-3 flex animate-[fade-in_250ms_ease-out] flex-col gap-2.5">
-          <p className="text-xs text-ink-faint">
-            Sem título, o dia aparece como "Dia 4". Os 3 primeiros dias com título viram os cartões
-            do banner. Dá para mudar depois em "Editar o conteúdo da jornada".
-          </p>
           {groups.map((group) => {
             const offset = group.firstDay - 1
             return (
@@ -239,9 +235,28 @@ export function StructureSection({ form, errors, onChange }: StructureSectionPro
   const editorLink =
     form.id === 'chama-interna-21' ? '#/jornada/editar' : `#/jornada/${form.id}/editar`
   const weeks = visibleWeeks(form)
+  // As explicações ficam no "i" do título (pedido de 2026-11-25), conforme a estrutura escolhida.
+  const info = [
+    form.layout === 'themes'
+      ? 'Sem duração: cada tema abre quando o anterior é concluído.'
+      : form.split === 'parts'
+        ? '"+ Parte" divide a última parte ao meio. Mudar a ordem troca os nomes; os dias de cada faixa ficam onde estão.'
+        : form.split === 'none'
+          ? 'Os dias seguem corridos, sem grupos. No caderno, uma aba "Dias".'
+          : 'A cada 7 dias, uma semana nova.',
+    form.layout === 'days' && !locked
+      ? 'Sem título, o dia aparece como "Dia 4". Os 3 primeiros dias com título viram os cartões do banner.'
+      : '',
+    !isWide && !locked ? 'Para mudar a ordem, segure um item e arraste.' : '',
+    !locked && form.hasEditorContent
+      ? 'A jornada está em Rascunho: ao salvar, os dias que você já montou no editor vão para a estrutura nova, na mesma ordem.'
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
-    <Section title="Estrutura">
+    <Section title="Estrutura" info={info}>
       <Segmented
         label="Estrutura"
         value={form.layout}
@@ -290,11 +305,6 @@ export function StructureSection({ form, errors, onChange }: StructureSectionPro
               ]}
               onChange={(split) => onChange(normalizeStructure({ ...form, split }))}
             />
-            {form.split === 'none' && (
-              <p className="text-xs text-ink-faint">
-                Os dias seguem corridos, sem grupos. No caderno, uma aba "Dias".
-              </p>
-            )}
             {form.split === 'weeks' && (
               <>
                 <p className="text-xs text-ink-faint">
@@ -353,10 +363,6 @@ export function StructureSection({ form, errors, onChange }: StructureSectionPro
                 >
                   + Parte
                 </button>
-                <p className="text-xs text-ink-faint">
-                  "+ Parte" divide a última parte ao meio. Mudar a ordem troca os nomes; os dias de
-                  cada faixa ficam onde estão.
-                </p>
               </>
             )}
           </div>
@@ -385,14 +391,7 @@ export function StructureSection({ form, errors, onChange }: StructureSectionPro
           >
             + Tema
           </button>
-          <p className="text-xs text-ink-faint">
-            Sem duração: cada tema abre quando o anterior é concluído.
-          </p>
         </div>
-      )}
-
-      {!isWide && !locked && (
-        <p className="text-xs text-ink-faint">Para mudar a ordem, segure um item e arraste.</p>
       )}
     </Section>
   )

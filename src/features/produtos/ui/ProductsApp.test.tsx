@@ -8,6 +8,8 @@ import { createCatalogStore } from '../../../shared/catalog/catalogStore'
 import { TerritoryContext } from '../../../shared/catalog/TerritoryContext'
 import { createTerritoryStore } from '../../../shared/catalog/territoryStore'
 import { setWideViewport } from '../../../test/viewport'
+import { seedCatalog } from '../../../shared/catalog/seedCatalog'
+import { createInMemoryAccessAdmin } from '../infrastructure/accessAdmin'
 import { createInMemoryProductsBackend } from '../infrastructure/productsBackend'
 import { ProdutosEntry } from '../ProdutosEntry'
 import { ProductsApp } from './ProductsApp'
@@ -86,7 +88,7 @@ describe('Modo Andreía de produtos no computador', () => {
     setWideViewport(false)
   })
 
-  it('apaga um produto que não está publicado (e a Chama, publicada, não tem o botão)', async () => {
+  it('descarta um produto que não está publicado (e a Chama, publicada, não tem o botão)', async () => {
     setWideViewport(true)
     const { backend, catalog } = setup()
     backend.dayTitles.set('ritual-matinal', ['Chegada'])
@@ -94,12 +96,13 @@ describe('Modo Andreía de produtos no computador', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /A Chama Interna/ }))
     await screen.findByRole('radiogroup', { name: 'Grátis ou paga' })
-    expect(screen.queryByRole('button', { name: 'Apagar produto' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Descartar' })).toBeNull()
 
     fireEvent.click(screen.getByRole('button', { name: /Ritual Matinal/ }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Apagar produto' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Apagar' }))
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('foi apagado'))
+    fireEvent.click(await screen.findByRole('button', { name: 'Descartar' }))
+    const dialog = screen.getByRole('dialog', { name: 'Descartar "Ritual Matinal"?' })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Descartar' }))
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('foi descartado'))
     expect(catalog.getSnapshot().some((p) => p.id === 'ritual-matinal')).toBe(false)
     expect(backend.dayTitles.has('ritual-matinal')).toBe(false)
     setWideViewport(false)
@@ -212,5 +215,107 @@ describe('porta de entrada do Modo Andreía', () => {
       </AuthContext.Provider>,
     )
     expect(await screen.findByText('Esta área é só da Andreía.')).toBeInTheDocument()
+  })
+})
+
+describe('duplicar no editor do produto', () => {
+  it('cria a cópia como rascunho, com o conteúdo do código, e já abre ela', async () => {
+    setWideViewport(true)
+    const { backend, catalog } = setup()
+    render(
+      <ProductsApp
+        backend={backend}
+        catalog={catalog}
+        loadBuiltInJourney={async (id) => JSON.stringify({ id, weeks: [] })}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: /A Chama Interna/ }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Duplicar' }))
+
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent('criada como rascunho'),
+    )
+    const copy = catalog.getSnapshot().find((p) => p.title.endsWith(' - Cópia'))
+    expect(copy?.status).toBe('draft')
+    expect(JSON.parse(backend.journeyDrafts.get(copy!.id)!).id).toBe(copy!.id)
+    expect(screen.getByLabelText('Nome')).toHaveValue(copy!.title)
+    setWideViewport(false)
+  })
+})
+
+describe('inativar produto (Disponível e Indisponível)', () => {
+  it('mostra quem tem acesso, confirma, vai para o grupo Indisponíveis e volta ao ar', async () => {
+    setWideViewport(true)
+    const { backend, catalog } = setup()
+    catalog.replace(
+      seedCatalog.map((p) =>
+        p.id === 'chama-interna-21'
+          ? { ...p, pricing: { type: 'paid' as const, priceCents: 9700, accessMonths: 12 } }
+          : p,
+      ),
+    )
+    const accessAdmin = createInMemoryAccessAdmin()
+    const nextYear = Date.now() + 365 * 24 * 60 * 60 * 1000
+    await accessAdmin.grant('ana', 'chama-interna-21', nextYear)
+    render(<ProductsApp backend={backend} catalog={catalog} accessAdmin={accessAdmin} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /A Chama Interna/ }))
+    await screen.findByText('com acesso agora')
+    const situation = screen.getByRole('radiogroup', { name: 'Situação' })
+    expect(within(situation).getByRole('radio', { name: 'Rascunho' })).toBeDisabled()
+    expect(within(situation).getByRole('radio', { name: 'Em breve' })).toBeDisabled()
+    // Publicada e com acesso: não se descarta, só se inativa.
+    expect(screen.queryByRole('button', { name: 'Descartar' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Inativar produto' }))
+    const dialog = screen.getByRole('dialog', { name: 'Inativar "A Chama Interna"?' })
+    expect(dialog).toHaveTextContent('1 pessoa ainda tem acesso')
+    expect(dialog).toHaveTextContent('Em recolhimento')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Inativar produto' }))
+
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('ficou indisponível'))
+    const retired = catalog.getSnapshot().find((p) => p.id === 'chama-interna-21')
+    expect(retired?.status).toBe('retired')
+    expect(retired?.retiredAt).toBeTypeOf('number')
+    expect(screen.getByRole('button', { name: /Indisponíveis · 1/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Publicar de novo' }))
+    await waitFor(() =>
+      expect(catalog.getSnapshot().find((p) => p.id === 'chama-interna-21')?.status).toBe(
+        'published',
+      ),
+    )
+    expect(screen.queryByRole('button', { name: /Indisponíveis/ })).toBeNull()
+    setWideViewport(false)
+  })
+})
+
+describe('descartar um Indisponível', () => {
+  it('só aparece se ninguém nunca acessou', async () => {
+    setWideViewport(true)
+    const { backend, catalog } = setup()
+    const paid = { type: 'paid' as const, priceCents: 9700, accessMonths: 12 }
+    catalog.replace(
+      seedCatalog.map((p) =>
+        p.id === 'boas-vindas' || p.id === 'retorne-ao-seu-centro'
+          ? { ...p, status: 'retired' as const, pricing: paid }
+          : p,
+      ),
+    )
+    const accessAdmin = createInMemoryAccessAdmin()
+    await accessAdmin.grant('ana', 'boas-vindas', null)
+    render(<ProductsApp backend={backend} catalog={catalog} accessAdmin={accessAdmin} />)
+    fireEvent.click(screen.getByRole('button', { name: /Indisponíveis · 2/ }))
+
+    fireEvent.click(screen.getByRole('button', { name: /Boas-vindas/ }))
+    await screen.findByRole('button', { name: 'Publicar de novo' })
+    expect(screen.queryByRole('button', { name: 'Descartar' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: /Retorne ao seu centro/i }))
+    expect(await screen.findByRole('button', { name: 'Descartar' })).toBeInTheDocument()
+    setWideViewport(false)
   })
 })

@@ -431,10 +431,44 @@ no código, sempre pode.
   cartões I, II, III do banner. Vão para o rascunho da jornada; no catálogo, só esses 3.
 - Numeração pela posição (não se digita), em trilha; ordem por arrastar (ADR-026) ou setas ▲ ▼ no
   computador.
-- **Trava:** quando o editor da jornada já salvou algo (ou ela foi publicada), a estrutura fica
-  desativada com um aviso e o link "Editar o conteúdo da jornada".
-- **Apagar produto:** só Rascunho ou Em breve, com confirmação ("Apagar de vez?"); a jornada perde
-  também o rascunho. Útil para testes.
+- **Trava da estrutura:** depois de publicada, ou fora de Rascunho quando o editor já salvou algo, a
+  estrutura fica desativada com um aviso e o link "Editar o conteúdo da jornada". Em Rascunho nunca
+  publicado ela muda aqui e os dias do editor se reorganizam ao salvar (ADR-036).
+- **Ajudas:** as explicações de cada bloco ficam no "i" ao lado do título (aparecem ao passar o mouse,
+  focar ou tocar).
+- **Botões de baixo:** Duplicar, Descartar (quando vale), Ver como fica no hub e Salvar, numa linha só;
+  o aviso de salvo aparece à esquerda deles.
+
+**Situações do produto: o que cada uma permite** (ADR-035, ADR-036, pedidos de 2026-11-25). Esta
+tabela é a referência: toda regra nova sobre situação entra aqui.
+
+|                                        | Rascunho                               | Em breve                         | Publicada                                 | Indisponível                                                                                                  |
+| -------------------------------------- | -------------------------------------- | -------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Aparece no site (vitrine, hubs, busca) | não                                    | sim, com "Quero ser avisada"     | sim                                       | não                                                                                                           |
+| Destaque na página inicial             | não (a caixinha some)                  | pode                             | pode                                      | não (a caixinha some; ao publicar de novo, volta como estava)                                                 |
+| Quem entra                             | ninguém (só a Andreía no Modo Andreía) | ninguém, nem com acesso liberado | grátis: todo mundo; paga: quem tem acesso | paga: quem tem acesso válido, até o prazo; jornada grátis: quem já começou; meditação grátis: quem tem o link |
+| Comprar                                | não                                    | não                              | sim (paga)                                | não                                                                                                           |
+| Liberar acesso à mão (Acessos)         | não                                    | não                              | sim                                       | sim                                                                                                           |
+| Perfil da pessoa                       | não aparece                            | não aparece                      | para quem começou ou tem acesso           | para quem começou ou tem acesso, com a faixa "Em recolhimento" (com acesso) ou "Indisponível" (vencido)       |
+| Link antigo sem acesso                 | "ainda não está disponível"            | "ainda não está disponível"      | pede login ou o preço                     | "… saiu do ar", com o caminho para o que está no ar                                                           |
+| Editar o produto                       | sim                                    | sim                              | sim                                       | não: só leitura, também no editor da jornada                                                                  |
+| Estrutura da jornada                   | muda, mesmo com dias no editor         | trava se o editor já salvou algo | trava                                     | trava                                                                                                         |
+| Pode ir para                           | Em breve, Publicada                    | Rascunho, Publicada              | só Indisponível ("Inativar produto")      | só Publicada ("Publicar de novo")                                                                             |
+| Duplicar                               | sim                                    | sim                              | sim                                       | sim                                                                                                           |
+| Descartar (sai do catálogo)            | se ninguém nunca teve acesso           | se ninguém nunca teve acesso     | não                                       | paga: se ninguém nunca teve acesso; grátis: não (quem fez sem acesso liberado não aparece)                    |
+
+- **Publicada** exige, na jornada, o conteúdo publicado no editor, e publicar o conteúdo exige todos os
+  dias salvos (nenhum em rascunho).
+- **Duplicar** (1.34.0, ADR-034): a cópia sai sempre como Rascunho, "Nome - Cópia", fora do destaque e
+  no fim da lista, com os links (meditação) ou o conteúdo dos dias (jornada, todos em rascunho até a
+  Andreía rever e salvar cada um), e já abre no editor. **Acessos, progresso e versões nunca vão
+  junto:** quem tinha acesso à original não tem à cópia.
+- **Inativar produto** (1.35.0, ADR-035): com Publicada, embaixo da Situação aparece quem tem acesso
+  agora e quando vence o último (os acessos de teste contam). O botão pede confirmação numa janela
+  (o que sai do site, quem continua, o que o perfil mostra). Indisponível vira um cartão cinza, e "Publicar de
+  novo" fica na linha dos botões, à direita de Duplicar; na lista, os indisponíveis ficam num grupo recolhido no fim.
+- **Descartar** (1.35.2): confirma numa janela; a jornada perde também o rascunho do editor. Num produto
+  novo ainda não salvo, só fecha a tela.
 - A lista de produtos fica parada ao lado enquanto o editor rola (computador).
 
 **Território do produto** (mock `Downloads/atmavox-territorio-v2.html`, ADR-027):

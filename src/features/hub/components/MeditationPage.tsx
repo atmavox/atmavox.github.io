@@ -15,7 +15,10 @@ import { productOffer } from '../../../shared/catalog/offer'
 import { AudioItem } from './AudioItem'
 import { OfferBadge } from './OfferBits'
 import { usePurchaseFlow } from './usePurchaseFlow'
-import { useCatalog } from '../../../shared/catalog/CatalogContext'
+import { isMeditation, useCatalog } from '../../../shared/catalog/CatalogContext'
+import { wasPublished } from '../../../shared/catalog/product'
+import { canStillUse } from '../../../shared/catalog/retired'
+import { RetiredNotice } from '../../../shared/ui/RetiredNotice'
 
 const backLink = (
   <a
@@ -29,15 +32,18 @@ const backLink = (
 
 /** Página de uma meditação (`#/meditacao/{id}`): capa, play e, quando houver, o e-book. */
 export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'narrow' }) {
-  const { meditations } = useCatalog()
-  const meditation = meditations.find((m) => m.id === id)
-  const purchase = usePurchaseFlow()
+  // As Indisponíveis também: quem ainda tem acesso continua ouvindo (ADR-035). Rascunho, nunca.
+  const { products } = useCatalog()
   const access = useAccess()
+  const meditation = products.filter(isMeditation).find((m) => m.id === id && m.status !== 'draft')
+  // Em breve: a página mostra "Quero ser avisada", mas ninguém ouve (nem com acesso liberado).
+  const isOnAir = !!meditation && wasPublished(meditation.status)
+  const purchase = usePurchaseFlow()
   const now = useNow()
   // Paga com acesso válido: o conteúdo vem do Firestore, lido com o login (ADR-020).
   const paid = usePaidContent(
     id,
-    !!meditation && meditation.pricing.type === 'paid' && !FREE_MEDIA[id] && access.owns(id, now),
+    isOnAir && meditation.pricing.type === 'paid' && !FREE_MEDIA[id] && access.owns(id, now),
   )
   const isWide = layout === 'wide'
   const wrap = isWide ? 'mx-auto w-full max-w-3xl px-6 py-10 md:px-12' : ''
@@ -52,11 +58,25 @@ export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'n
     )
   }
 
+  if (
+    meditation.status === 'retired' &&
+    !canStillUse(meditation, { access: access.accessOf(meditation.id), hasProgress: false, now })
+  ) {
+    if (access.status === 'loading') {
+      return <p className="py-20 text-center text-ink-muted">Carregando…</p>
+    }
+    return (
+      <div className={wrap}>
+        <RetiredNotice title={meditation.title} kind="meditation" />
+      </div>
+    )
+  }
+
   // Grátis sem login só as da página inicial (em destaque); as outras pedem conta, e-mail confirmado e
   // cadastro completo (pedido de 2026-11-24).
   const isLockedFree =
     meditation.pricing.type === 'free' && !meditation.featured && !purchase.passes
-  const freeMedia = isLockedFree ? undefined : FREE_MEDIA[meditation.id]
+  const freeMedia = isLockedFree || !isOnAir ? undefined : FREE_MEDIA[meditation.id]
   const productAccess = access.accessOf(meditation.id)
   const offer = productOffer(meditation, {
     place: 'hub',

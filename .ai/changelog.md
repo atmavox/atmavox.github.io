@@ -10,6 +10,96 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.36.1] · 2026-11-25
+
+### Alterado
+
+- Produto Indisponível não se edita: os campos ficam travados, sem "Salvar", prévia nem a caixinha de
+  destaque, e o editor da
+  jornada avisa que é preciso publicar de novo. Duplicar continua valendo.
+- Ninguém tem acesso a Rascunho ou Em breve: a jornada não abre, a meditação Em breve não toca, o
+  perfil não mostra e a aba Acessos só libera o que já foi ao ar. A cópia de um produto nunca leva os
+  acessos da original.
+- Linha de botões do editor reorganizada: link e aviso à esquerda, botões juntos à direita. Sem ícone no
+  "Inativar produto" da janela e no grupo "Indisponíveis".
+- O grupo "Indisponíveis" na lista de produtos segue o separador do mock 2-A (título em caixa alta e
+  linha, com a seta no fim) e abre e fecha de verdade (antes ficava preso aberto com um deles aberto).
+
+- "Publicar de novo" saiu do cartão cinza e fica na linha dos botões, à direita de Duplicar e
+  Descartar. Indisponível também não mostra a caixinha de destaque.
+- Perfil: quem ainda não concluiu nenhum dia vê "Começar pela Abertura", que leva à Abertura; quem já
+  começou continua de onde parou.
+
+### Documentação
+
+- `features.md` (F9) ganhou a tabela "Situações do produto: o que cada uma permite".
+
+## [1.36.0] · 2026-11-25
+
+### Adicionado
+
+- Modo Andreía · Produtos: jornada em Rascunho (nunca publicada) aceita mudar a estrutura mesmo com
+  conteúdo no editor (ADR-036). Ao salvar, os dias montados no editor vão para a estrutura nova, na mesma
+  ordem; se saírem dias com blocos, uma janela mostra quais antes de salvar.
+
+### Alterado
+
+- Depois de publicado, o produto não volta a Rascunho nem a Em breve (as duas opções ficam apagadas, com
+  a explicação); para tirar do site, "Inativar produto".
+- "Descartar" confirma numa janela, sem mexer nos botões ao lado.
+- Rascunho não tem "Destaque na página inicial" (não aparece no site).
+- O aviso de salvo fica na linha dos botões do editor, sem uma linha vazia acima deles.
+- Os textos de ajuda do editor do produto (Situação, Preço e acesso, Estrutura, Banner, Território)
+  ficam num "i" que mostra a explicação ao passar o mouse, focar ou tocar.
+
+### Corrigido
+
+- Duplicar jornada: os dias da cópia chegam em rascunho, como numa jornada nova, até a Andreía rever
+  e salvar cada um (antes chegavam como salvos).
+
+## [1.35.2] · 2026-11-25
+
+### Alterado
+
+- Modo Andreía · Produtos: a Situação volta a ter Rascunho, Em breve e Publicada; com Publicada, quem
+  tem acesso e "Inativar produto" aparecem embaixo. Os acessos de teste agora contam.
+- "Descartar" passa a tirar o produto do catálogo (com confirmação), no lugar de "Apagar produto": só em
+  Rascunho, Em breve ou Indisponível paga, e só se ninguém nunca teve acesso. Os botões de baixo do
+  editor ficaram menores, com "Duplicar" ao lado de "Descartar", numa linha só.
+- Perfil: quem tem acesso continua vendo o produto mesmo que ele volte a Rascunho.
+
+## [1.35.1] · 2026-11-25
+
+### Alterado
+
+- Modo Andreía · Produtos: "Inativar produto" menor e sem ícone; "Duplicar" com o mesmo estilo de
+  "Descartar".
+
+## [1.35.0] · 2026-11-25
+
+### Adicionado
+
+- Modo Andreía · Produtos: "Inativar produto" (ADR-035). Depois de publicado, a Situação vira um cartão
+  "Disponível" com quantas pessoas têm acesso e quando vence o último. Inativar pede confirmação (o que
+  acontece com o site, com quem tem acesso e com o perfil delas), e o produto fica "Indisponível", com
+  "Publicar de novo". Os indisponíveis ficam no fim da lista, num grupo que começa fechado.
+- Site: o produto Indisponível sai da vitrine, dos hubs e da busca. Quem tem acesso pago continua até o
+  prazo; a jornada grátis continua para quem já tinha começado. No perfil, o cartão ganha a faixa "Em
+  recolhimento" (ou "Indisponível", depois que o acesso vence, guardando a trilha). Quem abre um link
+  antigo sem acesso vê "… saiu do ar" e o caminho para o que está no ar.
+
+### Alterado
+
+- O que já foi ao ar não volta a Rascunho ou Em breve nem pode ser apagado: só fica Indisponível.
+
+## [1.34.0] · 2026-11-25
+
+### Adicionado
+
+- Modo Andreía · Produtos: botão "Duplicar" no editor (ADR-034). A cópia de uma jornada ou meditação sai
+  como Rascunho, com "- Cópia" no nome, os links ou o conteúdo dos dias (no rascunho do editor), e já
+  abre para editar.
+
 ## [1.33.0] · 2026-11-25
 
 ### Adicionado

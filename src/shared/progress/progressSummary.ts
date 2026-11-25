@@ -50,6 +50,14 @@ export function parseProgressDocument(document: unknown): ProgressSummary | null
   }
 }
 
+/** Já começou de verdade: concluiu um dia ou escreveu algo (um documento vazio não conta). */
+export function hasStarted(summary: ProgressSummary | undefined): boolean {
+  return (
+    !!summary &&
+    (summary.completedDays.length > 0 || summary.reflections > 0 || summary.victories > 0)
+  )
+}
+
 export type ProgressLoader = (
   uid: string,
   token: string,

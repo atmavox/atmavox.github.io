@@ -66,14 +66,26 @@ export interface JourneyEditor {
 /**
  * Rascunho: o que está na tela ainda não foi salvo, ou o dia salvo ainda não está pronto. Os dias que
  * nascem sozinhos (esqueleto de uma jornada nova, "novo dia") vão direto para o rascunho salvo, mas
- * vazios: ficam como rascunho até a Andreía preencher e salvar (pedido de 2026-11-25).
+ * vazios: ficam como rascunho até a Andreía preencher e salvar (pedido de 2026-11-25). Os de uma cópia
+ * (`unconfirmedDays`) também, até ela rever e salvar cada um.
  */
 export function dayStatus(state: EditorState, dayNumber: number): DayStatus {
   const working = findDay(state.working, dayNumber)
   const saved = findDay(state.saved, dayNumber)
   if (!sameDay(working, saved)) return 'draft'
   if (saved && dayProblems(saved).length > 0) return 'draft'
+  // Veio de uma cópia: rascunho até a Andreía rever e salvar.
+  if (state.saved.unconfirmedDays?.includes(dayNumber)) return 'draft'
   return sameDay(saved, findDay(state.published, dayNumber)) ? 'published' : 'saved'
+}
+
+/** Salvar um dia da cópia é a Andreía confirmando que reviu: ele sai de `unconfirmedDays`. */
+function confirmDay(journey: Journey, dayNumber: number): Journey {
+  const pending = journey.unconfirmedDays?.filter((n) => n !== dayNumber)
+  if (!pending || pending.length === journey.unconfirmedDays?.length) return journey
+  const next: Journey = { ...journey, unconfirmedDays: pending }
+  if (pending.length === 0) delete next.unconfirmedDays
+  return next
 }
 
 export function draftDayCount(state: EditorState): number {
@@ -204,7 +216,7 @@ export function createJourneyEditor({
     async saveDay(dayNumber) {
       const day = findDay(state.working, dayNumber)
       if (!day || dayProblems(day).length > 0) return
-      const saved = replaceDay(state.saved, day)
+      const saved = confirmDay(replaceDay(state.saved, day), dayNumber)
       await remote(async (backend) => {
         await backend.saveDraft(journeyId, JSON.stringify(saved))
         set({ saved })

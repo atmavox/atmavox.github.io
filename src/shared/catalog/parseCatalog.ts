@@ -24,7 +24,7 @@ const oneOf = <T extends string>(options: readonly T[], value: unknown): T | und
   options.find((option) => option === value)
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/
-const STATUSES: readonly ProductStatus[] = ['draft', 'soon', 'published']
+const STATUSES: readonly ProductStatus[] = ['draft', 'soon', 'published', 'retired']
 const STRUCTURES: readonly JourneyStructure[] = ['days', 'weeks', 'parts', 'themes']
 
 function parsePricing(raw: unknown): Pricing | undefined {
@@ -79,6 +79,9 @@ function parseProduct(raw: unknown): Product | undefined {
     pricing,
     featured: raw.featured === true,
     order,
+    ...(status === 'retired' && typeof raw.retiredAt === 'number' && Number.isFinite(raw.retiredAt)
+      ? { retiredAt: raw.retiredAt }
+      : {}),
   }
 
   if (raw.kind === 'journey') {

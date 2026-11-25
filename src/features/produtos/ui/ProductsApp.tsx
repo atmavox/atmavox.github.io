@@ -3,9 +3,10 @@ import { ArrowLeft, Plus } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { formatPrice } from '../../../shared/catalog/offer'
-import type { Product } from '../../../shared/catalog/product'
+import { wasPublished, type Product } from '../../../shared/catalog/product'
 import type { CatalogStore } from '../../../shared/catalog/catalogStore'
 import { useMediaQuery } from '../../../shared/lib/useMediaQuery'
+import { useNow } from '../../../shared/lib/useNow'
 import { ProductBanner } from '../../../shared/ui/ProductBanner'
 import { rememberBannerImage } from '../../../shared/ui/useBannerImage'
 import { UiIcon } from '../../../shared/ui/UiIcon'
@@ -14,7 +15,20 @@ import {
   deleteProduct,
   loadJourneySeed,
   saveProduct,
+  type JourneyReshaper,
 } from '../application/saveProduct'
+import {
+  duplicateProduct,
+  type BuiltInJourneyLoader,
+  type JourneyCopier,
+} from '../application/duplicateProduct'
+import { setAvailability } from '../application/setAvailability'
+import { accessStats, hasEverHadAccess } from '../domain/availability'
+import type { AccessAdmin, GrantedAccess } from '../infrastructure/accessAdmin'
+import { AvailabilityCard } from './AvailabilityCard'
+import { DiscardDialog } from './DiscardDialog'
+import { DropDaysDialog } from './DropDaysDialog'
+import { RetireDialog } from './RetireDialog'
 import {
   emptyForm,
   formFromProduct,
@@ -32,17 +46,28 @@ import { SaveStatus } from './SaveStatus'
 import { useSaveNotice } from './useSaveNotice'
 
 type Filter = 'todos' | 'journey' | 'meditation'
-const STATUS_LABEL = { draft: 'Rascunho', soon: 'Em breve', published: 'Publicada' } as const
+const STATUS_LABEL = {
+  draft: 'Rascunho',
+  soon: 'Em breve',
+  published: 'Publicada',
+  retired: 'Indisponível',
+} as const
 const STATUS_CLASS = {
   draft: 'bg-draft/14 text-draft',
   soon: 'bg-ink/8 text-ink-muted',
   published: 'bg-ok/14 text-ok',
+  retired: 'bg-gray-state/16 text-ink-faint',
 } as const
 
 const button =
   'inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-[18px] text-sm font-semibold whitespace-nowrap'
 const adminButton = `${button} bg-admin text-on-admin hover:opacity-90 disabled:opacity-60`
 const ghostButton = `${button} border border-line bg-surface text-ink-muted hover:border-admin hover:text-admin-ink`
+/** Os botões de baixo do editor, menores, para caberem numa linha só. */
+const smallButton =
+  'inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold whitespace-nowrap transition-[color,border-color,opacity] duration-200 disabled:opacity-60 motion-reduce:transition-none'
+const smallGhostButton = `${smallButton} border border-line bg-surface text-ink-muted hover:border-admin hover:text-admin-ink`
+const smallAdminButton = `${smallButton} bg-admin text-on-admin hover:opacity-90`
 
 /** Passos do celular (mock aprovado): o tipo só ao criar; termina em "Revisar". */
 const STEPS: readonly { id: EditorPart | 'revisar'; label: string }[] = [
@@ -65,8 +90,10 @@ function ProductRow({
   onSelect: () => void
 }) {
   const pricing = product.pricing
+  // Indisponível (mock aprovado, lista A): mais apagado, com a capa em tons de cinza.
+  const isRetired = product.status === 'retired'
   return (
-    <li>
+    <li className={isRetired ? 'opacity-60' : undefined}>
       <button
         type="button"
         onClick={onSelect}
@@ -78,7 +105,7 @@ function ProductRow({
         <ProductBanner
           territory={product.territory}
           mediaId={product.bannerMediaId}
-          className="aspect-square rounded-xl"
+          className={`aspect-square rounded-xl ${isRetired ? 'grayscale' : ''}`}
         />
         <span className="min-w-0">
           <b className="block truncate font-medium text-ink">{product.title}</b>
@@ -174,9 +201,21 @@ function PreviewDialog({
 export function ProductsApp({
   backend,
   catalog,
+  loadBuiltInJourney,
+  accessAdmin,
+  reshapeJourney,
+  copyJourney,
 }: {
   backend: ProductsBackend
   catalog: CatalogStore | null
+  /** Para o cartão Disponível: quem tem acesso a cada produto agora. */
+  accessAdmin?: AccessAdmin
+  /** O conteúdo das jornadas que vêm no código (para duplicar a Chama Interna). */
+  loadBuiltInJourney?: BuiltInJourneyLoader
+  /** Reorganiza os dias do editor quando a estrutura de uma jornada em Rascunho muda. */
+  reshapeJourney?: JourneyReshaper
+  /** O conteúdo da cópia de uma jornada, com os dias em rascunho. */
+  copyJourney?: JourneyCopier
 }) {
   const isWide = useMediaQuery('(min-width: 900px)')
   const { territories, store: territoryStore } = useTerritories()
@@ -190,6 +229,28 @@ export function ProductsApp({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [step, setStep] = useState(0)
   const [bannerState, setBannerState] = useState<'idle' | 'sending' | 'error'>('idle')
+  const [accesses, setAccesses] = useState<readonly GrantedAccess[] | null>(null)
+  const [isConfirmingRetire, setIsConfirmingRetire] = useState(false)
+  const [isRetiredOpen, setIsRetiredOpen] = useState(false)
+  const [dropDays, setDropDays] = useState<readonly { number: number; title: string }[] | null>(
+    null,
+  )
+  const now = useNow()
+
+  // Os acessos de todo mundo, uma vez: os números do cartão Disponível. Sem conexão, o cartão avisa.
+  useEffect(() => {
+    if (!accessAdmin) return
+    let cancelled = false
+    void accessAdmin
+      .listAccesses()
+      .then((list) => {
+        if (!cancelled) setAccesses(list)
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [accessAdmin])
 
   async function pickBanner(file: File) {
     setBannerState('sending')
@@ -209,11 +270,15 @@ export function ProductsApp({
   useEffect(() => catalog?.subscribe(() => setProducts(catalog.getSnapshot())), [catalog])
 
   const visible = products.filter((p) => filter === 'todos' || p.kind === filter)
+  // Os Indisponíveis ficam no fim, num grupo que começa fechado (mock aprovado, lista A + B).
+  const onAir = visible.filter((p) => p.status !== 'retired')
+  const retired = visible.filter((p) => p.status === 'retired')
   const steps = STEPS.filter((s) => s.id !== 'tipo' || isNew)
 
   async function open(product: Product) {
     saveNotice.hide()
     setIsConfirmingDelete(false)
+    setIsConfirmingRetire(false)
     setErrors({})
     setIsNew(false)
     setStep(0)
@@ -223,7 +288,13 @@ export function ProductsApp({
       const content = await backend.loadMeditationContent(product.id).catch(() => null)
       setForm(formFromProduct(product, content ?? undefined))
     } else {
-      setForm(formFromProduct(product, undefined, await loadJourneySeed(product.id, backend)))
+      setForm(
+        formFromProduct(
+          product,
+          undefined,
+          await loadJourneySeed(product.id, backend, product.status),
+        ),
+      )
     }
   }
 
@@ -235,12 +306,21 @@ export function ProductsApp({
     setForm(emptyForm('journey', Math.max(0, ...products.map((p) => p.order)) + 1))
   }
 
-  async function save() {
+  async function save(allowDrop = false) {
     if (!form) return
     setIsSaving(true)
     saveNotice.hide()
-    const result = await saveProduct(form, products, backend)
+    const result = await saveProduct(form, products, backend, {
+      reshape: reshapeJourney,
+      allowDrop,
+    })
     setIsSaving(false)
+    setDropDays(null)
+    if (result.kind === 'confirm-drop') {
+      setIsPreviewOpen(false)
+      setDropDays(result.days)
+      return
+    }
     if (result.kind === 'invalid') {
       setErrors(result.errors)
       setIsPreviewOpen(false)
@@ -260,7 +340,13 @@ export function ProductsApp({
     setIsNew(false)
     setIsPreviewOpen(false)
     // O formulário continua aberto, agora com o id definitivo (um produto novo ganha o id ao salvar).
-    setForm({ ...form, id: result.product.id })
+    // Saiu de Rascunho com conteúdo no editor: a estrutura passa a mudar só lá.
+    setForm({
+      ...form,
+      id: result.product.id,
+      structureLocked:
+        form.structureLocked || (result.product.status !== 'draft' && form.hasEditorContent),
+    })
     setStep(0)
     saveNotice.show({ kind: 'ok', text: 'Salvo' })
   }
@@ -275,14 +361,24 @@ export function ProductsApp({
     return { kind: 'created', id: result.territory.id }
   }
 
-  // Apagar vale para o produto como está salvo (Rascunho ou Em breve), não para o que está na tela.
+  // Descartar vale para o produto como está salvo, não para o que está na tela.
   const savedProduct = form && !isNew ? products.find((p) => p.id === form.id) : undefined
+  // Indisponível não se edita (pedido de 2026-11-25): só "Publicar de novo", Duplicar ou Descartar.
+  const isRetired = savedProduct?.status === 'retired'
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
+  // Sem a consulta de acessos (testes, sem Firebase) ninguém acessou; enquanto carrega, não se sabe.
+  const everAccessed = savedProduct
+    ? accesses
+      ? hasEverHadAccess(accesses, savedProduct.id)
+      : accessAdmin
+        ? null
+        : false
+    : null
 
   async function remove() {
     if (!savedProduct) return
     setIsSaving(true)
-    const result = await deleteProduct(savedProduct, products, backend)
+    const result = await deleteProduct(savedProduct, products, backend, everAccessed)
     setIsSaving(false)
     setIsConfirmingDelete(false)
     if (result.kind === 'error') {
@@ -292,42 +388,136 @@ export function ProductsApp({
     catalog?.replace(result.catalog)
     setProducts(result.catalog)
     setForm(null)
-    saveNotice.show({ kind: 'ok', text: `"${savedProduct.title}" foi apagado.` })
+    saveNotice.show({ kind: 'ok', text: `"${savedProduct.title}" foi descartado.` })
+  }
+  /** Duplica o produto como está salvo e já abre a cópia (Rascunho, "- Cópia" no nome). */
+  async function duplicate() {
+    if (!savedProduct) return
+    setIsSaving(true)
+    const result = await duplicateProduct(
+      savedProduct,
+      products,
+      backend,
+      loadBuiltInJourney,
+      copyJourney,
+    )
+    setIsSaving(false)
+    if (result.kind === 'error') {
+      saveNotice.show({ kind: 'error', text: result.message })
+      return
+    }
+    catalog?.replace(result.catalog)
+    setProducts(result.catalog)
+    await open(result.product)
+    saveNotice.show({ kind: 'ok', text: `"${result.product.title}" criada como rascunho.` })
   }
 
-  const deleteControl =
-    savedProduct && canDeleteProduct(savedProduct) ? (
-      isConfirmingDelete ? (
-        <span role="group" aria-label="Confirmar" className="flex items-center gap-2 text-sm">
-          <span className="text-ink-muted">Apagar de vez?</span>
-          <button
-            type="button"
-            disabled={isSaving}
-            onClick={() => void remove()}
-            className="rounded-full bg-wine px-3.5 py-1.5 font-semibold text-on-admin hover:opacity-90"
-          >
-            Apagar
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsConfirmingDelete(false)}
-            className="rounded-full px-3 py-1.5 text-ink-muted hover:text-ink"
-          >
-            Não
-          </button>
-        </span>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setIsConfirmingDelete(true)}
-          className="inline-flex items-center gap-1.5 text-sm text-ink-faint hover:text-wine"
-        >
-          <UiIcon name="trash" size={16} />
-          Apagar produto
-        </button>
-      )
-    ) : null
+  /** Inativar (Disponível → Indisponível) ou publicar de novo: grava na hora, como Duplicar. */
+  async function changeAvailability(available: boolean) {
+    if (!savedProduct) return
+    setIsSaving(true)
+    const result = await setAvailability(savedProduct, products, backend, available)
+    setIsSaving(false)
+    setIsConfirmingRetire(false)
+    if (result.kind === 'error') {
+      saveNotice.show({ kind: 'error', text: result.message })
+      return
+    }
+    catalog?.replace(result.catalog)
+    setProducts(result.catalog)
+    const { status, retiredAt } = result.product
+    setForm((f) => {
+      if (!f) return f
+      const next = { ...f, status }
+      if (retiredAt === undefined) delete next.retiredAt
+      else next.retiredAt = retiredAt
+      return next
+    })
+    if (!available) setIsRetiredOpen(true)
+    saveNotice.show({
+      kind: 'ok',
+      text: available
+        ? `"${savedProduct.title}" está disponível de novo.`
+        : `"${savedProduct.title}" ficou indisponível.`,
+    })
+  }
 
+  const stats = savedProduct && accesses ? accessStats(accesses, savedProduct.id, now) : null
+  const situation =
+    savedProduct &&
+    (savedProduct.status === 'retired' ||
+      (savedProduct.status === 'published' && form?.status === 'published')) ? (
+      <AvailabilityCard
+        product={savedProduct}
+        stats={stats}
+        isBusy={isSaving}
+        onRetire={() => setIsConfirmingRetire(true)}
+      />
+    ) : undefined
+  const dropDialog = dropDays && (
+    <DropDaysDialog
+      days={dropDays}
+      isWide={isWide}
+      isBusy={isSaving}
+      onConfirm={() => void save(true)}
+      onClose={() => setDropDays(null)}
+    />
+  )
+  const discardDialog = isConfirmingDelete && savedProduct && (
+    <DiscardDialog
+      product={savedProduct}
+      isWide={isWide}
+      isBusy={isSaving}
+      onConfirm={() => void remove()}
+      onClose={() => setIsConfirmingDelete(false)}
+    />
+  )
+  const retireDialog = isConfirmingRetire && savedProduct && (
+    <RetireDialog
+      product={savedProduct}
+      stats={stats}
+      isWide={isWide}
+      isBusy={isSaving}
+      onConfirm={() => void changeAvailability(false)}
+      onClose={() => setIsConfirmingRetire(false)}
+    />
+  )
+
+  // Indisponível: "Publicar de novo" fica na linha dos botões, à direita de Duplicar (pedido de 2026-11-25).
+  const republishControl = isRetired ? (
+    <button
+      type="button"
+      disabled={isSaving}
+      onClick={() => void changeAvailability(true)}
+      className={smallAdminButton}
+    >
+      Publicar de novo
+    </button>
+  ) : null
+
+  const duplicateControl = savedProduct ? (
+    <button
+      type="button"
+      disabled={isSaving}
+      onClick={() => void duplicate()}
+      className={smallGhostButton}
+    >
+      <UiIcon name="copy" size={14} />
+      Duplicar
+    </button>
+  ) : null
+
+  // Descartar: o produto novo ainda não salvo some da tela; o salvo sai do catálogo (confirmado numa janela),
+  // se estiver em Rascunho, Em breve ou Indisponível e ninguém nunca tiver acessado.
+  const deleteControl = isNew ? (
+    <button type="button" onClick={() => setForm(null)} className={smallGhostButton}>
+      Descartar
+    </button>
+  ) : savedProduct && canDeleteProduct(savedProduct, everAccessed) ? (
+    <button type="button" onClick={() => setIsConfirmingDelete(true)} className={smallGhostButton}>
+      Descartar
+    </button>
+  ) : null
   const list = (
     <div className="flex flex-col gap-1.5 rounded-[18px] border border-line bg-surface p-3">
       <div role="group" aria-label="Filtrar produtos" className="flex gap-1.5 px-1 pb-2">
@@ -354,7 +544,7 @@ export function ProductsApp({
         ))}
       </div>
       <ul className="flex flex-col gap-1">
-        {visible.map((product) => (
+        {onAir.map((product) => (
           <ProductRow
             key={product.id}
             product={product}
@@ -364,6 +554,38 @@ export function ProductsApp({
           />
         ))}
       </ul>
+      {retired.length > 0 && (
+        <>
+          {/* Separador do mock 2-A (título em caixa alta + linha), que abre e fecha pela seta no fim. */}
+          <button
+            type="button"
+            aria-expanded={isRetiredOpen}
+            onClick={() => setIsRetiredOpen((open) => !open)}
+            className="flex w-full items-center gap-2 rounded-lg px-3 pt-3 pb-1 text-[11px] font-semibold tracking-[0.18em] text-ink-faint uppercase transition-colors hover:text-admin-ink"
+          >
+            <span>Indisponíveis · {retired.length}</span>
+            <span aria-hidden="true" className="h-px flex-1 bg-line" />
+            <span
+              className={`transition-transform duration-200 motion-reduce:transition-none ${isRetiredOpen ? 'rotate-180' : ''}`}
+            >
+              <UiIcon name="down" size={16} />
+            </span>
+          </button>
+          {isRetiredOpen && (
+            <ul className="flex animate-[fade-in_250ms_ease-out] flex-col gap-1 motion-reduce:animate-none">
+              {retired.map((product) => (
+                <ProductRow
+                  key={product.id}
+                  product={product}
+                  isActive={!!form && form.id === product.id}
+                  compact={!isWide}
+                  onSelect={() => void open(product)}
+                />
+              ))}
+            </ul>
+          )}
+        </>
+      )}
     </div>
   )
 
@@ -373,7 +595,7 @@ export function ProductsApp({
 
   // Os dias (ou temas) de uma jornada se editam no editor da jornada, já montado pela estrutura.
   const contentLink =
-    form && form.kind === 'journey' && !isNew ? (
+    form && form.kind === 'journey' && !isNew && !isRetired ? (
       <a
         href={form.id === 'chama-interna-21' ? '#/jornada/editar' : `#/jornada/${form.id}/editar`}
         className="text-sm font-semibold text-admin-ink hover:underline"
@@ -419,33 +641,41 @@ export function ProductsApp({
                 isNew={isNew}
                 onPickBanner={(file) => void pickBanner(file)}
                 bannerState={bannerState}
+                situation={situation}
+                wasPublished={!!savedProduct && wasPublished(savedProduct.status)}
+                readOnly={isRetired}
               />
-              {noticeLine}
-              <div className="flex flex-wrap items-center justify-end gap-2.5">
-                {(contentLink || deleteControl) && (
-                  <span className="mr-auto flex flex-wrap items-center gap-x-5 gap-y-2">
-                    {contentLink}
-                    {deleteControl}
-                  </span>
-                )}
-                <button type="button" onClick={() => setForm(null)} className={ghostButton}>
-                  Descartar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsPreviewOpen(true)}
-                  className={ghostButton}
-                >
-                  Ver como fica no hub
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void save()}
-                  disabled={isSaving}
-                  className={adminButton}
-                >
-                  {isSaving ? 'Salvando…' : 'Salvar'}
-                </button>
+              {/* À esquerda o link e o aviso; à direita os botões, sempre juntos e na mesma ordem. */}
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                <span className="flex min-w-0 flex-1 basis-48 flex-wrap items-center gap-x-4 gap-y-1">
+                  {contentLink}
+                  {noticeLine}
+                </span>
+                <div className="ml-auto flex shrink-0 items-center gap-2">
+                  {duplicateControl}
+                  {deleteControl}
+                  {republishControl}
+                  {/* Indisponível não se edita: sem prévia nem Salvar. */}
+                  {!isRetired && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setIsPreviewOpen(true)}
+                        className={smallGhostButton}
+                      >
+                        Ver como fica no hub
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void save()}
+                        disabled={isSaving}
+                        className={smallAdminButton}
+                      >
+                        {isSaving ? 'Salvando…' : 'Salvar'}
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
@@ -465,6 +695,9 @@ export function ProductsApp({
             onSave={() => void save()}
           />
         )}
+        {retireDialog}
+        {discardDialog}
+        {dropDialog}
       </div>
     )
   }
@@ -495,7 +728,13 @@ export function ProductsApp({
         {form.title || (isNew ? 'Novo produto' : 'Produto')}
       </h1>
       {contentLink}
-      {step === 0 && deleteControl}
+      {step === 0 && (duplicateControl || deleteControl) && (
+        <span className="flex flex-wrap items-center gap-2">
+          {duplicateControl}
+          {deleteControl}
+          {republishControl}
+        </span>
+      )}
       <p className="text-sm text-ink-faint">
         Passo {step + 1} de {steps.length} · {current.label}
       </p>
@@ -520,6 +759,9 @@ export function ProductsApp({
           isNew={isNew}
           onPickBanner={(file) => void pickBanner(file)}
           bannerState={bannerState}
+          situation={situation}
+          wasPublished={!!savedProduct && wasPublished(savedProduct.status)}
+          readOnly={isRetired}
         />
       )}
       {noticeLine}
@@ -533,20 +775,25 @@ export function ProductsApp({
           {isLast ? 'Voltar para arrumar' : 'Voltar'}
         </button>
         {isLast ? (
-          <button
-            type="button"
-            onClick={() => void save()}
-            disabled={isSaving}
-            className={adminButton}
-          >
-            {isSaving ? 'Salvando…' : 'Salvar'}
-          </button>
+          isRetired ? null : (
+            <button
+              type="button"
+              onClick={() => void save()}
+              disabled={isSaving}
+              className={adminButton}
+            >
+              {isSaving ? 'Salvando…' : 'Salvar'}
+            </button>
+          )
         ) : (
           <button type="button" onClick={() => setStep(step + 1)} className={adminButton}>
             Continuar →
           </button>
         )}
       </div>
+      {retireDialog}
+      {discardDialog}
+      {dropDialog}
     </div>
   )
 }

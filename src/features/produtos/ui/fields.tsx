@@ -1,3 +1,4 @@
+import { InfoTip } from '../../../shared/ui/InfoTip'
 import { useId, type ReactNode } from 'react'
 
 /** Um campo com rótulo e, se houver, a mensagem de erro logo abaixo. */
@@ -43,7 +44,8 @@ export function Segmented<T extends string>({
 }: {
   label: string
   value: T
-  options: readonly { id: T; label: string }[]
+  /** `disabled` numa opção: aparece apagada e não se escolhe. */
+  options: readonly { id: T; label: string; disabled?: boolean }[]
   onChange: (value: T) => void
   disabled?: boolean
 }) {
@@ -59,7 +61,7 @@ export function Segmented<T extends string>({
           type="button"
           role="radio"
           aria-checked={value === option.id}
-          disabled={disabled}
+          disabled={disabled || option.disabled}
           onClick={() => onChange(option.id)}
           className={`rounded-full px-3.5 py-1.5 text-sm transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${
             value === option.id
@@ -74,10 +76,22 @@ export function Segmented<T extends string>({
   )
 }
 
-export function Section({ title, children }: { title: string; children: ReactNode }) {
+export function Section({
+  title,
+  info,
+  children,
+}: {
+  title: string
+  /** A explicação do bloco, no "i" ao lado do título (aparece ao passar o mouse). */
+  info?: ReactNode
+  children: ReactNode
+}) {
   return (
     <section className="flex flex-col gap-3.5 rounded-[18px] border border-line bg-surface p-[18px]">
-      <h3 className="text-xs font-semibold tracking-[0.2em] text-admin-ink uppercase">{title}</h3>
+      <h3 className="flex items-center gap-1 text-xs font-semibold tracking-[0.2em] text-admin-ink uppercase">
+        {title}
+        {info && <InfoTip label={`Sobre ${title}`}>{info}</InfoTip>}
+      </h3>
       {children}
     </section>
   )

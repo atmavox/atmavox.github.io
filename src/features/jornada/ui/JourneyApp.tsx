@@ -28,6 +28,11 @@ import { BRAND_TAB_TITLE } from '../../../shared/brand/links'
 import { useCatalog } from '../../../shared/catalog/CatalogContext'
 import { useAccess } from '../../../shared/catalog/AccessContext'
 import { useNow } from '../../../shared/lib/useNow'
+import { canStillUse } from '../../../shared/catalog/retired'
+import { wasPublished } from '../../../shared/catalog/product'
+import { hasStarted } from '../../../shared/progress/progressSummary'
+import { useProgressSummaries } from '../../../shared/progress/useProgressSummaries'
+import { RetiredNotice } from '../../../shared/ui/RetiredNotice'
 import { useAccount } from './useAccount'
 import { useJourney } from './useJourney'
 
@@ -144,6 +149,9 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
   const product = useCatalog().find(journeyId)
   const my = useMyProfile()
   const userId = state?.user?.uid
+  // Jornada Indisponível (ADR-035): a grátis continua para quem já tinha começado; a paga, até o prazo.
+  const retired = product?.status === 'retired' && !isAdmin ? product : null
+  const retiredProgress = useProgressSummaries(retired?.pricing.type === 'free' ? [journeyId] : [])
 
   // Quem acabou de entrar pode ter acesso a uma jornada paga: busca de novo, agora com o login.
   useEffect(() => {
@@ -154,6 +162,38 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
     document.title = BRAND_TAB_TITLE
     window.scrollTo({ top: 0 })
   }, [tab])
+
+  // Rascunho e Em breve: ninguém entra, nem com acesso liberado; só a Andreía (pedido de 2026-11-25).
+  if (product && !wasPublished(product.status) && !isAdmin) {
+    return <UnavailableJourney />
+  }
+  if (retired && account && state && !state.user) {
+    // Quem ainda tem acesso entra primeiro; aí se vê se continua.
+    return state.authChecked ? (
+      <LoginGate account={account} journeyId={journeyId} background={loginBackground} />
+    ) : (
+      <p aria-busy="true" className="py-20 text-center text-ink-muted">
+        Carregando…
+      </p>
+    )
+  }
+  if (retired) {
+    const hasProgress = hasStarted(retiredProgress.byJourney.get(journeyId))
+    if (!canStillUse(retired, { access: access.accessOf(journeyId), hasProgress, now })) {
+      const isChecking =
+        retired.pricing.type === 'free' && state?.user
+          ? retiredProgress.status !== 'ready'
+          : access.status === 'loading'
+      if (isChecking) {
+        return (
+          <p aria-busy="true" className="py-20 text-center text-ink-muted">
+            Carregando…
+          </p>
+        )
+      }
+      return <RetiredNotice title={retired.title} kind="journey" className="min-h-dvh" />
+    }
+  }
 
   // A Andreía vê a jornada nova antes de publicar ("Ver como participante").
   if (journeyId !== journey.id || (availability === 'unavailable' && !isAdmin)) {

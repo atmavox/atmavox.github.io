@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { seedCatalog } from '../../../shared/catalog/seedCatalog'
 import { emptyForm, formFromProduct } from '../domain/productForm'
 import { createInMemoryProductsBackend } from '../infrastructure/productsBackend'
-import { saveProduct, UNPUBLISHED_JOURNEY } from './saveProduct'
+import type { JourneyProduct } from '../../../shared/catalog/product'
+import {
+  loadJourneySeed,
+  saveProduct,
+  UNPUBLISHED_JOURNEY,
+  type JourneyReshaper,
+} from './saveProduct'
 
 describe('jornada só fica Publicada com conteúdo publicado', () => {
   const newJourney = {
@@ -94,5 +100,72 @@ describe('salvar um produto', () => {
       kind: 'error',
       message: 'Não foi possível salvar. Verifique sua internet e tente de novo.',
     })
+  })
+})
+
+describe('estrutura de uma jornada em Rascunho', () => {
+  const draft: JourneyProduct = {
+    ...(seedCatalog.find((p) => p.id === 'ritual-matinal') as JourneyProduct),
+    status: 'draft',
+  }
+  const catalog = seedCatalog.map((p) => (p.id === draft.id ? draft : p))
+
+  it('com conteúdo no editor, só trava fora de Rascunho ou depois de publicada', async () => {
+    const backend = createInMemoryProductsBackend()
+    backend.draftJourneys.add(draft.id)
+    expect(await loadJourneySeed(draft.id, backend, 'draft')).toMatchObject({
+      locked: false,
+      hasContent: true,
+    })
+    expect((await loadJourneySeed(draft.id, backend, 'soon')).locked).toBe(true)
+    backend.publishedJourneys.add(draft.id)
+    expect((await loadJourneySeed(draft.id, backend, 'draft')).locked).toBe(true)
+  })
+
+  it('ao salvar, os dias do editor vão para a estrutura nova', async () => {
+    const backend = createInMemoryProductsBackend()
+    backend.journeyDrafts.set(draft.id, '{"antes":true}')
+    const seen: unknown[] = []
+    const reshape: JourneyReshaper = async (json, spec) => {
+      seen.push([json, spec.structure, spec.groups.at(-1)?.lastDay])
+      return { json: '{"depois":true}', dropped: [] }
+    }
+    const form = {
+      ...formFromProduct(draft, undefined, { dayTitles: null, locked: false, hasContent: true }),
+      layout: 'days' as const,
+      division: 'none' as const,
+      dayCount: 10,
+    }
+    const result = await saveProduct(form, catalog, backend, { reshape })
+    expect(result.kind).toBe('saved')
+    expect(seen).toEqual([['{"antes":true}', 'days', 10]])
+    expect(backend.journeyDrafts.get(draft.id)).toBe('{"depois":true}')
+  })
+
+  it('se saem dias com blocos, pede confirmação antes de gravar', async () => {
+    const backend = createInMemoryProductsBackend()
+    backend.journeyDrafts.set(draft.id, '{"antes":true}')
+    const reshape: JourneyReshaper = async () => ({
+      json: '{"depois":true}',
+      dropped: [{ number: 7, title: 'Fechamento' }],
+    })
+    const form = formFromProduct(draft, undefined, {
+      dayTitles: null,
+      locked: false,
+      hasContent: true,
+    })
+    const asked = await saveProduct(form, catalog, backend, { reshape })
+    expect(asked).toEqual({ kind: 'confirm-drop', days: [{ number: 7, title: 'Fechamento' }] })
+    expect(backend.catalog).toBeNull()
+    const saved = await saveProduct(form, catalog, backend, { reshape, allowDrop: true })
+    expect(saved.kind).toBe('saved')
+    expect(backend.journeyDrafts.get(draft.id)).toBe('{"depois":true}')
+  })
+
+  it('Rascunho não fica em destaque', async () => {
+    const backend = createInMemoryProductsBackend()
+    const form = { ...formFromProduct(draft), featured: true }
+    const result = await saveProduct(form, catalog, backend)
+    expect(result.kind === 'saved' && result.product.featured).toBe(false)
   })
 })

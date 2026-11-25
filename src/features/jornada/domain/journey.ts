@@ -156,6 +156,11 @@ export interface Journey {
    * por `d{número}:…`, e um dia novo com o mesmo número mostraria respostas de outro dia.
    */
   retiredDays?: readonly number[]
+  /**
+   * Dias que vieram de uma cópia ("Duplicar") e a Andreía ainda não reviu e salvou: ficam em rascunho,
+   * como os de uma jornada nova, até ela salvar cada um.
+   */
+  unconfirmedDays?: readonly number[]
 }
 
 export function structureOf(journey: Journey): JourneyStructure {

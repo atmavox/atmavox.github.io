@@ -26,6 +26,8 @@ import { AccessesApp } from './ui/AccessesApp'
 import { AtivacoesApp } from './ui/ativacoes/AtivacoesApp'
 import { orderIdFromPath, sectionFromPath } from './ui/ativacoes/sections'
 import { ProductsApp } from './ui/ProductsApp'
+import type { BuiltInJourneyLoader, JourneyCopier } from './application/duplicateProduct'
+import type { JourneyReshaper } from './application/saveProduct'
 
 /**
  * Porta de entrada do Modo Andreía de produtos (`#/admin/produtos`), carregada sob demanda: só a admin
@@ -36,11 +38,20 @@ export function ProdutosEntry({
   backend: injected,
   accessAdmin: injectedAccess,
   ativacoes: injectedAtivacoes,
+  loadBuiltInJourney,
+  reshapeJourney,
+  copyJourney,
 }: {
   path?: string
   backend?: ProductsBackend
   accessAdmin?: AccessAdmin
   ativacoes?: AtivacoesBackend
+  /** Vem da composição (`app/`): o conteúdo das jornadas que estão no código, para duplicar. */
+  loadBuiltInJourney?: BuiltInJourneyLoader
+  /** Vem da composição: reorganiza os dias do editor de uma jornada em Rascunho. */
+  reshapeJourney?: JourneyReshaper
+  /** Vem da composição: o conteúdo da cópia com os dias em rascunho. */
+  copyJourney?: JourneyCopier
 }) {
   const area = path.startsWith('/admin/acessos')
     ? 'acessos'
@@ -139,7 +150,14 @@ export function ProdutosEntry({
           orderId={orderIdFromPath(path)}
         />
       ) : (
-        <ProductsApp backend={backend ?? createInMemoryProductsBackend()} catalog={store} />
+        <ProductsApp
+          backend={backend ?? createInMemoryProductsBackend()}
+          catalog={store}
+          loadBuiltInJourney={loadBuiltInJourney}
+          accessAdmin={accessAdmin ?? undefined}
+          reshapeJourney={reshapeJourney}
+          copyJourney={copyJourney}
+        />
       )
   }
 

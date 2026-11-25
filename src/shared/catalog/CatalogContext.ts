@@ -2,6 +2,7 @@ import { createContext, useContext, useSyncExternalStore } from 'react'
 import type { CatalogStore } from './catalogStore'
 import {
   featuredProducts,
+  profileProducts,
   visibleProducts,
   type JourneyProduct,
   type MeditationProduct,
@@ -26,10 +27,14 @@ export function useCatalog() {
     store ? store.getSnapshot : seed,
   )
   const visible = visibleProducts(products)
+  const inProfile = profileProducts(products)
   return {
     products,
     journeys: visible.filter(isJourney),
     meditations: visible.filter(isMeditation),
+    /** Para o perfil: também as Indisponíveis (ADR-035), que só aparecem para quem fez ou tem acesso. */
+    profileJourneys: inProfile.filter(isJourney),
+    profileMeditations: inProfile.filter(isMeditation),
     featuredJourneys: featuredProducts(products).filter(isJourney),
     featuredMeditations: featuredProducts(products).filter(isMeditation),
     find: (id: string) => products.find((p) => p.id === id),

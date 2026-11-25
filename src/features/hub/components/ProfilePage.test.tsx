@@ -9,6 +9,9 @@ import type { JourneyProduct } from '../../../shared/catalog/product'
 import type { ProgressLoader } from '../../../shared/progress/progressSummary'
 import { EMPTY_PROFILE } from '../../../shared/profile/profile'
 import { createInMemoryProfileSource } from '../../../shared/profile/profileSource'
+import { CatalogContext } from '../../../shared/catalog/CatalogContext'
+import { createCatalogStore } from '../../../shared/catalog/catalogStore'
+import { seedCatalog } from '../../../shared/catalog/seedCatalog'
 import { AccessPill, ProfilePage } from './ProfilePage'
 
 async function loggedSession(): Promise<AuthSession> {
@@ -152,5 +155,40 @@ describe('etiqueta do tipo de acesso', () => {
     expect(screen.getByText(/Venceu em/)).toBeInTheDocument()
     rerender(<AccessPill product={{ ...paid, pricing: { type: 'free' } }} now={NOW} />)
     expect(screen.getByText('Grátis')).toBeInTheDocument()
+  })
+})
+
+describe('perfil com jornada Indisponível (ADR-035)', () => {
+  it('a jornada grátis que saiu do ar continua no perfil de quem começou, com a faixa', async () => {
+    const catalog = createCatalogStore({})
+    catalog.replace(
+      seedCatalog.map((p) =>
+        p.id === 'chama-interna-21' ? { ...p, status: 'retired' as const, retiredAt: 1 } : p,
+      ),
+    )
+    render(
+      <AuthContext.Provider value={await loggedSession()}>
+        <CatalogContext.Provider value={catalog}>
+          <ProfilePage layout="wide" progressLoader={sevenDays} />
+        </CatalogContext.Provider>
+      </AuthContext.Provider>,
+    )
+    expect(await screen.findByText('Em recolhimento.')).toBeInTheDocument()
+    expect(
+      screen.getByText('A Andreía tirou esta jornada do ar. Você continua podendo voltar a ela.'),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Continuar no dia 8/ })).toBeInTheDocument()
+  })
+})
+
+describe('começar e continuar pelo perfil', () => {
+  it('quem ainda não concluiu nenhum dia começa pela Abertura', async () => {
+    const started: ProgressLoader = async (_uid, _token, journeyId) =>
+      journeyId === 'chama-interna-21' ? { completedDays: [], reflections: 1, victories: 0 } : null
+    renderProfile(await loggedSession(), started)
+    expect(await screen.findByRole('link', { name: /Começar pela Abertura/ })).toHaveAttribute(
+      'href',
+      '#/jornada/chama-interna-21',
+    )
   })
 })

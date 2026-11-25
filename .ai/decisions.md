@@ -569,6 +569,75 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   com a etiqueta "Teste" no Modo Andreía (revogar ou cancelar como os outros). ➖ testes na conta da
   admin ficam guardados até alguém revogá-los.
 
+## ADR-034 · Duplicar jornada ou meditação
+
+- **Status:** aceita
+- **Data:** 2026-11-25
+- **Contexto:** a Andreía quer criar um produto parecido com outro sem montar tudo de novo.
+- **Decisão:** "Duplicar" no editor do produto (`application/duplicateProduct.ts`). A cópia ganha
+  "Nome - Cópia" (ou "- Cópia 2"…), id novo pelo nome, sempre Rascunho, fora do destaque e no fim da
+  lista. Meditação leva os links (`published/{id}`). Jornada leva o conteúdo para `drafts/{id}` da cópia,
+  com o `id` trocado: o rascunho da original ou, sem ele, o publicado; a Chama Interna, que mora no
+  código, chega por um `loadBuiltInJourney` que a composição (`app/App.tsx`) injeta com import dinâmico,
+  para `produtos/` não importar `jornada/`. Sem conteúdo, vão os títulos dos dias.
+- **Alternativas consideradas:** copiar também a versão publicada (a cópia entraria no ar sem a Andreía
+  revisar); botão na lista de produtos (ela pediu só no editor).
+- **Atualização (1.36.0):** os dias da cópia vão com `unconfirmedDays` (todos os números): ficam em
+  rascunho no editor até a Andreía salvar cada um, e a publicação espera por eles. A composição injeta
+  `copyJourney` (`jornada/domain/journeyCopy.ts`), como o `loadBuiltInJourney`.
+- **Consequências:** ➕ sem coleção nova nem custo: só cópias de documentos que já existem. ➖ progresso,
+  acessos e histórico de versões não vão junto (de propósito); a Abertura da Chama Interna, que vem do
+  código, não entra na cópia (dá para escrever no editor).
+
+## ADR-035 · Inativar produto (Disponível e Indisponível)
+
+- **Status:** aceita
+- **Data:** 2026-11-25
+- **Contexto:** a Andreía quer tirar do ar uma jornada ou meditação publicada sem apagar o histórico de
+  quem fez, e sem cortar o acesso de quem pagou.
+- **Decisão:** um quarto status no catálogo, `retired` ("Indisponível", com `retiredAt`). Fica no
+  catálogo público para o perfil achar, mas `visibleProducts` o tira da vitrine, dos hubs e da busca; o
+  perfil procura em todo o catálogo (`profileProducts`) e só mostra o que a pessoa começou ou tem acesso,
+  então quem pagou continua achando o produto. Quem entra
+  (`shared/catalog/retired.ts`): no pago, quem tem acesso válido; na jornada grátis, quem já tinha
+  começado (progresso com dia concluído ou algo escrito); a meditação grátis segue tocando para quem tem
+  o link (não há registro de quem ouviu). Antes de publicar, Rascunho, Em breve e Publicada se trocam na
+  Situação; depois, não se volta a Rascunho nem a Em breve; Indisponível só entra pelo "Inativar produto" e só sai pelo "Publicar de novo"
+  (`application/setAvailability.ts`), que mudam só o catálogo. Descartar (apagar do catálogo) vale para
+  Rascunho, Em breve e Indisponível paga, e só se ninguém nunca teve acesso; a Indisponível grátis não se
+  descarta (quem a fez sem acesso liberado não aparece para a admin). No Modo Andreía o termo é
+  Publicada/Indisponível; para a pessoa, "Em recolhimento" enquanto ainda entra e "Indisponível" depois.
+  Os números vêm da consulta de acessos que a aba Acessos já usa (os de teste contam). Indisponível
+  não se edita (nem o produto nem o conteúdo) e Rascunho/Em breve nunca dão acesso a ninguém. A tabela
+  completa do que cada situação permite fica em `features.md` (F9, "Situações do produto").
+- **Alternativas consideradas:** apagar o produto (perderia o histórico no perfil); status só no Modo
+  Andreía, tirando do catálogo público (o perfil não acharia o produto); "Fora do ar" como quarta opção
+  da Situação (ficava fácil de clicar sem ver quem é afetado); contar quem já fez a jornada (as regras
+  não deixam a admin ler o progresso das pessoas).
+- **Consequências:** ➕ sem regra nova nem coleção: o acesso continua sendo `expiresAt`. ➖ versões
+  antigas do site em cache ignoram o produto Indisponível até recarregar; ler as próprias reflexões
+  depois que o acesso vence ainda depende de um passo seguinte (o conteúdo pago só é entregue com acesso
+  válido).
+
+## ADR-036 · Estrutura de jornada em Rascunho muda pelo produto
+
+- **Status:** aceita
+- **Data:** 2026-11-25
+- **Contexto:** a ADR-025 travava a estrutura no produto assim que o editor salvava algo, e desde a
+  1.33.0 uma jornada nova já nasce com dias no editor. A Andreía quer mudar a estrutura enquanto a
+  jornada é só Rascunho.
+- **Decisão:** a trava vale quando o conteúdo já foi publicado, quando vem no código e, fora de
+  Rascunho, quando o editor já salvou algo. Em Rascunho, ao salvar o produto, o rascunho do editor é
+  reorganizado por `jornada/domain/reshapeJourney.ts`: o dia na posição N continua na posição N (com
+  blocos e número, de que dependem os ids das respostas), faltando entram dias vazios com números novos,
+  sobrando saem os últimos e o número vai para `retiredDays`. Se sai dia com blocos, `saveProduct`
+  devolve `confirm-drop` e a tela pede confirmação. A composição (`app/App.tsx`) injeta a função com
+  import dinâmico, como o `loadBuiltInJourney` da ADR-034, para `produtos/` não importar `jornada/`.
+- **Alternativas consideradas:** continuar travado (a Andreía teria de refazer a estrutura dia a dia no
+  editor); apagar o rascunho do editor ao mudar a estrutura (perderia o que ela já escreveu).
+- **Consequências:** ➕ sem formato novo: o rascunho continua sendo a jornada em JSON. ➖ com o editor da
+  jornada aberto em outra aba, o que estiver lá sem salvar fica na estrutura antiga.
+
 ## ADR-00X · Título curto
 
 - **Status:** proposta | aceita | substituída por ADR-00Y · AAAA-MM-DD
