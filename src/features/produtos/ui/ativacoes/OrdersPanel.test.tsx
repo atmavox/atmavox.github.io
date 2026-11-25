@@ -115,7 +115,7 @@ describe('Modo Andreía · pedidos', () => {
     render(<AtivacoesApp backend={backend} section="pedidos" />)
     fireEvent.click(await screen.findByRole('button', { name: /Renata Alves/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Marcar como realizada' }))
-    expect(await screen.findByText('Marcado como realizado ✓')).toBeInTheDocument()
+    expect(await screen.findByText('Marcado como realizado')).toBeInTheDocument()
     expect(backend.orders.find((o) => o.id === 'AFEITO')).toMatchObject({
       status: 'done',
       doneAt: NOW,
@@ -129,7 +129,7 @@ describe('Modo Andreía · pedidos', () => {
         name: 'Cancelar pedido',
       }),
     )
-    expect(await screen.findByText('Pedido cancelado ✓')).toBeInTheDocument()
+    expect(await screen.findByText('Pedido cancelado')).toBeInTheDocument()
     expect(backend.orders.find((o) => o.id === 'APAGO1')?.status).toBe('cancel')
   })
 
@@ -211,7 +211,7 @@ describe('Modo Andreía · mensagens', () => {
     fireEvent.change(text, { target: { value: 'Oi, {apelido}! Aprovado: {data}.' } })
     expect(screen.getByText('Oi, Mari! Aprovado: quinta, 3 de dezembro.')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
-    expect(await screen.findByText('Salvo ✓')).toBeInTheDocument()
+    expect(await screen.findByText('Salvo')).toBeInTheDocument()
     expect(backend.messages.approved).toBe('Oi, {apelido}! Aprovado: {data}.')
   })
 })

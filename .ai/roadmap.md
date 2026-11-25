@@ -326,10 +326,21 @@ Surgiu no caminho:
     - [x] (1.32.1) Acessos · Liberados com títulos das colunas e botões com hover de botão
     - [ ] Simular também no "Pagar" de um pedido da ativação aguardando pagamento (aba Ativações do
           perfil), se fizer falta
-    - [ ] **Desenvolvedor:** publicar as regras do Firestore (a admin lista `admins`, para marcar os
-          outros admins)
-    - [ ] Trocar o ✓ pelo ícone (e sumir sozinho) também em Produtos, Acessos, Anamnese, Mensagens e
-          Pedidos do Modo Andreía
+    - [x] **Desenvolvedor:** publicar as regras do Firestore (a admin lista `admins`, para marcar os
+          outros admins) (publicadas em 2026-11-25)
+    - [x] (1.33.0) Trocar o ✓ pelo ícone (e sumir sozinho) também em Produtos, Acessos, Anamnese,
+          Mensagens e Pedidos do Modo Andreía; o teste de emoji barra o ✓
+    - [x] (1.33.0) Agenda: reservado sai do livre (filete com os minutos que sobram), reserva com resumo
+          ao passar o mouse e ficha ao clicar (link direto para o pedido), reservas no mês e no celular,
+          grade abrindo das 11h às 22h, balão de horário novo sem cortes (pedidos de 2026-11-25)
+    - [x] (1.33.0) Celular: só a etiqueta "Modo Andreía" (sem a frase cortada) e o cartão do WhatsApp
+          do Contato e do hub Ativações com o botão na largura toda
+    - [x] (1.33.0) Clicar fora fecha balões e janelas; X pequeno no canto do balão; jornada nova com os
+          dias criados sozinhos como Rascunho; Anamnese sem o aviso do mock; "← Produtos" com hover
+    - [ ] **Histórico da agenda de ativações** (ideia de 2026-11-25, aguardando escolha do mock):
+          "Movimentações recentes" com o que mudou (pedido novo, pago, reservado, confirmado, vencido,
+          cancelado, faixa livre criada/mudada/tirada); ver a proposta na conversa de 2026-11-25
+    - [ ] Conferir no computador de verdade o resumo ao passar o mouse e o balão perto das bordas
     - [ ] **Andreía:** ajustar os textos provisórios do hub Ativações (título, convite, Como funciona)
     - [ ] **Desenvolvedor:** confirmar o e-mail das contas de teste criadas com e-mail e senha
     - [ ] **Desenvolvedor:** preencher o cadastro da conta da Andreía (ela também passa pela trava ao

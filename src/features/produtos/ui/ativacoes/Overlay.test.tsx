@@ -31,4 +31,18 @@ describe('janela do Modo Andreía', () => {
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(onClose).toHaveBeenCalledTimes(1)
   })
+
+  it('clicar fora da janela fecha; clicar dentro não', () => {
+    const onClose = vi.fn()
+    render(<Form onClose={onClose} />)
+    const dialog = screen.getByRole('dialog', { name: 'Nova terapia' })
+    fireEvent.pointerDown(dialog)
+    fireEvent.click(dialog)
+    expect(onClose).not.toHaveBeenCalled()
+
+    const backdrop = dialog.parentElement!
+    fireEvent.pointerDown(backdrop)
+    fireEvent.click(backdrop)
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
 })

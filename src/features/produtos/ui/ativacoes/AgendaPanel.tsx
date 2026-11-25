@@ -3,6 +3,7 @@ import {
   addDays,
   dayOfMonth,
   EMPTY_AVAILABILITY,
+  freeParts,
   fromMinutes,
   localDate,
   longDate,
@@ -19,8 +20,11 @@ import {
   weekOf,
   type Availability,
   type AvailabilityWindow,
+  type Booking,
+  type TimeRange,
   type WindowErrors,
 } from '../../../../shared/ativacao/availability'
+import type { SessionOrder } from '../../../../shared/ativacao/order'
 import { DEFAULT_THERAPIES, type Therapy } from '../../../../shared/ativacao/therapy'
 import { useNow } from '../../../../shared/lib/useNow'
 import { UiIcon } from '../../../../shared/ui/UiIcon'
@@ -29,6 +33,9 @@ import { Segmented } from '../fields'
 import { adminButton, ghostButton } from '../styles'
 import { SaveStatus } from '../SaveStatus'
 import { useSaveNotice } from '../useSaveNotice'
+import { BookingDetails } from './BookingDetails'
+import { bookingState, bookingWho } from './bookingText'
+import { AnchoredPopover } from './AnchoredPopover'
 import { Overlay } from './Overlay'
 import { Switch } from './TherapyFields'
 import { TherapyChecks, ToneDot, WindowForm } from './WindowForm'
@@ -43,9 +50,11 @@ import { TONE_DOT } from '../../../../shared/ui/bannerTones'
 const FIRST_HOUR = 0
 const LAST_HOUR = 24
 const HOUR_PX = 46
-/** A grade sempre abre mostrando das 9h às 21h (pedido de 2026-11-23); o resto do dia, rolando. */
-const VIEW_FROM_HOUR = 9
+/** A grade sempre abre mostrando das 11h às 22h (pedido de 2026-11-25); o resto do dia, rolando. */
+const VIEW_FROM_HOUR = 11
 const VIEW_HOURS = 12
+/** Um respiro acima da primeira hora, para o rótulo \"11h\" não ficar colado nos dias. */
+const VIEW_TOP_GAP_PX = 12
 const PHONE_FIRST_HOUR = 7
 const PHONE_LAST_HOUR = 22
 const SNAP = 30
@@ -75,7 +84,6 @@ interface Editing {
 
 interface Quick {
   window: AvailabilityWindow
-  column: number
 }
 
 /** Agenda da Andreía (mock aprovado): grade da semana com arrastar + mês no computador; dia no celular. */
@@ -85,6 +93,8 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   const nowMinutes = new Date(nowMs).getHours() * 60 + new Date(nowMs).getMinutes()
   const [availability, setAvailability] = useState<Availability | null>(null)
   const [therapies, setTherapies] = useState<readonly Therapy[]>(DEFAULT_THERAPIES)
+  const [orders, setOrders] = useState<readonly SessionOrder[]>([])
+  const [shownBooking, setShownBooking] = useState<Booking | null>(null)
   const [view, setView] = useState<'semana' | 'mes'>('semana')
   const [day, setDay] = useState(today)
   const [editing, setEditing] = useState<Editing | null>(null)
@@ -101,22 +111,25 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     void Promise.all([
       backend.loadAvailability().catch(() => EMPTY_AVAILABILITY),
       backend.loadTherapies().catch(() => null),
-    ]).then(([loaded, list]) => {
+      // Os pedidos só enriquecem as reservas (nome, terapia); sem eles a agenda funciona igual.
+      backend.listOrders().catch(() => []),
+    ]).then(([loaded, list, orderList]) => {
       if (cancelled) return
       setAvailability(loaded)
       if (list?.length) setTherapies(list)
+      setOrders(orderList)
     })
     return () => {
       cancelled = true
     }
   }, [backend])
 
-  // A grade abre sempre das 9h às 21h; antes e depois, rolando dentro dela.
+  // A grade abre sempre das 11h às 22h; antes e depois, rolando dentro dela.
   const weekStart = startOfWeek(day)
   const isLoaded = availability !== null
   useEffect(() => {
     if (!isLoaded || view !== 'semana' || !gridRef.current) return
-    gridRef.current.scrollTop = (VIEW_FROM_HOUR - FIRST_HOUR) * HOUR_PX
+    gridRef.current.scrollTop = (VIEW_FROM_HOUR - FIRST_HOUR) * HOUR_PX - VIEW_TOP_GAP_PX
   }, [isLoaded, view, weekStart])
   if (!availability) return <LoadingNote text="Carregando a agenda…" />
 
@@ -126,6 +139,13 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     therapies.some((t) => t.active) ? therapies.filter((t) => t.active) : therapies
   ).map((t) => t.id)
   const therapyOf = (id: string) => therapies.find((t) => t.id === id)
+  const orderOf = (booking: Booking) =>
+    booking.orderId ? orders.find((o) => o.id === booking.orderId) : undefined
+  const bookedOn = (date: string) =>
+    availability.booked
+      .filter((b) => b.date === date)
+      .sort((a, b) => toMinutes(a.start) - toMinutes(b.start))
+  const bookingKey = (b: Booking) => `${b.orderId ?? ''}-${b.date}-${b.start}`
 
   function draft(date: string, start: string, end: string): AvailabilityWindow {
     return {
@@ -181,6 +201,24 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
 
   /* ---------- arrastar na grade (computador) ---------- */
 
+  function closeQuick() {
+    setQuick(null)
+    setErrors({})
+  }
+
+  /** O retângulo da seleção na tela, para o balão ficar ao lado dela (fora da rolagem da grade). */
+  function quickAnchor(): DOMRect | null {
+    if (!quick) return null
+    const column = gridRef.current?.querySelector<HTMLElement>(
+      `[data-testid="dia-${quick.window.date}"]`,
+    )
+    if (!column) return null
+    const rect = column.getBoundingClientRect()
+    const top = rect.top + ((toMinutes(quick.window.start) - FIRST_HOUR * 60) / 60) * HOUR_PX
+    const height = ((toMinutes(quick.window.end) - toMinutes(quick.window.start)) / 60) * HOUR_PX
+    return new DOMRect(rect.left, top, rect.width, height)
+  }
+
   function minuteAt(event: ReactPointerEvent<HTMLElement>) {
     const rect = event.currentTarget.getBoundingClientRect()
     return clampDay(FIRST_HOUR * 60 + ((event.clientY - rect.top) / HOUR_PX) * 60)
@@ -213,7 +251,6 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     const to = Math.max(drag.to, Math.min(LAST_HOUR * 60, from + 60))
     setQuick({
       window: draft(drag.date, fromMinutes(from), fromMinutes(to)),
-      column: week.indexOf(drag.date),
     })
     setErrors({})
     setDrag(null)
@@ -299,39 +336,121 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     </button>
   )
 
-  /** A faixa livre na grade: o mesmo tracejado da seleção ao arrastar, no marrom do site (pedido de 2026-11-23). */
-  const gridBlock = (window: AvailabilityWindow, date: string, top: number, height: number) => (
-    <button
-      key={window.id}
-      type="button"
-      data-window
-      onClick={() => openExisting(window, date)}
-      aria-label={`Livre ${longDate(date)}, ${timeLabel(window.start)} às ${timeLabel(window.end)}`}
-      style={{ top: top + 1, height: height - 2 }}
-      className="absolute inset-x-[3px] z-[1] flex flex-col items-start gap-0.5 overflow-hidden rounded-lg border-2 border-dashed border-accent/70 bg-accent/12 px-1.5 py-1 text-left text-[11.5px] leading-tight text-ink transition-colors hover:border-accent hover:bg-accent/18"
-    >
-      <span className="text-[10.5px] font-semibold tracking-[0.16em] text-gold uppercase">
-        Livre
-      </span>
-      <b className="font-medium">
-        {timeLabel(window.start)} – {timeLabel(window.end)}
-        {window.weekly ? ' · toda semana' : ''}
-      </b>
-      {height > 70 && (
-        <span className="mt-0.5 flex flex-wrap items-center gap-1">
-          {window.therapyIds.map((id) => {
-            const t = therapyOf(id)
-            return t ? (
-              <span
-                key={id}
-                className="inline-block size-2.5 rounded-full"
-                style={{ background: TONE_DOT[t.tone] }}
-              />
-            ) : null
-          })}
-        </span>
-      )}
-    </button>
+  /**
+   * Um pedaço livre de uma faixa na grade: o mesmo tracejado da seleção ao arrastar, no marrom do site
+   * (pedido de 2026-11-23). O que foi reservado sai do livre; sobrando poucos minutos, fica só um
+   * filete, que ainda abre a faixa ao clicar (pedido de 2026-11-25).
+   */
+  const gridBlock = (window: AvailabilityWindow, date: string, part: TimeRange) => {
+    const top = ((toMinutes(part.start) - FIRST_HOUR * 60) / 60) * HOUR_PX
+    const height = ((toMinutes(part.end) - toMinutes(part.start)) / 60) * HOUR_PX
+    const range = `${timeLabel(part.start)} – ${timeLabel(part.end)}`
+    if (height < 26) {
+      return (
+        <button
+          key={`${window.id}-${part.start}`}
+          type="button"
+          data-window
+          onClick={() => openExisting(window, date)}
+          aria-label={`Livre ${longDate(date)}, ${timeLabel(part.start)} às ${timeLabel(part.end)}`}
+          title={`Livre ${range}`}
+          style={{ top: top + 1, height: Math.max(5, height - 2) }}
+          className="absolute inset-x-[3px] z-[1] rounded-md border-[1.5px] border-dashed border-accent/70 bg-accent/12 transition-colors hover:border-accent hover:bg-accent/25"
+        />
+      )
+    }
+    return (
+      <button
+        key={`${window.id}-${part.start}`}
+        type="button"
+        data-window
+        onClick={() => openExisting(window, date)}
+        aria-label={`Livre ${longDate(date)}, ${timeLabel(part.start)} às ${timeLabel(part.end)}`}
+        style={{ top: top + 1, height: height - 2 }}
+        className="absolute inset-x-[3px] z-[1] flex flex-col items-start gap-0.5 overflow-hidden rounded-lg border-2 border-dashed border-accent/70 bg-accent/12 px-1.5 py-1 text-left text-[11.5px] leading-tight text-ink transition-colors hover:border-accent hover:bg-accent/18"
+      >
+        {height >= 44 && (
+          <span className="text-[10.5px] font-semibold tracking-[0.16em] text-gold uppercase">
+            Livre
+          </span>
+        )}
+        <b className="font-medium">
+          {range}
+          {window.weekly && height >= 44 ? ' · toda semana' : ''}
+        </b>
+        {height > 70 && (
+          <span className="mt-0.5 flex flex-wrap items-center gap-1">
+            {window.therapyIds.map((id) => {
+              const t = therapyOf(id)
+              return t ? (
+                <span
+                  key={id}
+                  className="inline-block size-2.5 rounded-full"
+                  style={{ background: TONE_DOT[t.tone] }}
+                />
+              ) : null
+            })}
+          </span>
+        )}
+      </button>
+    )
+  }
+
+  /**
+   * Um horário reservado na grade: ao passar o mouse, quem é e em que pé está; ao clicar, a ficha
+   * (pedido de 2026-11-25).
+   */
+  const bookedBlock = (booking: Booking) => {
+    const order = orderOf(booking)
+    const top = ((toMinutes(booking.start) - FIRST_HOUR * 60) / 60) * HOUR_PX
+    const height = ((toMinutes(booking.end) - toMinutes(booking.start)) / 60) * HOUR_PX
+    const who = bookingWho(booking, order)
+    const range = `${timeLabel(booking.start)} – ${timeLabel(booking.end)}`
+    // Perto do topo da grade, o resumo abre embaixo (em cima, ficaria escondido pelos dias).
+    const tipBelow = top < 2.5 * HOUR_PX
+    return (
+      <div
+        key={bookingKey(booking)}
+        data-window
+        className="group absolute inset-x-[3px] z-[2] hover:z-[4] focus-within:z-[4]"
+        style={{ top: top + 1, height: height - 2 }}
+      >
+        <button
+          type="button"
+          onClick={() => setShownBooking(booking)}
+          aria-label={`Reservado: ${who}, ${longDate(booking.date)}, ${timeLabel(booking.start)} às ${timeLabel(booking.end)}`}
+          className="flex size-full flex-col items-start overflow-hidden rounded-[4px_10px_10px_4px] bg-wine px-2 py-1 text-left text-[11px] leading-tight text-[var(--banner-mark)] transition-[filter,box-shadow] group-hover:shadow-[0_6px_18px_rgb(20_14_10/0.28)] group-hover:brightness-110"
+        >
+          <b className="truncate font-semibold">
+            {order?.name ? order.name.split(' ')[0] : 'Reservado'}
+          </b>
+          {height >= 40 && <span className="truncate opacity-85">{range}</span>}
+        </button>
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute left-1/2 z-10 w-max max-w-[230px] -translate-x-1/2 rounded-xl border border-line bg-bg px-3 py-2 text-left text-xs leading-snug text-ink opacity-0 shadow-[0_12px_30px_rgb(20_14_10/0.22)] transition-opacity duration-200 group-hover:opacity-100 ${
+            tipBelow ? 'top-full mt-1.5' : 'bottom-full mb-1.5'
+          }`}
+        >
+          <b className="block text-[13px]">{who}</b>
+          {order?.therapyName && <span className="block text-ink-muted">{order.therapyName}</span>}
+          <span className="block text-ink-muted">
+            {range} · {bookingState(order, nowMs)}
+          </span>
+          <span className="mt-1 block text-[11px] text-ink-faint">Clique para ver mais</span>
+        </div>
+      </div>
+    )
+  }
+
+  const bookingSheet = shownBooking && (
+    <BookingDetails
+      booking={shownBooking}
+      order={orderOf(shownBooking)}
+      now={nowMs}
+      isWide={isWide}
+      onClose={() => setShownBooking(null)}
+    />
   )
 
   /* ---------- formulário completo (janela ou folha) ---------- */
@@ -459,7 +578,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
           // dia pequeno e o número em Playfair; linhas bem leves; a linha de agora em âmbar.
           <div
             ref={gridRef}
-            // Cabeçalho dos dias (~76 px) + 12 horas: das 9h às 21h cabem inteiras na tela.
+            // Cabeçalho dos dias (~76 px) + 12 horas: das 11h às 22h (e a linha das 22h) cabem na tela.
             style={{ height: 76 + VIEW_HOURS * HOUR_PX }}
             className="thin-scroll relative overflow-y-auto rounded-[22px] bg-surface-2 px-1 pb-2.5"
           >
@@ -510,27 +629,10 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
                     backgroundImage: `repeating-linear-gradient(to bottom, transparent 0 ${HOUR_PX - 1}px, color-mix(in oklab, var(--text) 7%, transparent) ${HOUR_PX - 1}px ${HOUR_PX}px)`,
                   }}
                 >
-                  {occurrencesOn(availability, date).map(({ window }) => {
-                    const top = ((toMinutes(window.start) - FIRST_HOUR * 60) / 60) * HOUR_PX
-                    const height =
-                      ((toMinutes(window.end) - toMinutes(window.start)) / 60) * HOUR_PX
-                    return gridBlock(window, date, top, height)
-                  })}
-                  {availability.booked
-                    .filter((b) => b.date === date)
-                    .map((b) => (
-                      <div
-                        key={`${b.orderId ?? ''}-${b.start}`}
-                        className="pointer-events-none absolute right-1.5 left-4 z-[2] overflow-hidden rounded-[4px_10px_10px_4px] bg-wine px-2 py-1 text-[11px] leading-tight text-[var(--banner-mark)]"
-                        style={{
-                          top: ((toMinutes(b.start) - FIRST_HOUR * 60) / 60) * HOUR_PX + 1,
-                          height: ((toMinutes(b.end) - toMinutes(b.start)) / 60) * HOUR_PX - 2,
-                        }}
-                      >
-                        <b className="font-semibold">Reservado</b>
-                        {b.orderId ? ` · ${b.orderId}` : ''}
-                      </div>
-                    ))}
+                  {occurrencesOn(availability, date).flatMap(({ window }) =>
+                    freeParts(window, bookedOn(date)).map((part) => gridBlock(window, date, part)),
+                  )}
+                  {bookedOn(date).map(bookedBlock)}
                   {date === today &&
                     nowMinutes > FIRST_HOUR * 60 &&
                     nowMinutes < LAST_HOUR * 60 && (
@@ -570,22 +672,19 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
             </div>
 
             {quick && (
-              <div
-                role="dialog"
-                aria-label="Novo horário livre"
-                className="absolute z-20 w-[290px] animate-[dialog-in_250ms_ease-out] rounded-2xl border border-line bg-bg p-4 shadow-[0_20px_50px_rgb(20_14_10/0.3)]"
-                style={{
-                  top: Math.max(
-                    44,
-                    ((toMinutes(quick.window.start) - FIRST_HOUR * 60) / 60) * HOUR_PX + 30,
-                  ),
-                  left:
-                    quick.column >= 4
-                      ? `calc(52px + ${quick.column} * (100% - 52px) / 7 - 298px)`
-                      : `calc(52px + ${quick.column + 1} * (100% - 52px) / 7 + 8px)`,
-                }}
-              >
-                <b className="text-ink">Novo horário livre</b>
+              <AnchoredPopover label="Novo horário livre" anchor={quickAnchor} onClose={closeQuick}>
+                {/* O X pequeno no canto de cima (pedido de 2026-11-25). */}
+                <div className="flex items-start justify-between gap-2">
+                  <b className="text-ink">Novo horário livre</b>
+                  <button
+                    type="button"
+                    aria-label="Cancelar"
+                    onClick={closeQuick}
+                    className="-mt-1 -mr-1.5 grid size-6 shrink-0 place-items-center rounded-full text-ink-faint transition-colors hover:bg-field hover:text-ink"
+                  >
+                    <UiIcon name="close" size={13} />
+                  </button>
+                </div>
                 <p className="mb-2.5 text-sm text-ink-faint">
                   {longDate(quick.window.date)} · {timeLabel(quick.window.start)} às{' '}
                   {timeLabel(quick.window.end)}
@@ -632,19 +731,8 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
                   >
                     <UiIcon name="plus" size={16} />
                   </button>
-                  <button
-                    type="button"
-                    aria-label="Cancelar"
-                    onClick={() => {
-                      setQuick(null)
-                      setErrors({})
-                    }}
-                    className={`${ghostButton} px-3`}
-                  >
-                    <UiIcon name="close" size={16} />
-                  </button>
                 </div>
-              </div>
+              </AnchoredPopover>
             )}
           </div>
         ) : (
@@ -685,6 +773,13 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
                         {timeLabel(window.start)}–{timeLabel(window.end)}
                       </span>
                     ))}
+                    {bookedOn(date).length > 0 && (
+                      <span className="w-full truncate rounded-md bg-wine px-1.5 py-0.5 text-[11px] text-[var(--banner-mark)]">
+                        {bookedOn(date).length === 1
+                          ? '1 reservado'
+                          : `${bookedOn(date).length} reservados`}
+                      </span>
+                    )}
                   </button>
                 )
               })}
@@ -692,10 +787,12 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
           </div>
         )}
         <p className="text-sm text-ink-faint">
-          Arraste na grade para marcar um horário livre. Clique num horário para mudar ou tirar. No
-          Mês, clique num dia para abrir a semana dele.
+          Arraste na grade para marcar um horário livre. Clique num horário livre para mudar ou
+          tirar, e num reservado para ver de quem é. No Mês, clique num dia para abrir a semana
+          dele.
         </p>
         {editor}
+        {bookingSheet}
       </div>
     )
   }
@@ -754,12 +851,48 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
             ({ window }) => Math.floor(toMinutes(window.start) / 60) === hour,
           )
           if (starting.length)
-            return starting.map(({ window }) => (
-              <div key={window.id} className="flex items-stretch gap-3">
-                <b className="w-10 pt-2 text-sm text-ink">{timeLabel(window.start)}</b>
-                {windowBlock(window, day, { flex: 1, padding: '10px 12px', fontSize: 13 })}
-              </div>
-            ))
+            return starting.map(({ window }) => {
+              const inside = bookedOn(day).filter(
+                (b) =>
+                  toMinutes(b.start) < toMinutes(window.end) &&
+                  toMinutes(b.end) > toMinutes(window.start),
+              )
+              const free = freeParts(window, inside)
+              return (
+                <div key={window.id} className="flex items-stretch gap-3">
+                  <b className="w-10 pt-2 text-sm text-ink">{timeLabel(window.start)}</b>
+                  <div className="flex flex-1 flex-col gap-1.5">
+                    {windowBlock(window, day, { padding: '10px 12px', fontSize: 13 })}
+                    {inside.length > 0 && (
+                      <p className="px-1 text-xs text-ink-faint">
+                        {free.length
+                          ? `Livre ainda: ${free.map((p) => `${timeLabel(p.start)}–${timeLabel(p.end)}`).join(', ')}`
+                          : 'Sem tempo livre: tudo reservado.'}
+                      </p>
+                    )}
+                    {inside.map((b) => {
+                      const order = orderOf(b)
+                      return (
+                        <button
+                          key={bookingKey(b)}
+                          type="button"
+                          onClick={() => setShownBooking(b)}
+                          className="flex flex-col items-start rounded-[4px_12px_12px_4px] bg-wine px-3 py-2 text-left text-[13px] leading-tight text-[var(--banner-mark)]"
+                        >
+                          <b className="font-semibold">
+                            {timeLabel(b.start)}–{timeLabel(b.end)} · {bookingWho(b, order)}
+                          </b>
+                          <span className="text-xs opacity-85">
+                            {order?.therapyName ? `${order.therapyName} · ` : ''}
+                            {bookingState(order, nowMs)}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })
           if (covered(hour)) return null
           return (
             <div key={hour} className="flex items-center gap-3">
@@ -777,6 +910,7 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
       </div>
       {legend}
       {editor}
+      {bookingSheet}
     </div>
   )
 }

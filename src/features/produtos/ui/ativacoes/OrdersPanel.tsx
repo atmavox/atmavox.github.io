@@ -43,6 +43,8 @@ import { TherapyBadge } from '../../../../shared/ui/TherapyIcon'
 import { UiIcon } from '../../../../shared/ui/UiIcon'
 import type { AtivacoesBackend, OrderChange } from '../../infrastructure/ativacoesBackend'
 import { adminButton, ghostButton } from '../styles'
+import { SaveStatus } from '../SaveStatus'
+import { useSaveNotice } from '../useSaveNotice'
 import { LoadingNote } from '../../../../shared/ui/LoadingNote'
 import { ApprovePanel } from './ApprovePanel'
 import { Overlay } from './Overlay'
@@ -178,7 +180,16 @@ function AnamnesisAnswers({
 }
 
 /** Pedidos (mock aprovado): quadro por status no computador, lista por dia no celular. */
-export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; isWide: boolean }) {
+export function OrdersPanel({
+  backend,
+  isWide,
+  initialOrderId = null,
+}: {
+  backend: AtivacoesBackend
+  isWide: boolean
+  /** Abre este pedido assim que a lista chega (link vindo da agenda). */
+  initialOrderId?: string | null
+}) {
   const now = useNow()
   const [orders, setOrders] = useState<SessionOrder[] | null>(null)
   const [therapies, setTherapies] = useState<readonly Therapy[]>(DEFAULT_THERAPIES)
@@ -187,7 +198,7 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
   const [saved, setSaved] = useState<SavedAnamnesis | null | undefined>(undefined)
   const [showCancelled, setShowCancelled] = useState(false)
   const [confirmCancel, setConfirmCancel] = useState(false)
-  const [notice, setNotice] = useState<string | null>(null)
+  const saveNotice = useSaveNotice()
   const [isSaving, setIsSaving] = useState(false)
   const [availability, setAvailability] = useState<Availability>(EMPTY_AVAILABILITY)
   const [messages, setMessages] = useState<Messages>(DEFAULT_MESSAGES)
@@ -232,11 +243,19 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
       if (cancelled) return
       setAvailability(nextAv)
       setOrders(nextList)
+      const linked = initialOrderId ? nextList.find((o) => o.id === initialOrderId) : undefined
+      if (linked) {
+        setOpen(linked)
+        void backend
+          .loadPersonAnamnesis(linked.uid)
+          .catch(() => null)
+          .then((s) => !cancelled && setSaved(s))
+      }
     })
     return () => {
       cancelled = true
     }
-  }, [backend])
+  }, [backend, initialOrderId])
 
   if (!orders) return <LoadingNote text="Carregando os pedidos…" />
 
@@ -247,7 +266,7 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     setOpen(order)
     setConfirmCancel(false)
     setIsApproving(false)
-    setNotice(null)
+    saveNotice.hide()
     setSaved(undefined)
     void backend
       .loadPersonAnamnesis(order.uid)
@@ -262,9 +281,12 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
       const next = { ...order, ...update }
       setOrders((all) => all!.map((o) => (o.uid === order.uid && o.id === order.id ? next : o)))
       setOpen(next)
-      setNotice(message)
+      saveNotice.show({ kind: 'ok', text: message })
     } catch {
-      setNotice('Não deu para salvar. Confira a internet e tente de novo.')
+      saveNotice.show({
+        kind: 'error',
+        text: 'Não deu para salvar. Confira a internet e tente de novo.',
+      })
     } finally {
       setIsSaving(false)
       setConfirmCancel(false)
@@ -283,16 +305,22 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
       setOrders((all) => all!.map((o) => (o.uid === order.uid && o.id === order.id ? next : o)))
       setOpen(next)
       setIsApproving(false)
-      setNotice('Horário reservado ✓ Agora envie a confirmação pelo WhatsApp.')
+      saveNotice.show({
+        kind: 'ok',
+        text: 'Horário reservado. Agora envie a confirmação pelo WhatsApp.',
+      })
     } catch {
-      setNotice('Não deu para salvar. Confira a internet e tente de novo.')
+      saveNotice.show({
+        kind: 'error',
+        text: 'Não deu para salvar. Confira a internet e tente de novo.',
+      })
     } finally {
       setIsSaving(false)
     }
   }
 
   async function cancelOrder(order: SessionOrder) {
-    await change(order, { status: 'cancel', cancelledAt: Date.now() }, 'Pedido cancelado ✓')
+    await change(order, { status: 'cancel', cancelledAt: Date.now() }, 'Pedido cancelado')
     if (availability.booked.some((b) => b.orderId === order.id)) {
       const nextAv = releaseBooking(availability, order.id)
       await backend.saveAvailability(nextAv).catch(() => {})
@@ -463,7 +491,7 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
             type="button"
             disabled={isSaving}
             onClick={() =>
-              void change(open, { status: 'done', doneAt: Date.now() }, 'Marcado como realizado ✓')
+              void change(open, { status: 'done', doneAt: Date.now() }, 'Marcado como realizado')
             }
             className={ghostButton}
           >
@@ -526,13 +554,8 @@ export function OrdersPanel({ backend, isWide }: { backend: AtivacoesBackend; is
         </div>
         {info}
         {actions}
-        {notice && (
-          <p
-            role="status"
-            className={`text-sm ${notice.endsWith('✓') ? 'text-ok' : 'text-accent'}`}
-          >
-            {notice}
-          </p>
+        {saveNotice.notice && (
+          <SaveStatus notice={saveNotice.notice} isVisible={saveNotice.isVisible} />
         )}
         {cancelControl}
         {open.status !== 'cancel' && open.paymentRef && !isTestOrder(open) && (

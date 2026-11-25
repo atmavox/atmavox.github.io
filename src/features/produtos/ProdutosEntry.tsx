@@ -24,7 +24,7 @@ import {
 } from './infrastructure/ativacoesBackend'
 import { AccessesApp } from './ui/AccessesApp'
 import { AtivacoesApp } from './ui/ativacoes/AtivacoesApp'
-import { sectionFromPath } from './ui/ativacoes/sections'
+import { orderIdFromPath, sectionFromPath } from './ui/ativacoes/sections'
 import { ProductsApp } from './ui/ProductsApp'
 
 /**
@@ -136,6 +136,7 @@ export function ProdutosEntry({
         <AtivacoesApp
           backend={ativacoes ?? createInMemoryAtivacoesBackend()}
           section={sectionFromPath(path)}
+          orderId={orderIdFromPath(path)}
         />
       ) : (
         <ProductsApp backend={backend ?? createInMemoryProductsBackend()} catalog={store} />

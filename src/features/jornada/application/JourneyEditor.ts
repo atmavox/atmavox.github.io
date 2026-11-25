@@ -63,10 +63,16 @@ export interface JourneyEditor {
   uploadImage(file: Blob): Promise<string | null>
 }
 
+/**
+ * Rascunho: o que está na tela ainda não foi salvo, ou o dia salvo ainda não está pronto. Os dias que
+ * nascem sozinhos (esqueleto de uma jornada nova, "novo dia") vão direto para o rascunho salvo, mas
+ * vazios: ficam como rascunho até a Andreía preencher e salvar (pedido de 2026-11-25).
+ */
 export function dayStatus(state: EditorState, dayNumber: number): DayStatus {
   const working = findDay(state.working, dayNumber)
   const saved = findDay(state.saved, dayNumber)
   if (!sameDay(working, saved)) return 'draft'
+  if (saved && dayProblems(saved).length > 0) return 'draft'
   return sameDay(saved, findDay(state.published, dayNumber)) ? 'published' : 'saved'
 }
 
@@ -74,16 +80,13 @@ export function draftDayCount(state: EditorState): number {
   return allDays(state.working).filter((day) => dayStatus(state, day.number) === 'draft').length
 }
 
-/** Pode publicar: nenhum dia em rascunho, nenhum problema e algo diferente do que está no ar. */
+/** Pode publicar: nenhum dia em rascunho (inclui os incompletos) e algo diferente do que está no ar. */
 export function publishBlocker(state: EditorState): string | null {
   const drafts = draftDayCount(state)
   if (drafts > 0) {
     return drafts === 1
       ? 'Falta salvar 1 dia em rascunho.'
       : `Faltam salvar ${drafts} dias em rascunho.`
-  }
-  if (allDays(state.saved).some((day) => dayProblems(day).length > 0)) {
-    return 'Há dias com campos para completar.'
   }
   if (JSON.stringify(state.saved) === JSON.stringify(state.published)) {
     return 'Tudo o que está salvo já está publicado.'

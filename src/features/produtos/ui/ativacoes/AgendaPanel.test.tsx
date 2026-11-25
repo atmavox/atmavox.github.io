@@ -126,3 +126,93 @@ describe('Modo Andreía · agenda no celular', () => {
     })
   })
 })
+
+describe('Modo Andreía · reservas na agenda', () => {
+  const reservada = {
+    id: 'A7KX2Q',
+    uid: 'u1',
+    status: 'sched' as const,
+    createdAt: 0,
+    therapyId: 'reiki-a-distancia',
+    therapyName: 'Reiki a distância',
+    durationMin: 50,
+    priceCents: 12000,
+    preference: { date: '2026-12-02', start: '17:00' },
+    extra: {},
+    name: 'Mariana Souza',
+    phone: '(41) 9 9876-5432',
+    chargedCents: 12000,
+    paidAt: 1,
+    requestedAt: 1,
+    scheduledAt: 2,
+    doneAt: null,
+    cancelledAt: null,
+    paymentRef: 'pg1',
+    scheduled: { date: '2026-12-02', start: '17:00', end: '19:50' },
+    proposed: null,
+    proposedAt: null,
+  }
+  const comReserva = () =>
+    createInMemoryAtivacoesBackend({
+      therapies: priced,
+      availability: {
+        windows: [quarta],
+        booked: [{ date: '2026-12-02', start: '17:00', end: '19:50', orderId: 'A7KX2Q' }],
+      },
+      orders: [reservada],
+    })
+
+  it('o reservado sai do livre: sobra só o filete de minutos livres', async () => {
+    setWideViewport(true)
+    render(<AtivacoesApp backend={comReserva()} section="agenda" />)
+    expect(
+      await screen.findByRole('button', { name: 'Livre Quarta, 2 de dezembro, 19h50 às 20h' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Livre Quarta, 2 de dezembro, 17h às 20h' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('clicar no reservado mostra de quem é e leva ao pedido', async () => {
+    setWideViewport(true)
+    render(<AtivacoesApp backend={comReserva()} section="agenda" />)
+    fireEvent.click(await screen.findByRole('button', { name: /^Reservado: Mariana Souza/ }))
+    const ficha = screen.getByRole('dialog', { name: 'Horário reservado' })
+    expect(within(ficha).getByText('Reiki a distância')).toBeInTheDocument()
+    expect(within(ficha).getByText('Confirmado pela pessoa')).toBeInTheDocument()
+    expect(within(ficha).getByRole('link', { name: 'Abrir o pedido' })).toHaveAttribute(
+      'href',
+      '#/admin/ativacoes/pedidos/A7KX2Q',
+    )
+  })
+
+  it('no celular, a faixa lista as reservas e o que ainda está livre', async () => {
+    render(<AtivacoesApp backend={comReserva()} section="agenda" />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Quarta, 2 de dezembro' }))
+    expect(await screen.findByText('Livre ainda: 19h50–20h')).toBeInTheDocument()
+    expect(screen.getByText(/Mariana Souza/)).toBeInTheDocument()
+  })
+})
+
+describe('Modo Andreía · balão de horário novo', () => {
+  it('clicar fora do balão (ou no X do canto) fecha sem salvar', async () => {
+    setWideViewport(true)
+    const backend = createInMemoryAtivacoesBackend({ therapies: priced })
+    render(<AtivacoesApp backend={backend} section="agenda" />)
+    const column = await screen.findByTestId('dia-2026-12-02')
+    fireEvent.pointerDown(column, { clientY: 782, pointerId: 1 })
+    fireEvent.pointerUp(column, { clientY: 782, pointerId: 1 })
+    const popover = screen.getByRole('dialog', { name: 'Novo horário livre' })
+    fireEvent.pointerDown(popover)
+    expect(screen.getByRole('dialog', { name: 'Novo horário livre' })).toBeInTheDocument()
+
+    fireEvent.pointerDown(document.body)
+    expect(screen.queryByRole('dialog', { name: 'Novo horário livre' })).not.toBeInTheDocument()
+    expect(backend.availability.windows).toEqual([])
+
+    fireEvent.pointerDown(column, { clientY: 782, pointerId: 1 })
+    fireEvent.pointerUp(column, { clientY: 782, pointerId: 1 })
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+    expect(screen.queryByRole('dialog', { name: 'Novo horário livre' })).not.toBeInTheDocument()
+  })
+})

@@ -6,8 +6,8 @@ import { readFirebaseConfig } from '../../../shared/firebase/config'
 import { LoadingNote } from '../../../shared/ui/LoadingNote'
 import { TherapyBadge } from '../../../shared/ui/TherapyIcon'
 import { Portrait } from '../components/Portrait'
-import { SocialIcon } from '../components/SocialIcon'
-import { activationsIntro as copy, contactCta } from '../content'
+import { WhatsAppDoubtCard } from '../components/WhatsAppDoubtCard'
+import { activationsIntro as copy } from '../content'
 import {
   createInMemoryAtivacaoSource,
   createRestAtivacaoSource,
@@ -109,28 +109,7 @@ function Steps({ layout }: { layout: Layout }) {
   )
 }
 
-function WhatsAppCard() {
-  return (
-    <div className="flex flex-wrap items-center gap-4 rounded-[18px] border border-line bg-surface px-5 py-4">
-      <span className="text-ink-muted">
-        <SocialIcon id="whatsapp" size={26} />
-      </span>
-      <span className="min-w-0 flex-1">
-        <b className="block font-display text-lg font-medium text-ink">Ficou com alguma dúvida?</b>
-        <span className="text-sm text-ink-faint">Fale direto com a Andreía antes de agendar.</span>
-      </span>
-      <a
-        href={contactCta.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex min-h-10 items-center gap-2 rounded-full border border-line px-4 text-sm font-medium text-ink transition-colors hover:border-accent"
-      >
-        <SocialIcon id="whatsapp" size={16} />
-        Chamar no WhatsApp
-      </a>
-    </div>
-  )
-}
+const whatsAppCard = <WhatsAppDoubtCard note="Fale direto com a Andreía antes de agendar." />
 
 function TherapyList({ therapies, layout }: { therapies: Therapy[] | null; layout: Layout }) {
   if (!therapies) return <LoadingNote className="text-ink-muted" />
@@ -225,7 +204,7 @@ export default function ActivationsHub({
           </h2>
           <Steps layout="narrow" />
         </section>
-        <WhatsAppCard />
+        {whatsAppCard}
       </div>
     )
   }
@@ -268,9 +247,7 @@ export default function ActivationsHub({
             </h2>
             <Steps layout="wide" />
           </div>
-          <div className="lg:pt-14">
-            <WhatsAppCard />
-          </div>
+          <div className="lg:pt-14">{whatsAppCard}</div>
         </section>
       </div>
     </div>

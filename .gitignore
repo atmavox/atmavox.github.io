@@ -29,3 +29,6 @@ public/social/
 
 # Capturas de tela do desenvolvedor (podem ter dados de contas e chaves de teste)
 .ai/img*
+
+# Capturas de tela coladas para o Claude ver o que foi testado
+.ai/test_screenshots/

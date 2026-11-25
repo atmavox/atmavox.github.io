@@ -26,6 +26,8 @@ import { UiIcon } from '../../../../shared/ui/UiIcon'
 import type { AtivacoesBackend } from '../../infrastructure/ativacoesBackend'
 import { Field } from '../fields'
 import { adminButton, ghostButton, inputClass } from '../styles'
+import { SaveStatus } from '../SaveStatus'
+import { useSaveNotice } from '../useSaveNotice'
 import { Switch } from './TherapyFields'
 import { LoadingNote } from '../../../../shared/ui/LoadingNote'
 
@@ -198,7 +200,7 @@ export function AnamnesisPanel({
   const [openSection, setOpenSection] = useState<string | null>(null)
   const [editing, setEditing] = useState<string | null>(null)
   const [errors, setErrors] = useState<AnamnesisErrors>({})
-  const [notice, setNotice] = useState<string | null>(null)
+  const saveNotice = useSaveNotice()
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
@@ -230,7 +232,7 @@ export function AnamnesisPanel({
   const isDirty = isFromModel || JSON.stringify(form) !== JSON.stringify(saved)
   const change = (next: AnamnesisForm) => {
     setForm(next)
-    setNotice(null)
+    saveNotice.hide()
   }
 
   async function save() {
@@ -238,7 +240,10 @@ export function AnamnesisPanel({
     const found = validateAnamnesis(form)
     setErrors(found)
     if (Object.keys(found).length) {
-      setNotice('Faltam alguns campos. Confira as mensagens em vermelho.')
+      saveNotice.show({
+        kind: 'error',
+        text: 'Faltam alguns campos. Confira as mensagens em vermelho.',
+      })
       const sectionWithError = form.sections.find(
         (s) => found[s.id] || s.questions.some((q) => found[q.id]),
       )
@@ -252,9 +257,12 @@ export function AnamnesisPanel({
       setSaved(clean)
       setForm(clean)
       setIsFromModel(false)
-      setNotice('Salvo ✓')
+      saveNotice.show({ kind: 'ok', text: 'Salvo' })
     } catch {
-      setNotice('Não deu para salvar. Confira a internet e tente de novo.')
+      saveNotice.show({
+        kind: 'error',
+        text: 'Não deu para salvar. Confira a internet e tente de novo.',
+      })
     } finally {
       setIsSaving(false)
     }
@@ -285,11 +293,6 @@ export function AnamnesisPanel({
         O que a pessoa responde antes de escolher a terapia. Pergunta que já tem respostas não se
         apaga: sai do formulário e fica guardada no fim da página.
       </p>
-      {isFromModel && (
-        <p className="rounded-2xl bg-admin/8 px-4 py-3 text-sm text-ink-muted">
-          Este é o modelo aprovado no mock, ainda não salvo. Ajuste o que quiser e salve.
-        </p>
-      )}
 
       {form.sections.map((section, sectionIndex) => {
         const isOpen = openSection === section.id
@@ -488,16 +491,16 @@ export function AnamnesisPanel({
           isWide ? 'bottom-4' : 'bottom-[76px]'
         }`}
       >
-        {notice && (
-          <p
-            role="status"
-            className={`mr-auto text-sm ${notice.endsWith('✓') ? 'text-ok' : 'text-accent'}`}
-          >
-            {notice}
-          </p>
-        )}
-        {!notice && isDirty && (
-          <span className="mr-auto text-sm text-draft">Alterações não salvas</span>
+        {/* O erro fica até a próxima mudança; o "Salvo" esmaece no lugar enquanto nada mudou. */}
+        {saveNotice.notice &&
+        (saveNotice.notice.kind === 'error' ? saveNotice.isVisible : !isDirty) ? (
+          <SaveStatus
+            notice={saveNotice.notice}
+            isVisible={saveNotice.isVisible}
+            className="mr-auto"
+          />
+        ) : (
+          isDirty && <span className="mr-auto text-sm text-draft">Alterações não salvas</span>
         )}
         {isDirty && !isFromModel && (
           <button
@@ -506,7 +509,7 @@ export function AnamnesisPanel({
               setForm(saved)
               setErrors({})
               setEditing(null)
-              setNotice(null)
+              saveNotice.hide()
             }}
             className={ghostButton}
           >

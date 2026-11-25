@@ -2,6 +2,7 @@ import { DEFAULT_THERAPIES } from '../../../shared/ativacao/therapy'
 import { TherapyBadge } from '../../../shared/ui/TherapyIcon'
 import { contactCta } from '../content'
 import { SocialIcon } from './SocialIcon'
+import { WhatsAppDoubtCard } from './WhatsAppDoubtCard'
 
 /**
  * Contato (mock aprovado, C): a ativação individual em destaque e a dúvida pelo WhatsApp ao lado.
@@ -68,24 +69,7 @@ export function ActivationCards({ layout }: { layout: 'wide' | 'narrow' }) {
       </div>
     </div>
   ) : (
-    <div className="flex items-center gap-3 rounded-[18px] border border-line bg-surface px-4 py-3.5">
-      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-surface-2 text-ink">
-        <SocialIcon id="whatsapp" size={19} />
-      </span>
-      <span className="min-w-0 flex-1">
-        <b className="block text-sm font-semibold text-ink">Ficou com alguma dúvida?</b>
-        <span className="text-[13px] text-ink-faint">Fale direto com a Andreía.</span>
-      </span>
-      <a
-        href={contactCta.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line px-3.5 text-sm font-medium text-ink"
-      >
-        <SocialIcon id="whatsapp" size={15} />
-        Chamar
-      </a>
-    </div>
+    <WhatsAppDoubtCard note="Fale direto com a Andreía." />
   )
 
   return isWide ? (

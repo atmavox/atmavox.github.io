@@ -11,6 +11,8 @@ import {
 import { UiIcon } from '../../../../shared/ui/UiIcon'
 import type { AtivacoesBackend } from '../../infrastructure/ativacoesBackend'
 import { adminButton, ghostButton, inputClass } from '../styles'
+import { SaveStatus } from '../SaveStatus'
+import { useSaveNotice } from '../useSaveNotice'
 import { LoadingNote } from '../../../../shared/ui/LoadingNote'
 
 /** Como cada mensagem fica, com um pedido de exemplo. */
@@ -32,7 +34,7 @@ export function MessagesPanel({ backend, isWide }: { backend: AtivacoesBackend; 
   const [saved, setSaved] = useState<Messages | null>(null)
   const [messages, setMessages] = useState<Messages | null>(null)
   const [selected, setSelected] = useState<MessageKey>('approved')
-  const [notice, setNotice] = useState<string | null>(null)
+  const saveNotice = useSaveNotice()
   const [isSaving, setIsSaving] = useState(false)
   const textRef = useRef<HTMLTextAreaElement>(null)
 
@@ -56,7 +58,7 @@ export function MessagesPanel({ backend, isWide }: { backend: AtivacoesBackend; 
   const isDirty = JSON.stringify(messages) !== JSON.stringify(saved)
   const set = (key: MessageKey, text: string) => {
     setMessages({ ...messages, [key]: text })
-    setNotice(null)
+    saveNotice.hide()
   }
 
   /** Põe o campo onde está o cursor. */
@@ -77,9 +79,12 @@ export function MessagesPanel({ backend, isWide }: { backend: AtivacoesBackend; 
     try {
       await backend.saveMessages(messages!)
       setSaved(messages)
-      setNotice('Salvo ✓')
+      saveNotice.show({ kind: 'ok', text: 'Salvo' })
     } catch {
-      setNotice('Não deu para salvar. Confira a internet e tente de novo.')
+      saveNotice.show({
+        kind: 'error',
+        text: 'Não deu para salvar. Confira a internet e tente de novo.',
+      })
     } finally {
       setIsSaving(false)
     }
@@ -134,13 +139,14 @@ export function MessagesPanel({ backend, isWide }: { backend: AtivacoesBackend; 
         isWide ? 'bottom-4' : 'bottom-[76px]'
       }`}
     >
-      {notice ? (
-        <p
-          role="status"
-          className={`mr-auto text-sm ${notice.endsWith('✓') ? 'text-ok' : 'text-accent'}`}
-        >
-          {notice}
-        </p>
+      {/* O erro fica até a próxima mudança; o "Salvo" esmaece no lugar enquanto nada mudou. */}
+      {saveNotice.notice &&
+      (saveNotice.notice.kind === 'error' ? saveNotice.isVisible : !isDirty) ? (
+        <SaveStatus
+          notice={saveNotice.notice}
+          isVisible={saveNotice.isVisible}
+          className="mr-auto"
+        />
       ) : (
         isDirty && <span className="mr-auto text-sm text-draft">Alterações não salvas</span>
       )}

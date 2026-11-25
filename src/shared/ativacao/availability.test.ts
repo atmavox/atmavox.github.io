@@ -4,6 +4,7 @@ import {
   bookSlot,
   releaseBooking,
   EMPTY_AVAILABILITY,
+  freeParts,
   isDate,
   localDate,
   longDate,
@@ -100,6 +101,28 @@ describe('horários de início', () => {
       { date: '2026-12-09', starts: ['17:00', '18:00', '19:00'] },
     ])
     expect(slotsFor(agenda, reprog, '2026-12-01', '2026-12-10')).toEqual([])
+  })
+
+  it('o reservado sai do livre: sobra só o pedaço que ninguém reservou', () => {
+    const faixa = { start: '15:00', end: '17:00' }
+    expect(freeParts(faixa, [{ start: '15:00', end: '16:50' }])).toEqual([
+      { start: '16:50', end: '17:00' },
+    ])
+    expect(freeParts(faixa, [{ start: '15:30', end: '16:00' }])).toEqual([
+      { start: '15:00', end: '15:30' },
+      { start: '16:00', end: '17:00' },
+    ])
+    expect(freeParts(faixa, [{ start: '14:00', end: '18:00' }])).toEqual([])
+    expect(freeParts(faixa, [{ start: '18:00', end: '19:00' }])).toEqual([faixa])
+    expect(
+      freeParts(faixa, [
+        { start: '16:00', end: '16:50' },
+        { start: '15:00', end: '15:50' },
+      ]),
+    ).toEqual([
+      { start: '15:50', end: '16:00' },
+      { start: '16:50', end: '17:00' },
+    ])
   })
 
   it('aprovado num dia só tira daquele dia', () => {

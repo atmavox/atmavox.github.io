@@ -110,13 +110,21 @@ function AnamnesisDialog({
     <div
       className={`fixed inset-0 z-40 ${isClosing ? CLOSING_BACKDROP : 'animate-[fade-in_250ms_ease-out]'} bg-black/45 ${isWide ? 'grid place-items-center p-6' : ''}`}
     >
+      {/* O fundo fecha a janela (clicar fora); o botão "Fechar" é o caminho acessível. */}
+      <button
+        type="button"
+        aria-hidden="true"
+        tabIndex={-1}
+        onClick={requestClose}
+        className="absolute inset-0 cursor-default"
+      />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         className={`flex flex-col gap-4 overflow-y-auto border border-line bg-surface p-6 ${
           isWide
-            ? `max-h-[88dvh] w-full max-w-[560px] ${isClosing ? CLOSING_DIALOG : 'animate-[dialog-in_320ms_ease-out]'} rounded-3xl`
+            ? `relative max-h-[88dvh] w-full max-w-[560px] ${isClosing ? CLOSING_DIALOG : 'animate-[dialog-in_320ms_ease-out]'} rounded-3xl`
             : `absolute inset-x-0 bottom-0 max-h-[88dvh] ${isClosing ? CLOSING_SHEET : 'animate-[sheet-up_360ms_ease-out]'} rounded-t-[26px]`
         }`}
       >

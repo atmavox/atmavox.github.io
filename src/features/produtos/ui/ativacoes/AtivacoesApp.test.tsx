@@ -66,8 +66,8 @@ describe('Modo Andreía · terapias', () => {
     expect(screen.getByRole('status')).toBe(status)
     await act(async () => finishSave())
     expect(status).toHaveTextContent('Salvo')
-    // O sinal de salvo é o ícone do projeto, não um caractere ✓.
-    expect(status.textContent).not.toContain('✓')
+    // O sinal de salvo é o ícone do projeto, não o caractere de check.
+    expect(status.textContent).not.toContain(String.fromCharCode(0x2713))
     expect(status.querySelector('svg')).not.toBeNull()
 
     fireEvent.click(reiki)
@@ -133,14 +133,16 @@ describe('Modo Andreía · anamnese', () => {
     setWideViewport(true)
     const backend = createInMemoryAtivacoesBackend()
     render(<AtivacoesApp backend={backend} section="anamnese" />)
-    expect(await screen.findByText(/modelo aprovado no mock/)).toBeInTheDocument()
+    // O modelo do código abre sem aviso (a frase saiu a pedido em 2026-11-25).
+    await screen.findByRole('button', { name: /Cidade onde você mora/ })
+    expect(screen.queryByText(/modelo aprovado no mock/)).not.toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /Cidade onde você mora/ }))
     fireEvent.change(screen.getByLabelText('Pergunta'), {
       target: { value: 'Em que cidade você mora?' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
-    expect(await screen.findByText('Salvo ✓')).toBeInTheDocument()
+    expect(await screen.findByText('Salvo')).toBeInTheDocument()
     const saved = backend.anamnesis?.sections[0]?.questions.find((q) => q.id === 'cidade')
     expect(saved?.label).toBe('Em que cidade você mora?')
   })
@@ -167,7 +169,7 @@ describe('Modo Andreía · anamnese', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Tirar do formulário' }))
     expect(screen.getByText('Perguntas guardadas (1)')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
-    expect(await screen.findByText('Salvo ✓')).toBeInTheDocument()
+    expect(await screen.findByText('Salvo')).toBeInTheDocument()
     expect(backend.anamnesis?.archived.map((q) => q.id)).toEqual(['cidade'])
   })
 

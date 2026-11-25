@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 // Regra de conventions.md: sem emoji no site (cada aparelho desenha de um jeito e foge da marca).
-// Sinais tipográficos da marca continuam valendo.
-const ALLOWED = new Set(['✦', '✓', '✕', '↗', '←', '→', '↑', '↓', '·', '©'])
+// Sinais tipográficos da marca continuam valendo; o check de texto não (o sinal de feito é o ícone "check" do UiIcon).
+const ALLOWED = new Set(['✦', '✕', '↗', '←', '→', '↑', '↓', '·', '©'])
 
 const sources = import.meta.glob<string>('/src/**/*.{ts,tsx,css}', {
   query: '?raw',

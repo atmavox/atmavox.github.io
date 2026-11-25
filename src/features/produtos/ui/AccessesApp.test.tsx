@@ -89,7 +89,7 @@ describe('tela de Acessos', () => {
       target: { value: 'ana@exemplo.com' },
     })
     fireEvent.blur(screen.getByLabelText('E-mail da pessoa'))
-    expect(await screen.findByText('✓ Ana Lima tem conta no site.')).toBeInTheDocument()
+    expect(await screen.findByText('Ana Lima tem conta no site.')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('Prazo'), { target: { value: 'sempre' } })
     fireEvent.click(screen.getByRole('button', { name: 'Liberar' }))
 

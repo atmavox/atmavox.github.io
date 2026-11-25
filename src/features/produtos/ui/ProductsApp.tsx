@@ -28,6 +28,8 @@ import { useTerritories } from '../../../shared/catalog/TerritoryContext'
 import { ProductEditor, type EditorPart } from './ProductEditor'
 import type { CreateTerritory } from './TerritoryPicker'
 import { ProductPreview } from './ProductPreview'
+import { SaveStatus } from './SaveStatus'
+import { useSaveNotice } from './useSaveNotice'
 
 type Filter = 'todos' | 'journey' | 'meditation'
 const STATUS_LABEL = { draft: 'Rascunho', soon: 'Em breve', published: 'Publicada' } as const
@@ -133,12 +135,20 @@ function PreviewDialog({
 
   return createPortal(
     <div className="fixed inset-0 z-40 grid animate-[fade-in_250ms_ease-out] place-items-center bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.4))] p-6">
+      {/* O fundo fecha a janela (clicar fora); "Voltar" é o caminho acessível. */}
+      <button
+        type="button"
+        aria-hidden="true"
+        tabIndex={-1}
+        onClick={onBack}
+        className="absolute inset-0 cursor-default"
+      />
       <div
         ref={ref}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="flex max-h-[90dvh] w-full max-w-[520px] animate-[dialog-in_320ms_ease-out] flex-col gap-3.5 overflow-y-auto rounded-3xl border border-line bg-bg p-6 shadow-[0_30px_80px_rgb(20_14_10/0.35)]"
+        className="relative flex max-h-[90dvh] w-full max-w-[520px] animate-[dialog-in_320ms_ease-out] flex-col gap-3.5 overflow-y-auto rounded-3xl border border-line bg-bg p-6 shadow-[0_30px_80px_rgb(20_14_10/0.35)]"
       >
         <h2 id={titleId} className="font-display text-2xl text-ink">
           Como fica no hub
@@ -176,7 +186,7 @@ export function ProductsApp({
   const [isNew, setIsNew] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSaving, setIsSaving] = useState(false)
-  const [notice, setNotice] = useState<string | null>(null)
+  const saveNotice = useSaveNotice()
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [step, setStep] = useState(0)
   const [bannerState, setBannerState] = useState<'idle' | 'sending' | 'error'>('idle')
@@ -202,7 +212,7 @@ export function ProductsApp({
   const steps = STEPS.filter((s) => s.id !== 'tipo' || isNew)
 
   async function open(product: Product) {
-    setNotice(null)
+    saveNotice.hide()
     setIsConfirmingDelete(false)
     setErrors({})
     setIsNew(false)
@@ -218,7 +228,7 @@ export function ProductsApp({
   }
 
   function create() {
-    setNotice(null)
+    saveNotice.hide()
     setErrors({})
     setIsNew(true)
     setStep(0)
@@ -228,17 +238,20 @@ export function ProductsApp({
   async function save() {
     if (!form) return
     setIsSaving(true)
-    setNotice(null)
+    saveNotice.hide()
     const result = await saveProduct(form, products, backend)
     setIsSaving(false)
     if (result.kind === 'invalid') {
       setErrors(result.errors)
       setIsPreviewOpen(false)
-      setNotice(result.errors.status ?? 'Faltam alguns campos. Confira as mensagens em vermelho.')
+      saveNotice.show({
+        kind: 'error',
+        text: result.errors.status ?? 'Faltam alguns campos. Confira as mensagens em vermelho.',
+      })
       return
     }
     if (result.kind === 'error') {
-      setNotice(result.message)
+      saveNotice.show({ kind: 'error', text: result.message })
       return
     }
     catalog?.replace(result.catalog)
@@ -249,7 +262,7 @@ export function ProductsApp({
     // O formulário continua aberto, agora com o id definitivo (um produto novo ganha o id ao salvar).
     setForm({ ...form, id: result.product.id })
     setStep(0)
-    setNotice('Salvo ✓')
+    saveNotice.show({ kind: 'ok', text: 'Salvo' })
   }
 
   const patch = (change: Partial<ProductForm>) => setForm((f) => (f ? { ...f, ...change } : f))
@@ -273,13 +286,13 @@ export function ProductsApp({
     setIsSaving(false)
     setIsConfirmingDelete(false)
     if (result.kind === 'error') {
-      setNotice(result.message)
+      saveNotice.show({ kind: 'error', text: result.message })
       return
     }
     catalog?.replace(result.catalog)
     setProducts(result.catalog)
     setForm(null)
-    setNotice(`"${savedProduct.title}" foi apagado.`)
+    saveNotice.show({ kind: 'ok', text: `"${savedProduct.title}" foi apagado.` })
   }
 
   const deleteControl =
@@ -354,13 +367,8 @@ export function ProductsApp({
     </div>
   )
 
-  const noticeLine = notice && (
-    <p
-      role="status"
-      className={`text-sm ${notice.startsWith('Salvo') ? 'text-ok' : 'text-accent'}`}
-    >
-      {notice}
-    </p>
+  const noticeLine = saveNotice.notice && (
+    <SaveStatus notice={saveNotice.notice} isVisible={saveNotice.isVisible} />
   )
 
   // Os dias (ou temas) de uma jornada se editam no editor da jornada, já montado pela estrutura.
@@ -478,7 +486,7 @@ export function ProductsApp({
       <button
         type="button"
         onClick={() => setForm(null)}
-        className="inline-flex items-center gap-1.5 self-start text-ink-muted"
+        className="-ml-1 inline-flex items-center gap-1.5 self-start rounded-full border border-line py-1 pr-3.5 pl-2 text-sm text-ink-muted transition-[color,background-color,border-color,transform] duration-200 hover:border-admin-ink/60 hover:bg-admin/8 hover:text-admin-ink active:scale-[0.97] motion-reduce:transition-none"
       >
         <ArrowLeft aria-hidden size={16} />
         Produtos

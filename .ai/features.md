@@ -280,7 +280,8 @@ Editar a jornada →" e o mesmo atalho no menu da conta. Qualquer outra pessoa q
 
 - **Três versões** (ADR-015): edições não salvas (no aparelho dela), rascunho salvo (`drafts/{id}`) e
   publicada (`published/{id}`, o que as participantes veem). Estado de cada dia: Rascunho (laranja),
-  Salvo · falta publicar, Salvo (verde).
+  Salvo · falta publicar, Salvo (verde). Dia criado sozinho (esqueleto de jornada nova, "novo dia") ou
+  ainda incompleto conta como Rascunho; dia sem nenhum bloco (fora as revisões) não salva (1.33.0).
 - **"Salvar dia"** grava o dia no rascunho; só libera sem problemas (título, textos, links `https://`,
   imagem escolhida e descrita). **"Descartar alterações"** volta ao salvo.
 - **"Publicar jornada"** fica só no quadro de todos os dias, pede confirmação e só libera sem nenhum dia
@@ -520,13 +521,19 @@ as áreas do Modo Andreía nas abas de baixo e as seções numa linha no topo.
 - **Pedidos** ✅ (aprovar o horário: reserva de 24 h, link de confirmação, reserva vencida volta para a agenda): quadro por status no computador, lista por dia no celular; o pedido abre numa
   janela (dados fixos à esquerda, só a anamnese rola) ou numa folha. "Aprovar" e "Sugerir outro
   horário" abrem o WhatsApp com a mensagem pronta.
-- **Agenda** ✅: grade da semana das 7h às 22h (arrastar marca uma faixa livre, de meia em meia hora;
+- **Agenda** ✅: grade da semana do dia inteiro (arrastar marca uma faixa livre, de meia em meia hora;
   um clique marca uma hora; o balão escolhe as terapias e "repetir toda semana"; o "+" abre o
   formulário completo); vista do mês com as faixas de cada dia (clicar abre a semana); no celular, a
   faixa da semana e o dia com "toque para marcar livre". Formulário: dia, das/até, terapias, repetir
   (só este dia ou toda semana) e até quando, com os horários de início que a pessoa vai ver (duração +
   10 min de intervalo). Clicar numa faixa: mudar, tirar só este dia ou tirar todas as semanas. Faixas
   do mesmo dia não podem se encostar; nenhuma terapia escolhida que não caiba no período.
+  **Reservas na agenda (1.33.0):** o horário reservado sai do livre (sobrando poucos minutos, fica um
+  filete que ainda abre a faixa). No computador, passar o mouse na reserva mostra quem é, a terapia, o
+  horário e a situação (esperando a pessoa confirmar, confirmado); clicar abre a ficha com celular,
+  WhatsApp e "Abrir o pedido" (`#/admin/ativacoes/pedidos/{id}` abre Pedidos já com ele). No mês,
+  "N reservados" no dia; no celular, as reservas embaixo da faixa e "Livre ainda: …". A grade abre das
+  11h às 22h; o balão de horário novo fica por cima de tudo, sem ser cortado pela grade nem pela tela.
 - **Mensagens** ✅: os textos prontos do WhatsApp com campos ({nome}, {data}, {link}…) e prévia.
 
 **Critérios de aceite do passo 1:** terapias e anamnese salvam em `catalog/therapies` e

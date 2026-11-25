@@ -1,6 +1,6 @@
 /**
  * A marca do Modo Andreía: uma tag pequena no canto da faixa azul, com uma linha bem pequena ao lado
- * dizendo que é a área da admin. Igual no site e nas telas de edição.
+ * (só do tablet para cima) dizendo que é a área da admin. Igual no site e nas telas de edição.
  */
 export function AdminTag({ note = 'área da admin' }: { note?: string }) {
   return (
@@ -8,7 +8,8 @@ export function AdminTag({ note = 'área da admin' }: { note?: string }) {
       <b className="shrink-0 rounded-full bg-on-admin/18 px-2.5 py-0.5 text-[11px] font-semibold tracking-[0.08em] uppercase">
         Modo Andreía
       </b>
-      <span className="truncate text-[11px] text-on-admin/70">{note}</span>
+      {/* No celular a linha não cabe (cortada, ninguém lê): fica só a tag (pedido de 2026-11-25). */}
+      <span className="hidden truncate text-[11px] text-on-admin/70 sm:block">{note}</span>
     </span>
   )
 }

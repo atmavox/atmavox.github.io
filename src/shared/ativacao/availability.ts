@@ -223,6 +223,31 @@ export function startTimes(
   return starts
 }
 
+export interface TimeRange {
+  start: string
+  end: string
+}
+
+/**
+ * O que sobra livre de uma faixa depois de tirar os horários reservados (para a agenda da Andreía):
+ * uma faixa das 15h às 17h com reserva das 15h às 16h50 vira só 16h50–17h.
+ */
+export function freeParts(window: TimeRange, booked: readonly TimeRange[]): TimeRange[] {
+  const busy = booked
+    .map((b) => [toMinutes(b.start), toMinutes(b.end)] as const)
+    .sort((a, b) => a[0] - b[0])
+  const parts: TimeRange[] = []
+  let cursor = toMinutes(window.start)
+  const end = toMinutes(window.end)
+  for (const [from, to] of busy) {
+    if (to <= cursor || from >= end) continue
+    if (from > cursor) parts.push({ start: fromMinutes(cursor), end: fromMinutes(from) })
+    cursor = Math.max(cursor, to)
+  }
+  if (cursor < end) parts.push({ start: fromMinutes(cursor), end: fromMinutes(end) })
+  return parts
+}
+
 /** Para a pessoa: os dias (de `from` a `to`) com horários de início daquela terapia. */
 export function slotsFor(
   availability: Availability,

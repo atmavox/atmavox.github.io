@@ -266,7 +266,8 @@ export function EditorOverview({ editor, state, onOpenDay, onPublish, onAddDay }
         <div>
           <a
             href="#/admin/produtos"
-            className="mb-1.5 inline-flex items-center gap-1 text-sm text-ink-muted hover:text-admin-ink"
+            // Com cara de botão: contorno, fundo no hover e um leve afundar ao tocar (pedido de 2026-11-25).
+            className="mb-2 -ml-1 inline-flex items-center gap-1 rounded-full border border-line py-1 pr-3.5 pl-2 text-sm text-ink-muted transition-[color,background-color,border-color,transform] duration-200 hover:border-admin-ink/60 hover:bg-admin/8 hover:text-admin-ink active:scale-[0.97] motion-reduce:transition-none"
           >
             <EditorIcon name="back" size={16} />
             Produtos

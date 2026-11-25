@@ -34,7 +34,7 @@ describe('Modo Andreía de produtos no computador', () => {
     expect(within(preview).getAllByText('R$ 97').length).toBeGreaterThan(0)
     fireEvent.click(within(preview).getByRole('button', { name: 'Salvar' }))
 
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Salvo ✓'))
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Salvo'))
     expect(backend.free.get('chama-interna-21')).toBe(false)
     const saved = catalog.getSnapshot().find((p) => p.id === 'chama-interna-21')
     expect(saved?.pricing).toEqual({ type: 'paid', priceCents: 9700, accessMonths: 12 })
@@ -61,7 +61,7 @@ describe('Modo Andreía de produtos no computador', () => {
     fireEvent.change(screen.getByLabelText('Nome: Dia 12'), { target: { value: 'Raiz' } })
 
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Salvo ✓'))
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Salvo'))
     expect(catalog.getSnapshot().find((p) => p.id === 'florescer')).toMatchObject({
       structure: 'parts',
       dayCount: 21,

@@ -10,7 +10,7 @@ import { UiIcon } from '../../../../shared/ui/UiIcon'
 
 /**
  * Janela do Modo Andreía: no computador, no centro da tela; no celular, folha que sobe de baixo
- * (mock aprovado). Esc e o X fecham; o foco vai para o primeiro campo.
+ * (mock aprovado). Esc, o X e um clique fora da janela fecham; o foco vai para o primeiro campo.
  */
 export function Overlay({
   title,
@@ -30,6 +30,7 @@ export function Overlay({
 }) {
   const titleId = useId()
   const ref = useRef<HTMLDivElement>(null)
+  const pressedBackdrop = useRef(false)
   const { isClosing, requestClose } = useClosing(onClose)
   useEffect(() => {
     ref.current?.querySelector<HTMLElement>('input, textarea, button:not([data-close])')?.focus()
@@ -46,6 +47,16 @@ export function Overlay({
 
   return createPortal(
     <div
+      // Clique no fundo (fora da janela) fecha; arrastar de dentro para fora (selecionar texto) não.
+      // O fundo é só apresentação: pelo teclado, Esc fecha (acima).
+      role="presentation"
+      onPointerDown={(event) => {
+        pressedBackdrop.current = event.target === event.currentTarget
+      }}
+      onClick={(event) => {
+        if (pressedBackdrop.current && event.target === event.currentTarget) requestClose()
+        pressedBackdrop.current = false
+      }}
       className={`fixed inset-0 z-50 ${isClosing ? CLOSING_BACKDROP : 'animate-[fade-in_250ms_ease-out]'} bg-[color-mix(in_oklab,var(--bg)_35%,rgb(20_14_10/0.45))] ${
         isWide ? 'grid place-items-center p-6' : ''
       }`}

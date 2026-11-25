@@ -10,6 +10,37 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.33.0] · 2026-11-25
+
+### Adicionado
+
+- Modo Andreía · Agenda: o horário reservado sai do horário livre (sobra só o que ninguém reservou;
+  poucos minutos viram um filete). Passar o mouse numa reserva mostra quem é, a terapia, o horário e a
+  situação; clicar abre a ficha com celular, WhatsApp e "Abrir o pedido". O mês mostra quantos
+  horários estão reservados no dia, e o celular lista as reservas e o que ainda está livre.
+- Link direto para um pedido (`#/admin/ativacoes/pedidos/{id}`): Pedidos abre já com ele.
+
+### Alterado
+
+- Agenda no computador abre mostrando das 11h às 22h.
+- "Salvo" e os outros avisos de feito com o ícone do projeto e sumindo sozinhos também em Produtos,
+  Anamnese, Mensagens e Pedidos; Acessos e a prévia do produto usam o ícone no lugar do ✓. O teste de
+  emoji passa a barrar o ✓.
+- Celular: a etiqueta "Modo Andreía" aparece sozinha, sem a frase cortada ao lado.
+- Contato e hub Ativações: o cartão "Ficou com alguma dúvida?" no celular com o texto inteiro e o
+  botão "Chamar no WhatsApp" na largura toda, embaixo.
+- Clicar fora fecha também o balão de horário novo da agenda (e Esc), as janelas do Modo Andreía das
+  ativações, a prévia "Como fica no hub" e a janela da ativação no perfil. O X do balão fica pequeno,
+  no canto de cima.
+- Jornada nova: os dias e temas criados sozinhos começam como **Rascunho** (não "Salvo"); um dia sem
+  nenhum bloco não salva nem publica. O "novo dia" também nasce como rascunho.
+- Anamnese do Modo Andreía sem o aviso "Este é o modelo aprovado no mock…".
+- "← Produtos" no editor da jornada (e no produto, no celular) com cara de botão: contorno e hover.
+
+### Corrigido
+
+- O balão de "Novo horário livre" não é mais cortado pela grade nem pela borda da tela.
+
 ## [1.32.1] · 2026-11-24
 
 ### Alterado

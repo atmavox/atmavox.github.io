@@ -1,3 +1,4 @@
+import { UiIcon } from '../../../shared/ui/UiIcon'
 import { useCallback, useEffect, useState } from 'react'
 import type { Product } from '../../../shared/catalog/product'
 import { useAuthSession } from '../../../shared/auth/AuthContext'
@@ -231,8 +232,9 @@ export function AccessesApp({
         {person !== 'unknown' && (
           <p className="text-sm">
             {person ? (
-              <span className="font-semibold text-ok">
-                ✓ {person.name || person.email} tem conta no site.
+              <span className="inline-flex items-center gap-1.5 font-semibold text-ok">
+                <UiIcon name="check" size={15} />
+                {person.name || person.email} tem conta no site.
               </span>
             ) : (
               <span className="text-accent">

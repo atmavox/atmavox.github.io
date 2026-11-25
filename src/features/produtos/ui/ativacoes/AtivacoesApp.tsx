@@ -24,14 +24,17 @@ const SECTIONS: readonly { id: AtivacoesSection; label: string }[] = [
 export function AtivacoesApp({
   backend,
   section,
+  orderId = null,
 }: {
   backend: AtivacoesBackend
   section: AtivacoesSection
+  /** Pedido para abrir já na tela de pedidos (link da agenda). */
+  orderId?: string | null
 }) {
   const isWide = useMediaQuery('(min-width: 900px)')
   const panel =
     section === 'pedidos' ? (
-      <OrdersPanel backend={backend} isWide={isWide} />
+      <OrdersPanel backend={backend} isWide={isWide} initialOrderId={orderId} />
     ) : section === 'agenda' ? (
       <AgendaPanel backend={backend} isWide={isWide} />
     ) : section === 'mensagens' ? (

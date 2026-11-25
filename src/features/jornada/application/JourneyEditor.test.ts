@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { chamaInterna21 } from '../content/chama-interna-21'
 import { allDays } from '../domain/journey'
-import { findDay } from '../domain/journeyEditing'
+import { dayProblems, findDay } from '../domain/journeyEditing'
 import { createJourneySkeleton } from '../domain/journeySkeleton'
 import { InMemoryEditorBackend } from '../infrastructure/InMemoryCloudBackend'
 import { createJourneyContent } from './JourneyContent'
@@ -92,7 +92,12 @@ describe('JourneyEditor', () => {
     const state = editor.getSnapshot()
     expect(findDay(state.saved, 22)?.title).toBe('Novo dia')
     expect(backend.drafts.get(chamaInterna21.id)).toContain('"number":22')
-    expect(publishBlocker(state)).toBe('Há dias com campos para completar.')
+    expect(dayStatus(state, 22)).toBe('draft')
+    expect(publishBlocker(state)).toBe('Falta salvar 1 dia em rascunho.')
+  })
+
+  it('todos os dias da jornada publicada estão completos (nenhum vira rascunho sozinho)', () => {
+    expect(allDays(chamaInterna21).flatMap(dayProblems)).toEqual([])
   })
 
   it('apagar um dia vai direto para o rascunho salvo e libera publicar', async () => {
@@ -181,6 +186,14 @@ describe('JourneyEditor de uma jornada nova', () => {
     await editor.load()
     return editor
   }
+
+  it('os dias criados sozinhos começam como rascunho, não como salvos', async () => {
+    const editor = await setupNew(new InMemoryEditorBackend())
+    await editor.setOpening('Boas-vindas') // a estrutura vai para o rascunho salvo
+    const state = editor.getSnapshot()
+    expect([1, 2, 3].map((n) => dayStatus(state, n))).toEqual(['draft', 'draft', 'draft'])
+    expect(publishBlocker(state)).toBe('Faltam salvar 3 dias em rascunho.')
+  })
 
   it('sem rascunho, os títulos dados no produto entram nos dias', async () => {
     const backend = new InMemoryEditorBackend()

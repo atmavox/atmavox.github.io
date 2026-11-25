@@ -29,7 +29,9 @@ export function useSaveNotice() {
       setNotice(next)
       setIsVisible(true)
       if (next.kind === 'ok') {
-        timer.current = setTimeout(() => setIsVisible(false), SAVED_VISIBLE_MS)
+        // Aviso mais longo ("Horário reservado. Agora envie…") fica mais tempo, para dar tempo de ler.
+        const visibleMs = Math.max(SAVED_VISIBLE_MS, next.text.length * 70)
+        timer.current = setTimeout(() => setIsVisible(false), visibleMs)
       }
     },
     [stopTimer],

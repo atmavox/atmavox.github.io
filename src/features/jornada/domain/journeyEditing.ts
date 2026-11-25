@@ -239,6 +239,8 @@ const isHttpUrl = (url: string) => /^https?:\/\/\S+$/i.test(url.trim())
 export function dayProblems(day: JourneyDay): string[] {
   const problems: string[] = []
   if (day.title.trim() === '') problems.push('O dia precisa de um título.')
+  // Dia criado sozinho (jornada nova) ainda sem nenhum bloco: é rascunho até ganhar conteúdo.
+  if (!day.isReview && day.sections.length === 0) problems.push('O dia ainda não tem nenhum bloco.')
   day.sections.forEach((section, index) => {
     const where = `Bloco ${index + 1}`
     switch (section.type) {

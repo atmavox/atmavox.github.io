@@ -1,3 +1,4 @@
+import { UiIcon } from '../../../shared/ui/UiIcon'
 import { Clock } from 'lucide-react'
 import { cardTiles } from '../../../shared/catalog/journeyLayout'
 import { formatPrice } from '../../../shared/catalog/offer'
@@ -65,8 +66,8 @@ export function ProductPreview({ product }: { product: Product }) {
             {formatPrice(pricing.priceCents)}{' '}
             <small className="font-sans text-sm text-ink-faint">pagamento único</small>
           </b>
-          <span className="text-sm text-ink-muted">
-            ✓{' '}
+          <span className="inline-flex items-center gap-1.5 text-sm text-ink-muted">
+            <UiIcon name="check" size={15} />
             {pricing.accessMonths === null
               ? 'Acesso para sempre'
               : `Acesso por ${pricing.accessMonths} ${pricing.accessMonths === 1 ? 'mês' : 'meses'}`}{' '}
