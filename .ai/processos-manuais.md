@@ -21,12 +21,13 @@ Mercado Pago recebidos. Instagram e WhatsApp travaram no painel da Meta (passos 
 - [ ] Pagamentos: conta de serviço do Firebase + Worker + webhook + botão + compra de teste
 - [ ] Pagamentos: trocar para as credenciais de **produção** antes de vender
 - [x] Publicar as regras novas do Firestore (anamnese, pedidos e confirmação do horário da ativação individual, 1.24.0 a 1.26.0): seção 4 (feito em 2026-11-23)
-- [ ] Publicar as regras novas do Firestore (dados do perfil na aba Conta, 1.27.0; e-mail confirmado,
+- [x] Publicar as regras novas do Firestore (dados do perfil na aba Conta, 1.27.0; e-mail confirmado,
       1.28.0): seção 4
-- [ ] Publicar as regras novas do Firestore (reler as reflexões de um produto Indisponível depois que o
+- [x] Publicar as regras novas do Firestore (reler as reflexões de um produto Indisponível depois que o
       acesso vence, 1.37.0; quem abriu cada conteúdo, 1.38.0): seção 4. Até publicar, quem tem o acesso vencido vê "… saiu do ar" em vez da
       releitura; nada quebra
-- [ ] Publicar as regras novas do Firestore (sino das movimentações das ativações, 1.39.0): seção 4
+- [x] Publicar as regras novas do Firestore (sino das movimentações das ativações, 1.39.0 a 1.39.2):
+      seção 4 (o arquivo inteiro publicado em 2026-11-25, cobrindo também as pendências acima)
 - [ ] Contas de teste criadas com e-mail e senha: confirmar o e-mail (link no e-mail, ou marcar como
       confirmado em Firebase Console → Authentication → Usuários), senão a jornada pede a confirmação
 - [ ] (Opcional) Firebase Console → Authentication → Modelos → "Verificação de endereço de e-mail":

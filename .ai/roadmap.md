@@ -344,10 +344,11 @@ Surgiu no caminho:
           perfil e aviso "… saiu do ar" no link antigo
     - [x] (1.37.0) **Ler minhas reflexões** depois que o acesso a um produto Indisponível vence (só
           leitura; regra nova no Firestore)
-    - [ ] Publicar as regras do Firestore da 1.37.0 (`processos-manuais.md`) e conferir a releitura
+    - [x] Publicar as regras do Firestore da 1.37.0 a 1.39.2 (feito em 2026-11-25)
+    - [ ] Conferir no site publicado a releitura ("Ler minhas reflexões") de um produto Indisponível
     - [ ] Conferir no site publicado: inativar uma meditação de teste, ver o perfil e o link antigo
     - [x] (1.39.0) **Movimentações recentes das ativações**: sino com contador (ADR-037, mock C)
-    - [ ] Publicar as regras do Firestore da 1.39.0 e conferir o sino no site publicado
+    - [ ] Conferir no site publicado o sino, a bolinha da aba Pedidos e a contagem "Quem acessou"
     - [ ] Conferir no computador de verdade o resumo ao passar o mouse e o balão perto das bordas
     - [ ] **Andreía:** ajustar os textos provisórios do hub Ativações (título, convite, Como funciona)
     - [ ] **Desenvolvedor:** confirmar o e-mail das contas de teste criadas com e-mail e senha
