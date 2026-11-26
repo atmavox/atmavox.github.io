@@ -51,15 +51,13 @@ export type JourneyReshaper = (
   spec: { structure: JourneyStructure; groups: readonly DayGroup[]; dayTitles: readonly string[] },
 ) => Promise<{ json: string; dropped: { number: number; title: string }[] } | null>
 /**
- * Descartar (apagar do catálogo, pedido de 2026-11-25): Rascunho, Em breve ou Indisponível, e só se
- * ninguém nunca teve acesso (`everAccessed`; `null` enquanto não se sabe, e aí não). Publicada, só
- * inativando (ADR-035). A Indisponível grátis também não: quem a fez sem acesso liberado não aparece
- * para a admin (as regras não deixam ler o progresso das pessoas). Nunca a jornada que vem no código.
+ * Descartar (apagar do catálogo, pedidos de 2026-11-25): Rascunho, Em breve ou Indisponível, e só se
+ * ninguém nunca usou (`everAccessed`: abriu o conteúdo ou teve acesso liberado; `null` enquanto não se
+ * sabe, e aí não). Publicada, só inativando (ADR-035). Nunca a jornada que vem no código.
  */
 export function canDeleteProduct(product: Product, everAccessed: boolean | null): boolean {
   if (BUILT_IN_JOURNEYS.includes(product.id) || everAccessed !== false) return false
-  if (product.status === 'published') return false
-  return product.status !== 'retired' || product.pricing.type === 'paid'
+  return product.status !== 'published'
 }
 
 export type DeleteResult =

@@ -19,6 +19,7 @@ import { isMeditation, useCatalog } from '../../../shared/catalog/CatalogContext
 import { wasPublished } from '../../../shared/catalog/product'
 import { canStillUse } from '../../../shared/catalog/retired'
 import { RetiredNotice } from '../../../shared/ui/RetiredNotice'
+import { RecordOpened } from '../../../shared/usage/RecordOpened'
 
 const backLink = (
   <a
@@ -92,6 +93,8 @@ export function MeditationPage({ id, layout }: { id: string; layout: 'wide' | 'n
 
   return (
     <article className={`${wrap} flex flex-col gap-5`}>
+      {/* Com o player na tela, conta como acesso (Modo Andreía, "já acessaram"). */}
+      {media && <RecordOpened productId={meditation.id} />}
       {backLink}
       {media && 'youtubeId' in media ? (
         <YouTubeFacade videoId={media.youtubeId} title={meditation.title} />

@@ -33,6 +33,7 @@ import { wasPublished } from '../../../shared/catalog/product'
 import { hasStarted } from '../../../shared/progress/progressSummary'
 import { useProgressSummaries } from '../../../shared/progress/useProgressSummaries'
 import { RetiredNotice } from '../../../shared/ui/RetiredNotice'
+import { RecordOpened } from '../../../shared/usage/RecordOpened'
 import { UiIcon } from '../../../shared/ui/UiIcon'
 import { ReadOnlyContext } from './ReadOnlyContext'
 import { useAccount } from './useAccount'
@@ -319,6 +320,8 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
     <ReadOnlyContext.Provider value={isReadOnly}>
       <div className="min-h-dvh">
         <JourneyHeader activeTab={activeTab} />
+        {/* Conta como acesso (Modo Andreía, "já acessaram"); a admin testando não conta. */}
+        {!isAdmin && <RecordOpened productId={journeyId} />}
         <main
           key={activeTab}
           className="mx-auto max-w-2xl animate-[page-in_400ms_ease-out] px-4 pb-16 lg:max-w-3xl"

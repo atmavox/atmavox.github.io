@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import type { Product } from '../../../shared/catalog/product'
 import { seedCatalog } from '../../../shared/catalog/seedCatalog'
-import { accessStats, statusChangeError, whoStillHasAccess } from '../domain/availability'
+import {
+  accessStats,
+  hasEverHadAccess,
+  statusChangeError,
+  whoStillHasAccess,
+} from '../domain/availability'
 import { emptyForm, formFromProduct } from '../domain/productForm'
 import { createInMemoryProductsBackend } from '../infrastructure/productsBackend'
 import { canDeleteProduct, saveProduct } from './saveProduct'
@@ -50,8 +55,8 @@ describe('inativar e publicar de novo', () => {
     expect(canDeleteProduct({ ...other, status: 'draft' }, true)).toBe(false)
     expect(canDeleteProduct({ ...other, status: 'retired', pricing: paid }, false)).toBe(true)
     expect(canDeleteProduct({ ...other, status: 'retired', pricing: paid }, true)).toBe(false)
-    // Grátis: quem fez sem acesso liberado não aparece para a admin.
-    expect(canDeleteProduct({ ...other, status: 'retired' }, false)).toBe(false)
+    // Grátis: vale quem abriu o conteúdo; sem ninguém, pode.
+    expect(canDeleteProduct({ ...other, status: 'retired' }, false)).toBe(true)
     expect(canDeleteProduct({ ...other, status: 'published' }, false)).toBe(false)
     // Enquanto não se sabe quem acessou, não.
     expect(canDeleteProduct({ ...other, status: 'draft' }, null)).toBe(false)
@@ -90,7 +95,20 @@ describe('inativar e publicar de novo', () => {
   })
 })
 
-describe('quem tem acesso (cartão Disponível)', () => {
+describe('quem acessou (quadro do produto publicado)', () => {
+  it('conta as pessoas que abriram o conteúdo, uma vez cada, só deste produto', () => {
+    const opened = [
+      { uid: 'ana', productId: journey.id },
+      { uid: 'ana', productId: journey.id },
+      { uid: 'bia', productId: journey.id },
+      { uid: 'cris', productId: 'outro' },
+    ]
+    expect(accessStats([], journey.id, NOW, opened).opened).toBe(2)
+    // Abrir conta como uso: aí não se descarta.
+    expect(hasEverHadAccess([], journey.id, opened)).toBe(true)
+    expect(hasEverHadAccess([], 'nada', opened)).toBe(false)
+  })
+
   const access = (uid: string, expiresAt: number | null, source = 'payment' as const) => ({
     uid,
     productId: journey.id,
@@ -110,15 +128,21 @@ describe('quem tem acesso (cartão Disponível)', () => {
       journey.id,
       NOW,
     )
-    expect(stats).toEqual({ active: 3, lastExpiresAt: NOW + 400 * DAY, hasForever: false })
+    expect(stats).toEqual({
+      opened: 0,
+      active: 3,
+      lastExpiresAt: NOW + 400 * DAY,
+      hasForever: false,
+    })
   })
 
   it('o resumo em uma frase', () => {
-    expect(whoStillHasAccess({ active: 0, lastExpiresAt: null, hasForever: false })).toBe(
-      'Ninguém tem acesso agora.',
-    )
+    expect(
+      whoStillHasAccess({ opened: 0, active: 0, lastExpiresAt: null, hasForever: false }),
+    ).toBe('Ninguém tem acesso agora.')
     expect(
       whoStillHasAccess({
+        opened: 0,
         active: 12,
         lastExpiresAt: Date.UTC(2027, 10, 23, 12),
         hasForever: false,

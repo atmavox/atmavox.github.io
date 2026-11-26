@@ -24,7 +24,7 @@ import {
 } from '../application/duplicateProduct'
 import { setAvailability } from '../application/setAvailability'
 import { accessStats, hasEverHadAccess } from '../domain/availability'
-import type { AccessAdmin, GrantedAccess } from '../infrastructure/accessAdmin'
+import type { AccessAdmin, GrantedAccess, OpenedProduct } from '../infrastructure/accessAdmin'
 import { AvailabilityCard } from './AvailabilityCard'
 import { DiscardDialog } from './DiscardDialog'
 import { DropDaysDialog } from './DropDaysDialog'
@@ -230,6 +230,7 @@ export function ProductsApp({
   const [step, setStep] = useState(0)
   const [bannerState, setBannerState] = useState<'idle' | 'sending' | 'error'>('idle')
   const [accesses, setAccesses] = useState<readonly GrantedAccess[] | null>(null)
+  const [opened, setOpened] = useState<readonly OpenedProduct[]>([])
   const [isConfirmingRetire, setIsConfirmingRetire] = useState(false)
   const [isRetiredOpen, setIsRetiredOpen] = useState(false)
   const [dropDays, setDropDays] = useState<readonly { number: number; title: string }[] | null>(
@@ -237,14 +238,16 @@ export function ProductsApp({
   )
   const now = useNow()
 
-  // Os acessos de todo mundo, uma vez: os números do cartão Disponível. Sem conexão, o cartão avisa.
+  // Os acessos e quem abriu cada conteúdo, uma vez: os números do quadro "Quem acessou" e a regra de
+  // Descartar. Sem as regras novas, a lista de quem abriu vem vazia e o resto segue.
   useEffect(() => {
     if (!accessAdmin) return
     let cancelled = false
-    void accessAdmin
-      .listAccesses()
-      .then((list) => {
-        if (!cancelled) setAccesses(list)
+    void Promise.all([accessAdmin.listAccesses(), accessAdmin.listOpened().catch(() => [])])
+      .then(([list, openedList]) => {
+        if (cancelled) return
+        setOpened(openedList)
+        setAccesses(list)
       })
       .catch(() => undefined)
     return () => {
@@ -377,7 +380,7 @@ export function ProductsApp({
   // Sem a consulta de acessos (testes, sem Firebase) ninguém acessou; enquanto carrega, não se sabe.
   const everAccessed = savedProduct
     ? accesses
-      ? hasEverHadAccess(accesses, savedProduct.id)
+      ? hasEverHadAccess(accesses, savedProduct.id, opened)
       : accessAdmin
         ? null
         : false
@@ -453,7 +456,8 @@ export function ProductsApp({
     })
   }
 
-  const stats = savedProduct && accesses ? accessStats(accesses, savedProduct.id, now) : null
+  const stats =
+    savedProduct && accesses ? accessStats(accesses, savedProduct.id, now, opened) : null
   const situation =
     savedProduct &&
     (savedProduct.status === 'retired' ||

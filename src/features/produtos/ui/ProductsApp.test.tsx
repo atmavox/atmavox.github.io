@@ -244,7 +244,7 @@ describe('duplicar no editor do produto', () => {
 })
 
 describe('inativar produto (Disponível e Indisponível)', () => {
-  it('mostra quem tem acesso, confirma, vai para o grupo Indisponíveis e volta ao ar', async () => {
+  it('mostra quem acessou, confirma, vai para o grupo Indisponíveis e volta ao ar', async () => {
     setWideViewport(true)
     const { backend, catalog } = setup()
     catalog.replace(
@@ -257,10 +257,13 @@ describe('inativar produto (Disponível e Indisponível)', () => {
     const accessAdmin = createInMemoryAccessAdmin()
     const nextYear = Date.now() + 365 * 24 * 60 * 60 * 1000
     await accessAdmin.grant('ana', 'chama-interna-21', nextYear)
+    accessAdmin.opened.push({ uid: 'ana', productId: 'chama-interna-21', lastOpenedAt: 1 })
     render(<ProductsApp backend={backend} catalog={catalog} accessAdmin={accessAdmin} />)
 
     fireEvent.click(screen.getByRole('button', { name: /A Chama Interna/ }))
-    await screen.findByText('com acesso agora')
+    // Conta quem de fato abriu, não quem só tem o acesso liberado.
+    expect(await screen.findByText('pessoa já acessou')).toBeInTheDocument()
+    expect(screen.getByText('último acesso vence')).toBeInTheDocument()
     const situation = screen.getByRole('radiogroup', { name: 'Situação' })
     expect(within(situation).getByRole('radio', { name: 'Rascunho' })).toBeDisabled()
     expect(within(situation).getByRole('radio', { name: 'Em breve' })).toBeDisabled()

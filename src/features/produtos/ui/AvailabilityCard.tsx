@@ -4,8 +4,11 @@ import { whoStillHasAccess, type AccessStats } from '../domain/availability'
 
 const DATE = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo' })
 
-/** Os números do cartão: com acesso agora e quando vence o último (ou "Para sempre"). */
-function StatTiles({ stats }: { stats: AccessStats }) {
+/**
+ * Os números do cartão: quantas pessoas de fato abriram o conteúdo e, no pago, quando vence a última
+ * liberação de acesso (ou "Para sempre").
+ */
+function StatTiles({ stats, isPaid }: { stats: AccessStats; isPaid: boolean }) {
   const last = stats.hasForever
     ? 'Para sempre'
     : stats.lastExpiresAt === null
@@ -14,17 +17,20 @@ function StatTiles({ stats }: { stats: AccessStats }) {
   return (
     <div className="grid grid-cols-2 gap-2.5">
       <div className="rounded-[14px] border border-line bg-bg px-3 py-2.5">
-        <b className="block font-display text-2xl font-medium text-ink">{stats.active}</b>
-        <span className="text-xs text-ink-faint">com acesso agora</span>
+        <b className="block font-display text-2xl font-medium text-ink">{stats.opened}</b>
+        <span className="text-xs text-ink-faint">
+          {stats.opened === 1 ? 'pessoa já acessou' : 'pessoas já acessaram'}
+        </span>
       </div>
-      <div className="rounded-[14px] border border-line bg-bg px-3 py-2.5">
-        <b className="block font-display text-2xl font-medium text-ink">{last}</b>
-        <span className="text-xs text-ink-faint">último acesso vence</span>
-      </div>
+      {isPaid && (
+        <div className="rounded-[14px] border border-line bg-bg px-3 py-2.5">
+          <b className="block font-display text-2xl font-medium text-ink">{last}</b>
+          <span className="text-xs text-ink-faint">último acesso vence</span>
+        </div>
+      )}
     </div>
   )
 }
-
 /**
  * Produto que já foi ao ar (mock aprovado, "Tirar do ar" C): Publicada, com quem tem acesso e o botão
  * "Inativar produto"; ou Indisponível, em cinza (o "Publicar de novo" fica na linha dos botões).
@@ -70,18 +76,16 @@ export function AvailabilityCard({
     )
   }
 
-  // Publicada: quem tem acesso e o botão para tirar do ar, abaixo da Situação.
+  // Publicada: quem acessou e o botão para tirar do ar, abaixo da Situação.
   return (
     <div className="flex flex-col gap-2.5 rounded-[14px] border border-line p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="flex items-center gap-1 text-sm text-ink-muted">
-          Quem tem acesso
-          {isFree && (
-            <InfoTip label="Sobre os acessos">
-              É grátis: aqui só entram os acessos liberados a alguém. Quem começou sem acesso
-              liberado não aparece, mas continua com acesso se você inativar.
-            </InfoTip>
-          )}
+          Quem acessou
+          <InfoTip label="Sobre quem acessou">
+            Conta cada pessoa que abriu o conteúdo com a conta dela. Quem ouve as meditações da
+            página inicial sem entrar não aparece.
+          </InfoTip>{' '}
         </span>
         <button
           type="button"
@@ -92,7 +96,11 @@ export function AvailabilityCard({
           Inativar produto
         </button>
       </div>
-      {stats ? <StatTiles stats={stats} /> : <p className="text-sm text-ink-faint">Carregando…</p>}
+      {stats ? (
+        <StatTiles stats={stats} isPaid={!isFree} />
+      ) : (
+        <p className="text-sm text-ink-faint">Carregando…</p>
+      )}
     </div>
   )
 }

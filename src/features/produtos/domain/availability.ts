@@ -3,8 +3,10 @@ import { wasPublished, type Product, type ProductStatus } from '../../../shared/
 
 const DATE = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo' })
 
-/** Quem tem acesso a um produto agora (cartão "Disponível", mock aprovado C). */
+/** O quadro "Quem acessou" de um produto publicado (mock aprovado C, pedidos de 2026-11-25). */
 export interface AccessStats {
+  /** Pessoas que de fato abriram o conteúdo (logadas), grátis ou pago. */
+  opened: number
   /** Pessoas com acesso válido agora. */
   active: number
   /** Quando vence o último acesso válido; `null` se algum é para sempre ou se não há nenhum. */
@@ -23,7 +25,9 @@ export function accessStats(
   })[],
   productId: string,
   now: number,
+  opened: readonly { uid: string; productId: string }[] = [],
 ): AccessStats {
+  const openedBy = new Set(opened.filter((o) => o.productId === productId).map((o) => o.uid))
   const valid = accesses.filter(
     (a) => a.productId === productId && hasValidAccess({ ...a, grantedAt: 0 }, now),
   )
@@ -31,6 +35,7 @@ export function accessStats(
   const hasForever = valid.some((a) => a.expiresAt === null)
   const dates = valid.flatMap((a) => (a.expiresAt === null ? [] : [a.expiresAt]))
   return {
+    opened: openedBy.size,
     active: people.size,
     lastExpiresAt: hasForever || dates.length === 0 ? null : Math.max(...dates),
     hasForever,
@@ -82,10 +87,16 @@ export function statusChangeError(
   if (saved && wasPublished(saved) && !wasPublished(next)) return PUBLISHED_STAYS
   return null
 }
-/** Alguém já teve acesso a este produto (válido ou vencido, de qualquer origem). */
+/**
+ * Alguém já usou este produto: abriu o conteúdo ou teve o acesso liberado (válido ou vencido, de
+ * qualquer origem).
+ */
 export function hasEverHadAccess(
   accesses: readonly Pick<ProductAccess, 'productId'>[],
   productId: string,
+  opened: readonly { productId: string }[] = [],
 ): boolean {
-  return accesses.some((a) => a.productId === productId)
+  return (
+    accesses.some((a) => a.productId === productId) || opened.some((o) => o.productId === productId)
+  )
 }

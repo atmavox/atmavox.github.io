@@ -128,6 +128,20 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Quem de fato abriu cada conteúdo (Modo Andreía, "já acessaram"): a pessoa grava só a data da
+    // última vez, no próprio documento; a admin lista de todo mundo.
+    match /users/{uid}/opened/{productId} {
+      allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['lastOpenedAt'])
+        && request.resource.data.lastOpenedAt is int;
+    }
+
+    match /{path=**}/opened/{productId} {
+      allow read: if isAdmin();
+    }
+
     // Rascunhos e histórico de versões: só a admin.
     match /drafts/{journeyId}/{document=**} {
       allow read, write: if isAdmin();

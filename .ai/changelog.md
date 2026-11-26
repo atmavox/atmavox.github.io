@@ -10,6 +10,21 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.38.0] · 2026-11-25
+
+### Adicionado
+
+- "Quem acessou" no produto publicado conta as pessoas que de fato abriram o conteúdo (jornada aberta ou
+  meditação com o player na tela), grátis ou pago, e não mais as liberações de acesso. Cada pessoa
+  logada grava `users/{uid}/opened/{produto}` com a data da última vez; o Modo Andreía lista todas. No
+  pago, "último acesso vence" continua olhando as liberações. Quem ouve as meditações da página inicial
+  sem entrar não aparece. Precisa publicar as regras novas do Firestore.
+- Descartar passa a valer também para Indisponível grátis, quando ninguém abriu nem teve acesso.
+
+### Corrigido
+
+- O mock `atmavox-movimentacoes-agenda.html` tinha o CSS novo fora do `<style>` (aparecia como texto).
+
 ## [1.37.0] · 2026-11-25
 
 ### Adicionado

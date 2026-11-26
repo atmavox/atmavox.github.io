@@ -38,10 +38,19 @@ export interface GrantedAccess {
   source: AccessSource
 }
 
+/** Alguém abriu o conteúdo de um produto (`users/{uid}/opened/{productId}`). */
+export interface OpenedProduct {
+  uid: string
+  productId: string
+  lastOpenedAt: number
+}
+
 export interface AccessAdmin {
   findByEmail(email: string): Promise<Person | null>
   listPeople(): Promise<Person[]>
   listAccesses(): Promise<GrantedAccess[]>
+  /** Quem de fato abriu cada conteúdo ("já acessaram" no Modo Andreía). */
+  listOpened(): Promise<OpenedProduct[]>
   grant(uid: string, productId: string, expiresAt: number | null): Promise<void>
   revoke(uid: string, productId: string): Promise<void>
 }
@@ -72,6 +81,21 @@ export function accessOf(document: unknown): GrantedAccess | null {
     grantedAt,
     expiresAt,
     source,
+  }
+}
+
+/** `projects/…/documents/users/{uid}/opened/{produto}` → uid, produto e quando abriu. */
+export function openedOf(document: unknown): OpenedProduct | null {
+  if (typeof document !== 'object' || document === null || !('name' in document)) return null
+  const name = String((document as { name: unknown }).name)
+  const match = /\/documents\/users\/([^/]+)\/opened\/([^/]+)$/.exec(name)
+  const fields = fieldsOf(document)
+  const lastOpenedAt = fields ? numberField(fields, 'lastOpenedAt') : undefined
+  if (!match || lastOpenedAt === undefined) return null
+  return {
+    uid: decodeURIComponent(match[1]!),
+    productId: decodeURIComponent(match[2]!),
+    lastOpenedAt,
   }
 }
 
@@ -133,6 +157,10 @@ export function createAccessAdmin(
       const documents = await runQuery({ from: [{ collectionId: 'access', allDescendants: true }] })
       return documents.flatMap((d) => accessOf(d) ?? [])
     },
+    async listOpened() {
+      const documents = await runQuery({ from: [{ collectionId: 'opened', allDescendants: true }] })
+      return documents.flatMap((d) => openedOf(d) ?? [])
+    },
     async grant(uid, productId, expiresAt) {
       await patchDocument(
         config,
@@ -155,13 +183,15 @@ export function createAccessAdmin(
 /** Para os testes: tudo na memória. */
 export function createInMemoryAccessAdmin(people: Person[] = []): AccessAdmin & {
   accesses: GrantedAccess[]
+  opened: OpenedProduct[]
 } {
-  const state = { accesses: [] as GrantedAccess[] }
+  const state = { accesses: [] as GrantedAccess[], opened: [] as OpenedProduct[] }
   return Object.assign(state, {
     findByEmail: async (email: string) =>
       people.find((p) => p.email === email.trim().toLowerCase()) ?? null,
     listPeople: async () => [...people],
     listAccesses: async () => [...state.accesses],
+    listOpened: async () => [...state.opened],
     grant: async (uid: string, productId: string, expiresAt: number | null) => {
       state.accesses = state.accesses.filter((a) => !(a.uid === uid && a.productId === productId))
       state.accesses.push({ uid, productId, grantedAt: Date.now(), expiresAt, source: 'manual' })
