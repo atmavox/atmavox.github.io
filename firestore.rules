@@ -142,6 +142,23 @@ service cloud.firestore {
       allow read: if isAdmin();
     }
 
+    // Movimentações das ativações (ADR-037): as mudanças nos horários livres, só a admin.
+    match /activity/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // Preferências da pessoa no próprio documento (hoje: o que a admin já viu no sino das
+    // movimentações: a marca geral e as marcas de lida ou não lida de cada uma).
+    match /users/{uid}/prefs/{doc} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['seenAt', 'marks'])
+        && request.resource.data.seenAt is int
+        && (!('marks' in request.resource.data)
+            || (request.resource.data.marks is string && request.resource.data.marks.size() < 50000));
+    }
+
     // Rascunhos e histórico de versões: só a admin.
     match /drafts/{journeyId}/{document=**} {
       allow read, write: if isAdmin();

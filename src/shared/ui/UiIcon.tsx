@@ -13,6 +13,26 @@ const PATHS = {
     </>
   ),
   minus: <path d="M6 12h12" />,
+  /** Movimentações recentes das ativações (o sino). */
+  bell: (
+    <>
+      <path d="M6.5 16.5V11a5.5 5.5 0 0 1 11 0v5.5l1.5 2H5z" />
+      <path d="M10 20.5a2 2 0 0 0 4 0" />
+    </>
+  ),
+  /** Pagamento. */
+  card: (
+    <>
+      <rect x="3.5" y="6" width="17" height="12" rx="2.5" />
+      <path d="M3.5 10h17M7 14.5h3" />
+    </>
+  ),
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 8v4.5l3 2" />
+    </>
+  ),
   /** Reler as próprias reflexões (mock "Tirar do ar", perfil B). */
   book: (
     <>

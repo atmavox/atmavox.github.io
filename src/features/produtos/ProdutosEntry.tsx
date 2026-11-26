@@ -148,6 +148,7 @@ export function ProdutosEntry({
           backend={ativacoes ?? createInMemoryAtivacoesBackend()}
           section={sectionFromPath(path)}
           orderId={orderIdFromPath(path)}
+          adminUid={uid}
         />
       ) : (
         <ProductsApp

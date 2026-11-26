@@ -507,6 +507,15 @@ tabela é a referência: toda regra nova sobre situação entra aqui.
 Mocks aprovados (2026-11-23): `Downloads/atmavox-ativacao-pessoa-v3.html` (pessoa) e
 `Downloads/atmavox-ativacao-andreia-v3.html` (Modo Andreía). Decisão: ADR-029.
 
+**Movimentações recentes** (1.39.0, ADR-037, mock `Downloads/atmavox-movimentacoes-agenda.html`, C):
+sino com contador na barra das Ativações (Modo Andreía), no computador e no celular. O número conta o
+que as pessoas fizeram desde a última visita (pedido novo, pago, horário pedido, confirmado,
+cancelado, vencido sem pagamento, reserva vencida); o que a própria Andreía fez (aprovar horário,
+marcar como realizada, criar, mudar ou tirar horário livre) aparece sem contar. Abrir mostra a lista
+dos últimos 60 dias por dia (painel no computador, folha de baixo no celular), com "Abrir o pedido" ou
+"Ver na agenda". Lida ao parar o mouse em cima ou pelo botãozinho da linha, que também deixa como
+não lida (lembrete); "Marcar tudo como lido" no topo. Fica na conta dela. A aba "Pedidos" mostra a
+mesma bolinha âmbar enquanto há movimentação de pedido por ler. Busca de novo a cada 3 minutos com a tela aberta.
 **Hub Ativações** (`#/ativacoes`, 1.31.0, mock `Downloads/atmavox-hub-ativacao.html`, D, ADR-032): ao
 lado de Jornadas e Meditações no cabeçalho dos hubs e na barra do celular (5 itens). Convite com o
 retrato da Andreía sobre os anéis parados (centro perto do canto de cima à esquerda), "Agendar minha

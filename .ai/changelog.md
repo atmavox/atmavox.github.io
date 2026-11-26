@@ -10,6 +10,35 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.39.2] · 2026-11-25
+
+### Alterado
+
+- Sino das movimentações: abrir não marca mais tudo como lido. Cada movimentação fica lida ao parar o
+  mouse em cima (meio segundo) ou pelo botãozinho da linha, que também a deixa como não lida, de
+  lembrete (aí o mouse não a marca de novo). A caixinha "Marcar tudo como lido" no topo marca ou desmarca
+  todas. Fica na conta da Andreía; precisa publicar as regras do Firestore de novo.
+- A aba "Pedidos" das Ativações ganha a mesma bolinha âmbar enquanto há movimentação de pedido por ler.
+
+## [1.39.1] · 2026-11-25
+
+### Corrigido
+
+- Sino das movimentações no computador: a lista abria ao lado do sino, cortada na borda da tela e com
+  rolagem para o lado. Agora abre embaixo do sino, para a direita (sobre a área vazia) quando cabe e para
+  a esquerda quando não, com largura que cabe na tela; clicar fora ou Esc fecha.
+
+## [1.39.0] · 2026-11-25
+
+### Adicionado
+
+- Modo Andreía · Ativações: sino das movimentações recentes (ADR-037, mock aprovado C). O número conta o
+  que as pessoas fizeram desde a última visita (pedido novo, pago, horário pedido, confirmado, cancelado,
+  vencido); o que a própria Andreía fez (aprovar horário, marcar como realizada, criar, mudar ou tirar
+  horário livre) aparece na lista, sem contar. Abrir mostra a lista por dia, com o link do pedido ou da
+  agenda, e marca como visto na conta (igual no celular e no computador). Precisa publicar as regras
+  novas do Firestore.
+
 ## [1.38.0] · 2026-11-25
 
 ### Adicionado

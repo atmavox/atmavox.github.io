@@ -640,6 +640,31 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
 - **Consequências:** ➕ sem formato novo: o rascunho continua sendo a jornada em JSON. ➖ com o editor da
   jornada aberto em outra aba, o que estiver lá sem salvar fica na estrutura antiga.
 
+## ADR-037 · Movimentações recentes das ativações (o sino)
+
+- **Status:** aceita
+- **Data:** 2026-11-25 (mock `Downloads/atmavox-movimentacoes-agenda.html`, opção C)
+- **Contexto:** a Andreía quer saber o que mudou nas ativações desde a última vez que olhou, sem ter
+  de conferir pedido por pedido.
+- **Decisão:** um sino com contador na barra das Ativações. O feed sai quase todo dos pedidos, que já
+  guardam quando passaram por cada situação (`domain/activity.ts`: pedido novo, pago, horário pedido,
+  aprovado, confirmado, realizado, cancelado, vencido sem pagamento, reserva vencida). Só as mudanças
+  nos horários livres ganham registro próprio: ao salvar a agenda, o site compara antes e depois e
+  grava em `activity/{id}` (só a admin lê e grava). O que ela já viu fica na conta dela
+  (`users/{uid}/prefs/activity`): `seenAt` ("tudo lido até aqui", pela caixinha do topo) e `marks`
+  (lida ou não lida de cada movimentação, em JSON; vale mais que `seenAt`). Parar o mouse em cima marca
+  como lida, menos o que ela deixou de propósito como não lida (lembrete). Igual no celular e no
+  computador. O que a própria
+  Andreía fez aparece na lista e não conta no número. O sino busca de novo ao abrir e a cada 3 minutos
+  com a tela aberta. Mostra os últimos 60 dias; na primeira visita, conta a última semana.
+- **Alternativas consideradas:** fila de mensagens ou servidor de eventos (Kafka e afins: feitos para
+  milhares de mensagens por segundo, pagos e desnecessários aqui); notificação em tempo real
+  (exigiria SDK do Firestore com escuta aberta, mais peso no Modo Andreía); última visita no aparelho
+  (contagens diferentes entre celular e computador).
+- **Consequências:** ➕ sem servidor nem custo; poucas leituras (pedidos + até 300 registros). ➖ não
+  avisa no mesmo segundo; mudanças de horário livre feitas antes da 1.39.0 não aparecem; anamnese
+  respondida fica de fora por enquanto (exigiria ler a anamnese de todo mundo).
+
 ## ADR-00X · Título curto
 
 - **Status:** proposta | aceita | substituída por ADR-00Y · AAAA-MM-DD

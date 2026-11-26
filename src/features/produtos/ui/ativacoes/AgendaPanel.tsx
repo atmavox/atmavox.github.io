@@ -35,6 +35,7 @@ import { SaveStatus } from '../SaveStatus'
 import { useSaveNotice } from '../useSaveNotice'
 import { BookingDetails } from './BookingDetails'
 import { bookingState, bookingWho } from './bookingText'
+import { windowChanges } from '../../domain/activity'
 import { AnchoredPopover } from './AnchoredPopover'
 import { Overlay } from './Overlay'
 import { Switch } from './TherapyFields'
@@ -165,6 +166,9 @@ export function AgendaPanel({ backend, isWide }: { backend: AtivacoesBackend; is
     setIsSaving(true)
     try {
       await backend.saveAvailability(next)
+      // As mudanças nos horários livres entram nas movimentações (o sino); falhar aqui não desfaz nada.
+      const changes = windowChanges(availability ?? EMPTY_AVAILABILITY, next, Date.now())
+      if (changes.length > 0) void backend.addActivity(changes).catch(() => undefined)
       setAvailability(next)
       saveNotice.show({ kind: 'ok', text: message })
       return true

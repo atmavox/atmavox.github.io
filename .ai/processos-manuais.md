@@ -26,6 +26,7 @@ Mercado Pago recebidos. Instagram e WhatsApp travaram no painel da Meta (passos 
 - [ ] Publicar as regras novas do Firestore (reler as reflexões de um produto Indisponível depois que o
       acesso vence, 1.37.0; quem abriu cada conteúdo, 1.38.0): seção 4. Até publicar, quem tem o acesso vencido vê "… saiu do ar" em vez da
       releitura; nada quebra
+- [ ] Publicar as regras novas do Firestore (sino das movimentações das ativações, 1.39.0): seção 4
 - [ ] Contas de teste criadas com e-mail e senha: confirmar o e-mail (link no e-mail, ou marcar como
       confirmado em Firebase Console → Authentication → Usuários), senão a jornada pede a confirmação
 - [ ] (Opcional) Firebase Console → Authentication → Modelos → "Verificação de endereço de e-mail":

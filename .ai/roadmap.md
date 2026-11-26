@@ -345,9 +345,9 @@ Surgiu no caminho:
     - [x] (1.37.0) **Ler minhas reflexões** depois que o acesso a um produto Indisponível vence (só
           leitura; regra nova no Firestore)
     - [ ] Publicar as regras do Firestore da 1.37.0 (`processos-manuais.md`) e conferir a releitura
-    - [ ] Conferir no site publicado: inativar uma meditação de teste, ver o perfil e o link antigo - [ ] **Histórico da agenda de ativações** (ideia de 2026-11-25, aguardando escolha do mock):
-          "Movimentações recentes" com o que mudou (pedido novo, pago, reservado, confirmado, vencido,
-          cancelado, faixa livre criada/mudada/tirada); ver a proposta na conversa de 2026-11-25
+    - [ ] Conferir no site publicado: inativar uma meditação de teste, ver o perfil e o link antigo
+    - [x] (1.39.0) **Movimentações recentes das ativações**: sino com contador (ADR-037, mock C)
+    - [ ] Publicar as regras do Firestore da 1.39.0 e conferir o sino no site publicado
     - [ ] Conferir no computador de verdade o resumo ao passar o mouse e o balão perto das bordas
     - [ ] **Andreía:** ajustar os textos provisórios do hub Ativações (título, convite, Como funciona)
     - [ ] **Desenvolvedor:** confirmar o e-mail das contas de teste criadas com e-mail e senha
