@@ -157,15 +157,23 @@ describe('hub no celular (abas)', () => {
     expect(screen.queryByRole('button', { name: 'Com e-book' })).toBeNull()
   })
 
-  it('a página da meditação toca o áudio no player do site', () => {
-    render(<HubPage path="/meditacao/boas-vindas" />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Boas-vindas' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Ouvir Boas-vindas' })).toBeInTheDocument()
+  it('a página da meditação fica na aba Meditações', () => {
+    render(<HubPage path="/meditacao/retorne-ao-seu-centro" />)
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Retorne ao Seu Centro' }),
+    ).toBeInTheDocument()
     const tabs = screen.getByRole('navigation', { name: 'Seções' })
     expect(within(tabs).getByRole('link', { name: 'Meditações' })).toHaveAttribute(
       'aria-current',
       'page',
     )
+  })
+
+  it('o áudio de boas-vindas não é meditação: fica só na página inicial', () => {
+    render(<HubPage path="/meditacao/boas-vindas" />)
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Meditação não encontrada' }),
+    ).toBeInTheDocument()
   })
 
   it('meditação que não existe avisa e volta para a lista', () => {

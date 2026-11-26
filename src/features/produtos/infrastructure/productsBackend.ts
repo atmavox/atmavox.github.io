@@ -32,6 +32,11 @@ export interface ProductsBackend {
   saveTerritories(territories: readonly Territory[]): Promise<void>
   /** `free` espelha o catálogo: as regras só entregam conteúdo pago a quem tem acesso (ADR-020). */
   setFree(productId: string, free: boolean): Promise<void>
+  /**
+   * Marca `published/{id}` como Indisponível (ADR-035): as regras deixam quem já teve acesso, mesmo
+   * vencido, ler o conteúdo para reler as próprias reflexões.
+   */
+  setRetired(productId: string, retired: boolean): Promise<void>
   loadMeditationContent(productId: string): Promise<MeditationContent | null>
   /** A jornada já foi publicada no editor (`published/{id}` tem `content`)? */
   hasPublishedJourney(productId: string): Promise<boolean>
@@ -115,6 +120,15 @@ export function createProductsBackend(
         config,
         `published/${productId}`,
         { free: restBoolean(free) },
+        await token(),
+        fetchFn,
+      )
+    },
+    async setRetired(productId, retired) {
+      await patchDocument(
+        config,
+        `published/${productId}`,
+        { retired: restBoolean(retired) },
         await token(),
         fetchFn,
       )
@@ -229,6 +243,7 @@ export function createProductsBackend(
 export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
   catalog: Product[] | null
   free: Map<string, boolean>
+  retired: Set<string>
   contents: Map<string, MeditationContent>
   images: Map<string, CompressedImage>
   publishedJourneys: Set<string>
@@ -244,6 +259,7 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
     catalog: null as Product[] | null,
     territories: null as Territory[] | null,
     free: new Map<string, boolean>(),
+    retired: new Set<string>(),
     contents: new Map<string, MeditationContent>(),
     images: new Map<string, CompressedImage>(),
     publishedJourneys: new Set<string>(),
@@ -262,6 +278,10 @@ export function createInMemoryProductsBackend(admin = true): ProductsBackend & {
     },
     setFree: async (id: string, free: boolean) => {
       state.free.set(id, free)
+    },
+    setRetired: async (id: string, retired: boolean) => {
+      if (retired) state.retired.add(id)
+      else state.retired.delete(id)
     },
     loadMeditationContent: async (id: string) => state.contents.get(id) ?? null,
     hasPublishedJourney: async (id: string) => state.publishedJourneys.has(id),

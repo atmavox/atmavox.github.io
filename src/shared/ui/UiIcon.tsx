@@ -13,6 +13,13 @@ const PATHS = {
     </>
   ),
   minus: <path d="M6 12h12" />,
+  /** Reler as próprias reflexões (mock "Tirar do ar", perfil B). */
+  book: (
+    <>
+      <path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z" />
+      <path d="M17 20h2V6.5" />
+    </>
+  ),
   /** O "i" das explicações que aparecem ao passar o mouse. */
   info: (
     <>

@@ -9,6 +9,7 @@ import type { JourneyProduct } from '../../../shared/catalog/product'
 import type { ProgressLoader } from '../../../shared/progress/progressSummary'
 import { EMPTY_PROFILE } from '../../../shared/profile/profile'
 import { createInMemoryProfileSource } from '../../../shared/profile/profileSource'
+import { AccessContext } from '../../../shared/catalog/AccessContext'
 import { CatalogContext } from '../../../shared/catalog/CatalogContext'
 import { createCatalogStore } from '../../../shared/catalog/catalogStore'
 import { seedCatalog } from '../../../shared/catalog/seedCatalog'
@@ -58,7 +59,7 @@ describe('perfil (mock aprovado)', () => {
     await screen.findByRole('link', { name: /Continuar no dia 8/ })
     fireEvent.click(screen.getByRole('tab', { name: 'Meditações' }))
     expect(screen.getByRole('tab', { name: 'Meditações' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('link', { name: 'Boas-vindas' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Retorne ao Seu Centro' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /Continuar no dia 8/ })).toBeNull()
 
     fireEvent.click(screen.getByRole('tab', { name: 'Conta' }))
@@ -190,5 +191,48 @@ describe('começar e continuar pelo perfil', () => {
       'href',
       '#/jornada/chama-interna-21',
     )
+  })
+})
+
+describe('reler depois que o acesso vence (ADR-035)', () => {
+  it('Indisponível paga com acesso vencido: a trilha fica e aparece "Ler minhas reflexões"', async () => {
+    const catalog = createCatalogStore({})
+    catalog.replace(
+      seedCatalog.map((p) =>
+        p.id === 'chama-interna-21'
+          ? {
+              ...p,
+              status: 'retired' as const,
+              retiredAt: 1,
+              pricing: { type: 'paid' as const, priceCents: 9700, accessMonths: 12 },
+            }
+          : p,
+      ),
+    )
+    const expired = {
+      productId: 'chama-interna-21',
+      grantedAt: 1,
+      expiresAt: 2,
+      source: 'payment' as const,
+    }
+    const state = { status: 'ready' as const, byProduct: new Map([[expired.productId, expired]]) }
+    render(
+      <AuthContext.Provider value={await loggedSession()}>
+        <AccessContext.Provider
+          value={{ getSnapshot: () => state, subscribe: () => () => {}, refresh: async () => {} }}
+        >
+          <CatalogContext.Provider value={catalog}>
+            <ProfilePage layout="wide" progressLoader={sevenDays} />
+          </CatalogContext.Provider>
+        </AccessContext.Provider>
+      </AuthContext.Provider>,
+    )
+    fireEvent.click(await screen.findByRole('tab', { name: 'Jornadas' }))
+    expect(await screen.findByRole('link', { name: /Ler minhas reflexões/ })).toHaveAttribute(
+      'href',
+      '#/jornada/chama-interna-21',
+    )
+    expect(screen.getByText('Indisponível.')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /Continuar/ })).toBeNull()
   })
 })

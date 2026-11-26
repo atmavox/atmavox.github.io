@@ -63,7 +63,8 @@ export const hero = {
 
 /**
  * Áudio curto de boas-vindas da tela inicial: introdutório e estimulante, tocado no player do site.
- * Título provisório: confirmar com a Andreía.
+ * Não é uma meditação (pedido de 2026-11-25): fica só aqui, fora do catálogo. Título provisório:
+ * confirmar com a Andreía.
  */
 export const introAudio: HubAudio = {
   id: 'boas-vindas',

@@ -300,22 +300,38 @@ describe('descartar um Indisponível', () => {
     const paid = { type: 'paid' as const, priceCents: 9700, accessMonths: 12 }
     catalog.replace(
       seedCatalog.map((p) =>
-        p.id === 'boas-vindas' || p.id === 'retorne-ao-seu-centro'
+        p.id === 'ritual-matinal' || p.id === 'retorne-ao-seu-centro'
           ? { ...p, status: 'retired' as const, pricing: paid }
           : p,
       ),
     )
     const accessAdmin = createInMemoryAccessAdmin()
-    await accessAdmin.grant('ana', 'boas-vindas', null)
+    await accessAdmin.grant('ana', 'retorne-ao-seu-centro', null)
     render(<ProductsApp backend={backend} catalog={catalog} accessAdmin={accessAdmin} />)
     fireEvent.click(screen.getByRole('button', { name: /Indisponíveis · 2/ }))
 
-    fireEvent.click(screen.getByRole('button', { name: /Boas-vindas/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Retorne ao seu centro/i }))
     await screen.findByRole('button', { name: 'Publicar de novo' })
     expect(screen.queryByRole('button', { name: 'Descartar' })).toBeNull()
 
-    fireEvent.click(screen.getByRole('button', { name: /Retorne ao seu centro/i }))
+    fireEvent.click(screen.getByRole('button', { name: /Ritual Matinal/ }))
     expect(await screen.findByRole('button', { name: 'Descartar' })).toBeInTheDocument()
+    setWideViewport(false)
+  })
+})
+
+describe('barra dos botões do editor', () => {
+  it('avisa "Alterações não salvas" até salvar', async () => {
+    setWideViewport(true)
+    const { backend, catalog } = setup()
+    render(<ProductsApp backend={backend} catalog={catalog} />)
+    fireEvent.click(screen.getByRole('button', { name: /A Chama Interna/ }))
+    const name = await screen.findByLabelText('Nome')
+    expect(screen.queryByText('Alterações não salvas')).toBeNull()
+    fireEvent.change(name, { target: { value: 'A Chama Interna!' } })
+    expect(screen.getByText('Alterações não salvas')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+    await waitFor(() => expect(screen.queryByText('Alterações não salvas')).toBeNull())
     setWideViewport(false)
   })
 })

@@ -23,6 +23,9 @@ Mercado Pago recebidos. Instagram e WhatsApp travaram no painel da Meta (passos 
 - [x] Publicar as regras novas do Firestore (anamnese, pedidos e confirmação do horário da ativação individual, 1.24.0 a 1.26.0): seção 4 (feito em 2026-11-23)
 - [ ] Publicar as regras novas do Firestore (dados do perfil na aba Conta, 1.27.0; e-mail confirmado,
       1.28.0): seção 4
+- [ ] Publicar as regras novas do Firestore (reler as reflexões de um produto Indisponível depois que o
+      acesso vence, 1.37.0): seção 4. Até publicar, quem tem o acesso vencido vê "… saiu do ar" em vez da
+      releitura; nada quebra
 - [ ] Contas de teste criadas com e-mail e senha: confirmar o e-mail (link no e-mail, ou marcar como
       confirmado em Firebase Console → Authentication → Usuários), senão a jornada pede a confirmação
 - [ ] (Opcional) Firebase Console → Authentication → Modelos → "Verificação de endereço de e-mail":
@@ -199,7 +202,7 @@ temos as **credenciais de teste** (no `.env.local` do desenvolvedor).
    Pago, entrar com o **usuário de teste** (painel → **Contas de teste**: usuário `TESTUSER…`, senha e
    código de verificação aparecem lá) e pagar com o **cartão de teste** do painel, titular `APRO`
    (pagamento aprovado).
-3. Deve voltar para "Pronto, … é sua" e aparecer "Sua" no hub. Na ativação individual, o pedido vira
+3. Deve voltar para "Pronto, … é sua" e aparecer "Acesso até …" no hub. Na ativação individual, o pedido vira
    "Paga".
 4. Antes de abrir as vendas: rodar de novo `npx wrangler@4 secret put MP_ACCESS_TOKEN` com o token de
    **produção** e trocar o webhook (2.4) para o modo produção.

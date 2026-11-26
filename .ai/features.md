@@ -15,7 +15,8 @@ Ao mudar um comportamento, atualize aqui no mesmo commit.
 
 - **Celular (< 700 px): "app com abas".** Barra fixa embaixo com Início · Jornadas · Meditações · Contato.
   - Início: retrato + slogan + "Um espaço para perceber… Com Andreía Oliveirà."; "Conhecer as jornadas";
-    cartão "Comece aqui" (áudio de boas-vindas, 1 min, com música de fundo); fileiras de jornadas e de meditações (deslizar
+    cartão "Comece aqui" (áudio de boas-vindas, 1 min, com música de fundo; não é meditação: fica só aqui,
+    fora do catálogo e do hub de meditações); fileiras de jornadas e de meditações (deslizar
     com o dedo, pontinhos); faixa dos encontros (TikTok); frase da marca com "Ver as jornadas";
     "Quem já viveu" (só com depoimento real); redes sociais; A Ativadora (retrato, práticas, WhatsApp).
   - Jornadas: o hub de jornadas (F9), compacto por padrão.
@@ -331,16 +332,16 @@ ADR-019 (catálogo), ADR-020 (login e acesso), ADR-021 (página inicial).
 
 **Tag de preço** (uma regra só, em `shared/catalog`, com teste), para jornadas e meditações:
 
-| Situação                              | Tag                     | Botão                             |
-| ------------------------------------- | ----------------------- | --------------------------------- |
-| `status: 'soon'`                      | "Em breve"              | "Quero ser avisada" (pede login)  |
-| Vitrine (página inicial), qualquer um | nenhuma                 | "Conhecer"                        |
-| Hub, sem login, paga                  | "Pago"                  | "Começar jornada" → login         |
-| Hub, sem login, grátis                | nenhuma                 | "Começar jornada" → login         |
-| Hub, logada, paga sem acesso          | preço com cadeado       | "Ver e começar" → janela de preço |
-| Hub, logada, grátis                   | "Grátis"                | "Começar"                         |
-| Logada com acesso válido              | "Sua" (filtro "Minhas") | "Continuar"                       |
-| Acesso vencido                        | preço com cadeado       | "Renovar" → janela de preço       |
+| Situação                              | Tag                                                      | Botão                             |
+| ------------------------------------- | -------------------------------------------------------- | --------------------------------- |
+| `status: 'soon'`                      | "Em breve"                                               | "Quero ser avisada" (pede login)  |
+| Vitrine (página inicial), qualquer um | nenhuma                                                  | "Conhecer"                        |
+| Hub, sem login, paga                  | "Pago"                                                   | "Começar jornada" → login         |
+| Hub, sem login, grátis                | nenhuma                                                  | "Começar jornada" → login         |
+| Hub, logada, paga sem acesso          | preço com cadeado                                        | "Ver e começar" → janela de preço |
+| Hub, logada, grátis                   | "Grátis"                                                 | "Começar"                         |
+| Logada com acesso válido              | "Acesso até X" ou "Acesso para sempre" (filtro "Minhas") | "Continuar"                       |
+| Acesso vencido                        | "Acesso venceu em X" + preço com cadeado                 | "Renovar" → janela de preço       |
 
 **Página inicial (vitrine):** topo da revista com "Conhecer as jornadas" e "Ouvir uma meditação";
 jornadas em destaque (sem preço); meditações ("Pausas guiadas para voltar ao centro"); encontros (sem
@@ -436,26 +437,27 @@ no código, sempre pode.
   publicado ela muda aqui e os dias do editor se reorganizam ao salvar (ADR-036).
 - **Ajudas:** as explicações de cada bloco ficam no "i" ao lado do título (aparecem ao passar o mouse,
   focar ou tocar).
-- **Botões de baixo:** Duplicar, Descartar (quando vale), Ver como fica no hub e Salvar, numa linha só;
-  o aviso de salvo aparece à esquerda deles.
+- **Botões de baixo:** Duplicar, Descartar (quando vale), Ver como fica no hub e Salvar, numa linha só,
+  numa barra presa no rodapé da tela enquanto se rola (como na Anamnese); à esquerda, o aviso de salvo
+  ou "Alterações não salvas".
 
 **Situações do produto: o que cada uma permite** (ADR-035, ADR-036, pedidos de 2026-11-25). Esta
 tabela é a referência: toda regra nova sobre situação entra aqui.
 
-|                                        | Rascunho                               | Em breve                         | Publicada                                 | Indisponível                                                                                                  |
-| -------------------------------------- | -------------------------------------- | -------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Aparece no site (vitrine, hubs, busca) | não                                    | sim, com "Quero ser avisada"     | sim                                       | não                                                                                                           |
-| Destaque na página inicial             | não (a caixinha some)                  | pode                             | pode                                      | não (a caixinha some; ao publicar de novo, volta como estava)                                                 |
-| Quem entra                             | ninguém (só a Andreía no Modo Andreía) | ninguém, nem com acesso liberado | grátis: todo mundo; paga: quem tem acesso | paga: quem tem acesso válido, até o prazo; jornada grátis: quem já começou; meditação grátis: quem tem o link |
-| Comprar                                | não                                    | não                              | sim (paga)                                | não                                                                                                           |
-| Liberar acesso à mão (Acessos)         | não                                    | não                              | sim                                       | sim                                                                                                           |
-| Perfil da pessoa                       | não aparece                            | não aparece                      | para quem começou ou tem acesso           | para quem começou ou tem acesso, com a faixa "Em recolhimento" (com acesso) ou "Indisponível" (vencido)       |
-| Link antigo sem acesso                 | "ainda não está disponível"            | "ainda não está disponível"      | pede login ou o preço                     | "… saiu do ar", com o caminho para o que está no ar                                                           |
-| Editar o produto                       | sim                                    | sim                              | sim                                       | não: só leitura, também no editor da jornada                                                                  |
-| Estrutura da jornada                   | muda, mesmo com dias no editor         | trava se o editor já salvou algo | trava                                     | trava                                                                                                         |
-| Pode ir para                           | Em breve, Publicada                    | Rascunho, Publicada              | só Indisponível ("Inativar produto")      | só Publicada ("Publicar de novo")                                                                             |
-| Duplicar                               | sim                                    | sim                              | sim                                       | sim                                                                                                           |
-| Descartar (sai do catálogo)            | se ninguém nunca teve acesso           | se ninguém nunca teve acesso     | não                                       | paga: se ninguém nunca teve acesso; grátis: não (quem fez sem acesso liberado não aparece)                    |
+|                                        | Rascunho                               | Em breve                         | Publicada                                 | Indisponível                                                                                                                                |
+| -------------------------------------- | -------------------------------------- | -------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aparece no site (vitrine, hubs, busca) | não                                    | sim, com "Quero ser avisada"     | sim                                       | não                                                                                                                                         |
+| Destaque na página inicial             | não (a caixinha some)                  | pode                             | pode                                      | não (a caixinha some; ao publicar de novo, volta como estava)                                                                               |
+| Quem entra                             | ninguém (só a Andreía no Modo Andreía) | ninguém, nem com acesso liberado | grátis: todo mundo; paga: quem tem acesso | paga: quem tem acesso válido, até o prazo; jornada grátis: quem já começou; meditação grátis: quem tem o link                               |
+| Comprar                                | não                                    | não                              | sim (paga)                                | não                                                                                                                                         |
+| Liberar acesso à mão (Acessos)         | não                                    | não                              | sim                                       | sim                                                                                                                                         |
+| Perfil da pessoa                       | não aparece                            | não aparece                      | para quem começou ou tem acesso           | para quem começou ou tem acesso, com a faixa "Em recolhimento" (com acesso) ou "Indisponível" (vencido, com "Ler minhas reflexões" na paga) |
+| Link antigo sem acesso                 | "ainda não está disponível"            | "ainda não está disponível"      | pede login ou o preço                     | "… saiu do ar", com o caminho para o que está no ar                                                                                         |
+| Editar o produto                       | sim                                    | sim                              | sim                                       | não: só leitura, também no editor da jornada                                                                                                |
+| Estrutura da jornada                   | muda, mesmo com dias no editor         | trava se o editor já salvou algo | trava                                     | trava                                                                                                                                       |
+| Pode ir para                           | Em breve, Publicada                    | Rascunho, Publicada              | só Indisponível ("Inativar produto")      | só Publicada ("Publicar de novo")                                                                                                           |
+| Duplicar                               | sim                                    | sim                              | sim                                       | sim                                                                                                                                         |
+| Descartar (sai do catálogo)            | se ninguém nunca teve acesso           | se ninguém nunca teve acesso     | não                                       | paga: se ninguém nunca teve acesso; grátis: não (quem fez sem acesso liberado não aparece)                                                  |
 
 - **Publicada** exige, na jornada, o conteúdo publicado no editor, e publicar o conteúdo exige todos os
   dias salvos (nenhum em rascunho).

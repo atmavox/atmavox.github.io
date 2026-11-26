@@ -10,6 +10,42 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 
 ## [Não lançado]
 
+## [1.37.0] · 2026-11-25
+
+### Adicionado
+
+- "Ler minhas reflexões" (ADR-035): numa jornada paga Indisponível, quem já teve acesso relê o que
+  escreveu depois que o acesso vence. O perfil mostra o botão no cartão; a jornada abre com todas as
+  abas, o aviso "Só para reler" no topo e os campos travados. Regra nova do Firestore: o conteúdo de um
+  produto marcado `retired` em `published/{id}` também é entregue a quem já teve acesso (precisa
+  publicar as regras; até lá, vale o aviso "… saiu do ar").
+- Inativar e publicar de novo também marcam `retired` em `published/{id}`.
+
+### Alterado
+
+- "Boas-vindas" deixou de ser meditação (pedido de 2026-11-25): saiu do hub de meditações, do perfil e
+  do Modo Andreía (o catálogo salvo o ignora e o perde na próxima gravação). O áudio continua na página
+  inicial, no cartão "Comece aqui".
+- Hub Ativações: o cartão "Ficou com alguma dúvida?" olha a própria largura (na coluna estreita do
+  computador, o texto em cima e o botão embaixo; o título não se quebra mais) e ficou mais espaçado.
+
+## [1.36.2] · 2026-11-25
+
+### Alterado
+
+- Modo Andreía · Produtos: a barra dos botões do editor fica presa no rodapé da tela enquanto se rola
+  (como na Anamnese) e volta ao lugar no fim; mostra "Alterações não salvas" quando há mudança sem
+  salvar. No celular, fica acima das abas de baixo. O link virou "Editar o conteúdo →" (mais curto) e
+  fica à esquerda da barra, sem empurrar os botões para outra linha. "Descartar" ganhou o ícone da
+  lixeira, como o "Duplicar" tem o de copiar.
+- Estrutura em semanas: sem a explicação "a cada 7 dias, uma semana nova" (no "i" e embaixo da divisão).
+  A explicação dos títulos dos dias foi para um "i" ao lado de "Títulos dos dias", e o aviso sobre os
+  dias do editor saiu (a janela de confirmação já cobre quando saem dias com conteúdo).
+- Hubs: no lugar de "Sua", a etiqueta mostra "Acesso até X" (ou "Acesso para sempre"); quem já
+  comprou e o acesso venceu vê "Acesso venceu em X" ao lado do preço para renovar.
+- Hub de jornadas, visão compacta no computador: sem os títulos dos dias; a etiqueta de acesso fica na
+  linha da duração e do território, e só o botão à direita.
+
 ## [1.36.1] · 2026-11-25
 
 ### Alterado
@@ -49,7 +85,7 @@ Ao terminar uma tarefa, o Claude Code registra a mudança em "Não lançado". Qu
 - "Descartar" confirma numa janela, sem mexer nos botões ao lado.
 - Rascunho não tem "Destaque na página inicial" (não aparece no site).
 - O aviso de salvo fica na linha dos botões do editor, sem uma linha vazia acima deles.
-- Os textos de ajuda do editor do produto (Situação, Preço e acesso, Estrutura, Banner, Território)
+- Os textos de ajuda do editor do produto (Situação, Preço e acesso, Estrutura, Banner)
   ficam num "i" que mostra a explicação ao passar o mouse, focar ou tocar.
 
 ### Corrigido

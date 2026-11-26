@@ -8,7 +8,12 @@ const journeyHref = (journey: JourneyProduct) => `#/jornada/${journey.id}`
 const pill =
   'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs'
 
-/** A tag de cada jornada (F9): "Em breve", "Pago", preço, "Grátis" ou "Sua". */
+const DATE = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo' })
+
+/**
+ * A tag de cada jornada (F9): "Em breve", "Pago", preço, "Grátis", "Acesso até X" (ou "para
+ * sempre") e, para quem já comprou e venceu, "Acesso venceu em X" com o preço para renovar.
+ */
 export function OfferBadge({ tag }: { tag: OfferTag | null }) {
   if (!tag) return null
   switch (tag.kind) {
@@ -27,7 +32,23 @@ export function OfferBadge({ tag }: { tag: OfferTag | null }) {
       return <span className={`${pill} border-ok/45 font-semibold text-ok`}>Grátis</span>
     case 'owned':
       return (
-        <span className={`${pill} border-transparent bg-ok/14 font-semibold text-ok`}>Sua</span>
+        <span className={`${pill} border-transparent bg-ok/14 font-semibold text-ok`}>
+          {tag.expiresAt === null
+            ? 'Acesso para sempre'
+            : `Acesso até ${DATE.format(tag.expiresAt)}`}
+        </span>
+      )
+    case 'expired':
+      return (
+        <span className="inline-flex flex-wrap items-center gap-1.5">
+          <span className={`${pill} border-line text-ink-muted`}>
+            Acesso venceu em {DATE.format(tag.expiredAt)}
+          </span>
+          <span className={`${pill} border-accent/45 text-sm font-semibold text-accent`}>
+            <Lock aria-hidden size={13} />
+            {formatPrice(tag.priceCents)}
+          </span>
+        </span>
       )
   }
 }

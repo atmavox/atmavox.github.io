@@ -157,12 +157,7 @@ export function ProductEditor({
                 ) : null}
               </div>{' '}
               <div className="flex flex-col gap-1.5">
-                <span className="flex items-center gap-1 text-sm text-ink-muted">
-                  Território
-                  <InfoTip label="Sobre o território">
-                    Agrupa e filtra no hub; dá a cor do banner dos produtos sem imagem.
-                  </InfoTip>
-                </span>
+                <span className="text-sm text-ink-muted">Território</span>
                 <TerritoryPicker
                   value={form.territory}
                   territories={territories}

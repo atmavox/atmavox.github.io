@@ -33,6 +33,8 @@ import { wasPublished } from '../../../shared/catalog/product'
 import { hasStarted } from '../../../shared/progress/progressSummary'
 import { useProgressSummaries } from '../../../shared/progress/useProgressSummaries'
 import { RetiredNotice } from '../../../shared/ui/RetiredNotice'
+import { UiIcon } from '../../../shared/ui/UiIcon'
+import { ReadOnlyContext } from './ReadOnlyContext'
 import { useAccount } from './useAccount'
 import { useJourney } from './useJourney'
 
@@ -98,6 +100,24 @@ export function JourneyApp({ path, loginBackground }: JourneyAppProps) {
     <Suspense fallback={<p className="py-20 text-center text-ink-muted">Carregando…</p>}>
       <EditorApp />
     </Suspense>
+  )
+}
+
+const DATE = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo' })
+
+/** O aviso do topo quando a jornada é só para reler (ADR-035). */
+function RereadBanner({ until }: { until: number }) {
+  return (
+    <p className="mt-4 flex items-start gap-2.5 rounded-2xl bg-gray-state/12 px-4 py-3 text-sm text-ink-muted">
+      <span className="mt-0.5 text-ink-faint">
+        <UiIcon name="book" size={18} />
+      </span>
+      <span>
+        <b className="font-semibold text-ink">Só para reler.</b> Esta jornada saiu do ar e seu
+        acesso terminou em {DATE.format(until)}. Aqui você relê o que escreveu; nada pode ser
+        mudado.
+      </span>
+    </p>
   )
 }
 
@@ -177,9 +197,12 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
       </p>
     )
   }
+  // Indisponível paga, com o acesso vencido: quem já teve acesso relê o que escreveu (ADR-035).
+  let rereadUntil: number | null = null
   if (retired) {
     const hasProgress = hasStarted(retiredProgress.byJourney.get(journeyId))
-    if (!canStillUse(retired, { access: access.accessOf(journeyId), hasProgress, now })) {
+    const productAccess = access.accessOf(journeyId)
+    if (!canStillUse(retired, { access: productAccess, hasProgress, now })) {
       const isChecking =
         retired.pricing.type === 'free' && state?.user
           ? retiredProgress.status !== 'ready'
@@ -191,8 +214,17 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
           </p>
         )
       }
-      return <RetiredNotice title={retired.title} kind="journey" className="min-h-dvh" />
+      if (retired.pricing.type === 'paid' && productAccess?.expiresAt != null) {
+        rereadUntil = productAccess.expiresAt
+      } else {
+        return <RetiredNotice title={retired.title} kind="journey" className="min-h-dvh" />
+      }
     }
+  }
+  const isReadOnly = rereadUntil !== null
+  // Sem a regra nova publicada (ou sem o conteúdo), não há o que reler: vale o aviso de sempre.
+  if (isReadOnly && retired && availability === 'unavailable') {
+    return <RetiredNotice title={retired.title} kind="journey" className="min-h-dvh" />
   }
 
   // A Andreía vê a jornada nova antes de publicar ("Ver como participante").
@@ -267,7 +299,12 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
       )
     }
   }
-  if (product?.pricing.type === 'paid' && !isAdmin && !access.owns(product.id, now)) {
+  if (
+    product?.pricing.type === 'paid' &&
+    !isAdmin &&
+    !isReadOnly &&
+    !access.owns(product.id, now)
+  ) {
     if (access.status === 'loading') {
       return (
         <p aria-busy="true" className="py-20 text-center text-ink-muted">
@@ -279,14 +316,23 @@ function ParticipantApp({ path, loginBackground }: JourneyAppProps) {
   }
 
   return (
-    <div className="min-h-dvh">
-      <JourneyHeader activeTab={activeTab} />
-      <main
-        key={activeTab}
-        className="mx-auto max-w-2xl animate-[page-in_400ms_ease-out] px-4 pb-16 lg:max-w-3xl"
-      >
-        <TabContent tab={activeTab} />
-      </main>
-    </div>
+    <ReadOnlyContext.Provider value={isReadOnly}>
+      <div className="min-h-dvh">
+        <JourneyHeader activeTab={activeTab} />
+        <main
+          key={activeTab}
+          className="mx-auto max-w-2xl animate-[page-in_400ms_ease-out] px-4 pb-16 lg:max-w-3xl"
+        >
+          {rereadUntil !== null && <RereadBanner until={rereadUntil} />}
+          {/* Só leitura: o fieldset desativa todos os campos e botões da página de uma vez. */}
+          <fieldset
+            disabled={isReadOnly}
+            className="contents [&_textarea:disabled]:cursor-default [&_textarea:disabled]:text-ink [&_textarea:disabled]:opacity-100"
+          >
+            <TabContent tab={activeTab} />
+          </fieldset>
+        </main>
+      </div>
+    </ReadOnlyContext.Provider>
   )
 }

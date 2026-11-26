@@ -275,6 +275,14 @@ export function ProductsApp({
   const retired = visible.filter((p) => p.status === 'retired')
   const steps = STEPS.filter((s) => s.id !== 'tipo' || isNew)
 
+  // O formulário como está salvo: o que difere dele é "Alterações não salvas" (como na Anamnese).
+  const [baseline, setBaseline] = useState<ProductForm | null>(null)
+  const loadForm = (next: ProductForm) => {
+    setForm(next)
+    setBaseline(next)
+  }
+  const isDirty = !!form && !!baseline && JSON.stringify(form) !== JSON.stringify(baseline)
+
   async function open(product: Product) {
     saveNotice.hide()
     setIsConfirmingDelete(false)
@@ -286,9 +294,9 @@ export function ProductsApp({
     // dos dias e a trava da estrutura vêm do rascunho dela (ADR-025).
     if (product.kind === 'meditation') {
       const content = await backend.loadMeditationContent(product.id).catch(() => null)
-      setForm(formFromProduct(product, content ?? undefined))
+      loadForm(formFromProduct(product, content ?? undefined))
     } else {
-      setForm(
+      loadForm(
         formFromProduct(
           product,
           undefined,
@@ -303,7 +311,7 @@ export function ProductsApp({
     setErrors({})
     setIsNew(true)
     setStep(0)
-    setForm(emptyForm('journey', Math.max(0, ...products.map((p) => p.order)) + 1))
+    loadForm(emptyForm('journey', Math.max(0, ...products.map((p) => p.order)) + 1))
   }
 
   async function save(allowDrop = false) {
@@ -341,7 +349,7 @@ export function ProductsApp({
     setIsPreviewOpen(false)
     // O formulário continua aberto, agora com o id definitivo (um produto novo ganha o id ao salvar).
     // Saiu de Rascunho com conteúdo no editor: a estrutura passa a mudar só lá.
-    setForm({
+    loadForm({
       ...form,
       id: result.product.id,
       structureLocked:
@@ -425,14 +433,17 @@ export function ProductsApp({
     }
     catalog?.replace(result.catalog)
     setProducts(result.catalog)
+    // Mudar a situação já salva: não conta como alteração por salvar.
     const { status, retiredAt } = result.product
-    setForm((f) => {
+    const withStatus = (f: ProductForm | null) => {
       if (!f) return f
       const next = { ...f, status }
       if (retiredAt === undefined) delete next.retiredAt
       else next.retiredAt = retiredAt
       return next
-    })
+    }
+    setForm(withStatus)
+    setBaseline(withStatus)
     if (!available) setIsRetiredOpen(true)
     saveNotice.show({
       kind: 'ok',
@@ -515,6 +526,7 @@ export function ProductsApp({
     </button>
   ) : savedProduct && canDeleteProduct(savedProduct, everAccessed) ? (
     <button type="button" onClick={() => setIsConfirmingDelete(true)} className={smallGhostButton}>
+      <UiIcon name="trash" size={14} />
       Descartar
     </button>
   ) : null
@@ -592,6 +604,18 @@ export function ProductsApp({
   const noticeLine = saveNotice.notice && (
     <SaveStatus notice={saveNotice.notice} isVisible={saveNotice.isVisible} />
   )
+  // Na barra dos botões (como na Anamnese): o erro fica até a próxima mudança; o "Salvo" esmaece no
+  // lugar enquanto nada mudou; com mudança por salvar, "Alterações não salvas".
+  const barStatus =
+    saveNotice.notice && (saveNotice.notice.kind === 'error' ? saveNotice.isVisible : !isDirty) ? (
+      noticeLine
+    ) : isDirty ? (
+      <span className="text-sm text-draft">Alterações não salvas</span>
+    ) : null
+  /** A barra dos botões fica presa no rodapé da tela enquanto se rola, e volta ao lugar no fim. */
+  const stickyBar = `sticky z-20 rounded-2xl border border-line bg-surface/95 px-4 py-3 backdrop-blur ${
+    isWide ? 'bottom-4' : 'bottom-[76px]'
+  }`
 
   // Os dias (ou temas) de uma jornada se editam no editor da jornada, já montado pela estrutura.
   const contentLink =
@@ -600,7 +624,7 @@ export function ProductsApp({
         href={form.id === 'chama-interna-21' ? '#/jornada/editar' : `#/jornada/${form.id}/editar`}
         className="text-sm font-semibold text-admin-ink hover:underline"
       >
-        Editar o conteúdo da jornada →
+        Editar o conteúdo →
       </a>
     ) : null
 
@@ -645,13 +669,13 @@ export function ProductsApp({
                 wasPublished={!!savedProduct && wasPublished(savedProduct.status)}
                 readOnly={isRetired}
               />
-              {/* À esquerda o link e o aviso; à direita os botões, sempre juntos e na mesma ordem. */}
-              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                <span className="flex min-w-0 flex-1 basis-48 flex-wrap items-center gap-x-4 gap-y-1">
+              {/* À esquerda o link do conteúdo e o aviso; à direita os botões, juntos e na mesma ordem. */}
+              <div className={`${stickyBar} flex items-center justify-between gap-3`}>
+                <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-1 leading-snug">
                   {contentLink}
-                  {noticeLine}
+                  {barStatus}
                 </span>
-                <div className="ml-auto flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center gap-2">
                   {duplicateControl}
                   {deleteControl}
                   {republishControl}
@@ -764,32 +788,35 @@ export function ProductsApp({
           readOnly={isRetired}
         />
       )}
-      {noticeLine}
-      <div className="flex justify-between gap-3">
-        <button
-          type="button"
-          onClick={() => (step === 0 ? setForm(null) : setStep(step - 1))}
-          className={ghostButton}
-        >
-          <ArrowLeft aria-hidden size={16} />
-          {isLast ? 'Voltar para arrumar' : 'Voltar'}
-        </button>
-        {isLast ? (
-          isRetired ? null : (
-            <button
-              type="button"
-              onClick={() => void save()}
-              disabled={isSaving}
-              className={adminButton}
-            >
-              {isSaving ? 'Salvando…' : 'Salvar'}
-            </button>
-          )
-        ) : (
-          <button type="button" onClick={() => setStep(step + 1)} className={adminButton}>
-            Continuar →
+      {/* Celular: a mesma barra presa no rodapé, acima das abas de baixo. */}
+      <div className={`${stickyBar} flex flex-col gap-2`}>
+        {barStatus}
+        <div className="flex justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => (step === 0 ? setForm(null) : setStep(step - 1))}
+            className={ghostButton}
+          >
+            <ArrowLeft aria-hidden size={16} />
+            {isLast ? 'Voltar para arrumar' : 'Voltar'}
           </button>
-        )}
+          {isLast ? (
+            isRetired ? null : (
+              <button
+                type="button"
+                onClick={() => void save()}
+                disabled={isSaving}
+                className={adminButton}
+              >
+                {isSaving ? 'Salvando…' : 'Salvar'}
+              </button>
+            )
+          ) : (
+            <button type="button" onClick={() => setStep(step + 1)} className={adminButton}>
+              Continuar →
+            </button>
+          )}
+        </div>
       </div>
       {retireDialog}
       {discardDialog}

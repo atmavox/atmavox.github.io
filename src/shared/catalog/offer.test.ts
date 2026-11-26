@@ -63,13 +63,17 @@ describe('productOffer', () => {
     })
   })
 
-  it('com acesso válido mostra "Sua" e continua; vencido pede renovação', () => {
+  it('com acesso válido mostra até quando e continua; vencido mostra que venceu e pede renovação', () => {
     expect(productOffer(base, { ...hub, access: access(null) })).toEqual({
-      tag: { kind: 'owned' },
+      tag: { kind: 'owned', expiresAt: null },
+      action: 'continue',
+    })
+    expect(productOffer(base, { ...hub, access: access(NOW + 1) })).toEqual({
+      tag: { kind: 'owned', expiresAt: NOW + 1 },
       action: 'continue',
     })
     expect(productOffer(base, { ...hub, access: access(NOW - 1) })).toEqual({
-      tag: { kind: 'price', priceCents: 9700 },
+      tag: { kind: 'expired', priceCents: 9700, expiredAt: NOW - 1 },
       action: 'renew',
     })
   })

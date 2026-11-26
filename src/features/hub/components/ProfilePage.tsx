@@ -102,6 +102,7 @@ function JourneyTrailCard({
   compact,
   note = null,
   canContinue = true,
+  canReread = false,
 }: {
   journey: JourneyProduct
   trail: Trail
@@ -111,6 +112,8 @@ function JourneyTrailCard({
   note?: RetiredNote | null
   /** Sem acesso (Indisponível e vencida): a trilha fica, sem "Continuar". */
   canContinue?: boolean
+  /** Indisponível paga e vencida: "Ler minhas reflexões" abre a jornada só para reler (ADR-035). */
+  canReread?: boolean
 }) {
   const finished = trail.nextDay === null
   const percent = trail.totalDays > 0 ? Math.round((trail.doneDays / trail.totalDays) * 100) : 0
@@ -210,6 +213,15 @@ function JourneyTrailCard({
             )
           })}
         </ol>
+        {canReread && (
+          <a
+            href={`#/jornada/${journey.id}`}
+            className="inline-flex min-h-10 items-center gap-2 self-start rounded-full border border-line px-4 text-sm font-semibold text-ink-muted transition-colors hover:border-accent/50 hover:text-accent"
+          >
+            <UiIcon name="book" size={16} />
+            Ler minhas reflexões
+          </a>
+        )}
         {finished && <p className="text-sm text-ink-faint">Jornada concluída ✦</p>}
       </div>
     </section>
@@ -324,7 +336,12 @@ export function ProfilePage({
       now,
     })
     const note = retiredNote(journey, { access: productAccess, now })
-    return [{ journey, trail, summary, canContinue, note }]
+    const canReread =
+      !canContinue &&
+      journey.status === 'retired' &&
+      journey.pricing.type === 'paid' &&
+      productAccess !== undefined
+    return [{ journey, trail, summary, canContinue, note, canReread }]
   })
   const current =
     journeys.find((j) => j.canContinue && j.trail.nextDay !== null && j.trail.doneDays > 0) ??
@@ -400,7 +417,7 @@ export function ProfilePage({
       emptyJourneys
     ) : (
       <div className={`grid gap-5 ${isWide ? 'grid-cols-2' : ''}`}>
-        {journeys.map(({ journey, trail, note, canContinue }) => (
+        {journeys.map(({ journey, trail, note, canContinue, canReread }) => (
           <JourneyTrailCard
             key={journey.id}
             journey={journey}
@@ -409,6 +426,7 @@ export function ProfilePage({
             compact={compact}
             note={note}
             canContinue={canContinue}
+            canReread={canReread}
           />
         ))}
       </div>

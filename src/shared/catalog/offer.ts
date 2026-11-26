@@ -20,8 +20,11 @@ export type OfferTag =
   | { kind: 'soon' }
   | { kind: 'paid' }
   | { kind: 'price'; priceCents: number }
+  /** Já comprou e o acesso venceu: o preço para renovar e quando venceu (pedido de 2026-11-25). */
+  | { kind: 'expired'; priceCents: number; expiredAt: number }
   | { kind: 'free' }
-  | { kind: 'owned' }
+  /** Acesso válido: até quando (`null` = para sempre). */
+  | { kind: 'owned'; expiresAt: number | null }
 
 export type OfferAction =
   | 'notify' // "Quero ser avisada"
@@ -56,10 +59,17 @@ export function productOffer(product: Product, ctx: OfferContext): Offer {
   if (!ctx.logged)
     return { tag: pricing.type === 'paid' ? { kind: 'paid' } : null, action: 'login' }
   if (pricing.type === 'free') return { tag: { kind: 'free' }, action: 'start' }
-  if (hasValidAccess(ctx.access, ctx.now)) return { tag: { kind: 'owned' }, action: 'continue' }
-
-  const price: OfferTag = { kind: 'price', priceCents: pricing.priceCents }
-  return { tag: price, action: ctx.access ? 'renew' : 'see-price' }
+  const { access } = ctx
+  if (access && hasValidAccess(access, ctx.now)) {
+    return { tag: { kind: 'owned', expiresAt: access.expiresAt }, action: 'continue' }
+  }
+  if (access?.expiresAt != null) {
+    return {
+      tag: { kind: 'expired', priceCents: pricing.priceCents, expiredAt: access.expiresAt },
+      action: 'renew',
+    }
+  }
+  return { tag: { kind: 'price', priceCents: pricing.priceCents }, action: 'see-price' }
 }
 
 /** Quando vence um acesso liberado agora: soma meses no calendário (31/01 + 1 mês = 28 ou 29/02). */

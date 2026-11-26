@@ -1,6 +1,7 @@
 import { useContext, useSyncExternalStore } from 'react'
 import type { AccessOptions } from '../domain/access'
 import { JourneyContext } from './JourneyContext'
+import { useIsReadOnly } from './ReadOnlyContext'
 import { useReleaseClock } from './releaseClock'
 
 const noSubscription = () => () => {}
@@ -17,7 +18,11 @@ export function useJourney() {
     account ? () => account.getSnapshot().isAdmin : notAdmin,
   )
   const now = useReleaseClock()
-  /** A admin vê tudo, sem cadeados (ADR-013); os dias abrem pelo calendário (ADR-024). */
-  const access: AccessOptions = { bypass: isAdmin, now }
+  const isReadOnly = useIsReadOnly()
+  /**
+   * A admin vê tudo, sem cadeados (ADR-013); quem só relê também (ADR-035). Os dias abrem pelo
+   * calendário (ADR-024).
+   */
+  const access: AccessOptions = { bypass: isAdmin || isReadOnly, now }
   return { journey, content, store, progress, access, isAdmin }
 }

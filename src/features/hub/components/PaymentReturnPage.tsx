@@ -77,7 +77,7 @@ export function PaymentReturnPage({
         <h1 className="font-display text-3xl text-ink">Pagamento em análise</h1>
         <p className="text-ink-muted">
           Assim que o Mercado Pago confirmar, o acesso é liberado sozinho na sua conta
-          {product ? ` e ${product.title} aparece como "Sua"` : ''}.
+          {product ? ` e ${product.title} aparece com a data até quando é sua` : ''}.
         </p>
         <a href={backHref} className={ghost}>
           Voltar para a lista

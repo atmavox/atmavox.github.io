@@ -616,8 +616,10 @@ adicione um registro novo e marque o antigo como "Substituída por ADR-00X".
   não deixam a admin ler o progresso das pessoas).
 - **Consequências:** ➕ sem regra nova nem coleção: o acesso continua sendo `expiresAt`. ➖ versões
   antigas do site em cache ignoram o produto Indisponível até recarregar; ler as próprias reflexões
-  depois que o acesso vence ainda depende de um passo seguinte (o conteúdo pago só é entregue com acesso
-  válido).
+  depois que o acesso vence exigiu, na 1.37.0, a marca `retired` em `published/{id}` e a regra
+  `hadAccess` (quem tem o documento de acesso, mesmo vencido); a jornada abre só para leitura
+  (`ReadOnlyContext` + fieldset desativado). Só vale para Indisponível: no produto no ar, acesso vencido
+  continua pedindo renovação.
 
 ## ADR-036 · Estrutura de jornada em Rascunho muda pelo produto
 

@@ -7,8 +7,9 @@ export type AvailabilityResult =
   { kind: 'changed'; catalog: Product[]; product: Product } | { kind: 'error'; message: string }
 
 /**
- * Inativa um produto publicado ("Inativar produto", ADR-035) ou o publica de novo. Só o catálogo
- * muda: o conteúdo e os acessos ficam como estão, e quem tem acesso continua até o prazo.
+ * Inativa um produto publicado ("Inativar produto", ADR-035) ou o publica de novo. Mudam o catálogo
+ * e a marca `retired` do `published/{id}`; o conteúdo e os acessos ficam como estão, e quem tem
+ * acesso continua até o prazo.
  */
 export async function setAvailability(
   product: Product,
@@ -30,6 +31,8 @@ export async function setAvailability(
   let next: Product[]
   try {
     next = upsertProduct(catalog, changed)
+    // Primeiro o `published/{id}`: é por ele que as regras deixam quem teve acesso reler o conteúdo.
+    await backend.setRetired(product.id, !available)
     await backend.saveCatalog(next)
   } catch {
     return {

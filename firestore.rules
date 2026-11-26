@@ -41,6 +41,13 @@ service cloud.firestore {
             || get(path).data.expiresAt > request.time.toMillis());
     }
 
+    // Já teve acesso, mesmo vencido (ADR-035): só vale para produto Indisponível, para reler as
+    // próprias reflexões.
+    function hadAccess(productId) {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/access/$(productId));
+    }
+
     // Catálogo (ADR-019): o que a vitrine e os hubs mostram, sem conteúdo. Qualquer pessoa lê.
     match /catalog/{doc} {
       allow read: if true;
@@ -48,10 +55,12 @@ service cloud.firestore {
     }
 
     // Conteúdo de cada produto (ADR-020). Grátis: qualquer pessoa lê. Pago: só quem tem acesso válido
-    // (ou a admin). Documentos antigos sem `free` contam como grátis (a jornada de 21 dias).
+    // (ou a admin); Indisponível (`retired`, ADR-035): também quem já teve acesso, só para reler.
+    // Documentos antigos sem `free` contam como grátis (a jornada de 21 dias).
     // Só leitura de um documento por vez: ninguém lista o conteúdo de todos.
     match /published/{productId} {
-      allow get: if resource.data.get('free', true) == true || isAdmin() || hasAccess(productId);
+      allow get: if resource.data.get('free', true) == true || isAdmin() || hasAccess(productId)
+        || (resource.data.get('retired', false) == true && hadAccess(productId));
       allow list: if false;
       allow write: if isAdmin() && request.resource.size() < 1000 * 1024;
     }

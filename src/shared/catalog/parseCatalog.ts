@@ -125,13 +125,19 @@ function parseProduct(raw: unknown): Product | undefined {
   return undefined
 }
 
+/**
+ * Ids que já não são produtos: "boas-vindas" é o áudio de boas-vindas da página inicial, não uma
+ * meditação (pedido de 2026-11-25). Saem do catálogo salvo na próxima vez que a Andreía salvar.
+ */
+const NOT_PRODUCTS: ReadonlySet<string> = new Set(['boas-vindas'])
+
 export function parseCatalog(raw: unknown): Product[] | null {
   if (!Array.isArray(raw)) return null
   const products: Product[] = []
   const seen = new Set<string>()
   for (const item of raw) {
     const product = parseProduct(item)
-    if (!product || seen.has(product.id)) continue
+    if (!product || seen.has(product.id) || NOT_PRODUCTS.has(product.id)) continue
     seen.add(product.id)
     products.push(product)
   }

@@ -119,25 +119,13 @@ export function CompactJourneyRow({ journey, offer, onPurchase }: CardProps) {
           </p>
         )}
       </div>
-      <div className="flex min-w-0 flex-col gap-2">
-        <div className="flex flex-wrap gap-1.5">
-          <Meta journey={journey} />
-        </div>
-        {cardTiles(journey).length > 0 && (
-          <ul aria-label="Temas" className="flex flex-wrap gap-1.5">
-            {cardTiles(journey).map((theme) => (
-              <li
-                key={theme.label}
-                className="rounded-lg bg-gold/12 px-2 py-1 text-xs text-ink-muted"
-              >
-                {theme.title}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      <div className="flex flex-col items-end gap-2">
+      {/* Compacta (pedido de 2026-11-25): sem os títulos dos dias; a etiqueta de acesso fica na
+          linha da duração e do território. */}
+      <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+        <Meta journey={journey} />
         <OfferBadge tag={offer.tag} />
+      </div>
+      <div className="flex justify-end">
         <OfferButton action={offer.action} journey={journey} onPurchase={onPurchase} />
       </div>
     </article>

@@ -342,8 +342,9 @@ Surgiu no caminho:
     - [x] (1.35.0) Inativar produto (ADR-035): cartão Disponível com quem tem acesso, confirmação,
           Indisponível com "Publicar de novo", grupo recolhido na lista, faixa "Em recolhimento" no
           perfil e aviso "… saiu do ar" no link antigo
-    - [ ] **Ler minhas reflexões** depois que o acesso a um produto Indisponível vence (só leitura;
-          precisa de regra nova no Firestore para entregar o conteúdo a quem já teve acesso)
+    - [x] (1.37.0) **Ler minhas reflexões** depois que o acesso a um produto Indisponível vence (só
+          leitura; regra nova no Firestore)
+    - [ ] Publicar as regras do Firestore da 1.37.0 (`processos-manuais.md`) e conferir a releitura
     - [ ] Conferir no site publicado: inativar uma meditação de teste, ver o perfil e o link antigo - [ ] **Histórico da agenda de ativações** (ideia de 2026-11-25, aguardando escolha do mock):
           "Movimentações recentes" com o que mudou (pedido novo, pago, reservado, confirmado, vencido,
           cancelado, faixa livre criada/mudada/tirada); ver a proposta na conversa de 2026-11-25

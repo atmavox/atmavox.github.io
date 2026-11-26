@@ -24,11 +24,8 @@ describe('meditações do hub', () => {
     expect(formatDuration(300)).toBe('5 min')
   })
 
-  it('as gratuitas trazem o link certo: áudio no player, vídeo no YouTube', () => {
-    expect(toHubAudio(allMeditations.find((m) => m.id === 'boas-vindas')!)).toMatchObject({
-      audioSrc: '/audio/atmavox-boas-vindas.m4a',
-      meta: 'Áudio · 1 min',
-    })
+  it('as gratuitas trazem o link certo (o vídeo, no YouTube)', () => {
+    expect(allMeditations.some((m) => m.id === 'boas-vindas')).toBe(false)
     expect(toHubAudio(allMeditations.find((m) => m.id === 'retorne-ao-seu-centro')!)).toMatchObject(
       { youtubeId: 'jKuKSAQUTCA', kind: 'video' },
     )
@@ -69,9 +66,9 @@ describe('conteúdo de meditação paga', () => {
   })
 
   it('"Minhas" mostra só as que a pessoa tem; o filtro só aparece com alguma', () => {
-    const owned = new Set(['boas-vindas'])
+    const owned = new Set(['retorne-ao-seu-centro'])
     expect(filterMeditations(allMeditations, 'minhas', owned).map((m) => m.id)).toEqual([
-      'boas-vindas',
+      'retorne-ao-seu-centro',
     ])
     expect(availableMeditationFilters(allMeditations, { logged: true })).not.toContain('minhas')
     expect(availableMeditationFilters(allMeditations, { logged: true, owned })).toContain('minhas')

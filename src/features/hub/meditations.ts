@@ -39,7 +39,6 @@ export function parseMeditationContent(json: string): MeditationMedia | null {
 
 /** Links das meditações gratuitas. */
 export const FREE_MEDIA: Readonly<Record<string, MeditationMedia>> = {
-  'boas-vindas': { audioSrc: '/audio/atmavox-boas-vindas.m4a' },
   'retorne-ao-seu-centro': { youtubeId: 'jKuKSAQUTCA' },
 }
 

@@ -22,6 +22,8 @@ describe('inativar e publicar de novo', () => {
       retiredAt: NOW,
     })
     expect(backend.free.has(journey.id)).toBe(false)
+    // A marca no `published/{id}` é o que deixa quem teve acesso reler o conteúdo.
+    expect(backend.retired.has(journey.id)).toBe(true)
   })
 
   it('publicar de novo: volta a Publicada, sem a data de quando saiu', async () => {
@@ -32,6 +34,7 @@ describe('inativar e publicar de novo', () => {
     if (result.kind !== 'changed') throw new Error(result.message)
     expect(result.product.status).toBe('published')
     expect(result.product).not.toHaveProperty('retiredAt')
+    expect(backend.retired.has(journey.id)).toBe(false)
   })
 
   it('só inativa o que está Publicado', async () => {

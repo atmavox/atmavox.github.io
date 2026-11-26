@@ -1,5 +1,5 @@
 // Os acessos de quem está logado (`users/{uid}/access/{productId}`, ADR-020), carregados quando a
-// pessoa entra. O hub usa para "Sua", "Renovar" e "Minhas"; a jornada, para abrir uma jornada paga.
+// pessoa entra. O hub usa para "Acesso até…", "Renovar" e "Minhas"; a jornada, para abrir uma jornada paga.
 import type { AuthSession } from '../auth/session'
 import type { ProductAccess } from './offer'
 
@@ -47,7 +47,7 @@ export function createAccessStore({
       if (request !== requestId) return
       set({ status: 'ready', byProduct: new Map(list.map((a) => [a.productId, a])) })
     } catch {
-      // Sem rede: ninguém perde nada, só não aparece "Sua" até a próxima tentativa.
+      // Sem rede: ninguém perde nada, só não aparece "Acesso até…" até a próxima tentativa.
       if (request === requestId) set({ status: 'ready', byProduct: new Map() })
     }
   }

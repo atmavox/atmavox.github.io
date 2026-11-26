@@ -1,7 +1,8 @@
 import { useId, useState } from 'react'
-import { groupName, MAX_DAY_COUNT, weekCountOf } from '../../../shared/catalog/journeyLayout'
+import { groupName, MAX_DAY_COUNT } from '../../../shared/catalog/journeyLayout'
 import { toRoman } from '../../../shared/lib/roman'
 import { useMediaQuery } from '../../../shared/lib/useMediaQuery'
+import { InfoTip } from '../../../shared/ui/InfoTip'
 import { UiIcon } from '../../../shared/ui/UiIcon'
 import type { FormErrors, ProductForm } from '../domain/productForm'
 import {
@@ -174,25 +175,34 @@ function DayTitles({
   const panelId = useId()
   return (
     <div className="border-t border-line pt-3.5">
-      <button
-        type="button"
-        aria-expanded={isOpen}
-        aria-controls={panelId}
-        onClick={() => setIsOpen((open) => !open)}
-        className="flex w-full items-center justify-between gap-2.5 text-left font-medium text-ink"
-      >
-        <span>
+      {/* O "i" fica entre o título e a seta, fora do botão (botão não pode ter outro dentro). */}
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          aria-expanded={isOpen}
+          aria-controls={panelId}
+          onClick={() => setIsOpen((open) => !open)}
+          className="min-w-0 text-left font-medium text-ink"
+        >
           Títulos dos dias{' '}
           <span className="text-sm font-normal text-ink-faint">
             (opcional · {named} de {form.dayCount} com título)
           </span>
-        </span>
-        <span
-          className={`text-ink-faint transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        </button>
+        <InfoTip label="Sobre os títulos dos dias">
+          Sem título, o dia aparece como "Dia 4". Os 3 primeiros dias com título viram os cartões do
+          banner.
+        </InfoTip>
+        <button
+          type="button"
+          aria-hidden="true"
+          tabIndex={-1}
+          onClick={() => setIsOpen((open) => !open)}
+          className={`ml-auto grid size-8 place-items-center text-ink-faint transition-transform duration-200 motion-reduce:transition-none ${isOpen ? 'rotate-180' : ''}`}
         >
           <UiIcon name="down" />
-        </span>
-      </button>
+        </button>
+      </div>
       {isOpen && (
         <div id={panelId} className="mt-3 flex animate-[fade-in_250ms_ease-out] flex-col gap-2.5">
           {groups.map((group) => {
@@ -243,14 +253,8 @@ export function StructureSection({ form, errors, onChange }: StructureSectionPro
         ? '"+ Parte" divide a última parte ao meio. Mudar a ordem troca os nomes; os dias de cada faixa ficam onde estão.'
         : form.split === 'none'
           ? 'Os dias seguem corridos, sem grupos. No caderno, uma aba "Dias".'
-          : 'A cada 7 dias, uma semana nova.',
-    form.layout === 'days' && !locked
-      ? 'Sem título, o dia aparece como "Dia 4". Os 3 primeiros dias com título viram os cartões do banner.'
-      : '',
+          : '',
     !isWide && !locked ? 'Para mudar a ordem, segure um item e arraste.' : '',
-    !locked && form.hasEditorContent
-      ? 'A jornada está em Rascunho: ao salvar, os dias que você já montou no editor vão para a estrutura nova, na mesma ordem.'
-      : '',
   ]
     .filter(Boolean)
     .join(' ')
@@ -307,10 +311,6 @@ export function StructureSection({ form, errors, onChange }: StructureSectionPro
             />
             {form.split === 'weeks' && (
               <>
-                <p className="text-xs text-ink-faint">
-                  {plural(weekCountOf(form.dayCount), 'semana', 'semanas')}: a cada 7 dias, uma
-                  semana nova.
-                </p>
                 <TrailList
                   isWide={isWide}
                   disabled={locked}

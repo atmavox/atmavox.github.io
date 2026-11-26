@@ -16,7 +16,7 @@ import type { ProductsBackend } from '../infrastructure/productsBackend'
 const BUILT_IN_JOURNEYS: readonly string[] = ['chama-interna-21']
 
 export const UNPUBLISHED_JOURNEY =
-  'Para marcar como Publicada, publique antes o conteúdo da jornada (em "Editar o conteúdo da jornada"). Até lá, deixe em Rascunho ou Em breve.'
+  'Para marcar como Publicada, publique antes o conteúdo da jornada (em "Editar o conteúdo"). Até lá, deixe em Rascunho ou Em breve.'
 
 /**
  * Ao abrir uma jornada: os títulos dos dias e se a estrutura travou. Trava quando o conteúdo já foi
